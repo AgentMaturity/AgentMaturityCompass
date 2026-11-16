@@ -1982,7 +1982,7 @@
   {
     "packId": "privacy-security-mobility",
     "questionId": "pack",
-    "citation": "ISO/SAE 21434",
+    "citation": "ISO 21434",
     "instrument": "ISO/SAE 21434 Road vehicles, cybersecurity engineering",
     "clause": "whole instrument",
     "verdict": "unverifiable",
@@ -1992,7 +1992,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year was taken out of the citation and the question text because it could not be confirmed; the old label 'ISO 21434:2021' also lacked the SAE co-designation used elsewhere in the pack."
+    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year was taken out of the citation and the question text because it could not be confirmed ('ISO 21434:2021' became 'ISO 21434')."
   },
   {
     "packId": "privacy-security-mobility",
@@ -2042,21 +2042,6 @@
   {
     "packId": "privacy-security-mobility",
     "questionId": "pack",
-    "citation": "ISO/IEC 27701",
-    "instrument": "ISO/IEC 27701 Privacy information management systems",
-    "clause": "whole instrument",
-    "verdict": "unverifiable",
-    "was": null,
-    "now": null,
-    "sourceTitle": null,
-    "sourceUrl": null,
-    "checkedOn": "2026-11-16",
-    "checkedBy": "ai-agent",
-    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year was taken out of the citation and the question text because it could not be confirmed (':2025')."
-  },
-  {
-    "packId": "privacy-security-mobility",
-    "questionId": "pack",
     "citation": "Annex III §1 — biometrics (remote biometric identification, biometric categorisation, emotion recognition) where used; §6 only for law-enforcement use",
     "instrument": "Regulation (EU) 2024/1689 (Artificial Intelligence Act)",
     "clause": "Annex III points 1 and 6",
@@ -2082,22 +2067,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32016R0679",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Pseudonymisation and data minimisation as examples of by-design measures; purpose limitation is an Art. 5(1)(b) principle that Art. 25 implements."
-  },
-  {
-    "packId": "privacy-security-mobility",
-    "questionId": "MOB-PS-1",
-    "citation": "ISO/IEC 27701",
-    "instrument": "ISO/IEC 27701 Privacy information management systems",
-    "clause": "whole instrument",
-    "verdict": "unverifiable",
-    "was": null,
-    "now": null,
-    "sourceTitle": null,
-    "sourceUrl": null,
-    "checkedOn": "2026-11-16",
-    "checkedBy": "ai-agent",
-    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year was taken out of the citation and the question text because it could not be confirmed (also in the L5 text and the detail file)."
+    "note": "Pseudonymisation and data minimisation as examples of by-design measures; purpose limitation is an Art. 5(1)(b) principle that Art. 25 implements. The second citation 'ISO/IEC 27701:2025' (also listed in the pack's regulatory basis) was removed: www.iso.org answered HTTP 403, so the edition could not be confirmed, and without the year the catalogue cannot resolve it. The L5 text and the framework list still name ISO/IEC 27701."
   },
   {
     "packId": "privacy-security-mobility",
@@ -2252,7 +2222,7 @@
   {
     "packId": "privacy-security-mobility",
     "questionId": "MOB-PS-11",
-    "citation": "ISO/SAE 21434 Clause 15",
+    "citation": "ISO 21434 Clause 15",
     "instrument": "ISO/SAE 21434 Road vehicles, cybersecurity engineering",
     "clause": "Clause 15",
     "verdict": "unverifiable",

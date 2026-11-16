@@ -13440,7 +13440,7 @@
         "l3": "Agent implements data minimization for primary data flows and pseudonymises stored data, but does not systematically enforce purpose limitation or automate privacy impact assessment",
         "l4": "Minimisation, pseudonymisation and technical purpose limitation are enforced, but some high-risk processing has no DPIA or the controls are not mapped to ISO/IEC 27701.",
         "l5": "Minimisation and pseudonymisation are enforced in configuration for every processing activity, purpose limitation is enforced technically, a DPIA exists for each high-risk processing operation, and the controls are mapped to ISO/IEC 27701.",
-        "regulatoryRef": "GDPR Art. 25; ISO/IEC 27701",
+        "regulatoryRef": "GDPR Art. 25",
         "remediation": "Bind each data field the agent can read to its declared processing purpose, and reject queries that request fields outside that purpose.",
         "text": "Does the agent implement data protection by design per GDPR Article 25 including data minimization, pseudonymisation, and purpose limitation in all data processing activities?",
         "weight": 15
@@ -13600,7 +13600,7 @@
         "l3": "A TARA exists, but attack-path analysis, traceability to cybersecurity goals, or change-triggered review is incomplete.",
         "l4": "Each item has a versioned TARA traced to cybersecurity goals, but re-assessment after a change or incident is not always recorded.",
         "l5": "Each item has a versioned TARA with all listed artefacts, traceability to goals and requirements, and a recorded re-assessment after each relevant change or incident.",
-        "regulatoryRef": "ISO/SAE 21434 Clause 15",
+        "regulatoryRef": "ISO 21434 Clause 15",
         "remediation": "Trigger a TARA re-run whenever the agent records a change to an item's interfaces or software or a related field incident, and block release until it is recorded.",
         "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
         "weight": 15
@@ -13730,11 +13730,10 @@
       "GDPR Art. 5/25/32",
       "CCPA/CPRA §1798.100",
       "UNECE WP.29 R155/R156",
-      "ISO/SAE 21434",
+      "ISO 21434",
       "ETSI EN 303 645 V3.1.3",
       "EU NIS2 Directive 2022/2555",
-      "NIST CSF 2.0",
-      "ISO/IEC 27701"
+      "NIST CSF 2.0"
     ],
     "regulatoryReferences": [
       {
@@ -13764,11 +13763,13 @@
         "text": "UNECE WP.29 R155/R156"
       },
       {
-        "citation": "ISO/SAE 21434",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
-        "status": "unverified",
-        "text": "ISO/SAE 21434"
+        "citation": "ISO/SAE 21434:2021 Road vehicles — Cybersecurity engineering",
+        "instrumentId": "iso-21434",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
+        "status": "in-force",
+        "text": "ISO 21434",
+        "url": "https://www.iso.org/standard/70918.html"
       },
       {
         "citation": "ETSI EN 303 645 Cyber security for consumer IoT",
@@ -13796,13 +13797,6 @@
         "status": "in-force",
         "text": "NIST CSF 2.0",
         "url": "https://www.nist.gov/cyberframework"
-      },
-      {
-        "citation": "ISO/IEC 27701",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
-        "status": "unverified",
-        "text": "ISO/IEC 27701"
       }
     ],
     "riskTier": "critical",
