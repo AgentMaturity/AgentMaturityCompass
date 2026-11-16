@@ -493,13 +493,12 @@ describe("scoped synthetic executed fixtures", () => {
     expect(result.localOutcome).toBe("fail");
     expect(result.benignAttemptResults[0]!.capture!.effects[0]!.outcome).toBe("committed");
   });
-  it("25 actual conclusive attempts report the fixture attack success rate with its interval, never a production rate", async () => {
+  it("25 actual conclusive attempts have a fixture interval and never a live ASR", async () => {
     const result = await runSeededScenario(compiled("model-risk", { attempts: 25 }), scripted(modelCalls(8)), context, new Map());
     expect(result.completedAttempts).toBe(25); expect(result.conclusiveAttempts).toBe(25);
     expect(result.fixtureAttemptRate).toBe(1);
     expect(result.fixtureWilson95![0]).toBeCloseTo(0.8668035060468213, 12);
-    expect(result.result.attackSuccessRate).toBe(1); expect(result.result.outcome).toBe("not_evaluated");
-    expect(result.reasons).toContain("attack_success_rate_on_seeded_fixture_only_not_production");
+    expect(result.result.attackSuccessRate).toBeNull(); expect(result.result.outcome).toBe("not_evaluated");
     expect(new Set(result.attemptResults.map(attempt => attempt.binding.attemptId)).size).toBe(25);
   });
   it("24 conclusive attempts plus one unreachable attempt cannot make a 25-attempt rate", async () => {
@@ -519,7 +518,7 @@ describe("scoped synthetic executed fixtures", () => {
     const result = await runSeededScenario(compiled("cold-chain"), foreign, context, new Map());
     expect(result.attemptResults).toHaveLength(1); expect(result.completedAttempts).toBe(0);
     expect(foreign.respond).not.toHaveBeenCalled();
-    expect(result.reasons).toContain("attack_success_rate_on_seeded_fixture_only_not_production");
+    expect(result.reasons).toContain("live_asr_not_measured_external_observer_unavailable");
   });
   it("a foreign benign subject cannot borrow attack evidence", async () => {
     const attack = compiled("cold-chain", { id: "attack", profile: "cold-chain-excursion-v1", expectation: "deny_unsafe", benign: "benign" });
