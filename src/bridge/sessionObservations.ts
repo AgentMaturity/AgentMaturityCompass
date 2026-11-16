@@ -21,6 +21,8 @@ import { sha256Hex } from "../utils/hash.js";
 import { verifyBridgeLease } from "./bridgeAuth.js";
 import { appendVerified, observationId } from "./claudeCodeObservations.js";
 import { consumeObservedHookRateLimit } from "./hookIngress.js";
+import { HookControlError } from "./hookProviders.js";
+import { recordLeasedObservation } from "./leasedObservation.js";
 
 export type SessionProvider = "claude-code" | "codex";
 const MAX_SESSION_EVENT_BYTES = 262_144;
@@ -45,9 +47,13 @@ const digest = (value: unknown) => {
 
 /** What AMC keeps of one session hook payload: never its text, and never anything that can fail. */
 export function readSessionEvent(provider: SessionProvider, rawInput: string): Json {
+  return readSession(provider, rawInput).read;
+}
+
+function readSession(provider: SessionProvider, rawInput: string): { read: Json; sessionId: string | null } {
   let parsed: unknown = null;
   try { parsed = JSON.parse(rawInput); } catch { /* recorded as unreadable */ }
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { event: "unreadable", payload: digest(rawInput) };
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { read: { event: "unreadable", payload: digest(rawInput) }, sessionId: null };
   const input = parsed as Json;
   const named = typeof input.hook_event_name === "string" ? input.hook_event_name : null;
   const event = named !== null && SESSION_EVENTS[provider].includes(named) ? named : named === null ? "unreadable" : "unknown";
@@ -58,26 +64,32 @@ export function readSessionEvent(provider: SessionProvider, rawInput: string): J
   for (const key of DIGESTED) if (input[key] !== undefined) reported[key] = digest(input[key]);
   for (const key of ["stop_hook_active", "is_interrupt"] as const) if (typeof input[key] === "boolean") reported[key] = input[key];
   const unknownFields = Object.keys(input).filter((key) => !COMMON.has(key)).length;
-  return { event, ...(event === "unknown" ? { eventName: digest(named) } : {}),
+  return { sessionId, read: { event, ...(event === "unknown" ? { eventName: digest(named) } : {}),
     sessionSha256: sessionId === null ? null : provider === "codex" ? codexSessionSha256(sessionId) : claudeSessionSha256(sessionId),
-    reported, ...(unknownFields > 0 ? { unknownFields } : {}) };
+    reported, ...(unknownFields > 0 ? { unknownFields } : {}) } };
 }
 
-/** Record one session hook report as the provider's own word, under the lease's agent. Signed and verified as written. */
+/**
+ * Record one session hook report as the provider's own word, under the lease's agent. Signed and verified as written,
+ * through the same latch and intake caps as tool observations (leasedObservation.ts): over a cap it throws 429, latched 503.
+ */
 export function recordSessionEvent(input: { workspace: string; agentId: string; provider: SessionProvider; rawInput: string; leaseId: string | null; now?: number }):
   { eventId: string; event: string } {
   const now = input.now ?? Date.now();
-  const read = readSessionEvent(input.provider, input.rawInput);
+  const { read, sessionId } = readSession(input.provider, input.rawInput);
   const body = { kind: "amc.hook-session-event/v1", provider: input.provider, agentId: input.agentId, claim: "self-reported", ...read };
-  const ledger = openLedger(input.workspace);
-  try {
-    const { eventId } = appendVerified(ledger, { id: observationId(input.provider === "codex" ? "cxsess" : "ccsess", [input.agentId, undefined], now), now, body,
-      meta: { auditType: "HOOK_SESSION_EVENT", sessionEventSchemaVersion: 1, trustTier: "SELF_REPORTED", contentTier: "SELF_REPORTED", ...body, leaseId: input.leaseId },
-      receipt: { kind: "work_accepted", providerId: `hook-session:${input.provider}` } });
-    return { eventId, event: String(read.event) };
-  } finally {
-    ledger.close();
-  }
+  const scope = { workspace: input.workspace, agentId: input.agentId, leaseId: input.leaseId ?? undefined, sessionId: sessionId ?? "unknown", provider: input.provider, now };
+  return recordLeasedObservation(scope, `the ${input.provider === "codex" ? "Codex" : "Claude Code"} session event`, () => {
+    const ledger = openLedger(input.workspace);
+    try {
+      const { eventId } = appendVerified(ledger, { id: observationId(input.provider === "codex" ? "cxsess" : "ccsess", [input.agentId, undefined], now), now, body,
+        meta: { auditType: "HOOK_SESSION_EVENT", sessionEventSchemaVersion: 1, trustTier: "SELF_REPORTED", contentTier: "SELF_REPORTED", ...body, leaseId: input.leaseId },
+        receipt: { kind: "work_accepted", providerId: `hook-session:${input.provider}` } });
+      return { eventId, event: String(read.event) };
+    } finally {
+      ledger.close();
+    }
+  });
 }
 
 const SESSION_HOOK_ROUTE = "/hooks/session/v1";
@@ -107,6 +119,7 @@ export async function handleSessionHookHttp(options: { workspace: string; req: I
     const recorded = recordSessionEvent({ workspace, agentId: auth.payload.agentId, provider, rawInput, leaseId: auth.payload.leaseId });
     writeControlJson(res, 201, { ok: true, observed: true, claim: "self-reported", ...recorded });
   } catch (error) {
+    if (error instanceof HookControlError) return refuse(res, error.statusCode, error.message);
     process.stderr.write(`[amc] session observation route: ${error instanceof Error ? error.message.replace(/[^\x20-\x7e]/g, "?").slice(0, 300) : "error"}\n`);
     return refuse(res, 503, "the session hook could not be recorded");
   }

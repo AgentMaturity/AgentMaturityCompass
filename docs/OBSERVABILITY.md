@@ -68,11 +68,17 @@ new 8-hour observe lease in `OTEL_EXPORTER_OTLP_HEADERS`; it writes nothing to t
 prints nothing: Codex documents only the protobuf form, which this receiver does not read.
 
 - Every request needs that lease; without it, or with a lease for another purpose, the answer is 401 with no detail.
-- Limits are checked before anything is stored: 1 MiB per request (also after gzip is inflated), 500 records, 128
+- Limits are checked before anything is stored: 1 MiB per request (also after gzip is inflated), 120 records, 128
   attributes per record, 16 KiB per string, and the lease's requests per minute. Over a limit the answer is 413 or 429
   and nothing is recorded. A protobuf body is answered 415.
+- Each record also counts against the same per-minute limits as hook observations: 120 for one agent's telemetry, 360
+  per lease and 1,200 per workspace. Over one of them the answer is 429, nothing of the request is recorded, and a
+  signed summary row says how many were not recorded. While AMC's hook writer is stopped after a failed write (see
+  `amc connect hooks health`), every request is refused with 503.
 - What arrives is the runtime's own report: every row is self-reported, under the lease's agent. Prompt text, outputs
-  and any value that is not a plain name or number are stored as SHA-256 and length only. Rows join hook observations
+  and any value that is not a plain name or number (letters, digits and `._:/@-`, no spaces, at most 64 characters)
+  are stored as SHA-256 and length only; a span, log or metric name that is not such a name is stored as `sha256:` and
+  its digest. Rows join hook observations
   on the session digest, `prompt.id` and `tool_use_id`.
 
 `amc watch connect --provider trace-query` (old name `otlp`) is something else: it polls a tracing backend's query API.

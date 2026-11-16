@@ -54,12 +54,15 @@ const observationCounters = new IntakeCounters(OBSERVATION_LIMITS);
 const PROVIDER_REPORTED = { contentTier: "SELF_REPORTED" } as const;
 
 /** The providers whose after-the-fact observations AMC records here, and how each names its sessions, calls and registrations. */
-export type ObservedProvider = "claude-code" | "pi" | "codex";
+export type ObservedProvider = "claude-code" | "pi" | "codex" | "otlp";
 /** Codex (P2-17) is observed only: no installation registers a Codex session, so its observations are never under registration. */
 const PROVIDERS = {
   "claude-code": { label: "Claude Code", prefix: "cc", sessionSha256: claudeSessionSha256, actionId: claudeActionId, registration: claudeCodeSessionRegistration },
   pi: { label: "Pi", prefix: "pi", sessionSha256: piSessionSha256, actionId: piActionId, registration: piSessionRegistration },
   codex: { label: "Codex", prefix: "cx", sessionSha256: codexSessionSha256, actionId: codexActionId, registration: () => ({ status: "missing" as const }) },
+  /** OTLP export requests (src/watch/otlpReceiver.ts): self-reported telemetry, never under a registration, capped like the rest. */
+  otlp: { label: "OTLP", prefix: "otlp", sessionSha256: (id: string) => sha256Hex(`otlp\0${id}`), actionId: (id: string, call: string) => sha256Hex(`otlp\0${id}\0${call}`),
+    registration: () => ({ status: "missing" as const }) },
 } as const;
 
 /** Whether `provider` session `sessionId` has a verified registration: only then can a fault of its writer latch. */
@@ -99,14 +102,17 @@ function summaryWriter(input: ScopeInput & { registered: boolean; now: number })
  * its session, its lease and its workspace (hookIntake.ts). Over a cap it is refused (429), never silently: it is listed
  * in a signed intake summary row, and decisions under the capped scope are denied until its window passes.
  */
-export function admitObservation(input: ScopeInput & { now: number; toolUseId?: string }): { registered: boolean } {
+export function admitObservation(input: ScopeInput & { now: number; toolUseId?: string; count?: number }): { registered: boolean } {
   const registered = sessionRegistered(input.workspace, input.agentId, input.sessionId, input.provider);
   const write = summaryWriter({ ...input, registered });
-  const refused = observationCounters.admit(intakeScope({ ...input, registered }), input.now, write,
-    input.toolUseId ? { toolUseId: input.toolUseId, actionId: PROVIDERS[input.provider].actionId(input.sessionId, input.toolUseId) } : undefined);
-  if (refused !== null) {
-    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `${PROVIDERS[input.provider].label} observations are over AMC's ${refused} intake limit: AMC lists this one `
-      + "in a signed intake summary as not recorded and denies the calls under that limit until it recovers");
+  // One count per record (an OTLP request carries many); the first refusal stops the rest, and nothing of the request is stored.
+  for (let counted = 0; counted < (input.count ?? 1); counted += 1) {
+    const refused = observationCounters.admit(intakeScope({ ...input, registered }), input.now, write,
+      input.toolUseId ? { toolUseId: input.toolUseId, actionId: PROVIDERS[input.provider].actionId(input.sessionId, input.toolUseId) } : undefined);
+    if (refused !== null) {
+      throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `${PROVIDERS[input.provider].label} observations are over AMC's ${refused} intake limit: AMC lists this one `
+        + "in a signed intake summary as not recorded and denies the calls under that limit until it recovers");
+    }
   }
   return { registered };
 }
@@ -255,7 +261,7 @@ const decisionMetaSchema = z.object({
 });
 
 /** The verified decision row of `provider`'s action `actionId`, or null when there is none or it does not verify. */
-function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, provider: Exclude<ObservedProvider, "codex">):
+function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, provider: Exclude<ObservedProvider, "codex" | "otlp">):
   (z.infer<typeof decisionMetaSchema> & { eventId: string }) | null {
   const eventId = decisionEventId(agentId, provider, actionId);
   try {
@@ -271,7 +277,7 @@ function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, pro
 /** One tool call's outcome as the provider's hook reports it, in AMC's terms. */
 export interface ReportedOutcome {
   /** A provider whose outcomes follow an AMC control decision; Codex has none. */
-  provider: Exclude<ObservedProvider, "codex">;
+  provider: Exclude<ObservedProvider, "codex" | "otlp">;
   /** The provider's event name (PostToolUse, PostToolUseFailure, tool_result). */
   event: string;
   sessionId: string;

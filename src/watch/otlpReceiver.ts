@@ -11,7 +11,8 @@
  * What arrives is what the runtime says about itself, so every row is SELF_REPORTED: AMC did not see the call. The
  * agent is always the lease's own; the ledger runtime is always "unknown"; the runtime the request names is kept only
  * as `reportedBy`. Privacy: digests only. Numbers, booleans and a short list of names (model, tool, event, status, ids)
- * are kept as printable ASCII; every other value is stored as its SHA-256 and length, never its text. The session id
+ * are kept only when the value is a plain token (letters, digits and `._:/@-`, no spaces, at most 64 characters); every
+ * other value, and any name that is not such a token, is stored as its SHA-256 and length, never its text. The session id
  * is stored as the digest the hook observations use (`<runtime>\0<session id>`), so rows join on session, prompt id
  * and tool_use_id. JSON only: a protobuf body is answered 415 with the setting that fixes it.
  */
@@ -21,6 +22,9 @@ import { promisify } from "node:util";
 import { gunzip } from "node:zlib";
 import { verifyBridgeLease } from "../bridge/bridgeAuth.js";
 import { consumeObservedHookRateLimit } from "../bridge/hookIngress.js";
+import { OBSERVATION_LIMITS } from "../bridge/hookIntake.js";
+import { HookControlError } from "../bridge/hookProviders.js";
+import { recordLeasedObservation } from "../bridge/leasedObservation.js";
 import { openLedger } from "../ledger/ledger.js";
 import { isLoopback, readCappedBytes } from "../standards/acs/acsGuardianHttp.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -30,7 +34,8 @@ type OtlpSignal = "traces" | "logs" | "metrics";
 const SIGNALS: Readonly<Record<string, OtlpSignal>> = { "/v1/traces": "traces", "/v1/logs": "logs", "/v1/metrics": "metrics" };
 /** The lease route OTLP requests are checked against; a lease whose route list holds `/hooks` or `/hooks/otlp` covers it. */
 export const OTLP_LEASE_ROUTE = "/hooks/otlp";
-export const OTLP_LIMITS = Object.freeze({ bodyBytes: 1_048_576, records: 500, attributesPerRecord: 128, stringBytes: 16_384, depth: 12 });
+// Records per request: at most what one minute of the hook intake cap admits, so a request within this limit can be admitted at all.
+export const OTLP_LIMITS = Object.freeze({ bodyBytes: 1_048_576, records: OBSERVATION_LIMITS.session!, attributesPerRecord: 128, stringBytes: 16_384, depth: 12 });
 export const isOtlpPath = (pathname: string): boolean => Object.hasOwn(SIGNALS, pathname);
 
 /** Runtimes AMC names from the prefix of their own event, span and metric names (a label only: the request says so). */
@@ -45,15 +50,19 @@ const CLEAR_KEYS = new Set([
 /** Counts and durations some runtimes send as text: kept when the text is a plain number. */
 const NUMERIC_KEY = /(tokens|_count|_ms|_usd|_length|\.sequence)$/;
 const SESSION_KEYS = ["session.id", "gen_ai.conversation.id", "conversation.id"];
-const SAFE_TEXT = /^[\x21-\x7e][\x20-\x7e]{0,255}$/;
+/** A value kept as sent: a plain token (no spaces, at most 64 characters). Anything else is stored as its SHA-256 and length. */
+const TOKEN = /^[A-Za-z0-9][A-Za-z0-9._:/@-]{0,63}$/;
+const UNIT = /^\{?[A-Za-z0-9._/%-]{1,32}\}?$/;
 const SAFE_KEY = /^[A-Za-z0-9_.-]{1,128}$/;
 const PLAIN_NUMBER = /^-?\d{1,18}(\.\d{1,9})?$/;
 
 type Json = Record<string, unknown>;
 const object = (value: unknown): Json => (value !== null && typeof value === "object" && !Array.isArray(value) ? value as Json : {});
 const list = (value: unknown): Json[] => (Array.isArray(value) ? value.map(object) : []);
-const text = (value: unknown): string | null => (typeof value === "string" && SAFE_TEXT.test(value) ? value : null);
+const text = (value: unknown): string | null => (typeof value === "string" && TOKEN.test(value) ? value : null);
 const digestOf = (value: string): { sha256: string; length: number } => ({ sha256: sha256Hex(value), length: Buffer.byteLength(value, "utf8") });
+/** A short text field (severity, unit): kept when it matches `pattern`, else its digest; null when absent. */
+const tokenOrDigest = (value: unknown, pattern = TOKEN) => (typeof value !== "string" ? null : pattern.test(value) ? value : digestOf(value));
 
 /** One OTLP AnyValue as AMC stores it: typed numbers and booleans, allow-listed names, and a digest for everything else. */
 function reported(key: string, raw: unknown): unknown {
@@ -64,7 +73,7 @@ function reported(key: string, raw: unknown): unknown {
     return Number.isFinite(number) ? number : null;
   }
   if (typeof value.stringValue === "string") {
-    if (CLEAR_KEYS.has(key) && SAFE_TEXT.test(value.stringValue)) return value.stringValue;
+    if (CLEAR_KEYS.has(key) && TOKEN.test(value.stringValue)) return value.stringValue;
     if (NUMERIC_KEY.test(key) && PLAIN_NUMBER.test(value.stringValue)) return Number(value.stringValue);
     return digestOf(value.stringValue);
   }
@@ -99,11 +108,13 @@ const EVENT_NAME_BODY = /^(claude_code|codex|gemini_cli)\.[a-z0-9_.]{1,96}$/;
 function row(signal: OtlpSignal, names: unknown[], attributeLists: unknown[], extra: Json, body?: unknown): OtlpRow {
   const { attrs, unreadableKeys } = rawAttributes(...attributeLists);
   const hint = typeof body === "string" && EVENT_NAME_BODY.test(body) ? [body] : [];
-  const candidates = [...hint, ...names.map(text).filter((name): name is string => name !== null)];
+  const sent = names.filter((name): name is string => typeof name === "string" && name.length > 0);
+  const candidates = [...hint, ...sent.filter((name) => TOKEN.test(name))];
+  // A name that is not a plain token ("chat my-model", free text) is kept only as `sha256:<digest>`.
   const known = RUNTIME_PREFIXES.flatMap(([prefix, runtime]) => {
     const name = candidates.find((candidate) => candidate.startsWith(prefix));
     return name ? [{ name, reportedBy: runtime }] : [];
-  })[0] ?? { name: candidates[0] ?? "unreadable", reportedBy: "unknown" };
+  })[0] ?? { name: candidates[0] ?? (sent[0] === undefined ? "unreadable" : `sha256:${sha256Hex(sent[0])}`), reportedBy: "unknown" };
   const stringOf = (key: string): string | null => text(object(attrs.get(key)).stringValue);
   const session = SESSION_KEYS.map((key) => object(attrs.get(key)).stringValue).find((value): value is string => typeof value === "string" && value.length > 0);
   const attributes = Object.fromEntries([...attrs].filter(([key]) => !SESSION_KEYS.includes(key)).map(([key, value]) => [key, reported(key, value)]));
@@ -157,11 +168,11 @@ function otlpRows(signal: OtlpSignal, request: unknown): OtlpRow[] {
       const body = object(record.body).stringValue;
       const eventName = list(record.attributes).find((item) => item.key === "event.name");
       return row(signal, [record.eventName, object(eventName?.value).stringValue],[resourceAttrs, record.attributes], { timeUnixNano: nanos(record.timeUnixNano),
-        severityText: text(record.severityText), bodyDigest: typeof body === "string" ? digestOf(body) : null }, body);
+        severityText: tokenOrDigest(record.severityText), bodyDigest: typeof body === "string" ? digestOf(body) : null }, body);
     }
     const value = Number(record.asInt ?? record.asDouble ?? record.sum);
     const count = Number(record.count);
-    return row(signal, [metric!.name], [resourceAttrs, record.attributes], { metricKind: kind, unit: text(metric!.unit),
+    return row(signal, [metric!.name], [resourceAttrs, record.attributes], { metricKind: kind, unit: tokenOrDigest(metric!.unit, UNIT),
       value: Number.isFinite(value) ? value : null, count: Number.isFinite(count) && record.count !== undefined ? count : null, timeUnixNano: nanos(record.timeUnixNano) });
   });
 }
@@ -244,9 +255,17 @@ export async function handleOtlpHttp(options: { workspace: string; req: Incoming
     const breach = otlpLimitBreach(signal, parsed);
     if (breach) return refuse(413, `The OTLP request has ${breach}; nothing was recorded. Lower the exporter's batch size.`);
     const rows = otlpRows(signal, parsed);
-    if (rows.length > 0) recordOtlpRows({ workspace, agentId: auth.payload.agentId, leaseId: auth.payload.leaseId, rows });
+    const { agentId, leaseId } = auth.payload;
+    // ponytail: every OTLP request of an agent shares one intake session cap (120 records a minute); per-session caps if runtimes need more.
+    recordLeasedObservation({ workspace, agentId, leaseId, sessionId: "otlp", provider: "otlp", count: rows.length }, "the OTLP request",
+      () => (rows.length > 0 ? recordOtlpRows({ workspace, agentId, leaseId, rows }) : null));
     return answer(res, 200, {});
   } catch (error) {
+    if (error instanceof HookControlError && error.statusCode === 429) {
+      res.setHeader("retry-after", "60");
+      return refuse(429, "This agent sent more telemetry than AMC records in a minute; nothing of this request was recorded. The exporter may retry later.");
+    }
+    if (error instanceof HookControlError) return refuse(503, error.message);
     process.stderr.write(`[amc] OTLP receiver: ${error instanceof Error ? error.message.replace(/[^\x20-\x7e]/g, "?").slice(0, 300) : "error"}\n`);
     return refuse(503, "AMC could not record this OTLP request; the exporter may retry.");
   }

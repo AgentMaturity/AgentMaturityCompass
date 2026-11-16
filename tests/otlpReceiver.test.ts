@@ -118,6 +118,23 @@ describe("OTLP receiver", () => {
     expect(received()).toHaveLength(2);
   });
 
+  test("a name or allow-listed value that is not a plain token (spaces, free text) is stored as a digest, never in clear", async () => {
+    const token = lease("hook:observe", "/hooks/otlp");
+    const leak = "my api key is sk-ant-abcdef please";
+    const logs = claudeLogs(1, [attr("model", { stringValue: leak }), attr("tool_name", { stringValue: "Bash" })]);
+    const traces = { resourceSpans: [{ scopeSpans: [{ spans: [{ name: `chat ${leak}`, traceId: "ab12", spanId: "cd34", attributes: [] }] }] }] };
+    const metrics = { resourceMetrics: [{ scopeMetrics: [{ metrics: [{ name: "gen_ai.client.token.usage", unit: "{token}", sum: { dataPoints: [{ asInt: "5", timeUnixNano: "1" }] } }] }] }] };
+    for (const [path, body] of [["/v1/logs", logs], ["/v1/traces", traces], ["/v1/metrics", metrics]] as const) {
+      expect((await post(path, JSON.stringify(body), { "x-amc-lease": token, "content-type": "application/json" })).status).toBe(200);
+    }
+    const stored = received();
+    expect(JSON.stringify(stored)).not.toContain("sk-ant-abcdef");
+    const log = stored.map((row) => JSON.parse(row.body) as { signal: string; name: string; unit?: string; attributes: Record<string, unknown> });
+    expect(log.find((row) => row.attributes.model !== undefined)?.attributes).toMatchObject({ model: { length: leak.length }, tool_name: "Bash" });
+    expect(log.find((row) => row.signal === "traces")?.name).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(log.find((row) => row.signal === "metrics")).toMatchObject({ name: "gen_ai.client.token.usage", unit: "{token}" });
+  });
+
   test("a lease over its requests per minute is answered 429 with Retry-After", async () => {
     const token = lease("hook:observe", "/hooks/otlp", 1);
     const body = JSON.stringify({ resourceSpans: [] });
