@@ -35,7 +35,8 @@
     { "name": "SessionStart", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
     { "name": "PostToolUse", "role": "observe", "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "Bash"], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
     { "name": "PostToolUseFailure", "role": "observe", "tools": ["Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "Bash"], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
-    { "name": "Stop", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] }
+    { "name": "Stop", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] },
+    { "name": "observe mode: session hooks (SessionStart, SessionEnd, UserPromptSubmit, Stop, StopFailure, SubagentStart, SubagentStop, PreCompact, PostCompact, PermissionRequest, PermissionDenied)", "role": "observe", "tools": [], "onFailure": "proceeds", "source": "docs/adapters/claude-code-hooks.md", "cases": [] }
   ],
   "notCovered": [
     "OS containment and Claude Code's own sandbox",

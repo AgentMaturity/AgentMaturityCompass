@@ -183,6 +183,16 @@ export function installCodexHook(options: InstallHookIntegrationOptions, cliPath
   return options.dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);
 }
 
+/** Whether `.codex/hooks.json` names every session hook AMC installs (an install made before AMC observed sessions does not). */
+function sessionHooksInstalled(configPath: string): boolean {
+  try {
+    const hooks = (JSON.parse(readFileSync(configPath, "utf8")) as { hooks?: Record<string, unknown> }).hooks ?? {};
+    return SESSION_EVENTS.codex.every((event) => Object.hasOwn(hooks, event));
+  } catch {
+    return false;
+  }
+}
+
 export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
   const workspace = resolve(workspaceInput);
   const paths = codexPaths(workspace);
@@ -201,6 +211,10 @@ export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
   }
   const configOwned = manifest !== null && fileSha(paths.config) === manifest.configSha256;
   if (manifest && !configOwned) issues.push(".codex/hooks.json is missing or changed after installation");
+  if (configOwned && !sessionHooksInstalled(paths.config)) {
+    issues.push("installed without the session hooks (session start and end, prompts, sub-agents, compaction); "
+      + "run `amc connect hooks install --provider codex` again to observe whole sessions");
+  }
   const forwarderMissing = manifest !== null && !existsSync(manifest.forwarderPath);
   if (forwarderMissing) issues.push("AMC's Codex forwarder is missing; build or reinstall AMC");
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);

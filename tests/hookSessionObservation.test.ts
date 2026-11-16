@@ -3,19 +3,39 @@
  * unknown payload is still recorded), as the provider's own word, digests only, under the lease's agent; the Claude
  * Code observe hook always answers `{}` with exit 0, so it never blocks the agent. Control mode is unchanged.
  */
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { runHookForward } from "../src/adapters/hookForwarder.js";
 import { getHookIntegrationStatus, installHookIntegration, removeHookIntegration } from "../src/adapters/hookIntegration.js";
 import { CLAUDE_OBSERVE_SESSION_HOOKS, claudeSessionSha256 } from "../src/adapters/hookProviders/claudeCode.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { signFileWithAuditor } from "../src/org/orgSigner.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { readSessionEvent, recordSessionEvent } from "../src/bridge/sessionObservations.js";
 import { controlledWorkspace, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 afterEach(() => removeFixtureWorkspaces());
 const agentId = "session-watch-agent";
 const PROMPT = "summarise the confidential merger memo";
+const TOOL_HOOKS = ["PostToolUse", "PostToolUseFailure", "PreToolUse"];
+
+/** An observe install in the shape AMC wrote before it observed sessions: the three tool hooks only, config and signed manifest. */
+function earlierObserveInstall(workspace: string): string {
+  installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "observe" });
+  const settingsPath = join(workspace, ".claude", "settings.local.json");
+  const manifestPath = join(workspace, ".amc", "hooks", "claude-code.json");
+  const settings = JSON.parse(readFileSync(settingsPath, "utf8")) as { hooks: Record<string, unknown> };
+  settings.hooks = Object.fromEntries(Object.entries(settings.hooks).filter(([event]) => TOOL_HOOKS.includes(event)));
+  const configText = `${JSON.stringify(settings, null, 2)}\n`;
+  writeFileSync(settingsPath, configText);
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as { handlers: Array<{ eventName: string }>; configSha256: string };
+  manifest.handlers = manifest.handlers.filter((row) => TOOL_HOOKS.includes(row.eventName));
+  manifest.configSha256 = sha256Hex(Buffer.from(configText, "utf8"));
+  writeFileSync(manifestPath, JSON.stringify(manifest));
+  signFileWithAuditor(workspace, manifestPath);
+  return settingsPath;
+}
 
 describe("reading a session hook", () => {
   test("keeps tokens, digests text and ids it does not need, and never fails", () => {
@@ -60,6 +80,28 @@ describe("recording and hooks", () => {
     removeHookIntegration({ workspace, provider: "claude-code" });
     // The file AMC created is gone again: no session handler is left behind.
     expect(existsSync(join(workspace, ".claude", "settings.local.json"))).toBe(false);
+  });
+
+  test("an observe install made before session hooks still reads installed, says how to add them, and reinstall and remove work", () => {
+    const workspace = controlledWorkspace(agentId);
+    const settingsPath = earlierObserveInstall(workspace);
+
+    const status = getHookIntegrationStatus({ workspace, provider: "claude-code" });
+    expect(status.state).toBe("installed");
+    expect(status.issues.join("\n")).toContain("amc connect hooks install --provider claude-code --mode observe");
+    installHookIntegration({ workspace, provider: "claude-code", agentId, mode: "observe" });
+    const upgraded = getHookIntegrationStatus({ workspace, provider: "claude-code" });
+    expect(upgraded).toMatchObject({ state: "installed", issues: [] });
+    expect(Object.keys((JSON.parse(readFileSync(settingsPath, "utf8")) as { hooks: object }).hooks)).toHaveLength(TOOL_HOOKS.length + CLAUDE_OBSERVE_SESSION_HOOKS.length);
+    removeHookIntegration({ workspace, provider: "claude-code" });
+    expect(existsSync(settingsPath)).toBe(false);
+  });
+
+  test("an earlier-shape observe install can be removed directly", () => {
+    const workspace = controlledWorkspace(agentId);
+    const settingsPath = earlierObserveInstall(workspace);
+    removeHookIntegration({ workspace, provider: "claude-code" });
+    expect(existsSync(settingsPath)).toBe(false);
   });
 
   test("the observe session hook answers {} with exit 0 within its deadline even when AMC is not there or the payload is junk", async () => {

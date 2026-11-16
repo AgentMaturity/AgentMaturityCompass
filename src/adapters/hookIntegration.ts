@@ -243,6 +243,18 @@ function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "contr
       ];
 }
 
+/**
+ * A Claude Code observe manifest signed before AMC observed whole sessions: its handlers are the three tool hooks only.
+ * Still a valid installation (tool calls are observed); status asks for a reinstall to add the session hooks.
+ */
+function claudeObserveWithoutSessionHooks(provider: ConfigHookProvider, manifest: HookManifest): boolean {
+  return provider === "claude-code" && manifest.mode === "observe" && manifest.v === 2
+    && canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
+      providerHookSpecs(provider, "observe").filter((spec) => spec.eventType !== null).map(({ eventName, phase }) => ({ eventName, phase })));
+}
+const CLAUDE_OBSERVE_SESSION_HOOKS_MISSING = "installed without the session hooks (session start and end, prompts, sub-agents, compaction); "
+  + "run `amc connect hooks install --provider claude-code --mode observe` to add them";
+
 function providerObservedEventTypes(provider: ConfigHookProvider): Array<"action.requested" | "action.completed" | "action.failed"> {
   return provider === "claude-code"
     ? ["action.requested", "action.completed", "action.failed"]
@@ -575,9 +587,9 @@ function validateManifestPaths(workspace: string, provider: ConfigHookProvider, 
   const lifecycleBindingValid = manifest.v === 1
     ? manifest.observation.eventType === "action.requested"
       && manifest.observation.correlation === (provider === "claude-code" ? "provider-call-id" : "derived-event-id")
-    : canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
+    : (canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
         providerHookSpecs(provider, manifest.mode).map(({ eventName, phase }) => ({ eventName, phase })),
-      )
+      ) || claudeObserveWithoutSessionHooks(provider, manifest))
       && canonicalize(manifest.observation.eventTypes) === canonicalize(providerObservedEventTypes(provider))
       && manifest.observation.correlation === (
         provider === "claude-code" ? "provider-call-id" : "derived-request-id-with-terminal-resolution"
@@ -992,6 +1004,7 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
   if (manifest?.v === 1) {
     issues.push("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
   }
+  if (manifestValid && manifest && claudeObserveWithoutSessionHooks(provider, manifest)) issues.push(CLAUDE_OBSERVE_SESSION_HOOKS_MISSING);
   if (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256) {
     issues.push("provider config changed after installation");
   }

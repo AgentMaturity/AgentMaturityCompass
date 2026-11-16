@@ -19,6 +19,8 @@ import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
 import { HookControlError } from "../src/bridge/hookProviders.js";
 import { revokeLeaseForCli } from "../src/leases/leaseCli.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { signFileWithAuditor } from "../src/org/orgSigner.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const agentId = "codex-observed";
@@ -84,6 +86,24 @@ describe("Codex observe installation", () => {
     expect(handler).toMatchObject({ type: "command", timeout: 10 });
     expect(handler.command).toMatch(/^'[^']+node[^']*' '[^']+codexObserveForwarder\.js' '[^']+'$/);
     expect(getHookIntegrationStatus({ workspace, provider: "codex" }).state).toBe("installed");
+  });
+
+  test("an install made before session hooks says to reinstall, and a reinstall adds them", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    // The earlier shape: PostToolUse only, in hooks.json and in the signed manifest's digest of it.
+    const configPath = join(workspace, ".codex", "hooks.json");
+    const manifestPath = join(workspace, ".amc", "hooks", "codex.json");
+    const file = JSON.parse(readFileSync(configPath, "utf8")) as { hooks: Record<string, unknown> };
+    const earlier = `${JSON.stringify({ ...file, hooks: { PostToolUse: file.hooks.PostToolUse } }, null, 2)}\n`;
+    writeFileSync(configPath, earlier);
+    writeFileSync(manifestPath, JSON.stringify({ ...JSON.parse(readFileSync(manifestPath, "utf8")), configSha256: sha256Hex(Buffer.from(earlier, "utf8")) }));
+    signFileWithAuditor(workspace, manifestPath);
+    const status = getHookIntegrationStatus({ workspace, provider: "codex" });
+    expect(status.state).toBe("installed");
+    expect(status.issues.join("\n")).toContain("amc connect hooks install --provider codex");
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    expect(getHookIntegrationStatus({ workspace, provider: "codex" }).issues).toEqual([]);
   });
 
   test("control mode is refused: Codex's PreToolUse fails open", () => {
