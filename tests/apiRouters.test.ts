@@ -1419,7 +1419,8 @@ describe("AMC API routers", () => {
       ["/api/v1/guardrails/enable", { name: 7 }],
       ["/api/v1/guardrails/enable", { name: "safe-output", unexpected: true }],
       ["/api/v1/guardrails/disable", { name: "" }],
-      ["/api/v1/guardrails/profile", { name: "default", unexpected: true }]
+      ["/api/v1/guardrails/profile", { name: "default", unexpected: true }],
+      ["/api/v1/guardrails/profile", { name: "default", mode: "enforce" }]
     ] as const;
 
     m.setGuardrailRequested.mockClear();
@@ -1428,6 +1429,7 @@ describe("AMC API routers", () => {
       const result = await callRoute(handleToolsRoute, { pathname, method: "POST", body, workspace: ws });
       expect(result.status, pathname).toBe(400);
       expect(result.json?.ok, pathname).toBe(false);
+      if ("mode" in body) expect(JSON.stringify(result.json), pathname).toContain("mode applies only to untrusted-input-guard.");
     }
     expect(m.setGuardrailRequested).not.toHaveBeenCalled();
     expect(m.applyGuardrailControlProfile).not.toHaveBeenCalled();

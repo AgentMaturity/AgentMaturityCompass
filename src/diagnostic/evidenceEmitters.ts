@@ -90,6 +90,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/dataflow/providerAdmission.ts", why: "protected-data admission records (P2-02) for native, gateway and bridge requests: aggregate classes and counts only, AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/dataflow/purposePolicy.ts", why: "protected-data refusals (P2-02): code, reason and registry identifiers only; AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/dataflow/redactingSession.ts", why: "redaction receipts (P2-02): classes, detector names, counts and the redacted digest only; AMC enforcement bookkeeping, never maturity evidence" },
+  { module: "src/enforce/inputGuardProfile.ts", why: "operator switched the untrusted-input guard (on, log-only, off): configuration bookkeeping, untagged, never maturity evidence" },
   { module: "src/diagnostic/audits.ts", why: "the diagnostic's own derived findings; excluded from scoring and read as penalties" },
   { module: "src/diagnostic/runner.ts", why: "the diagnostic's own findings about a run" },
   { module: "src/drift/driftDetector.ts", why: "drift regressions and freezes; they cap scores" },

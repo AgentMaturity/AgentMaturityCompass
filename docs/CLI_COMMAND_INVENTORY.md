@@ -406,7 +406,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce resources status` | Show the signed active, previous, rollback, drift, and integrity state | `--agent <agentId>`<br>`--json` | - |
 | `amc enforce resources validate` | Validate governed resource changes before accepting them | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
-| `amc enforce taint` | Track tainted input through the system | `--json` | - |
+| `amc enforce taint` | Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard) | `--json` | - |
 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model | `--properties <list>`<br>`--output <path>` | - |
 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance | - | - |
@@ -580,7 +580,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc guardrails disable` | Remove an additive guardrail request without weakening signed policy | - | - |
 | `amc guardrails enable` | Request a signed, runtime-bound guardrail | - | - |
 | `amc guardrails list` | List signed requested state and effective runtime guardrail bindings | `--json` | - |
-| `amc guardrails profile` | Apply bound controls from a signed additive profile | - | - |
+| `amc guardrails profile` | Apply bound controls from a signed additive profile, or switch the untrusted-input-guard preset (In Claude Code and Gemini CLI sessions that AMC's hooks govern, AMC asks for approval before (or blocks) consequential calls made after untrusted input. It does not stop prompt injection, and a call made through a tool AMC cannot see is outside this.) | `--mode <mode>` | - |
 | `amc guide` | Generate personalized improvement guide with exportable agent instructions | `--target <level>`<br>`--export`<br>`--agent-instructions`<br>`--guardrails`<br>`--apply [file]`<br>`--interactive`<br>`--watch`<br>`--watch-interval <seconds>`<br>`--diff`<br>`--frameworks`<br>`--ci`<br>`--dry-run`<br>`--quick`<br>`--auto-detect`<br>`--status`<br>`--go`<br>`--compliance [frameworks]`<br>`--agent <id>`<br>`--framework <name>`<br>`--json` | - |
 | `amc help` | Show help for a command (for example: amc help run) | `--all` | - |
 | `amc history` | List diagnostic run history | `--limit <n>`<br>`--valid-only`<br>`--since <hours>` | - |

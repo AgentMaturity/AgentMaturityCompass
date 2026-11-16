@@ -419,7 +419,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 400 | `amc enforce resources status` | Show the signed active, previous, rollback, drift, and integrity state |
 | 401 | `amc enforce resources validate` | Validate governed resource changes before accepting them |
 | 402 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest |
-| 403 | `amc enforce taint` | Track tainted input through the system |
+| 403 | `amc enforce taint` | Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard) |
 | 404 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model |
 | 405 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) |
 | 406 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance |
@@ -593,7 +593,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 574 | `amc guardrails disable` | Remove an additive guardrail request without weakening signed policy |
 | 575 | `amc guardrails enable` | Request a signed, runtime-bound guardrail |
 | 576 | `amc guardrails list` | List signed requested state and effective runtime guardrail bindings |
-| 577 | `amc guardrails profile` | Apply bound controls from a signed additive profile |
+| 577 | `amc guardrails profile` | Apply bound controls from a signed additive profile, or switch the untrusted-input-guard preset (In Claude Code and Gemini CLI sessions that AMC's hooks govern, AMC asks for approval before (or blocks) consequential calls made after untrusted input. It does not stop prompt injection, and a call made through a tool AMC cannot see is outside this.) |
 | 578 | `amc guide` | Generate personalized improvement guide with exportable agent instructions |
 | 579 | `amc help` | Show help for a command (for example: amc help run) |
 | 580 | `amc history` | List diagnostic run history |
@@ -4683,7 +4683,7 @@ Verify the current workspace resources against an Enforce resource manifest
 
 #### `amc enforce taint`
 
-Track tainted input through the system
+Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard)
 
 
 | Option | Description |
@@ -6015,6 +6015,15 @@ List signed requested state and effective runtime guardrail bindings
 | Option | Description |
 |--------|-------------|
 | `--json` | - |
+
+#### `amc guardrails profile`
+
+Apply bound controls from a signed additive profile, or switch the untrusted-input-guard preset (In Claude Code and Gemini CLI sessions that AMC's hooks govern, AMC asks for approval before (or blocks) consequential calls made after untrusted input. It does not stop prompt injection, and a call made through a tool AMC cannot see is outside this.)
+
+
+| Option | Description |
+|--------|-------------|
+| `--mode <mode>` | - |
 
 #### `amc guide`
 

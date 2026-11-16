@@ -15,6 +15,7 @@ import { z } from "zod";
 import { codexActionId, codexSessionSha256 } from "../adapters/codex/codexIdentity.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
+import { codexInputGuard } from "../enforce/untrustedInputGuard.js";
 import { admitObservation, observationId, parse, recordHookAudit, type HookObservationResult } from "./claudeCodeObservations.js";
 import type { HookLease } from "./hookAuthorization.js";
 
@@ -53,7 +54,10 @@ export function recordCodexPostToolUse(input: { workspace: string; authenticated
     toolName: parsed.tool_name, toolUseId: parsed.tool_use_id, toolInputSha256: digest(parsed.tool_input), toolResponseSha256: digest(parsed.tool_response),
     model: parsed.model, permissionMode: parsed.permission_mode, subagent: parsed.agent_type ?? null, leaseId: input.lease?.leaseId ?? null,
   };
-  return recordHookAudit({ workspace: input.workspace, now, sessionSha256, provider: "codex", body: record, meta: { codexObservationSchemaVersion: 1, ...record },
+  // What the untrusted-input guard would have done (observe only), in the row's meta; the body a replay compares stays as it was.
+  const inputGuard = codexInputGuard({ workspace: input.workspace, agentId: input.authenticatedAgentId, sessionId: parsed.session_id,
+    toolName: parsed.tool_name, toolInput: parsed.tool_input });
+  return recordHookAudit({ workspace: input.workspace, now, sessionSha256, provider: "codex", body: record, meta: { codexObservationSchemaVersion: 1, ...record, inputGuard },
     id: observationId("cxpost", [input.authenticatedAgentId, actionId], now), idempotent: true,
     receipt: { kind: "tool_result", providerId: "hook-observe:codex" }, underRegistration: false });
 }

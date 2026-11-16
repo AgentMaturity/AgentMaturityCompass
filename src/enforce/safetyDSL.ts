@@ -1,5 +1,6 @@
 /**
- * safetyDSL.ts — AgentSpec-style declarative safety constraint language.
+ * safetyDSL.ts — AgentSpec-style declarative safety constraint language. Not enforced: nothing in AMC's decision paths
+ * evaluates these rules; a rule written here changes no decision.
  *
  * Inspired by ICSE 2026 AgentSpec paper and NeMo Guardrails Colang DSL.
  * Provides a declarative language for defining runtime safety constraints

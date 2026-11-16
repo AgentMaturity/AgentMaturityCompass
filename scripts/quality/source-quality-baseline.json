@@ -1448,7 +1448,6 @@
     {"id":"2fe7c47eced95580a56c754c04b53734fee759fe97274c7e75fe07b3ad686e1d","file":"src/redteam/index.ts","kind":"exports"},
     {"id":"2ffe6c4905c54377e111b2eed334094fa772ca8982466baa0c1a74192761a033","file":"src/residency/types.ts","kind":"types"},
     {"id":"302ba3b46bfd989fed43a55a75d451f60c9928a6f3da442bbed12ac8c5a043fc","file":"src/agents/llmJudge.ts","kind":"types"},
-    {"id":"306506b486453f79b6977f2d04935080f38e57dcc0e7deef1c02f2b71c2f838b","file":"src/shield/mcpTrustLedger.ts","kind":"types"},
     {"id":"306e98caa8c3276fc61cbce5daefb3c6d1c156d3e40233898b8e902fccfa568d","file":"src/product/index.ts","kind":"types"},
     {"id":"30730ef7335690795fe632b76a0dc93177d8481476c2b9043f72a2af0128c835","file":"src/corrections/correctionStore.ts","kind":"types"},
     {"id":"3073e0b3baef5257ad916cc3c682a621bea947b9fb475b2fb28851e1b6e77b28","file":"src/fleet/typedGraph.ts","kind":"exports"},

@@ -79,6 +79,9 @@ export const toolDefinitionSchema = z.object({
       .refine(path => !path.split(".").some(part => ["__proto__", "constructor", "prototype"].includes(part)), "reserved path segment"),
     z.enum(["phi", "pii", "card_number", "bank_account", "credential"])
   ).refine(fields => Object.keys(fields).length <= 256, "at most 256 protected fields").optional(),
+  // What the untrusted-input guard (src/enforce/untrustedInputGuard.ts) counts a call of this tool as having read. Labels
+  // only add: no label marks a tool as trusted, and a tool without one is classified by the guard's own table.
+  labels: z.array(z.enum(["untrusted-input", "private-data"])).max(2).optional(),
   // What the tool's effect is and how AMC settles it (P1-04). `repeatable` is true only when repeating the effect is
   // harmless. `idempotency` names where AMC's per-execution key travels: an HTTP header the body sets, or an argument AMC
   // fills (excluded from the arguments digest). `reconcile` names the adapter that asks the system of record.
