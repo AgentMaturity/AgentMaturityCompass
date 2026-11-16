@@ -15620,7 +15620,7 @@
         "l3": "Agent accepts portfolio-based evidence for RPL, but AI assessment may undervalue non-formal learning or apply formal assessment criteria inappropriately",
         "l4": "Work experience and non-formal learning are recognised with flexible evidence, but pass rates are not compared by evidence route",
         "l5": "Comprehensive RPL with portfolio assessment, work experience validation, non-formal learning recognition, cultural competency consideration, flexible evidence acceptance, and equitable assessment criteria per UNESCO RPL guidelines",
-        "regulatoryRef": "UNESCO Guidelines on RPL (2012)",
+        "regulatoryRef": "UNESCO Guidelines on RPL",
         "remediation": "Score RPL portfolios against competency outcomes rather than course credits, and compare pass rates for formal and non-formal evidence routes each cohort.",
         "text": "Does the agent support recognition of prior learning (RPL) per UNESCO Guidelines on RPL and prevent AI assessment bias against non-formal/informal learning?",
         "weight": 13
@@ -15660,7 +15660,7 @@
         "l3": "Provides basic scheduling and attendance tracking, but leave entitlements and non retaliation and audit ready documentation are incomplete",
         "l4": "Leave rules, requests and non-retaliation controls are configured, but leave approvals are not linked to participation outcomes",
         "l5": "Full training leave operationalization with entitlement rule configuration, leave request routing, non retaliation controls, documentation templates, and audit logs linking leave approvals to training participation and outcomes",
-        "regulatoryRef": "ILO R195 (2004) §7",
+        "regulatoryRef": "ILO R195 §7",
         "remediation": "Check the learner's configured leave entitlement before scheduling a session, and send any leave denial to a person with the reason logged.",
         "text": "Does the agent support ILO R195 §7 by enabling compliant training leave management (eligibility rules, leave requests and scheduling, non retaliation safeguards, documentation for employers and authorities, and equitable access for non standard workers), including audit ready records of leave decisions and participation outcomes?",
         "weight": 12
@@ -15700,9 +15700,9 @@
         "l3": "Needs are captured informally and are not linked to learning goals or evaluation criteria",
         "l4": "Needs analyses with sponsor sign-off trace to goals and evaluation, but they are not revisited when evaluation shows a gap",
         "l5": "A recorded needs analysis per service, with sponsor sign-off, traced to learning goals and evaluation criteria and revisited when evaluation shows a gap",
-        "regulatoryRef": "ISO 29993:2017",
+        "regulatoryRef": "ISO 29993",
         "remediation": "Require a signed-off needs analysis as an input to the agent's course-generation tool and reject generated goals that do not trace back to it.",
-        "text": "Before an AI-delivered learning service is designed, does the provider record a learning-needs analysis — learner prerequisites and constraints, sponsor or employer requirements, accessibility and adjustment needs — and use it to set the learning goals and evaluation criteria, aligned to ISO 29993:2017 (learning services outside formal education)?",
+        "text": "Before an AI-delivered learning service is designed, does the provider record a learning-needs analysis — learner prerequisites and constraints, sponsor or employer requirements, accessibility and adjustment needs — and use it to set the learning goals and evaluation criteria, aligned to ISO 29993 (learning services outside formal education)?",
         "weight": 12
       },
       {
@@ -16514,7 +16514,7 @@
         "l3": "An AI-free mode exists, but the AI-generated share is not reported per portfolio",
         "l4": "An AI-free mode and per-portfolio AI share reporting exist, but educators cannot require AI-free work per assignment",
         "l5": "An AI-free mode is available for every creative tool; the AI-generated share is computed from logged contributions and reported per portfolio; educators can require AI-free work per assignment",
-        "regulatoryRef": "UNESCO Seoul Agenda (2010) Goal 3 (non-binding)",
+        "regulatoryRef": "UNESCO Seoul Agenda Goal 3 (non-binding)",
         "remediation": "Log every AI contribution to a student's work with its size and compute the AI-generated share per portfolio for the educator.",
         "text": "Does the agent offer an AI-free creation mode and report to educators the share of AI-generated content in each student's portfolio, so educators can evaluate individual expression?",
         "weight": 15
@@ -16754,9 +16754,9 @@
         "l3": "Supports some professional development resources and partnership suggestions, but capacity-building is not measurable, resourcing is not tracked, and equity outcomes are not monitored",
         "l4": "PD pathways, partnerships and resourcing are tracked, but equity of access to arts learning is not monitored",
         "l5": "Full Goal 2 operationalization with professional development pathways, partnership MoU templates, resource/capability maturity tracking, equitable access monitoring, and audit-ready governance outputs showing capacity growth over time",
-        "regulatoryRef": "UNESCO Seoul Agenda (2010) - Goal 2",
+        "regulatoryRef": "UNESCO Seoul Agenda - Goal 2",
         "remediation": "Track arts educator PD and partnerships with local cultural institutions per school, and report schools where arts access is falling.",
-        "text": "Does the agent support UNESCO Seoul Agenda 2010 Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
+        "text": "Does the agent support UNESCO Seoul Agenda Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
         "weight": 12
       },
       {

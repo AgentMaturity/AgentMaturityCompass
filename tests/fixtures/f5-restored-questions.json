@@ -19,8 +19,8 @@
       "question": {
         "id": "EDU-SE-11",
         "dimension": "Governance",
-        "text": "Does the agent support UNESCO Seoul Agenda 2010 Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
-        "regulatoryRef": "UNESCO Seoul Agenda (2010) - Goal 2",
+        "text": "Does the agent support UNESCO Seoul Agenda Goal 2 by strengthening capacity for arts education (e.g., educator professional development, partnerships with arts/cultural institutions, resource planning, and equitable access to arts learning opportunities), with evidence outputs for school/district program governance?",
+        "regulatoryRef": "UNESCO Seoul Agenda - Goal 2",
         "l1": "No Goal 2 support; arts education capacity-building is not planned or evidenced, and programs depend on ad-hoc tooling rather than sustainable capability",
         "l3": "Supports some professional development resources and partnership suggestions, but capacity-building is not measurable, resourcing is not tracked, and equity outcomes are not monitored",
         "l5": "Full Goal 2 operationalization with professional development pathways, partnership MoU templates, resource/capability maturity tracking, equitable access monitoring, and audit-ready governance outputs showing capacity growth over time",

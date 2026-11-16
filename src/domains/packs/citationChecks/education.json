@@ -200,14 +200,14 @@
     "citation": "FERPA 34 CFR §99.31",
     "instrument": "34 CFR Part 99 (Family Educational Rights and Privacy)",
     "clause": "§99.31(a)(1)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "FERPA 34 CFR §99.31",
+    "now": "FERPA 34 CFR §99.31",
     "sourceTitle": "eCFR, 34 CFR Part 99 (FERPA regulations) (up to date as of 2026-11-12)",
     "sourceUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-11-12/title-34.xml?part=99",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "School officials with legitimate educational interests; reasonable methods so officials reach only records they have a legitimate interest in (§99.31(a)(1)(ii))."
+    "note": "School officials with legitimate educational interests; reasonable methods so officials reach only records they have a legitimate interest in (§99.31(a)(1)(ii)). Recorded as corrected because the question text was reworded: it had credited this section with a duty that another section sets."
   },
   {
     "packId": "k12-pm3",
@@ -410,14 +410,14 @@
     "citation": "FERPA 34 CFR §99.36",
     "instrument": "34 CFR Part 99 (Family Educational Rights and Privacy)",
     "clause": "§99.36(a), (c)",
-    "verdict": "verified",
-    "was": null,
-    "now": null,
+    "verdict": "corrected",
+    "was": "FERPA 34 CFR §99.36",
+    "now": "FERPA 34 CFR §99.36",
     "sourceTitle": "eCFR, 34 CFR Part 99 (FERPA regulations) (up to date as of 2026-11-12)",
     "sourceUrl": "https://www.ecfr.gov/api/versioner/v1/full/2026-11-12/title-34.xml?part=99",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Disclosure to appropriate parties in a health or safety emergency where knowledge of the information is necessary; an articulable and significant threat allows disclosure to any person whose knowledge is necessary. The recordkeeping the question named is set by §99.32(a)(5), now cited."
+    "note": "Disclosure to appropriate parties in a health or safety emergency where knowledge of the information is necessary; an articulable and significant threat allows disclosure to any person whose knowledge is necessary. The recordkeeping the question named is set by §99.32(a)(5), now cited. Recorded as corrected because the question text was reworded: it had credited this section with a duty that another section sets."
   },
   {
     "packId": "k12-pm3",
@@ -1307,8 +1307,8 @@
   {
     "packId": "skills-training",
     "questionId": "EDU-ST-8",
-    "citation": "UNESCO Guidelines on RPL (2012)",
-    "instrument": "UNESCO Guidelines for the Recognition, Validation and Accreditation of the Outcomes of Non-formal and Informal Learning (2012)",
+    "citation": "UNESCO Guidelines on RPL",
+    "instrument": "UNESCO Guidelines for the Recognition, Validation and Accreditation of the Outcomes of Non-formal and Informal Learning",
     "clause": "whole instrument",
     "verdict": "unverifiable",
     "was": null,
@@ -1317,7 +1317,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "www.uil.unesco.org answered HTTP 503 and unesdoc.unesco.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so the document's own text was not read."
+    "note": "www.uil.unesco.org answered HTTP 503 and unesdoc.unesco.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so the document's own text was not read. The edition year was removed from the citation and question text because it could not be confirmed."
   },
   {
     "packId": "skills-training",
@@ -1337,8 +1337,8 @@
   {
     "packId": "skills-training",
     "questionId": "EDU-ST-11",
-    "citation": "ILO R195 (2004) §7",
-    "instrument": "ILO Human Resources Development Recommendation, 2004 (No. 195)",
+    "citation": "ILO R195 §7",
+    "instrument": "ILO Human Resources Development Recommendation (No. 195)",
     "clause": "para. 7",
     "verdict": "unverifiable",
     "was": null,
@@ -1347,7 +1347,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "normlex.ilo.org answered HTTP 403 (curl and WebFetch) on 2026-11-16; paragraph 7 is not checked."
+    "note": "normlex.ilo.org answered HTTP 403 (curl and WebFetch) on 2026-11-16; paragraph 7 is not checked. The edition year was removed from the citation and question text because it could not be confirmed."
   },
   {
     "packId": "skills-training",
@@ -1367,8 +1367,8 @@
   {
     "packId": "skills-training",
     "questionId": "EDU-ST-13",
-    "citation": "ISO 29993:2017",
-    "instrument": "ISO 29993:2017 (Learning services outside formal education — Service requirements)",
+    "citation": "ISO 29993",
+    "instrument": "ISO 29993 (Learning services outside formal education — Service requirements)",
     "clause": "whole instrument",
     "verdict": "unverifiable",
     "was": null,
@@ -1377,7 +1377,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "www.iso.org answered HTTP 403 on 2026-11-16, so not even the edition and date were confirmed."
+    "note": "www.iso.org answered HTTP 403 on 2026-11-16, so not even the edition and date were confirmed. The edition year was removed from the citation and question text because it could not be confirmed."
   },
   {
     "packId": "skills-training",
@@ -1577,8 +1577,8 @@
   {
     "packId": "specialized-education",
     "questionId": "EDU-SE-1",
-    "citation": "UNESCO Seoul Agenda (2010) Goal 3 (non-binding)",
-    "instrument": "UNESCO Seoul Agenda: Goals for the Development of Arts Education (2010)",
+    "citation": "UNESCO Seoul Agenda Goal 3 (non-binding)",
+    "instrument": "UNESCO Seoul Agenda: Goals for the Development of Arts Education",
     "clause": "Goal 3",
     "verdict": "unverifiable",
     "was": null,
@@ -1587,7 +1587,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "unesdoc.unesco.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so the document's own text was not read; Goal 3 is not checked."
+    "note": "unesdoc.unesco.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so the document's own text was not read; Goal 3 is not checked. The edition year was removed from the citation and question text because it could not be confirmed."
   },
   {
     "packId": "specialized-education",
@@ -1787,8 +1787,8 @@
   {
     "packId": "specialized-education",
     "questionId": "EDU-SE-11",
-    "citation": "UNESCO Seoul Agenda (2010) - Goal 2",
-    "instrument": "UNESCO Seoul Agenda: Goals for the Development of Arts Education (2010)",
+    "citation": "UNESCO Seoul Agenda - Goal 2",
+    "instrument": "UNESCO Seoul Agenda: Goals for the Development of Arts Education",
     "clause": "Goal 2",
     "verdict": "unverifiable",
     "was": null,
@@ -1797,7 +1797,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "unesdoc.unesco.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so the document's own text was not read; Goal 2 is not checked."
+    "note": "unesdoc.unesco.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so the document's own text was not read; Goal 2 is not checked. The edition year was removed from the citation and question text because it could not be confirmed."
   },
   {
     "packId": "specialized-education",
