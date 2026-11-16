@@ -60,6 +60,71 @@ Use Node 22 or 24 LTS. Node 20 reached end of life on April 30, 2026; the packag
 
 ## Option B: From GitHub (Development)
 
+### One command (macOS and Linux)
+
+You need git and Node.js 20 or newer (22 or 24 recommended; both include Corepack). Then run:
+
+```bash
+curl -fsSL https://agentmaturity.co/install-source.sh | sh
+```
+
+The script fetches the newest source from GitHub, builds it on your computer and puts `amc` on your PATH. It
+needs no administrator password (no sudo) and takes a few minutes. When it finishes it prints the commit it built.
+Open a new terminal, go to your project folder and type `amc`.
+
+What it does, step by step:
+
+- Checks for git, Node.js and Corepack, and prints which Node.js it uses. It refuses a Node.js older than the
+  version `package.json` asks for.
+- Fetches `https://github.com/AgentMaturity/AgentMaturityCompass` over https, at the default branch unless you
+  name a ref. It downloads no other script.
+- Installs dependencies exactly as the lockfile lists them (`pnpm install --frozen-lockfile`), with the pnpm version
+  `package.json` names, through Corepack. Then it builds (`pnpm run build`).
+- Keeps everything in one folder, `~/.amc-source` (about 2 GB with two builds and the package store), and links
+  `amc` into `~/.amc-source/bin`.
+- Adds one line, marked `# AMC source install`, to your shell profile (`~/.zshrc` for zsh, `~/.bash_profile` for
+  bash on macOS, `~/.bashrc` for bash on Linux, otherwise `~/.profile`), and only if that line is not there yet.
+  It says which file it changed. Use `--no-modify-path` to change nothing and print the line instead. For fish it
+  prints the `fish_add_path` command to run.
+
+To pin a release tag or a commit (a commit id must be the full 40 characters):
+
+```bash
+curl -fsSL https://agentmaturity.co/install-source.sh | sh -s -- --ref <tag or commit id>
+```
+
+**Update:** run the same command again. The new build is made next to the one you use; only when it has built does
+`amc` switch to it. If the build fails, your previous `amc` keeps working, and the script says so and exits with an
+error. The build that was replaced is kept in `~/.amc-source/builds`, so you can go back by hand:
+`ln -sfn builds/<old commit> ~/.amc-source/current`.
+
+**Remove:** delete the folder and the one marked line:
+
+```bash
+rm -rf ~/.amc-source
+# then delete the line ending in "# AMC source install" from your shell profile
+```
+
+This does not touch your AMC workspaces (the `.amc` folder in each project).
+
+**Windows (untested).** `website/install-source.ps1` does the same in PowerShell. It has never been run on a real
+Windows machine, so read it before you run it:
+
+```powershell
+irm https://agentmaturity.co/install-source.ps1 | iex
+```
+
+It installs into `%USERPROFILE%\.amc-source` and adds `%USERPROFILE%\.amc-source\bin` to your user PATH once. To
+remove it, delete that folder and remove that entry from your user PATH.
+
+**Why not `npm install -g github:AgentMaturity/AgentMaturityCompass`?** It does not work for this repository. npm
+builds a package installed from git only when the package has a `prepare` script, and AMC has none, so npm would
+install it without `dist/`, and `amc` would not start. npm also runs the `prepack` script when it installs from git,
+which here is the full release gate, and npm cannot read the `workspace:` dependencies AMC's pnpm workspace uses.
+(Read from package.json and npm's documentation; not run.)
+
+### By hand (development)
+
 Install Node.js 22 or 24 first. Enable Corepack so the repository's `packageManager` field selects pnpm 10.33.0; if Corepack is unavailable, use `npm install --global pnpm@10.33.0` instead.
 
 ```bash
@@ -231,7 +296,10 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 # Windows PowerShell
 irm https://agentmaturity.co/install.ps1 | iex
 
-# GitHub
+# Current source, installed with the one command
+curl -fsSL https://agentmaturity.co/install-source.sh | sh
+
+# GitHub clone built by hand
 cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm run build
 ```
 
@@ -241,6 +309,7 @@ cd AgentMaturityCompass && git pull && pnpm install --frozen-lockfile && pnpm ru
 ## Uninstalling
 
 ```bash
-npm uninstall -g agent-maturity-compass
+npm uninstall -g agent-maturity-compass   # release or npm install
+rm -rf ~/.amc-source                      # one-command source install; also delete the "# AMC source install" line in your shell profile
 rm -rf .amc/    # removes workspace data (back up first!)
 ```
