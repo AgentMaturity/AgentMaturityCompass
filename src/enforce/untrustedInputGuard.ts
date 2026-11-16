@@ -148,7 +148,9 @@ function argumentReach(workspace: string, argv: readonly unknown[]): { outside: 
     const path = value.startsWith("~") ? resolve(homedir(), value.slice(value.startsWith("~/") ? 2 : 1)) : resolve(workspace, value);
     if (!inProject(workspace, path)) outside = true;
     if (secretPath(workspace, path)) secret = true;
-    try { folder ||= statSync(path).isDirectory(); } catch { /* not there: not a folder */ }
+    // A path that is not there yet may be a folder by the time the program runs (an earlier part of the same command can
+    // create it), so it counts as one: only an existing file that is not a folder is known not to be.
+    try { folder ||= statSync(path).isDirectory(); } catch { folder = true; }
   }
   return { outside, secret, folder };
 }

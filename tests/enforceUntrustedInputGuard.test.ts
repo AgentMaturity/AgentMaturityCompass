@@ -273,6 +273,9 @@ describe("untrusted-input guard rules", () => {
         expect(spawn(binary, [...argv]).untrusted, `${binary} ${argv.join(" ")}`).not.toBeNull();
       }
       expect(spawn("diff", ["d2/h", "d2/h"])).toMatchObject({ untrusted: null, outbound: false });
+      // An operand that does not exist when the call is judged may be a folder of links by the time diff runs.
+      expect(spawn("diff", ["not-there-yet", "d2"]).untrusted).not.toBeNull();
+      expect(spawn("diff", ["not-there-yet", "d2/h"]).untrusted).not.toBeNull();
       const session = String(recorded("SessionStart-startup", workspace).session_id);
       call(workspace, session, "PreToolUse-bash", { command: `'/usr/bin/diff' '-r' '${join(workspace, "d1")}' '${join(workspace, "d2")}'`, description: "compare" });
       expect(curl(workspace, session).reason).toContain("This session earlier read the output of a program that can reach outside this project (Bash: diff)");
