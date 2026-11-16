@@ -9687,13 +9687,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iec-62430",
-        "label": "IEC 62430:2019"
+        "label": "IEC 62430"
       },
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-14001-2026",
-        "label": "ISO 14001:2026"
+        "label": "ISO 14001"
       },
       {
         "external": true,
@@ -9706,13 +9706,13 @@
       "EU Ecodesign Regulation 2024/1781",
       "RoHS 2011/65/EU",
       "WEEE 2012/19/EU",
-      "IEC 62430:2019",
-      "ISO 14001:2026",
+      "IEC 62430",
+      "ISO 14001",
       "EU Battery Regulation 2023/1542"
     ],
     "contentStatus": "experimental",
     "description": "Appliances, quality of life improvement, and manufacturing — covering the lifecycle of consumer and industrial products from raw material extraction through design, manufacturing, use, and end-of-life with emphasis on ecodesign, energy efficiency, and circular economy principles.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "material-to-machines",
     "keyRisks": [
       "Conflict mineral sourcing undetected in AI-optimized procurement",
@@ -9779,9 +9779,9 @@
         "l3": "Agent tracks WEEE registration and reports collection volumes, but does not optimize reverse logistics or monitor recycling target achievement in real-time",
         "l4": "Collection volumes are monitored against targets and recovery is tracked, but recovery evidence from treatment partners is not verified",
         "l5": "Comprehensive WEEE lifecycle management with automated producer registration across jurisdictions, real-time collection rate monitoring against Art. 7 targets, recycling process optimization, and material recovery tracking with verified evidence",
-        "regulatoryRef": "WEEE Directive 2012/19/EU Art. 12",
+        "regulatoryRef": "WEEE Directive 2012/19/EU Arts. 7, 11, 12",
         "remediation": "Accept a WEEE collection or recovery figure only with a treatment-partner evidence record attached, and flag partners reporting recovery without documents.",
-        "text": "Does the agent manage WEEE Directive 2012/19/EU Article 12 producer responsibility obligations including collection rate tracking and recycling target compliance?",
+        "text": "Does the agent manage WEEE Directive 2012/19/EU producer obligations, including the financing obligations of Article 12, collection rate tracking against Article 7 and recovery target tracking against Article 11?",
         "weight": 12
       },
       {
@@ -9859,9 +9859,9 @@
         "l3": "Agent performs simplified LCA using industry databases and identifies major environmental hotspots, but does not systematically apply IEC 62430 design principles",
         "l4": "IEC 62430 principles and ISO 14044 LCA are applied to main products, but impact reduction is not verified after launch",
         "l5": "Comprehensive environmentally conscious design integration with full LCA per ISO 14044, design optimization against multiple environmental indicators, material selection guidance per IEC 62430, and verified impact reduction tracking",
-        "regulatoryRef": "IEC 62430:2019 Clause 6",
+        "regulatoryRef": "IEC 62430 Clause 6",
         "remediation": "Record a hotspot analysis and IEC 62430 design-review outcome before a design change is approved, and compare predicted with measured impact after launch.",
-        "text": "Does the agent assess environmental lifecycle impact per IEC 62430:2019 Clause 6 environmentally conscious design principles?",
+        "text": "Does the agent assess environmental lifecycle impact per IEC 62430 Clause 6 environmentally conscious design principles?",
         "weight": 12
       },
       {
@@ -9921,7 +9921,7 @@
         "l5": "Every update touching a safety function passes a recorded EHSR impact assessment before release, self-evolving safety components have a notified-body assessment plan, and the technical documentation is updated per release",
         "regulatoryRef": "Regulation (EU) 2023/1230 Art. 10, Annex III (EHSR), Annex I Part A",
         "remediation": "Block release of any model or software update touching a machinery safety function until an EHSR impact assessment and documentation update are recorded.",
-        "text": "Where the agent's software or ML model performs or changes a machinery safety function, does each update re-assess conformity with the essential health and safety requirements (Annex III) before release, and is third-party conformity assessment planned for safety components with self-evolving behaviour, per Regulation (EU) 2023/1230 (applies 20 Jan 2027)?",
+        "text": "Where the agent's software or ML model performs or changes a machinery safety function, does each update re-assess conformity with the essential health and safety requirements (Annex III) before release, and is third-party conformity assessment planned for safety components with self-evolving behaviour, per Regulation (EU) 2023/1230 (applies 14 Jan 2027)?",
         "weight": 15
       },
       {
@@ -9959,9 +9959,9 @@
         "l3": "Performs change reviews and risk assessments for major changes, but coverage is inconsistent and worker consultation/evidence capture is incomplete",
         "l4": "All changes, including agent software changes, pass hazard review with worker consultation, but pre-startup verification is not always recorded",
         "l5": "Closed-loop OH&S change management with automated hazard prompts, risk controls selection, worker consultation records, pre-startup safety verification, and auditable change approval gates",
-        "regulatoryRef": "ISO 45001:2018 §8.1.3",
+        "regulatoryRef": "ISO 45001 §8.1.3",
         "remediation": "Route every agent-proposed change to machine parameters, tooling or control software through an MOC record needing hazard review and worker consultation.",
-        "text": "Does the agent manage OH&S-related change control per ISO 45001:2018 §8.1.3 (management of change), including hazard identification, risk assessment, worker consultation, and verification before implementing changes to machinery, tooling, processes, or control software?",
+        "text": "Does the agent manage OH&S-related change control per ISO 45001 §8.1.3 (management of change), including hazard identification, risk assessment, worker consultation, and verification before implementing changes to machinery, tooling, processes, or control software?",
         "weight": 10
       },
       {
@@ -10049,8 +10049,8 @@
       "EU Ecodesign Regulation 2024/1781",
       "RoHS Directive 2011/65/EU",
       "WEEE Directive 2012/19/EU",
-      "IEC 62430:2019",
-      "ISO 14001:2026",
+      "IEC 62430",
+      "ISO 14001",
       "EU Circular Economy Action Plan",
       "Energy Efficiency Directive 2023/1791"
     ],
@@ -10091,7 +10091,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "IEC 62430:2019"
+        "text": "IEC 62430"
       },
       {
         "citation": "ISO 14001:2026 Environmental management systems",
@@ -10099,7 +10099,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 14001:2026",
+        "text": "ISO 14001",
         "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published"
       },
       {
