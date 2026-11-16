@@ -20,8 +20,8 @@ function nearby(text: string, needle: string, radius = 200): string[] {
 }
 
 describe("the first console login is in the first-run path", () => {
-  test("the README's 60-seconds block creates the first login after amc up", () => {
-    const section = readme.slice(readme.indexOf("## 60 Seconds to Your First Score"));
+  test("the README's first-score block creates the first login after amc up", () => {
+    const section = readme.slice(readme.indexOf("## Your first score"));
     const block = section.slice(section.indexOf("```bash"), section.indexOf("```", section.indexOf("```bash") + 7));
     expect(block).toContain("amc user init --username <you>   # new workspace only: the first console login (asks for a password)");
     expect(block.indexOf("amc user init")).toBeGreaterThan(block.indexOf("amc up"));

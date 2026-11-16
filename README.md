@@ -41,7 +41,7 @@ It is for people in regulated work, such as health, finance, education or the pu
 ## Three steps
 
 1. **Install AMC.** One command, [below](#install).
-2. **Build an agent for your industry.** In your project folder, type `amc` and choose "Build an agent for my industry (A4 Forge preview)". AMC starts on your computer and offers to open the A4 page of the Compass Console (AMC's web page on your computer). Sign in as the workspace owner, pick your industry and start an agent project. [A4 Forge](#a4-forge-preview) takes the agent through four stages, Aspire, Assemble, Adapt and Activate, and each step waits for a person's approval.
+2. **Build an agent for your industry.** In your project folder, type `amc` and choose "Build an agent for my industry (A4 Forge preview)". AMC starts on your computer and offers to open the A4 page of the Compass Console (AMC's web page on your computer). Sign in as the workspace owner (the first time, create your owner account with `amc user init --username <you>`), pick your industry and start an agent project. [A4 Forge](#a4-forge-preview) takes the agent through four stages, Aspire, Assemble, Adapt and Activate, and each step waits for a person's approval.
 3. **Watch or score an agent you already have.** In the same menu, choose "Watch Claude Code as it works" or "Watch Codex as it works" to record what your coding agent does, or "Just show my score" for a score worked out only from what AMC has recorded.
 
 Three things to know first:
@@ -186,7 +186,7 @@ That is the entire thesis: **trust, but verify — with receipts**.
 
 ---
 
-## 60 Seconds to Your First Score
+## Your first score
 
 ```bash
 # macOS or Linux: build the current source (the address works once the website is published from main)

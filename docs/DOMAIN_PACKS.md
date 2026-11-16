@@ -4,14 +4,14 @@ AMC domain packs extend the base 244-question AMC rubric with industry-specific 
 
 **Industry Packs in plain words.** An Industry Pack is a questionnaire for one sector, such as patient records, payments or public services. The 41 packs are grouped into seven stations (health, wealth, education, mobility, technology, environment and governance). You can use one on its own (`amc domain pack run --pack <packId>`) or start an A4 Forge agent project from one, in the Compass Console.
 
-**Status: experimental.** Pack content is drafted by AI, has not been reviewed by a qualified expert, and is not legal advice. Answers to a pack are self-reported and count at L1 at most. Every citation in the packs was checked by an AI agent on 2026-11-16, not by an expert; `amc domain pack describe --pack <packId>` prints the count for that pack, for example:
+**Status: experimental.** Pack content is drafted by AI, has not been reviewed by a qualified expert, and is not legal advice. Answers to a pack are self-reported and count at L1 at most. Every citation in the packs has a check record written by an AI agent on 2026-11-16, not by an expert; some sources could not be opened. `amc domain pack describe --pack <packId>` prints the count for that pack, for example:
 
 ```text
   Citations:  39 of 42 citations checked; 39 of them by an AI agent, not an expert review; 2 sources could not be opened; 1 instrument replaced
   Content:    experimental, self-reported questionnaire. AI-drafted; not reviewed by a qualified expert; not legal advice.
 ```
 
-("checked" there covers citations the agent found supported by the source as written and those it corrected.) A pack result is never a certification, a compliance verdict or proof of safety.
+In that output, "checked" counts the citations the agent found supported by the source as written and those it corrected. A pack result is never a certification, a compliance verdict or proof of safety.
 
 > The base-rubric figure is whatever `node scripts/gen-counts.mjs` reports (244
 > today); the earlier "138-question rubric" and "1,021 total" predate several

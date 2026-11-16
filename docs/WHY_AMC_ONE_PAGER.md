@@ -13,7 +13,7 @@ Most tools measure prompts, traces, or isolated eval cases. AMC measures operati
 | Score | Score | L0-L5 maturity, gap analysis, next actions |
 | Evidence | Vault, Watch | Signed evidence, traces, drift signals, reports |
 | Guardrails | Shield, Enforce | Adversarial packs, runtime checks, approval boundaries |
-| Governance | Comply, Fleet, Passport | Compliance maps, fleet comparisons, portable trust identity |
+| Governance | Comply, Fleet, Passport | Compliance maps, fleet comparisons, a self-issued, signed summary of an agent's results that others can check |
 | Business risk | Business commands | Expected annual loss, ROI, heatmaps, GRC treatment-plan export |
 
 ## Five-Minute Proof Path
