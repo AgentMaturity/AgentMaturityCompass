@@ -1136,8 +1136,8 @@ export function registerLateStageCliCommands({
 
   watch
     .command("connect")
-    .description("Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)")
-    .requiredOption("--provider <provider>", "Provider type: otlp | langfuse | helicone | datadog | webhook")
+    .description("Poll an observability backend for traces (trace-query, langfuse, helicone, datadog, webhook); to receive OTLP from an agent, see amc connect --print-env --runtime")
+    .requiredOption("--provider <provider>", "Provider type: trace-query (a tracing backend's query API, Jaeger-compatible; old name: otlp) | langfuse | helicone | datadog | webhook")
     .requiredOption("--endpoint <url>", "Provider API endpoint URL")
     .option("--api-key <key>", "API key for authentication (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)").option("--secret-key-file <path>", "Langfuse: read the secret key from this private file (or set AMC_WATCH_SECRET_KEY)")
     .option("--poll-interval <ms>", "Poll interval in milliseconds", "10000")
@@ -1176,14 +1176,14 @@ export function registerLateStageCliCommands({
     .action(async (opts: { agent?: string }) => {
       console.log(chalk.cyan("Watch Providers"));
       console.log(chalk.gray("Use `amc watch connect` to connect an observability provider."));
-      console.log(chalk.gray("Supported: otlp, langfuse, helicone, datadog, webhook"));
+      console.log(chalk.gray("Supported: trace-query (old name: otlp), langfuse, helicone, datadog, webhook"));
     });
 
   monitor
     .command("live")
     .description("Start real-time monitoring with live assurance checks on incoming traces")
     .option("--agent <agentId>", "Agent ID")
-    .option("--provider <provider>", "Observability provider", "otlp")
+    .option("--provider <provider>", "Observability provider", "trace-query")
     .option("--endpoint <url>", "Provider endpoint")
     .option("--api-key <key>", "Provider API key (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)").option("--secret-key-file <path>", "Langfuse: read the secret key from this private file (or set AMC_WATCH_SECRET_KEY)")
     .option("--budget <usd>", "Cost budget in USD", "100")
@@ -1198,10 +1198,10 @@ export function registerLateStageCliCommands({
         workspace: process.cwd(),
         agentId,
         providers: opts.endpoint ? [{
-          provider: (opts.provider ?? "otlp") as any,
+          provider: (opts.provider ?? "trace-query") as any,
           endpoint: opts.endpoint,
           apiKey: watchApiKey(opts),
-          headers: watchSecretHeaders({ ...opts, provider: opts.provider ?? "otlp" }),
+          headers: watchSecretHeaders({ ...opts, provider: opts.provider ?? "trace-query" }),
         }] : [],
       });
 
