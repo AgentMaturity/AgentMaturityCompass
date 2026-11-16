@@ -23,7 +23,22 @@ export interface McpLedgerEntry {
   toolCount: number;
   criticalFindings: number;
   highFindings: number;
+  /** Each tool's description and input-schema digests: what tells a changed tool definition from an unchanged one. */
+  tools: McpToolHashes[];
   contentHash: string;
+}
+
+export interface McpToolHashes {
+  name: string;
+  descriptionSha256: string;
+  schemaSha256: string;
+}
+
+/** A tool of a known server whose description or input schema differs from the previous receipt's. */
+export interface McpChangedTool {
+  server: string;
+  tool: string;
+  changed: Array<"description" | "schema">;
 }
 
 export interface McpTrustReceipt {
@@ -35,6 +50,8 @@ export interface McpTrustReceipt {
   aggregateRisk: "CLEAN" | "REVIEW" | "BLOCK";
   entries: McpLedgerEntry[];
   changedSincePrevious: string[] | null;
+  /** Tools a previous receipt knew whose description or schema changed; null without a previous receipt. */
+  changedTools: McpChangedTool[] | null;
   receiptHash: string;
 }
 
@@ -73,6 +90,8 @@ function collectDefinitionFiles(targets: string[]): string[] {
 function entryFromScan(scan: McpSecurityScanResult): McpLedgerEntry {
   const critical = scan.findings.filter((f) => f.severity === "CRITICAL").length;
   const high = scan.findings.filter((f) => f.severity === "HIGH").length;
+  const tools = scan.serverInfo.tools.map((tool) => ({ name: tool.name, descriptionSha256: tool.descriptionSha256, schemaSha256: tool.schemaSha256 }))
+    .sort((a, b) => a.name.localeCompare(b.name));
   return {
     path: scan.path,
     serverName: scan.serverInfo.name ?? null,
@@ -82,11 +101,12 @@ function entryFromScan(scan: McpSecurityScanResult): McpLedgerEntry {
     toolCount: scan.serverInfo.toolCount,
     criticalFindings: critical,
     highFindings: high,
+    tools,
     contentHash: sha256Hex(canonicalize({
       level: scan.securityLevel,
       score: scan.securityScore,
       findings: scan.findings.map((f) => ({ id: f.id ?? f.title, severity: f.severity })),
-      tools: scan.serverInfo.toolCount
+      tools
     }))
   };
 }
@@ -100,6 +120,8 @@ export function buildMcpTrustReceipt(params: {
   targets: string[];
   generatedAt: number;
   previous?: Record<string, string> | null;
+  /** The previous receipt's entries (or the servers AMC last recorded), for per-tool changes. */
+  previousEntries?: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">> | null;
 }): McpTrustReceipt {
   const files = collectDefinitionFiles(params.targets);
   const entries: McpLedgerEntry[] = [];
@@ -116,6 +138,7 @@ export function buildMcpTrustReceipt(params: {
         toolCount: 0,
         criticalFindings: 0,
         highFindings: 0,
+        tools: [],
         contentHash: sha256Hex(`unscannable:${file}`)
       });
     }
@@ -141,6 +164,7 @@ export function buildMcpTrustReceipt(params: {
     }
   }
 
+  const changedTools = params.previousEntries ? changedToolsSince(entries, params.previousEntries) : null;
   const body = {
     schemaVersion: "amc.mcp-trust-ledger.v1" as const,
     generatedAt: params.generatedAt,
@@ -149,7 +173,8 @@ export function buildMcpTrustReceipt(params: {
     cleanAsOf: aggregateRisk === "CLEAN",
     aggregateRisk,
     entries,
-    changedSincePrevious
+    changedSincePrevious,
+    changedTools
   };
   return { ...body, receiptHash: sha256Hex(canonicalize(body)) };
 }
@@ -160,4 +185,23 @@ export function previousHashMap(receipt: McpTrustReceipt): Record<string, string
     map[entry.path] = entry.contentHash;
   }
   return map;
+}
+
+export const mcpServerKey = (entry: Pick<McpLedgerEntry, "path" | "serverName">) => entry.serverName ?? entry.path;
+
+/** Tools that both receipts list for the same server whose description or input schema digest differs. */
+export function changedToolsSince(entries: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>,
+  previous: ReadonlyArray<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>): McpChangedTool[] {
+  const known = new Map(previous.map((entry) => [mcpServerKey(entry), new Map((entry.tools ?? []).map((tool) => [tool.name, tool]))]));
+  const changed: McpChangedTool[] = [];
+  for (const entry of entries) {
+    for (const tool of entry.tools) {
+      const before = known.get(mcpServerKey(entry))?.get(tool.name);
+      if (!before) continue;
+      const what = [...(before.descriptionSha256 !== tool.descriptionSha256 ? ["description" as const] : []),
+        ...(before.schemaSha256 !== tool.schemaSha256 ? ["schema" as const] : [])];
+      if (what.length > 0) changed.push({ server: mcpServerKey(entry), tool: tool.name, changed: what });
+    }
+  }
+  return changed.sort((a, b) => `${a.server}\0${a.tool}`.localeCompare(`${b.server}\0${b.tool}`));
 }
