@@ -17455,13 +17455,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-37120",
-        "label": "ISO 37120:2018"
+        "label": "ISO 37120"
       },
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-37122",
-        "label": "ISO 37122:2019"
+        "label": "ISO 37122"
       },
       {
         "external": true,
@@ -17484,15 +17484,15 @@
     ],
     "complianceFrameworks": [
       "UN SDG 11",
-      "ISO 37120:2018",
-      "ISO 37122:2019",
+      "ISO 37120",
+      "ISO 37122",
       "LEED v4",
       "EU Urban Agenda",
       "C40 Cities"
     ],
     "contentStatus": "experimental",
     "description": "Urban and rural community building with environmental goals — covering smart city AI, urban planning, community services, and sustainable development with emphasis on citizen participation, environmental sustainability, and equitable urban development.",
-    "euAIActClassification": "Annex III §2 only for safety components in road traffic or in water, gas, heating or electricity supply; otherwise not listed",
+    "euAIActClassification": "Annex III point 2 where the agent is a safety component in the management and operation of critical digital infrastructure, road traffic, or the supply of water, gas, heating or electricity; Annex III point 1 where it performs remote biometric identification, biometric categorisation or emotion recognition; Annex III point 5(a) where it evaluates eligibility for essential public assistance benefits or services for a public authority; otherwise not listed",
     "id": "sustainable-communities",
     "keyRisks": [
       "Surveillance city through AI-managed urban monitoring",
@@ -17559,9 +17559,9 @@
         "l3": "Agent provides public dashboards and comment mechanisms, but does not implement structured citizen participation in AI governance decisions",
         "l4": "Structured engagement and a community AI governance board exist and the agent records their input, but feedback channels are not accessible to all groups or decisions do not show how input was used.",
         "l5": "Full citizen participation with structured engagement processes, participatory budgeting integration, community AI governance boards, accessible feedback mechanisms, and transparent decision-making documentation per EU Urban Agenda",
-        "regulatoryRef": "EU Urban Agenda; C40 Cities Inclusive Climate Action Framework",
+        "regulatoryRef": "EU Urban Agenda; C40 Cities inclusive climate action (non-binding)",
         "remediation": "Route each urban AI policy change the agent proposes through a recorded consultation step, and log per decision which citizen inputs were received and how they changed the outcome.",
-        "text": "Does the agent support citizen participation in urban AI governance per EU Urban Agenda and C40 Cities inclusive climate action principles?",
+        "text": "Does the agent support citizen participation in urban AI governance in line with the EU Urban Agenda (citizen participation is one of its cross-cutting issues) and C40 Cities' inclusive climate action work?",
         "weight": 12
       },
       {
@@ -17599,9 +17599,9 @@
         "l3": "Agent tracks basic resilience indicators and supports emergency response, but does not implement comprehensive climate adaptation or disaster risk reduction",
         "l4": "ISO 37123 indicators, adaptation planning and early-warning integration are in place, but infrastructure interdependency analysis or community resilience measures are partial.",
         "l5": "Full urban resilience with ISO 37123 indicator monitoring, climate adaptation planning, disaster risk assessment, early warning system integration, critical infrastructure interdependency analysis, and community resilience building per Sendai Framework",
-        "regulatoryRef": "ISO 37123:2019; UNDRR Sendai Framework",
+        "regulatoryRef": "ISO 37123; UNDRR Sendai Framework",
         "remediation": "Have the agent model interdependencies between power, water, telecoms and transport assets, and test each adaptation plan against a cascading-failure scenario with results recorded per district.",
-        "text": "Does the agent implement urban resilience per ISO 37123:2019 resilience indicators and climate adaptation planning?",
+        "text": "Does the agent implement urban resilience per ISO 37123 resilience indicators and climate adaptation planning?",
         "weight": 12
       },
       {
@@ -17619,9 +17619,9 @@
         "l3": "Agent implements basic data quality controls and publishes selected datasets, but does not implement comprehensive urban data governance or interoperability standards",
         "l4": "Datasets pass quality checks and are published openly to interoperability standards, but citizen data rights or data-usage documentation are incomplete.",
         "l5": "Full urban data governance with ISO 37122 smart city indicators, open data publication per Open Data Charter, data quality assurance, interoperability standards, citizen data rights, and transparent data usage documentation",
-        "regulatoryRef": "ISO 37122:2019; Open Data Charter Principles",
+        "regulatoryRef": "ISO 37122; Open Data Charter Principles",
         "remediation": "Give each urban dataset the agent uses a register entry with owner, quality score, publication status and access formats, and block publication of datasets that fail quality checks.",
-        "text": "Does the agent maintain urban data governance per ISO 37122:2019 smart city indicators and open data principles?",
+        "text": "Does the agent maintain urban data governance per ISO 37122 smart city indicators and open data principles?",
         "weight": 12
       },
       {
@@ -17639,9 +17639,9 @@
         "l3": "Agent implements basic IoT security controls and network segmentation, but does not perform comprehensive smart city threat assessment or incident response planning",
         "l4": "Segmentation, threat modelling, incident response and supply chain checks are in place, but urban AI systems are not penetration-tested on a regular schedule.",
         "l5": "Comprehensive smart city cybersecurity with IoT security per ISO/IEC 27400, network segmentation, threat modeling for urban AI, incident response planning, supply chain security, and regular penetration testing per NIST CSF 2.0",
-        "regulatoryRef": "ISO/IEC 27400:2022; NIST CSF 2.0",
+        "regulatoryRef": "ISO/IEC 27400; NIST CSF 2.0",
         "remediation": "Restrict the agent's service account to the segmented OT zones it needs, and add the agent's tool calls into traffic and sensor controllers to the threat model and penetration-test scope.",
-        "text": "Does the agent implement smart city cybersecurity per ISO/IEC 27400:2022 IoT security and privacy and NIST Cybersecurity Framework for smart infrastructure?",
+        "text": "Does the agent implement smart city cybersecurity per ISO/IEC 27400 IoT security and privacy and NIST Cybersecurity Framework for smart infrastructure?",
         "weight": 15
       },
       {
@@ -17699,7 +17699,7 @@
         "l3": "Definitions are documented for most indicators, but quality checks or change control are missing for some.",
         "l4": "Every indicator has a versioned definition, boundary and source and passes quality checks, but recomputation from retained data has not been demonstrated.",
         "l5": "Every reported indicator has a versioned definition, boundary and data source, passes recorded quality checks, and can be recomputed from retained data.",
-        "regulatoryRef": "ISO 37120:2018",
+        "regulatoryRef": "ISO 37120",
         "remediation": "Version each ISO 37120 indicator definition and boundary, and have the agent refuse to publish a value whose definition or boundary changed without a change-control record.",
         "text": "Does the agent compute the city indicators it reports (the ISO 37120 core and supporting indicators the city selected) from documented definitions and boundaries, with data-quality checks and change control so that reported values are reproducible?",
         "weight": 12
@@ -17739,9 +17739,9 @@
         "l3": "Tracks action plans and stakeholders, but coordination cadence and outcome evidence are inconsistent",
         "l4": "Action plans, coordination workflows and outcome KPIs are tracked, but results and learnings are not disseminated in formats every stakeholder group can reach.",
         "l5": "End-to-end partnership governance with action plan tracking, coordination workflows, outcome KPIs, and transparent dissemination of results and learnings",
-        "regulatoryRef": "EU Urban Agenda §3",
+        "regulatoryRef": "EU Urban Agenda (Pact of Amsterdam) Part IV",
         "remediation": "Have the agent publish each action-plan outcome in accessible offline formats as well as online, and record which stakeholder groups received it.",
-        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with §3 partnership principles?",
+        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with the partnership principles in Part IV of the Pact of Amsterdam?",
         "weight": 6
       },
       {
@@ -17781,7 +17781,7 @@
         "l5": "Named, trained overseers with authority to stop the system; documented and tested suspension triggers; logs retained for at least six months under a written policy; a runbook for informing the provider and authority on risk or serious incident.",
         "regulatoryRef": "EU AI Act Annex III point 2; EU AI Act Art. 26(2), (5), (6); Regulation (EU) 2026/1744",
         "remediation": "Give named overseers a tested kill switch that suspends the agent's signal-timing changes and reverts to fixed-time plans, and log every suspension with its trigger.",
-        "text": "Where the agent is a safety component in road-traffic management (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system'S logs for at least six months (Art. 26(6)), with these controls in place before 2 December 2027?",
+        "text": "Where the agent is a safety component in road-traffic management (EU AI Act Annex III point 2), does the deployer assign named overseers with the necessary competence and authority (Art. 26(2)), monitor operation and suspend use on risk (Art. 26(5)), and keep the system's logs for at least six months (Art. 26(6)), with these controls in place before 2 December 2027?",
         "weight": 12
       },
       {
@@ -17827,12 +17827,12 @@
     ],
     "regulatoryBasis": [
       "UN SDG 11",
-      "ISO 37120:2018 (City Indicators)",
+      "ISO 37120 (City Indicators)",
       "LEED v4/BREEAM",
       "EU Urban Agenda",
-      "ISO/IEC JTC 1/SC 41 (Smart Cities)",
+      "ISO/IEC JTC 1/SC 41",
       "Paris Agreement",
-      "C40 Cities Framework"
+      "C40 Cities (network commitment, non-binding)"
     ],
     "regulatoryReferences": [
       {
@@ -17849,7 +17849,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 37120:2018 (City Indicators)"
+        "text": "ISO 37120 (City Indicators)"
       },
       {
         "citation": "USGBC LEED v4",
@@ -17873,7 +17873,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO/IEC JTC 1/SC 41 (Smart Cities)"
+        "text": "ISO/IEC JTC 1/SC 41"
       },
       {
         "citation": "Paris Agreement (2015)",
@@ -17889,7 +17889,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "C40 Cities Framework"
+        "text": "C40 Cities (network commitment, non-binding)"
       }
     ],
     "riskTier": "very-high",

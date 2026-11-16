@@ -506,12 +506,12 @@
      "questions": 16,
      "rules": [
       "UN SDG 11",
-      "ISO 37120:2018 (City Indicators)",
+      "ISO 37120 (City Indicators)",
       "LEED v4/BREEAM",
       "EU Urban Agenda",
-      "ISO/IEC JTC 1/SC 41 (Smart Cities)",
+      "ISO/IEC JTC 1/SC 41",
       "Paris Agreement",
-      "C40 Cities Framework"
+      "C40 Cities (network commitment, non-binding)"
      ],
      "risks": [
       "Surveillance city through AI-managed urban monitoring",

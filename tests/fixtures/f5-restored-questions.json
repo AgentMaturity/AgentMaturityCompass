@@ -162,8 +162,8 @@
       "question": {
         "id": "MOB-SC-14",
         "dimension": "Governance",
-        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with §3 partnership principles?",
-        "regulatoryRef": "EU Urban Agenda §3",
+        "text": "Does the agent support the Urban Agenda for the EU partnership implementation cycle (priority theme selection, action plan management, stakeholder coordination, and results dissemination) consistent with the partnership principles in Part IV of the Pact of Amsterdam?",
+        "regulatoryRef": "EU Urban Agenda (Pact of Amsterdam) Part IV",
         "l1": "No partnership delivery workflow; engagement does not translate into managed action plans and outcomes",
         "l3": "Tracks action plans and stakeholders, but coordination cadence and outcome evidence are inconsistent",
         "l5": "End-to-end partnership governance with action plan tracking, coordination workflows, outcome KPIs, and transparent dissemination of results and learnings",
