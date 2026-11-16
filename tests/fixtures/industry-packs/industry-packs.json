@@ -18380,7 +18380,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-50001",
-        "label": "ISO 50001:2018"
+        "label": "ISO 50001"
       },
       {
         "external": true,
@@ -18405,14 +18405,14 @@
       "LEED v4",
       "BREEAM In-Use",
       "WELL Building Standard v2",
-      "ISO 50001:2018",
+      "ISO 50001",
       "EU EPBD 2024",
       "GRESB",
       "EU Taxonomy Art. 10"
     ],
     "contentStatus": "experimental",
     "description": "Industrial real estate, manufacturing facilities, travel/leisure, entertainment, and hospital infrastructure — AI agents managing buildings, facilities, and real estate portfolios with focus on energy performance, occupant wellbeing, sustainability certification, and climate resilience.",
-    "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of heating or electricity (§2); Art. 50 transparency applies",
+    "euAIActClassification": "Not listed in Annex III unless a safety component in the supply of water, gas, heating or electricity (point 2); Art. 50 transparency duties apply where the agent interacts directly with people or generates synthetic content",
     "id": "sustainable-real-estate",
     "keyRisks": [
       "Greenwashing through unverified sustainability claims",
@@ -18458,7 +18458,7 @@
         "l2": "Taxonomy alignment is claimed at portfolio level with no criterion-level check.",
         "l3": "Agent tracks selected taxonomy criteria but does not perform comprehensive substantial contribution assessment or document DNSH compliance",
         "l4": "Substantial contribution and DNSH are assessed for each asset, but lifecycle carbon assessment or disclosure generation is manual.",
-        "l5": "Full EU Taxonomy alignment with substantial contribution verification per Annex I §7, DNSH assessment across all six environmental objectives, lifecycle carbon assessment, and automated taxonomy disclosure for EU SFDR reporting",
+        "l5": "Full EU Taxonomy alignment with substantial contribution verification per Annex I §7, DNSH assessment against the other five environmental objectives, lifecycle carbon assessment, and automated taxonomy disclosure for EU SFDR reporting",
         "regulatoryRef": "EU Taxonomy Climate Delegated Act, Annex I §7",
         "remediation": "Require a per-asset substantial contribution result and a DNSH result for all six objectives before the agent counts the asset as taxonomy-aligned in any disclosure.",
         "text": "Does the agent implement EU Taxonomy alignment per Climate Delegated Act Annex I substantial contribution criteria for climate change mitigation in buildings?",
@@ -18539,7 +18539,7 @@
         "l3": "Declarations are stored for major products but are not linked to building elements, and no disassembly information is kept.",
         "l4": "Each installed product links to its declaration and its location in the building, but disassembly information or export is incomplete.",
         "l5": "Each installed construction product links to its declaration (and passport where available), its location in the building and its disassembly information, and the records are exportable.",
-        "regulatoryRef": "Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887:2020",
+        "regulatoryRef": "Regulation (EU) 2024/3110 Art. 13; Regulation (EU) 2024/3110 Arts. 75-79; ISO 20887",
         "remediation": "Link each installed product's declaration of performance to its building element in the asset model, and have the agent flag elements with no declaration on file.",
         "text": "Does the agent keep construction-product records for the building (the declaration of performance and conformity under Regulation (EU) 2024/3110 Art. 13, and the construction digital product passport once delegated acts set it up under Arts. 75-79), together with disassembly information per ISO 20887?",
         "weight": 10
@@ -18749,7 +18749,7 @@
       "LEED v4",
       "BREEAM In-Use",
       "WELL Building Standard v2",
-      "ISO 50001:2018",
+      "ISO 50001",
       "EU Energy Performance of Buildings Directive (EPBD) 2024",
       "GRESB Real Estate Assessment",
       "EU Taxonomy Regulation Art. 10",
@@ -18786,7 +18786,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 50001:2018",
+        "text": "ISO 50001",
         "url": "https://www.iso.org/standard/88430.html"
       },
       {
