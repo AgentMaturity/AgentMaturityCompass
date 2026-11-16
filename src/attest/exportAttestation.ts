@@ -17,10 +17,9 @@ import { toSigstoreBundle } from "./sigstoreBundle.js";
 import { INTOTO_STATEMENT_TYPE } from "./statement.js";
 
 /** Never reuse a published predicate version: a changed shape gets a new URI. */
-export const EXPORT_PREDICATE = "https://agentmaturity.co/attestations/export/v0.1";
-export const EXPORT_NOTICE = "A signature shows who issued this file and that it is unchanged, not that its content is true.";
-export const EXPORT_KINDS = ["amcpass", "amcbundle", "amccert"] as const;
-export type ExportKind = (typeof EXPORT_KINDS)[number];
+const EXPORT_PREDICATE = "https://agentmaturity.co/attestations/export/v0.1";
+const EXPORT_NOTICE = "A signature shows who issued this file and that it is unchanged, not that its content is true.";
+export type ExportKind = "amcpass" | "amcbundle" | "amccert";
 
 export function exportStatement(input: { name: string; bytes: Uint8Array; kind: ExportKind; workspaceId: string; issuedAt: Date }) {
   return {

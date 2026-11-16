@@ -24,14 +24,14 @@ export const LEGACY_VAULT_ITERATIONS = 210_000;
 /** New vaults (OWASP Password Storage Cheat Sheet: PBKDF2-HMAC-SHA256, 600,000 iterations). */
 export const VAULT_ITERATIONS = 600_000;
 /** Above this a vault header would stall the machine for minutes on every unlock: refused as a denial of service. */
-export const MAX_VAULT_ITERATIONS = 10_000_000;
+const MAX_VAULT_ITERATIONS = 10_000_000;
 
 /**
  * The header's key-derivation settings, checked before any work is done. A count below the legacy one (a downgrade) or
  * absurdly high (a stall), or any setting AMC never writes, is refused with a plain message. A header with no count is
  * an old vault: it opens with the legacy count.
  */
-export function checkedVaultKdf(kdf: unknown): VaultKdfParams {
+function checkedVaultKdf(kdf: unknown): VaultKdfParams {
   const header = (kdf ?? {}) as Partial<VaultKdfParams>;
   const iterations = header.iterations ?? LEGACY_VAULT_ITERATIONS;
   if (header.name !== "pbkdf2-sha256" || header.digest !== "sha256" || header.keyLen !== 32 || typeof header.saltB64 !== "string") {
