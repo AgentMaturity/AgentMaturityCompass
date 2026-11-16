@@ -213,7 +213,7 @@ import { captureArchetypeApply } from "./archetypes/archetypePublication.js";
 import { exportBadge, exportPolicyPack } from "./exports/policyExport.js";
 import { applyAssurancePatchKit, listAssuranceHistory, loadAssuranceReport, runAssurance, verifyAssuranceRun } from "./assurance/assuranceRunner.js";
 import { AgentResponderUnavailableError } from "./assurance/agentResponder.js";
-import { assuranceSarifEntries, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
+import { assuranceSarifEntries, describeAssurancePack, noFailedScenariosLine, OVER_REFUSAL_FIX, refusedOrdinaryTask, renderAssuranceOverallScore, renderAssurancePackLine, renderAssuranceScenarioHeading, renderAssuranceTotalLine } from "./assurance/cliPresentation.js";
 import { executedRerunFlags, selectExecutedAssuranceOptions, withExecutedAssuranceOptions, type AssuranceRunCliOptions } from "./assurance/executed/cliOptions.js";
 import { getAssurancePack, listAssurancePacks } from "./assurance/packs/index.js";
 import { registerMirofishCommands } from "./mirofish/cli.js";
@@ -1292,7 +1292,7 @@ function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): Ass
   const items: AssuranceRemediationItem[] = [];
   for (const pack of packResults) {
     for (const scenario of pack.scenarioResults) {
-      if (scenario.pass) {
+      if (scenario.pass || scenario.inconclusive === true) { // not evaluated is not a failure to fix
         continue;
       }
       items.push({
@@ -1303,7 +1303,7 @@ function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): Ass
         category: scenario.category,
         score0to100: scenario.score0to100,
         reason: scenario.reasons[0] ?? "Scenario failed without a recorded reason.",
-        fix: assuranceRemediationFix(scenario.category),
+        fix: refusedOrdinaryTask(scenario) ? OVER_REFUSAL_FIX : assuranceRemediationFix(scenario.category),
       });
     }
   }
@@ -1329,7 +1329,7 @@ function renderAssuranceRemediationPriority(report: AssuranceReport, opts: {
   console.log("");
   console.log(chalk.bold("  Remediation priority:"));
   if (items.length === 0) {
-    console.log(chalk.gray("  No failed scenarios. Keep scheduled assurance running and graduate to signed reports before verifier-ready claims."));
+    console.log(chalk.gray(noFailedScenariosLine(report.packResults)));
     console.log(chalk.gray(`  Evidence: ${opts.artifactPath}`));
     return;
   }
@@ -10532,7 +10532,7 @@ ci
   .option("--min-score <n>", "minimum red-team score to pass (0-100)", "80")
   .option("--max-vulnerabilities <n>", "maximum total vulnerabilities allowed", "0")
   .option("--max-critical <n>", "maximum critical vulnerabilities allowed", "0")
-  .option("--max-high <n>", "maximum high vulnerabilities allowed", "0")
+  .option("--max-high <n>", "maximum high vulnerabilities allowed", "0").option("--max-inconclusive <n>", "maximum scenarios left unevaluated before the gate fails", "0")
   .option("--evil-mcp", "include built-in Evil MCP agent-provider scenarios")
   .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all)")
   .option("--min-mcp-score <n>", "minimum Evil MCP score to pass (0-100)", "80")
@@ -10546,7 +10546,7 @@ ci
     minScore: string;
     maxVulnerabilities: string;
     maxCritical: string;
-    maxHigh: string;
+    maxHigh: string; maxInconclusive: string;
     evilMcp?: boolean;
     mcpAttacks?: string[];
     minMcpScore: string;
@@ -10578,7 +10578,7 @@ ci
           minScore0to100: parseGateNumber(opts.minScore, "--min-score"),
           maxVulnerabilities: parseGateNumber(opts.maxVulnerabilities, "--max-vulnerabilities"),
           maxCritical: parseGateNumber(opts.maxCritical, "--max-critical"),
-          maxHigh: parseGateNumber(opts.maxHigh, "--max-high"),
+          maxHigh: parseGateNumber(opts.maxHigh, "--max-high"), maxInconclusive: parseGateNumber(opts.maxInconclusive, "--max-inconclusive"),
           minMcpScore0to100: parseGateNumber(opts.minMcpScore, "--min-mcp-score"),
           minGamingResistanceScore0to100: parseGateNumber(opts.minGamingScore, "--min-gaming-score"),
         },
@@ -10597,6 +10597,7 @@ ci
         console.log(`  Vulnerabilities: ${result.severityCounts.total} (max: ${result.thresholds.maxVulnerabilities})`);
         console.log(`  Critical: ${result.severityCounts.critical} (max: ${result.thresholds.maxCritical})`);
         console.log(`  High: ${result.severityCounts.high} (max: ${result.thresholds.maxHigh})`);
+        console.log(`  Not evaluated: ${result.report.inconclusiveScenarios ?? 0} (max: ${result.thresholds.maxInconclusive})`);
         if (result.report.evilMcp) {
           console.log(`  Evil MCP score: ${result.report.evilMcp.overallScore0to100}/100 (min: ${result.thresholds.minMcpScore0to100})`);
         }
@@ -10885,8 +10886,7 @@ assurance
   .description("Describe assurance pack details")
   .argument("<packId>")
   .action((packId: string) => {
-    const pack = getAssurancePack(packId);
-    console.log(JSON.stringify(pack, null, 2));
+    console.log(JSON.stringify(describeAssurancePack(getAssurancePack(packId)), null, 2));
   });
 
 assurance
@@ -11013,7 +11013,7 @@ withExecutedAssuranceOptions(assurance
           window: opts.window,
           outputMarkdownPath: opts.out ? resolve(process.cwd(), opts.out) : undefined,
           noSign,
-          model: opts.model
+          model: opts.model, attempts: opts.attempts ?? (demoPackIds ? 1 : undefined)
         });
       } catch (error) {
         if (noSign) delete process.env.AMC_NO_SIGN;
@@ -19718,7 +19718,7 @@ shield
 // ── Shield Red Team ──────────────────────────────────────────────────────────
 shield
   .command("red-team")
-  .description("Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run`")
+  .description("Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run`")
   .option("--rounds <n>", "Number of attack rounds (default: 1)", "1")
   .option("--categories <list>", "Comma-separated attack categories to use")
   .option("--target <profile>", "Target profile id (default: demo)")
@@ -22028,7 +22028,7 @@ score
 
 score
   .command("output-integrity")
-  .description("Score output integrity maturity (OWASP LLM02, confidence calibration, citation)")
+  .description("Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation)")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {

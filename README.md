@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C610-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C611-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -133,7 +133,7 @@ To sign in to the Compass Console, create the first login with `amc user init --
 | Area | Plain meaning |
 |---|---|
 | **Score** | How mature is this agent, really? |
-| **Shield** | Does it survive attacks? (<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs) |
+| **Shield** | Does it survive attacks? (<!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs) |
 | **Enforce** | Can it be stopped from doing dangerous things? |
 | **Vault** | Are its secrets and keys protected? |
 | **Watch** | Do you see what it does in real time? |
@@ -281,7 +281,7 @@ Repair never deletes evidence. A failed signature looks the same whether a vault
 |  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |
 |---|---|---|---|---|
 | **Evidence model** | Execution-verified, cryptographic proofs | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
-| **Adversarial testing** | <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs built in | Not a focus | Partial (prompt-level only) | None |
+| **Adversarial testing** | <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> assurance packs built in | Not a focus | Partial (prompt-level only) | None |
 | **Compliance mapping** | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | Not included | Not included | Manual, labor-intensive |
 | **Framework support** | <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
 | **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
@@ -303,7 +303,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Resilience | 55 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
 | Skills | 52 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
-### <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> Registered Assurance Packs
+### <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> Registered Assurance Packs
 
 In these counts, registered = packs returned by `listAssurancePacks()`; files on disk may differ (the generated [API reference](docs/API_REFERENCE.md#assurance-packs) lists the files).
 
@@ -399,7 +399,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -1042,7 +1042,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,610<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,611<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -1063,6 +1063,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,302 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,302 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

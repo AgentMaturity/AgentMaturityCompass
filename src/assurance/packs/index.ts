@@ -263,12 +263,18 @@ const assurancePacks: AssurancePackDefinition[] = [
   autonomousLoopGovernancePack,
   multiAgentOrchestratorPack,
   scienceResearchAgentPack,
-  // Security Starter Pack (AMC-121) — default-on minimal security
+  // Security Starter Pack (AMC-121) — a minimal security baseline; runs only when chosen
   securityStarterPack,
   // Commercial Agent Archetype (AMC-156)
   commercialAgentPack,
   // Realtime Voice Safety
   realtimeVoiceSafetyPack,
+  // Effect-graded packs for attack classes seen in 2025-26 (shield lane, 2026-11-16)
+  instructionFilePoisoningPack,
+  mcpToolPoisoningPack,
+  packageHallucinationPack,
+  exfiltrationChannelsPack,
+  crossSessionMemoryPoisoningPack,
 ];
 
 export function listAssurancePacks(): AssurancePackDefinition[] {
@@ -343,9 +349,14 @@ import { whistleblowerProtectionPack } from "./whistleblowerProtectionPack.js";
 import { autonomousLoopGovernancePack } from "./autonomousLoopGovernancePack.js";
 import { multiAgentOrchestratorPack } from "./multiAgentOrchestratorPack.js";
 import { scienceResearchAgentPack } from "./scienceResearchAgentPack.js";
-// Security Starter Pack (AMC-121) — default-on minimal security baseline
+// Security Starter Pack (AMC-121) — minimal security baseline; runs only when chosen
 import { securityStarterPack } from "./securityStarterPack.js";
 // Commercial Agent Archetype (AMC-156)
 import { commercialAgentPack } from "./commercialAgentPack.js";
 // Realtime Voice Safety (AMC voice threat surface)
 import { realtimeVoiceSafetyPack } from "./realtimeVoiceSafetyPack.js";
+import { instructionFilePoisoningPack } from "./instructionFilePoisoningPack.js";
+import { mcpToolPoisoningPack } from "./mcpToolPoisoningPack.js";
+import { packageHallucinationPack } from "./packageHallucinationPack.js";
+import { exfiltrationChannelsPack } from "./exfiltrationChannelsPack.js";
+import { crossSessionMemoryPoisoningPack } from "./crossSessionMemoryPoisoningPack.js";

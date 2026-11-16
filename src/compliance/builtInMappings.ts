@@ -1217,7 +1217,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "atlas_supply_chain_compromise",
     framework: "MITRE_ATLAS",
     category: "Resource Development",
-    description: "Adversary compromises ML supply chain including poisoned models, libraries, and datasets (AML.T0010, AML.T0019).",
+    description: "Adversary compromises ML supply chain including poisoned models, libraries, and datasets (AML.T0010, AML.T0115.000).",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",
@@ -1313,7 +1313,7 @@ export const builtInComplianceMappings: ComplianceMapping[] = [
     id: "atlas_data_exfiltration",
     framework: "MITRE_ATLAS",
     category: "Exfiltration",
-    description: "Adversary extracts training data, model parameters, or sensitive info via inference API (AML.T0025, AML.T0057).",
+    description: "Adversary extracts training data, model parameters, or sensitive info via inference API (AML.T0024, AML.T0136).",
     evidenceRequirements: [
       {
         type: "requires_evidence_event",

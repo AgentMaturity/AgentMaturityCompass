@@ -105,7 +105,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc assurance patch` | Apply deterministic patch kit for failed assurance findings | `--assuranceRun <id>`<br>`--agent <agentId>`<br>`--apply` | - |
 | `amc assurance policy` | Print current assurance policy | - | - |
 | `amc assurance policy-apply` | Apply assurance policy from YAML/JSON file | `--file <path>` | - |
-| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
+| `amc assurance run` | Run assurance pack(s) with deterministic validation | `--agent <agentId>`<br>`--scope <scope>`<br>`--id <id>`<br>`--pack <packId>`<br>`--all`<br>`--demo`<br>`--mode <mode>`<br>`--window <window>`<br>`--window-days <days>`<br>`--out <path>`<br>`--format <format>`<br>`--verbose`<br>`--model <modelId>`<br>`--no-sign`<br>`--attempts <n>`<br>`--executed-attempts <1|25>`<br>`--station-questions <ids>` | - |
 | `amc assurance runs` | List assurance lab runs | - | - |
 | `amc assurance scheduler` | Assurance scheduler controls | - | - |
 | `amc assurance scheduler disable` | Disable assurance scheduler | - | - |
@@ -263,7 +263,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc ci check` | One-liner CI gate: quickscore + threshold check (exit 1 if below) | `--min-score <n>`<br>`--min-level <level>`<br>`--agent <agentId>`<br>`--json` | `gate` |
 | `amc ci init` | Generate GitHub workflow and gate policy | `--agent <agentId>`<br>`--no-sign` | - |
 | `amc ci print` | Print suggested CI pipeline steps | `--agent <agentId>` | - |
-| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
+| `amc ci redteam` | CI gate: run red-team plugins, optional Evil MCP, and score-gaming resistance checks | `--plugins <ids...>`<br>`--strategies <ids...>`<br>`--min-score <n>`<br>`--max-vulnerabilities <n>`<br>`--max-critical <n>`<br>`--max-high <n>`<br>`--max-inconclusive <n>`<br>`--evil-mcp`<br>`--mcp-attacks <categories...>`<br>`--min-mcp-score <n>`<br>`--no-gaming-resistance`<br>`--min-gaming-score <n>`<br>`--sign`<br>`--no-sign`<br>`--json` | - |
 | `amc claim-confidence` | Generate per-claim confidence report with citation-backed scoring | `--agent <agentId>` | - |
 | `amc claim-confidence-gate` | Check if claims for given questions pass confidence threshold | `--agent <agentId>`<br>`--questions <ids>` | - |
 | `amc claims` | Evidence claim expiry tracking | - | - |
@@ -1080,7 +1080,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc score mutual-verification` | Score agent-to-agent trust verification (challenge-response) | `--json` | - |
 | `amc score operational-independence` | Calculate operational independence score | `--window <days>`<br>`--domain <domain>`<br>`--json` | - |
 | `amc score output-attestation` | Score output signing and trust metadata for receiving agents | `--json` | - |
-| `amc score output-integrity` | Score output integrity maturity (OWASP LLM02, confidence calibration, citation) | `--json` | - |
+| `amc score output-integrity` | Score output integrity maturity (OWASP LLM05:2025, confidence calibration, citation) | `--json` | - |
 | `amc score owasp-llm` | OWASP Top 10 for LLM Applications (2025) coverage; not evaluated: file presence is not evidence. The evidence-bound version is `amc compliance report --framework owasp-llm` | `--json` | - |
 | `amc score pause-quality` | Score quality of agent-initiated pauses | `--json` | - |
 | `amc score policy-consistency` | Test policy enforcement consistency across repeated trials (pass^k) | `--json` | - |
@@ -1126,7 +1126,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield detect-injection` | Detect prompt injection attempts in text | `--json` | - |
 | `amc shield mcp-ledger` | Signed MCP trust ledger: scan a set of MCP servers and record a clean-as-of receipt | `--json`<br>`--out <path>`<br>`--previous <path>` | - |
 | `amc shield posture` | One-command agent-security posture scorecard (config, MCP trust, secrets, isolation, supply-chain) — L0–L5, signed receipt | `--json`<br>`--out <path>` | - |
-| `amc shield red-team` | Run a quick red team campaign (5 attacks on demo target). Tip: For full red-team suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>`<br>`--agent <agentId>`<br>`--model <modelId>` | - |
+| `amc shield red-team` | Run a quick red team campaign (5 attacks) against the agent under test. For the full suite with strategies, use `amc redteam run` | `--rounds <n>`<br>`--categories <list>`<br>`--target <profile>`<br>`--agent <agentId>`<br>`--model <modelId>` | - |
 | `amc shield red-team-status` | Show current red team capabilities and attack template count | - | - |
 | `amc shield reputation` | Check reputation score for a tool | `--json` | - |
 | `amc shield sandbox` | Check sandbox configuration for an agent | `--json` | - |

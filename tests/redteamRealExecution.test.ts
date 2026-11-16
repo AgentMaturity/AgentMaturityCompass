@@ -16,7 +16,7 @@ describe("red-team runner attacks a real agent", () => {
 
   it("invokes the shared real-agent responder", () => {
     expect(source).toContain("resolveAgentResponder");
-    expect(source).toContain("responder.respond(attackPrompt)");
+    expect(source).toContain("responder.respond(attackPrompt, { history: [...history] })");
   });
 
   it("never reports a perfect score when nothing was attacked", () => {

@@ -29,7 +29,7 @@ async function fixture() {
   process.env.AMC_HOME = join(root, "home");
   process.env.AMC_VAULT_PASSPHRASE = "cert-provenance-passphrase";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-  const run = await runAssurance({ workspace, agentId: "default", mode: "supervise", window: "14d", packId: "injection", noSign: true });
+  const run = await runAssurance({ workspace, agentId: "default", mode: "supervise", window: "14d", packId: "chainEscalation", noSign: true });
   initAssurancePolicy(workspace);
   const policy = loadAssurancePolicy(workspace);
   policy.assurancePolicy.gates = { ...policy.assurancePolicy.gates, minIntegrityIndex: 0, minCorrelationRatio: 0, minObservedShare: 0 };
@@ -53,6 +53,7 @@ describe("certificate issuance binds run.json, the report and the ledger session
     const flipped = JSON.parse(original) as AssuranceReport;
     const graded = flipped.packResults[0]!.scenarioResults.find((row) => row.inconclusive !== true)!;
     graded.pass = !graded.pass;
+    graded.score0to100 = graded.pass ? 100 : 0;
     writeFileSync(f.reportPath, JSON.stringify(flipped));
     await expect(issue("flipped.amccert")).rejects.toThrow(/run.json's score is not the one its assurance report derives to/);
 
@@ -68,7 +69,7 @@ describe("certificate issuance binds run.json, the report and the ledger session
     // run.json edited by a workspace writer who has no auditor key: its signature no longer verifies.
     const runOriginal = readFileSync(f.runPath, "utf8");
     const forgedRun = JSON.parse(runOriginal) as { score: { riskAssuranceScore: number | null; status: string; pass: boolean } };
-    forgedRun.score = { ...forgedRun.score, riskAssuranceScore: 100, status: "PASS", pass: true };
+    forgedRun.score = { ...forgedRun.score, riskAssuranceScore: forgedRun.score.riskAssuranceScore === 100 ? 99 : 100, status: "PASS", pass: true };
     writeFileSync(f.runPath, JSON.stringify(forgedRun, null, 2));
     await expect(issue("forged-run.amccert")).rejects.toThrow(/run.json auditor signature invalid/);
     writeFileSync(f.runPath, runOriginal);

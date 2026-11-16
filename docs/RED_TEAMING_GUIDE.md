@@ -147,6 +147,9 @@ amc ci redteam default --plugins injection --strategies direct --evil-mcp --mcp-
 ```
 
 The CI command above fails while its requested gaming-resistance assessment is unavailable. An explicit `--no-gaming-resistance` runs the other selected gates without claiming score-gaming assurance.
+It also fails when any scenario was not evaluated (for example, the agent made no tool call on an attack graded by what
+the agent did), because a run with partial evidence is not a pass. `--max-inconclusive <n>` allows up to n such
+scenarios on purpose; the default is 0.
 
 ### Understanding the Output
 

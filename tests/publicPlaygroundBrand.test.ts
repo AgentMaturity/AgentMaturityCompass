@@ -81,7 +81,7 @@ describe("AMC public Playground identity", () => {
   test("distinguishes the complete product registry from the curated browser preview", () => {
     const html = read("website/playground.html");
     const browserPackBlock = html.match(/const PACKS = \[([\s\S]*?)\n\];/)?.[1] ?? "";
-    expect(listAssurancePacks()).toHaveLength(143);
+    expect(listAssurancePacks()).toHaveLength(148);
     expect(browserPackBlock.match(/\{ id:/g)).toHaveLength(85);
     expect(html).toContain("Showing ${filtered.length} of ${PACKS.length} browser previews");
     expect(html).toContain("full CLI catalog of <!-- amc:count:assurancePacksRegistered -->");

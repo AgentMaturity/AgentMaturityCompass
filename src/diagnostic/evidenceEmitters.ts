@@ -75,6 +75,7 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/assurance/assuranceRunner.ts", why: "assurance run bookkeeping; scenario results are `test` rows, untagged" },
   { module: "src/assurance/evidenceWriters.ts", why: "assurance run start and abort bookkeeping" },
   { module: "src/redteam/runner.ts", why: "red-team attack bookkeeping (SH-TRUST-03): an unmeasured attack binds to no question and can never raise a level" },
+  { module: "src/redteam/effectRow.ts", why: "red-team bookkeeping for effect-graded rows moved out of runner.ts (rejected receipts, unmeasured attacks); untagged, never maturity evidence" },
   { module: "src/auth/userAudit.ts", why: "console account changes (LIVE-VAULT-09); operator account bookkeeping, untagged, never maturity evidence" },
   { module: "src/assurance/packs/mobilityFunctionalSafetyPack.ts", why: "failure findings; a finding against the agent cannot raise its level" },
   { module: "src/bridge/bridgeAuth.ts", why: "lease refusal; read only by score caps" },
