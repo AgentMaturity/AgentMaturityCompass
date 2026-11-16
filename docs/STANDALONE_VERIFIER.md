@@ -5,7 +5,7 @@ one record plus trust that you supply (signed trust lists and the root keys you 
 results. It never trusts a key, authority or anchor that is named only inside the record it checks, and it has no flag
 that admits an unpinned issuer.
 
-A signed record proves who wrote it and that it is unchanged, not that its statement is true. `amc-verify` tells you
+A signature shows who wrote a record and that it is unchanged, not that what it says is true. `amc-verify` tells you
 whether a pinned issuer signed the record, whether it is about what you are checking, whether it is current, whether the
 evidence it depends on is present and consistent, and whether its declared result follows from that evidence under the
 rules below. It does not re-run a control or check a claim against the world.
@@ -43,6 +43,7 @@ amc-verify verify attestation.json \
 | `--as-of <RFC 3339>` | Every time comparison is made as of this instant. Default: now. |
 | `--expect-tenant`, `--expect-deployment`, `--expect-subject`, `--expect-profile` | What the record must be about. A record without the field fails scope. |
 | `--known-sequence <id>=<n>` | The highest sequence you already saw for an id (below). Repeatable. |
+| `--revocation-list <file>` | A signed passport revocation list (`amc keys revoke --passport` publishes it). Repeatable. At most 64 MiB. Without one, a passport's freshness is `not-evaluated`: nobody checked whether it was revoked. |
 | `--evidence-dir <dir>` | Evidence files, addressed by the sha256 of their bytes; file names are ignored. Regular files only, at most 4,096 files of 64 MiB each and 256 MiB in all. |
 | `--json` | Print the verifier report instead of the summary. |
 
@@ -113,7 +114,10 @@ refused. Digests and key ids are compared in constant time.
 
 ## Record kinds (v1)
 
-The kind is read from the record itself: an object with `type: "amc.scoped-attestation"`, `profile:
+A gzip-compressed archive is read as a passport (`.amcpass`, it holds `amc-passport/passport.json`) or an evidence
+bundle (`.amcbundle`, it holds `manifest.json`); anything else is `UNSUPPORTED_VERSION`. Archives may be up to 256 MiB
+and expand to at most 512 MiB; only regular files are read, a name may appear once, and macOS attribute members (names
+starting `._`) are skipped and counted in a warning. Otherwise the kind is read from the record itself: an object with `type: "amc.scoped-attestation"`, `profile:
 "amc.external-evidence"`, `list.type` or `statement.type`, an object with `dsseEnvelope` or `payloadType` (a DSSE
 envelope, bare or in a Sigstore bundle), or a JSON string (a receipt token).
 
@@ -126,6 +130,9 @@ envelope, bare or in a Sigstore bundle), or a JSON string (a receipt token).
 | Key rotation (`amc.key-rotation`) | P1-08 bytes; authorized by the previous key as a counted list admits it for the purpose, or by pinned roots for `key-compromise` and a first key; `next` proves possession | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
 | Root rotation (`amc.root-rotation`) | P1-08 bytes; `previousRoots` must be the pinned roots and sign `previousThreshold` times; the new set proves possession | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
 | Revocation list (`amc.revocation-list`) | P1-08 bytes, by a key admitted for `revocation-list` | none | `issuedAt` | first of its chain, or not evaluated | not evaluated |
+| Passport (`.amcpass`) | Ed25519 (or P-256) over the 32-byte SHA-256 of the canonical `passport.json`, in `passport.sig`, by a key the trust lists hold, admitted for `artifact-seal`. The key in `signer.pub` or the signature envelope only selects among them | none | `generatedTs`, `expiresTs` (`ATTESTATION_EXPIRED`), and revocation in a supplied revocation list (`REPLAYED_OR_SUPERSEDED`); `not-evaluated` without `--revocation-list` | pass | `NOT_RECOMPUTABLE` |
+| Evidence bundle (`.amcbundle`) | Ed25519 over the 32-byte SHA-256 of `manifest.json`, in `manifest.sig`, by a key the trust lists hold, admitted for `artifact-seal`; every listed file must match its digest and size, and no unlisted file may be present | subject `agentId` | signing time | pass | `NOT_RECOMPUTABLE` |
+| Export statement (`export-statement`) | Ed25519 over the DSSE PAE, as for a DSSE in-toto statement, admitted for `artifact-seal` | none | `issuedAt` | the exported file must be among the supplied evidence | `NOT_RECOMPUTABLE` |
 | DSSE in-toto statement (`dsse-intoto`, [ATTESTATIONS.md](ATTESTATIONS.md)) | Ed25519 over the DSSE v1.0 PAE of `application/vnd.in-toto+json` and the payload, by the key the trust lists hold for the signature's `keyid`, admitted for `artifact-seal` (`independent-attestation` when `claimKind` is `independently_reviewed`) | tenant `scope.tenant`, deployment `scope.deployment`, subject `scope.agent`, profile `scope.profile` | `issuedAt`, `expiresAt` | every subject digest and every `evidence` digest among the supplied bytes; no cited evidence is `EMPTY_EVIDENCE` | `CLAIMED_RESULT_FAILED` when a control declares `fail`, otherwise `NOT_RECOMPUTABLE` |
 
 P1-08 records are accepted only in their one canonical byte encoding, and only the first record of a chain
@@ -170,6 +177,59 @@ Evidence is addressed by digest, so a changed AIBOM matches no subject and compl
 The statement has no sequence number, so freshness is its expiry only. Satisfaction is never a pass: a declared result
 cannot be recomputed from these bytes, so a valid statement exits 3.
 
+### Passports
+
+A passport is the issuing workspace's own summary of its own agent: the report always warns that it is self-issued,
+that its status (`VERIFIED`, `INFORMATIONAL` or `UNTRUSTED`) is that workspace's own check and not an outside
+verification, and that its times are the issuer's own clock. What `amc-verify` checks: `passport.json` is in AMC's
+canonical encoding and hashes to the digest `passport.sig` signs; the signature verifies under a key your trust list
+pins for `artifact-seal`; the passport has not expired as of `--as-of`; and, with `--revocation-list`, that the list is
+in its one canonical encoding, is the list the passport names (`issuance.revocationListId`; an older passport that names
+none accepts any `passports:` list, with a warning), verifies under a key your trust list pins for `revocation-list`,
+is not older than `--known-sequence <listId>=<n>` (`ROLLBACK_DETECTED`), and does not name the passport
+(`REPLAYED_OR_SUPERSEDED`). A list that is malformed, edited or names another list fails integrity; one whose signer you
+did not pin fails issuer admission. What it does not check: the transparency and Merkle proofs inside the passport
+(`amc passport verify` does) and the figures themselves.
+
+### Evidence bundles
+
+`amc-verify` checks the bundle's signed manifest and that the archive holds exactly the files it lists, with their
+digests and sizes. It does not open the SQLite ledger inside or re-check its hash chain and row signatures; `amc bundle
+verify` does that.
+
+### Export statements
+
+Every `.amcpass`, `.amcbundle` and `.amccert` that AMC writes gets `<file>.sigstore.json` beside it: an in-toto
+Statement v1 with predicate `https://agentmaturity.co/attestations/export/v0.1`, whose one subject is the sha256 of the
+whole exported file, DSSE-signed with the workspace's `artifact-seal` key and wrapped in a key-based Sigstore bundle
+v0.3 (no log entry, no timestamp). The predicate names the export kind, `issuerRelationship: "self"`, the workspace,
+`issuedAt` and `timeBasis: "claimed"`. Put the exported file in `--evidence-dir` to check it is the file the statement
+names. The AMC-specific `.sig` files inside the exports are unchanged. Other tools that read DSSE envelopes can check
+the same file against the same pinned key; that was not tested here.
+
+## Checking a passport with no AMC installed
+
+You need Node 20 or later, the `agent-maturity-compass-verifier` package (packed as above), the passport, the
+issuer's signed revocation list, and the issuer's public keys, obtained from the issuer through a channel you trust
+(not from the passport). The issuer prints them with `amc keys export-public --purpose artifact-seal` and
+`--purpose revocation-list`.
+
+1. Make your own trust list that pins those keys: a `amc.trust-list` (docs/TRUST_LIST.md) with one entry per key and
+   its purposes (`artifact-seal`, `revocation-list`; one entry with both purposes when the issuer uses one key for
+   both), signed with a root key you generate and keep. Your root key id is the sha256 of its public key PEM.
+2. Run:
+
+```bash
+amc-verify verify agent.amcpass --trust-list my-trust-list.json --trust-root <your root key id> \
+  --revocation-list revocations.signed.json --known-sequence passports:<workspaceId>=<highest sequence you saw>
+```
+
+3. Read the result: exit 3 with integrity, issuer admission, freshness and completeness passing is the best a passport
+   can get (satisfaction is never recomputed). Exit 1 means something failed: an edited passport fails integrity
+   (`DIGEST_MISMATCH`), a passport signed by any key your list does not pin fails issuer admission
+   (`ISSUER_NOT_PINNED`), even when the passport carries that key, and a revoked passport fails freshness
+   (`REPLAYED_OR_SUPERSEDED`).
+
 ### Receipt anchoring
 
 A state receipt is anchored when the supplied evidence holds the exported ledger row (spec/schemas/v1/evidence-event)
@@ -200,8 +260,9 @@ fixture runner stays in the verifier's package for its own packed-tarball check.
 
 ## Limits
 
-- `.amcbundle` archives carry a SQLite ledger, which a zero-dependency verifier cannot read on Node 20; verify them with
-  `amc bundle verify` (P0-09). `amc-verify` refuses them as malformed rather than read part of them.
+- `.amcbundle` archives carry a SQLite ledger, which a zero-dependency verifier cannot read on Node 20. `amc-verify`
+  checks the signed manifest and the file digests only; verify the ledger with `amc bundle verify` (P0-09).
+- The transparency and Merkle proofs inside a passport are checked by `amc passport verify` only.
 - Not yet: keyless Sigstore bundles and transparency-log entries (P1-27 verifies key-based DSSE bundles only), RFC 3161 timestamp tokens (P1-25; a trust list's
   `timestampAuthorities` are validated but unused), Merkle inclusion proofs and public-log receipts (P1-26),
   the producer, adapter and compiler conformance classes, which `packages/amc-conformance` runs (P1-32). A4 project records (`a4-record`) are checked by AMC's `verifyA4Bundle`; the suite runs them as their own `a4-record` class.

@@ -7,8 +7,8 @@
 import { isCanonicalSignatureBase64, parseJson, same, verifySignature } from "../bytes.js";
 import type { Finding } from "../codes.js";
 import { notRecomputable, result, scopeResult, type Env, type Evaluation } from "../evaluation.js";
-import { dsseEnvelope, INTOTO_PAYLOAD_TYPE, intotoStatement, sigstoreDsseBundle, type IntotoStatement } from "../records/intoto.js";
-import { attempt } from "../schema.js";
+import { dsseEnvelope, EXPORT_PREDICATE, exportStatement, INTOTO_PAYLOAD_TYPE, intotoStatement, sigstoreDsseBundle, type IntotoStatement } from "../records/intoto.js";
+import { attempt, isRecord } from "../schema.js";
 import { admit, listedPem } from "../trust.js";
 import { refused } from "./common.js";
 
@@ -54,6 +54,7 @@ export function evaluateDsseIntoto(value: Record<string, unknown>, env: Env): Ev
   try { raw = parseJson(payload); } catch (error) {
     return refused("dsse-intoto", { code: "MALFORMED", detail: `the payload is ${error instanceof Error ? error.message : String(error)}` });
   }
+  if (isRecord(raw) && raw.predicateType === EXPORT_PREDICATE) return evaluateExportStatement(raw, envelope.payloadType, payload, signature, env);
   const checked = attempt(intotoStatement, raw);
   if (!checked.ok) return refused("dsse-intoto", { code: checked.error.code, detail: `statement ${checked.error.message}` });
   const statement = checked.value;
@@ -95,5 +96,34 @@ export function evaluateDsseIntoto(value: Record<string, unknown>, env: Env): Ev
         ? result<"satisfaction">(failed.map(control => ({ code: "CLAIMED_RESULT_FAILED", detail: `control ${control.controlId} declares fail` })))
         : notRecomputable("a control-results statement declares results this verifier cannot recompute from the supplied bytes");
     }
+  };
+}
+
+/**
+ * An export statement: one subject, the whole exported file, which must be among the supplied evidence (--evidence-dir)
+ * for completeness to pass. It states who issued the file and when by their own clock, nothing about its content.
+ */
+function evaluateExportStatement(raw: Record<string, unknown>, payloadType: string, payload: Buffer, signature: { keyid: string; sig: string }, env: Env): Evaluation {
+  const checked = attempt(exportStatement, raw);
+  if (!checked.ok) return refused("export-statement", { code: checked.error.code, detail: `statement ${checked.error.message}` });
+  const { subject, predicate } = checked.value;
+  const integrity: Finding<"integrity">[] = [];
+  const pem = listedPem(env.ctx, signature.keyid);
+  if (!isCanonicalSignatureBase64(signature.sig)) integrity.push({ code: "MALFORMED", detail: "the signature is not canonical base64 of 64 bytes" });
+  else if (pem !== null && !verifySignature(pae(payloadType, payload), pem, Buffer.from(signature.sig, "base64"))) {
+    integrity.push({ code: "SIGNATURE_INVALID", detail: "the signature does not verify over the DSSE PAE" });
+  }
+  const admission = admit({ signature: "dsseEnvelope.signatures[0]", keyId: signature.keyid, purpose: "artifact-seal" }, env.ctx);
+  const file = subject[0]!;
+  return {
+    kind: "export-statement", integrity, admissions: [admission], admissionFindings: [],
+    unverifiable: pem === null ? [`dsseEnvelope.signatures[0]: no supplied trust list holds key ${signature.keyid}`] : [],
+    anchoring: { status: "not-applicable", detail: null }, claimedAt: predicate.issuedAt,
+    warnings: [`self-issued ${predicate.kind} export by workspace ${predicate.workspace}; the time is the issuer's own clock`],
+    scope: () => scopeResult({}, env.expect),
+    freshness: () => result<"freshness">(env.ctx.asOf < Date.parse(predicate.issuedAt) ? [{ code: "NOT_YET_VALID", detail: `issued at ${predicate.issuedAt}, after the as-of time` }] : []),
+    completeness: () => result<"completeness">(env.evidence.has(file.digest.sha256) ? []
+      : [{ code: "EVIDENCE_MISSING", detail: `${file.name} (sha256 ${file.digest.sha256}) was not supplied; put the exported file in --evidence-dir` }]),
+    satisfaction: () => notRecomputable("an export statement names a file and its issuer; there is no result to recompute")
   };
 }

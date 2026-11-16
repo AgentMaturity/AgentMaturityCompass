@@ -1,13 +1,14 @@
 /**
  * amc-verify verify <artifact> --trust-list <file>... --trust-root <sha256>... [--root-threshold <n>] [--as-of <RFC 3339>]
  *   [--expect-tenant|--expect-deployment|--expect-subject|--expect-profile <id>] [--known-sequence <id>=<n>]...
- *   [--evidence-dir <dir>] [--json]
+ *   [--evidence-dir <dir>] [--revocation-list <file>]... [--json]
  * Exit codes: 0 every dimension passes; 1 any fails; 3 none fails, some not evaluated; 64 usage error. There is no flag
  * that admits an unpinned issuer.
  */
 import { closeSync, constants, fstatSync, lstatSync, openSync, readdirSync, readSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { isGzip } from "./archive.js";
 import { parseJson, sha256Hex } from "./bytes.js";
 import { DIMENSIONS } from "./codes.js";
 import { exitCode, VERIFIER_NAME, VERIFIER_VERSION, type VerifierReport } from "./report.js";
@@ -15,12 +16,13 @@ import { verifyArtifact } from "./verify.js";
 
 const USAGE = `usage: amc-verify verify <artifact> [--trust-list <file>]... [--trust-root <sha256>]... [--root-threshold <n>] [--as-of <RFC 3339>]
   [--expect-tenant <id>] [--expect-deployment <id>] [--expect-subject <id>] [--expect-profile <id>]
-  [--known-sequence <id>=<n>]... [--evidence-dir <dir>] [--json]
+  [--known-sequence <id>=<n>]... [--evidence-dir <dir>] [--revocation-list <file>]... [--json]
        amc-verify --version
+<artifact> is a JSON record, a .amcpass passport or a .amcbundle evidence bundle
 exit codes: 0 all six dimensions pass; 1 any fails; 3 none fails but one is not evaluated; 64 usage error`;
 
 const MiB = 1024 * 1024;
-const LIMITS = { artifact: 16 * MiB, trustList: MiB, evidence: 64 * MiB, evidenceFiles: 4096, evidenceTotal: 256 * MiB };
+const LIMITS = { artifact: 16 * MiB, archive: 256 * MiB, trustList: MiB, revocationList: 64 * MiB, evidence: 64 * MiB, evidenceFiles: 4096, evidenceTotal: 256 * MiB };
 
 class UsageError extends Error {}
 
@@ -98,7 +100,7 @@ function options(args: string[]) {
     args, allowPositionals: true, strict: true,
     options: {
       "trust-list": many, "trust-root": many, "root-threshold": many, "as-of": many, "expect-tenant": many, "expect-deployment": many, "expect-subject": many,
-      "expect-profile": many, "known-sequence": many, "evidence-dir": many, json: { type: "boolean" }
+      "expect-profile": many, "known-sequence": many, "evidence-dir": many, "revocation-list": many, json: { type: "boolean" }
     }
   });
   if (positionals.length !== 2 || positionals[0] !== "verify") throw new UsageError("expected: verify <artifact>");
@@ -133,11 +135,22 @@ function options(args: string[]) {
   });
   const expectScope = Object.fromEntries((["tenant", "deployment", "subject", "profile"] as const)
     .map(key => [key, single(values[`expect-${key}`], `--expect-${key}`)]).filter(([, value]) => value !== undefined));
+  const revocationLists = (values["revocation-list"] ?? []).map(path => {
+    const bytes = readBounded(path, LIMITS.revocationList);
+    try {
+      return { value: parseJson(bytes), bytes };
+    } catch (error) {
+      throw new UsageError(`--revocation-list ${path}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  });
   const evidenceDir = single(values["evidence-dir"], "--evidence-dir");
   const path = positionals[1]!;
+  // An archive (.amcpass, .amcbundle) may be larger than a JSON record.
+  const bytes = readBounded(path, LIMITS.archive);
+  if (!isGzip(bytes) && bytes.length > LIMITS.artifact) throw new UsageError(`${path}: a JSON record may be at most ${LIMITS.artifact} bytes`);
   return {
-    path, json: values.json === true, bytes: readBounded(path, LIMITS.artifact),
-    verify: { trustLists, trustRoots, rootThreshold, asOf, expectScope, knownSequences, evidence: evidenceDir === undefined ? undefined : readEvidenceDir(evidenceDir), path }
+    path, json: values.json === true, bytes,
+    verify: { trustLists, trustRoots, rootThreshold, asOf, expectScope, knownSequences, evidence: evidenceDir === undefined ? undefined : readEvidenceDir(evidenceDir), revocationLists, path }
   };
 }
 
@@ -146,10 +159,14 @@ function human(report: VerifierReport): string {
   for (const dimension of DIMENSIONS) {
     const codes = report.reasonCodes[dimension];
     lines.push(`  ${dimension.padEnd(16)} ${report[dimension].status.padEnd(14)} ${codes.join(", ")}`.trimEnd());
+    const dim = report[dimension];
+    const reasons = "errors" in dim ? dim.errors : "reasons" in dim ? dim.reasons
+      : dim.signatures.filter(row => row.status !== "admitted").map(row => `${row.signature}: ${row.detail ?? row.status}`);
+    if (dim.status !== "pass") for (const reason of reasons.slice(0, 5)) lines.push(`      ${reason}`);
   }
   if (report.anchoring.status !== "not-applicable") lines.push(`  anchoring        ${report.anchoring.status}`);
   for (const warning of report.warnings) lines.push(`  warning: ${warning}`);
-  lines.push("  A signed record proves who wrote it and that it is unchanged, not that its statement is true.");
+  lines.push("  A signature shows who wrote a record and that it is unchanged, not that what it says is true.");
   return lines.join("\n");
 }
 
