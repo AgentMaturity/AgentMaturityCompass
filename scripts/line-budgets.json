@@ -35,7 +35,7 @@
     "src/score/operationalIndependence.ts": 1202,
     "src/toolhub/toolhubServer.ts": 1131,
     "src/org/orgRun.ts": 1124,
-    "src/bundles/bundle.ts": 1106,
+    "src/bundles/bundle.ts": 1101,
     "src/audit/binderCollector.ts": 1086,
     "src/cli-business-commands.ts": 1078,
     "src/watch/observabilityBridge.ts": 1072,

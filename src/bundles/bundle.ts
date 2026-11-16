@@ -771,22 +771,12 @@ export function exportEvidenceBundle(params: {
     ensureDir(dirname(outFile));
     runTarCreate(root, outFile);
     const sha256 = sha256Hex(readFileSync(outFile));
-    appendTransparencyEntry({
-      workspace: params.workspace,
-      type: "BUNDLE_EXPORTED",
-      agentId,
-      artifact: {
-        kind: "amcbundle",
-        sha256,
-        id: report.runId
-      }
-    });
+    appendTransparencyEntry({ workspace: params.workspace, type: "BUNDLE_EXPORTED", agentId, artifact: { kind: "amcbundle", sha256, id: report.runId } });
 
     return {
       outFile,
       sha256,
-      // The envelope beside the file, for this digest only: a file swapped after this point is never signed.
-      attestation: writeExportAttestation(params.workspace, outFile, "amcbundle", sha256),
+      attestation: writeExportAttestation(params.workspace, outFile, "amcbundle", sha256), // signs this digest only
       manifest,
       fileCount: manifest.files.length,
       eventCount: copied.eventCount,
