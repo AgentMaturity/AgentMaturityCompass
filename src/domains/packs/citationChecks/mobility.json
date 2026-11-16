@@ -185,14 +185,14 @@
     "citation": "LEED v5 O+M",
     "instrument": "USGBC LEED v5 Operations and Maintenance",
     "clause": "edition only",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "USGBC, LEED v5 product page (usgbc.org), which also lists LEED v4 and v4.1",
-    "sourceUrl": "https://www.usgbc.org/leed/v5",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "usgbc.org LEED v5 page: LEED v5 covers operations and maintenance (O+M). Rating-system text not read."
+    "note": "Only the usgbc.org LEED v5 product page was read (it says LEED v5 covers operations and maintenance, O+M); the rating-system text was not read, so what the question says about it is not confirmed."
   },
   {
     "packId": "sustainable-communities",
@@ -200,14 +200,14 @@
     "citation": "BREEAM In-Use",
     "instrument": "BREEAM In-Use (BRE)",
     "clause": "edition only",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "BRE, BREEAM In-Use standard page (breeam.com)",
-    "sourceUrl": "https://breeam.com/standards/in-use",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "breeam.com BREEAM In-Use page: framework for assessing and benchmarking operational assets with third-party assurance. Technical manual not read."
+    "note": "Only the breeam.com BREEAM In-Use page was read (framework for assessing and benchmarking operational assets with third-party assurance); the technical manual was not read, so what the question says about it is not confirmed."
   },
   {
     "packId": "sustainable-communities",
@@ -335,14 +335,14 @@
     "citation": "C40 Cities (network commitment, non-binding)",
     "instrument": "C40 Cities Climate Leadership Group (network of cities)",
     "clause": "whole network",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "C40 Cities, About C40 page (c40.org)",
-    "sourceUrl": "https://www.c40.org/about-c40/",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "c40.org About page: member cities commit to the C40 Leadership Standards (performance-based requirements) and Accelerator cities make public commitments for 2030. A voluntary network, not binding law; the Leadership Standards text was not read."
+    "note": "Only the c40.org About page was read: member cities commit to the C40 Leadership Standards and it is a voluntary network, not binding law. The Leadership Standards text was not read, so what the question says about them is not confirmed."
   },
   {
     "packId": "sustainable-communities",
@@ -792,7 +792,7 @@
     "sourceUrl": "https://publications.europa.eu/resource/celex/32017R0352",
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "Citation unchanged; question and level texts reworded. Art. 12 requires port service charges (internal operator, non-competitive pilotage, Art. 6(1)(b) providers) to be set in a transparent, objective and non-discriminatory way, proportionate to cost, and the provider to give the authority the basis for their structure and level on a formal complaint. It does not require charges and their basis to be published, which the question said ('publish port-service charges and their basis transparently')."
+    "note": "Citation unchanged; question and level texts reworded. Art. 12(1) requires the charges of an internal operator under a public service obligation, of pilotage not exposed to effective competition and of providers referred to in Art. 6(1)(b) to be set in a transparent, objective and non-discriminatory way, proportionate to cost; Art. 12(3) requires the provider to give the authority the basis for their structure and level in the event of a formal complaint and upon request. It does not require all port-service charges, or their basis, to be published, which the question said ('publish port-service charges and their basis transparently'); the duty is now stated only for the Art. 12(1) cases."
   },
   {
     "packId": "sustainable-ports",
@@ -1265,14 +1265,14 @@
     "citation": "IFRS S2",
     "instrument": "IFRS S2 Climate-related Disclosures",
     "clause": "edition only",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "IFRS Foundation, IFRS S2 Climate-related Disclosures page (ifrs.org)",
-    "sourceUrl": "https://www.ifrs.org/issued-standards/ifrs-sustainability-standards-navigator/ifrs-s2-climate-related-disclosures/",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "ifrs.org IFRS S2 Climate-related Disclosures page read; applies only where a jurisdiction or the entity adopts it, as the question says. Standard text (behind registration) not read."
+    "note": "Only the ifrs.org IFRS S2 Climate-related Disclosures page was read; the standard text (behind registration) was not read, so what the question says about it is not confirmed."
   },
   {
     "packId": "sustainable-real-estate",
@@ -1640,14 +1640,14 @@
     "citation": "CSA CCM v4.1",
     "instrument": "CSA Cloud Controls Matrix (CCM) v4.1",
     "clause": "edition only",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "Cloud Security Alliance, Cloud Controls Matrix page (cloudsecurityalliance.org)",
-    "sourceUrl": "https://cloudsecurityalliance.org/research/cloud-controls-matrix",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "CSA page: Version 4.1 of the CCM and CAIQ combined; the CCM comprises 17 domains. Control text not read."
+    "note": "Only the cloudsecurityalliance.org Cloud Controls Matrix page was read (version 4.1 of the CCM and CAIQ, 17 domains); the control text was not read, so what the question says about it is not confirmed."
   },
   {
     "packId": "virtual-infrastructure",
@@ -1655,14 +1655,14 @@
     "citation": "CSA STAR Level 2",
     "instrument": "CSA Security, Trust, Assurance and Risk (STAR) programme",
     "clause": "Level 2",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "Cloud Security Alliance, STAR programme page (cloudsecurityalliance.org)",
-    "sourceUrl": "https://cloudsecurityalliance.org/star",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "STAR Level 2 assurance path listed on the CSA STAR page."
+    "note": "Only the cloudsecurityalliance.org STAR programme page was read (it lists a Level 2 assurance path); the STAR Level 2 requirements were not read, so what the question says about them is not confirmed."
   },
   {
     "packId": "virtual-infrastructure",
@@ -2222,7 +2222,7 @@
   {
     "packId": "privacy-security-mobility",
     "questionId": "MOB-PS-11",
-    "citation": "ISO 21434 Clause 15",
+    "citation": "ISO/SAE 21434 Clause 15",
     "instrument": "ISO/SAE 21434 Road vehicles, cybersecurity engineering",
     "clause": "Clause 15",
     "verdict": "unverifiable",
@@ -2232,7 +2232,7 @@
     "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year was taken out of the citation and the question text because it could not be confirmed."
+    "note": "www.iso.org answered HTTP 403 (curl and WebFetch) on 2026-11-16, so neither the catalogue page nor the text was read. The edition year (':2021') was taken out of the citation and the question text because it could not be confirmed; the designation ISO/SAE 21434 is kept."
   },
   {
     "packId": "privacy-security-mobility",
@@ -2555,14 +2555,14 @@
     "citation": "GS1 EPCIS 2.0",
     "instrument": "GS1 EPCIS 2.0",
     "clause": "edition only",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "GS1, EPCIS and CBV standard page (gs1.org)",
-    "sourceUrl": "https://www.gs1.org/standards/epcis",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "EPCIS 2.0 shares supply chain event data (what, when, where, why). Standard text not read."
+    "note": "Only the gs1.org EPCIS and CBV page was read (EPCIS 2.0 shares supply chain event data: what, when, where, why); the standard text was not read, so what the question says about it is not confirmed."
   },
   {
     "packId": "freight-3pl-warehouse",
@@ -2570,14 +2570,14 @@
     "citation": "GS1 EPCIS 2.0",
     "instrument": "GS1 EPCIS 2.0",
     "clause": "edition only",
-    "verdict": "verified",
+    "verdict": "unverifiable",
     "was": null,
     "now": null,
-    "sourceTitle": "GS1, EPCIS and CBV standard page (gs1.org)",
-    "sourceUrl": "https://www.gs1.org/standards/epcis",
+    "sourceTitle": null,
+    "sourceUrl": null,
     "checkedOn": "2026-11-16",
     "checkedBy": "ai-agent",
-    "note": "EPCIS 2.0 traceability event messaging across enterprises. Standard text not read."
+    "note": "Only the gs1.org EPCIS and CBV page was read (EPCIS 2.0 traceability event messaging across enterprises); the standard text was not read, so what the question says about it is not confirmed."
   },
   {
     "packId": "freight-3pl-warehouse",

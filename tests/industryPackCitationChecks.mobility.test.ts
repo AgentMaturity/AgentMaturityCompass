@@ -46,9 +46,16 @@ describe("mobility station clauses the review corrected", () => {
     expect(question("virtual-infrastructure", "MOB-VI-7").regulatoryRef).toBe("EU AI Act Art. 13");
   });
 
+  it("never marks a question citation verified when the note says the instrument's text was not read", () => {
+    for (const r of rows) {
+      if (r.questionId !== "pack" && r.verdict === "verified") expect(r.note, `${r.packId}/${r.questionId}/${r.citation}`).not.toMatch(/not read/i);
+    }
+  });
+
   it("does not claim a date or duty the source does not set", () => {
     expect(text("sustainable-ports", "MOB-SP-10")).not.toMatch(/ECAs from 1 March 2026/);
     expect(text("sustainable-ports", "MOB-SP-7")).not.toMatch(/publish port-service charges/);
+    expect(text("sustainable-ports", "MOB-SP-7")).toMatch(/fall under Art\. 12\(1\)[\s\S]*formal complaint and request \(Art\. 12\(3\)\)/);
     expect(text("privacy-security-mobility", "MOB-PS-3")).not.toMatch(/also after reset|including after reset/);
     expect(text("sustainable-real-estate", "MOB-RE-2")).not.toMatch(/all six environmental objectives/);
   });

@@ -13593,7 +13593,7 @@
         "l3": "A TARA exists, but attack-path analysis, traceability to cybersecurity goals, or change-triggered review is incomplete.",
         "l4": "Each item has a versioned TARA traced to cybersecurity goals, but re-assessment after a change or incident is not always recorded.",
         "l5": "Each item has a versioned TARA with all listed artefacts, traceability to goals and requirements, and a recorded re-assessment after each relevant change or incident.",
-        "regulatoryRef": "ISO 21434 Clause 15",
+        "regulatoryRef": "ISO/SAE 21434 Clause 15",
         "remediation": "Trigger a TARA re-run whenever the agent records a change to an item's interfaces or software or a related field incident, and block release until it is recorded.",
         "text": "Does the agent produce and maintain item-level threat analysis and risk assessment (TARA) per ISO/SAE 21434 (TARA methods, Clause 15): asset identification, threat scenarios, attack paths, impact and feasibility ratings, risk determination and treatment decisions, traced to cybersecurity goals and re-run on change or incident?",
         "weight": 15
@@ -18051,20 +18051,20 @@
         "dimension": "Compliance",
         "evidence": [
           "port_service_provider_requirement_check",
-          "published_port_service_charges",
+          "art12_charge_basis_record",
           "art16_complaint_handling_log"
         ],
         "failureMode": "The agent assigns towage to a provider whose insurance or crew qualification evidence has lapsed, because it checked the minimum requirements only at onboarding.",
         "id": "MOB-SP-7",
         "keyRisk": 3,
-        "l1": "Provider compliance with the minimum requirements is not checked and charges have no documented basis.",
+        "l1": "Provider compliance with the minimum requirements is not checked and charges under Art. 12(1) have no documented basis.",
         "l2": "The minimum requirements are listed, but providers are onboarded without a recorded check against them.",
-        "l3": "Minimum requirements are checked at onboarding, but charges or their changes have no documented basis, or complaints are not tracked.",
-        "l4": "Providers are checked against Art. 4 and charges are set from documented criteria, but not every complaint is logged and closed through the Art. 16 procedure.",
-        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges are set from documented, non-discriminatory criteria with their basis ready for the authority, and complaints are logged and closed through the Art. 16 procedure with records.",
+        "l3": "Minimum requirements are checked at onboarding, but charges under Art. 12(1) or their changes have no documented basis, or complaints are not tracked.",
+        "l4": "Providers are checked against Art. 4 and charges under Art. 12(1) are set from documented criteria, but not every complaint is logged and closed through the Art. 16 procedure.",
+        "l5": "Each provider's compliance with the Art. 4 requirements is checked and recorded, charges that fall under Art. 12(1) are set from documented, non-discriminatory criteria proportionate to cost with their basis ready to give the authority on a formal complaint (Art. 12(3)), and complaints are logged and closed through the Art. 16 procedure with records.",
         "regulatoryRef": "EU Port Services Regulation Art. 4; EU Port Services Regulation Art. 12; EU Port Services Regulation Art. 16",
         "remediation": "Gate the agent's assignment of a pilotage, towage or mooring provider on a current Art. 4 requirement check, and file every user complaint it receives into the Art. 16 log.",
-        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), set port-service charges in a transparent, objective and non-discriminatory way and keep the basis for their structure and level ready for the authority on request (Art. 12), and route complaints into the handling procedure (Art. 16)?",
+        "text": "Does the agent check port-service providers against the port's minimum requirements (Port Services Regulation Art. 4), where its charges fall under Art. 12(1) (an internal operator under a public service obligation, pilotage not exposed to effective competition, or providers in a port where the number was limited for public service reasons, Art. 6(1)(b)) set them in a transparent, objective and non-discriminatory way proportionate to cost and give the authority their basis on a formal complaint and request (Art. 12(3)), and route complaints into the handling procedure (Art. 16)?",
         "weight": 12
       },
       {
