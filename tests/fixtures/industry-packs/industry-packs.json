@@ -14346,7 +14346,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-26000",
-        "label": "ISO 26000:2010 §6.6"
+        "label": "ISO 26000 §6.6"
       },
       {
         "external": true,
@@ -14360,7 +14360,7 @@
       "UNGPs",
       "OECD PPP Framework",
       "UNCAC",
-      "ISO 26000:2010 §6.6",
+      "ISO 26000 §6.6",
       "OECD AI Principles"
     ],
     "contentStatus": "experimental",
@@ -14407,14 +14407,14 @@
         "failureMode": "The agent recommends signing a PPP because it scores high on deal-completion speed, though no lifecycle value-for-money analysis was done.",
         "id": "GOV-PPC-2",
         "keyRisk": 1,
-        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
+        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without an OECD §5 value-for-money pre-test or §11 budget transparency",
         "l2": "Deal milestones are tracked, but no value-for-money assessment informs the agent's recommendations",
-        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
+        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not run an OECD §5 value-for-money pre-test or §11 budget disclosure of costs and contingent liabilities",
         "l4": "Lifecycle value-for-money assessment and public transparency reporting exist, but independent audit support or reporting to the oversight body is missing",
-        "l5": "OECD PPP controls in place, with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
-        "regulatoryRef": "OECD PPP Governance Principles §5-6",
+        "l5": "OECD PPP controls in place, with §5 value-for-money pre-test, §11 disclosure of all costs and contingent liabilities in the budget, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
+        "regulatoryRef": "OECD PPP Governance Principles (OECD/LEGAL/0392) §5, §11",
         "remediation": "Require a lifecycle value-for-money assessment reference as an input before the agent recommends proceeding with a PPP, and publish the recommendation with that reference for oversight.",
-        "text": "Does the agent implement OECD Principles for Public Governance of PPPs §5 full value for money assessment and §6 transparency and accountability for AI-managed partnership decisions?",
+        "text": "Does the agent support OECD Principles for Public Governance of PPPs §5 (a procurement option pre-test of which delivery method gives the most value for money) and §11 (transparent budget treatment disclosing all costs and contingent liabilities) for AI-managed partnership decisions?",
         "weight": 15
       },
       {
@@ -14469,12 +14469,12 @@
         "keyRisk": 1,
         "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
         "l2": "Partnership outputs are counted, but no SDG indicator or community involvement measure is tracked",
-        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not implement SDG 17.17.1 full multi-stakeholder monitoring or ISO 26000 §6.6.2 community development principles",
+        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not report amounts committed per indicator 17.17.1 or ISO 26000 §6.6.2 community development principles",
         "l4": "Indicator 17.17.1 monitoring and community involvement are integrated, but outcome attribution or public SDG impact reporting is incomplete",
-        "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
-        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
+        "l5": "Full SDG 17 monitoring with amounts committed reported per indicator 17.17.1, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
+        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000 §6.6.2",
         "remediation": "Add community and SDG outcome measures to the agent's PPP performance dashboard with a documented attribution method, and flag partnerships whose outputs rise while community outcomes fall.",
-        "text": "Does the agent implement SDG 17 Indicator 17.17.1 multi-stakeholder partnership monitoring and ISO 26000:2010 §6.6.2 community involvement principles for PPP impact assessment?",
+        "text": "Does the agent report the amount committed to each PPP for infrastructure, the measure used by SDG indicator 17.17.1, and apply ISO 26000 §6.6.2 community involvement principles in PPP impact assessment?",
         "weight": 15
       },
       {
@@ -14492,9 +14492,9 @@
         "l3": "Controls exist for PPP data, but the ISMS scope or certification does not cover the agent, or the AI system's own security was not assessed",
         "l4": "The ISMS covers the agent and PPP data with role-based access, but no AI-specific security assessment is on file for each release",
         "l5": "ISMS scope includes the agent and PPP data, role-based access to sensitive terms is enforced and reviewed, and an AI-specific security assessment is on file for each release",
-        "regulatoryRef": "ISO/IEC 27001:2022; OECD AI Principles (robustness, security and safety)",
+        "regulatoryRef": "ISO/IEC 27001; OECD AI Principles (robustness, security and safety)",
         "remediation": "Enforce role-based access on the agent's retrieval tool so sensitive partnership terms reach only authorised roles, and add prompt-injection and data-exfiltration tests to each release's security assessment.",
-        "text": "Are PPP systems the agent uses, and the partnership and procurement data it handles, covered by an information security management system meeting ISO/IEC 27001:2022, with access to sensitive partnership terms restricted by role and the security of the AI system itself (robustness, security and safety, OECD AI Principles) assessed before deployment?",
+        "text": "Are PPP systems the agent uses, and the partnership and procurement data it handles, covered by an information security management system meeting ISO/IEC 27001, with access to sensitive partnership terms restricted by role and the security of the AI system itself (robustness, security and safety, OECD AI Principles) assessed before deployment?",
         "weight": 10
       },
       {
@@ -14511,10 +14511,10 @@
         "l2": "PPP commitments are listed, but contingent liabilities are not identified",
         "l3": "Agent tracks PPP fiscal commitments and flags budget impacts, but does not implement IMF PFRAM-level fiscal risk quantification or OECD DAC blended finance monitoring",
         "l4": "PFRAM-level fiscal risk quantification and contingent liability assessment exist, but fiscal risk disclosure or budget-office integration is missing",
-        "l5": "Full fiscal risk governance with IMF PFRAM implementation, contingent liability assessment, guarantee exposure monitoring, OECD DAC blended finance compliance, fiscal risk disclosure per IMF standards, and parliamentary budget office integration for oversight",
+        "l5": "Full fiscal risk governance with IMF PFRAM implementation, contingent liability assessment, guarantee exposure monitoring, alignment with the OECD DAC Blended Finance Principles, fiscal risk disclosure per IMF standards, and parliamentary budget office integration for oversight",
         "regulatoryRef": "IMF PFRAM; OECD DAC Blended Finance Principles",
         "remediation": "Run a fiscal risk calculation on every PPP commitment or renegotiation the agent proposes, and route any proposal that raises contingent liabilities above a set threshold to the finance ministry for approval.",
-        "text": "Does the agent implement fiscal risk management per IMF PFRAM (PPP Fiscal Risk Assessment Model) and OECD DAC Blended Finance Guidelines for public finance protection?",
+        "text": "Does the agent implement fiscal risk management per IMF PFRAM (PPP Fiscal Risk Assessment Model) and the OECD DAC Blended Finance Principles (a standard addressed to donors) where blended finance is used?",
         "weight": 10
       },
       {
@@ -14635,7 +14635,7 @@
         "l3": "A policy exists and some partners are screened, but intermediary due diligence, reporting channels or records are incomplete",
         "l4": "Policy, due diligence and a protected reporting channel cover every partner and intermediary, but records of political contributions or lobbying contacts are incomplete",
         "l5": "Policy applied to every partner and intermediary, due diligence on file and refreshed on change, a protected reporting channel with case logs, and records of contributions and lobbying contacts",
-        "regulatoryRef": "ISO 26000:2010 clause 6.6.3; UNCAC Art. 12",
+        "regulatoryRef": "ISO 26000 clause 6.6.3; UNCAC Art. 12",
         "remediation": "Have the agent check the lobbying-contact and gifts registers for each official involved before it schedules a partner meeting or decision step, and flag undisclosed contacts to the integrity officer.",
         "text": "Does the agent support an anti-corruption programme across PPP partners and intermediaries — anti-bribery policy, third-party due diligence, gifts and hospitality controls, protected reporting channels, and records of political contributions and lobbying contacts — consistent with ISO 26000 clause 6.6.3 (anti-corruption) and the private-sector measures of UNCAC Art. 12?",
         "weight": 8
@@ -14670,14 +14670,14 @@
         "failureMode": "The agent cites the wrong FATF recommendation in a partner due-diligence summary, so reviewers apply the wrong control.",
         "id": "GOV-PPC-15",
         "keyRisk": 0,
-        "l1": "No mapping governance: citations drift and Council-required anchors are inconsistently applied",
+        "l1": "No mapping governance: citations drift and clause anchors are inconsistently applied",
         "l2": "Clause anchors are listed in a document, but UNCAC, FATF and ISO 26000 references drift between questions",
         "l3": "A mapping exists but updates are manual and inconsistently enforced",
         "l4": "The mapping is versioned and reviewed periodically, but consistency is not validated by automated checks",
         "l5": "Versioned, reviewed mapping with automated consistency checks and audit-defensible clause anchors",
         "regulatoryRef": "Citation mapping governance",
         "remediation": "Add an automated check that every UNCAC, OECD, FATF and ISO 26000 anchor in the agent's PPP outputs and evidence exports matches the versioned map, failing the release on a mismatch.",
-        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000, G20), ensuring Council-required anchors (UNCAC Art. 9(1)(c), OECD §5.1, FATF R16, ISO 26000 §6.6.7, G20 §3) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
+        "text": "Does the program maintain a versioned control-to-citation map for PPP governance (UNCAC, OECD, FATF, ISO 26000), ensuring the clause anchors the pack uses (for example UNCAC Art. 9(1)(c), OECD §5.1, FATF R16) are used consistently, reviewed periodically, and validated by automated checks for citation consistency across the pack?",
         "weight": 6
       },
       {
@@ -14762,14 +14762,14 @@
       }
     ],
     "regulatoryBasis": [
-      "UN SDG 17 Partnership Framework",
+      "UN SDG 17 (A/RES/70/1), target 17.17",
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
       "OECD PPP Framework (OECD/LEGAL/0392)",
       "World Bank PPP Guidelines",
       "UNCAC (UN Convention Against Corruption)",
-      "ISO 26000:2010 §6.6",
+      "ISO 26000 §6.6",
       "OECD AI Principles",
-      "FATF R1 (AML in PPP)",
+      "FATF R1",
       "EU AMLR (Regulation (EU) 2024/1624)",
       "EU Data Act (Regulation (EU) 2023/2854)"
     ],
@@ -14780,7 +14780,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN SDG 17 Partnership Framework"
+        "text": "UN SDG 17 (A/RES/70/1), target 17.17"
       },
       {
         "citation": "UN Guiding Principles on Business and Human Rights (2011)",
@@ -14820,7 +14820,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 26000:2010 §6.6"
+        "text": "ISO 26000 §6.6"
       },
       {
         "citation": "OECD Recommendation of the Council on Artificial Intelligence (OECD/LEGAL/0449), as amended 2024-05-03",
@@ -14837,7 +14837,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "FATF R1 (AML in PPP)",
+        "text": "FATF R1",
         "url": "https://www.fatf-gafi.org/en/publications/Fatfrecommendations/update-Recommendation-16-payment-transparency-june-2025.html"
       },
       {

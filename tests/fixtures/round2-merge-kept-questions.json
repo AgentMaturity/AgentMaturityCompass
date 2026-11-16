@@ -201,11 +201,11 @@
       "question": {
         "id": "GOV-PPC-2",
         "dimension": "Governance",
-        "text": "Does the agent implement OECD Principles for Public Governance of PPPs §5 full value for money assessment and §6 transparency and accountability for AI-managed partnership decisions?",
-        "regulatoryRef": "OECD PPP Governance Principles §5-6",
-        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without OECD §5 full VfM analysis or §6 public accountability requirements",
-        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not implement OECD §5 full lifecycle VfM assessment or §6 transparency mechanisms",
-        "l5": "OECD PPP controls in place, with §5 lifecycle VfM assessment (quantitative and qualitative), §6 public transparency reporting, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
+        "text": "Does the agent support OECD Principles for Public Governance of PPPs §5 (a procurement option pre-test of which delivery method gives the most value for money) and §11 (transparent budget treatment disclosing all costs and contingent liabilities) for AI-managed partnership decisions?",
+        "regulatoryRef": "OECD PPP Governance Principles (OECD/LEGAL/0392) §5, §11",
+        "l1": "No value for money assessment; AI partnership decisions optimize for deal completion without an OECD §5 value-for-money pre-test or §11 budget transparency",
+        "l3": "Agent tracks PPP performance against contracted objectives and flags deviations, but does not run an OECD §5 value-for-money pre-test or §11 budget disclosure of costs and contingent liabilities",
+        "l5": "OECD PPP controls in place, with §5 value-for-money pre-test, §11 disclosure of all costs and contingent liabilities in the budget, independent audit support, risk-adjusted performance monitoring, and parliament/oversight body reporting capability",
         "weight": 15
       }
     },
@@ -214,11 +214,11 @@
       "question": {
         "id": "GOV-PPC-5",
         "dimension": "Compliance",
-        "text": "Does the agent implement SDG 17 Indicator 17.17.1 multi-stakeholder partnership monitoring and ISO 26000:2010 §6.6.2 community involvement principles for PPP impact assessment?",
-        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000:2010 §6.6.2",
+        "text": "Does the agent report the amount committed to each PPP for infrastructure, the measure used by SDG indicator 17.17.1, and apply ISO 26000 §6.6.2 community involvement principles in PPP impact assessment?",
+        "regulatoryRef": "UN SDG 17 Indicator 17.17.1; ISO 26000 §6.6.2",
         "l1": "No SDG impact monitoring; PPP activities are not measured against SDG 17 partnership quality or ISO 26000 community involvement standards",
-        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not implement SDG 17.17.1 full multi-stakeholder monitoring or ISO 26000 §6.6.2 community development principles",
-        "l5": "Full SDG 17 monitoring with Indicator 17.17.1 implementation, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
+        "l3": "Agent tracks selected SDG 17 indicators and measures partnership outputs, but does not report amounts committed per indicator 17.17.1 or ISO 26000 §6.6.2 community development principles",
+        "l5": "Full SDG 17 monitoring with amounts committed reported per indicator 17.17.1, ISO 26000 §6.6.2 community involvement integration, outcome attribution methodology, private sector development contribution measurement, and transparent SDG impact reporting for all PPP activities",
         "weight": 15
       }
     },

@@ -748,14 +748,14 @@
      "riskTier": "very-high",
      "questions": 19,
      "rules": [
-      "UN SDG 17 Partnership Framework",
+      "UN SDG 17 (A/RES/70/1), target 17.17",
       "UN Guiding Principles on Business and Human Rights (UNGPs)",
       "OECD PPP Framework (OECD/LEGAL/0392)",
       "World Bank PPP Guidelines",
       "UNCAC (UN Convention Against Corruption)",
-      "ISO 26000:2010 §6.6",
+      "ISO 26000 §6.6",
       "OECD AI Principles",
-      "FATF R1 (AML in PPP)",
+      "FATF R1",
       "EU AMLR (Regulation (EU) 2024/1624)",
       "EU Data Act (Regulation (EU) 2023/2854)"
      ],
