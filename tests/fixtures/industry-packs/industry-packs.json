@@ -1012,7 +1012,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-sdg-regulation",
-        "label": "EU SDG 2018/1724"
+        "label": "EU Single Digital Gateway Regulation 2018/1724"
       },
       {
         "external": true,
@@ -1042,16 +1042,16 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-9241-210",
-        "label": "ISO 9241-210:2019"
+        "label": "ISO 9241-210"
       }
     ],
     "complianceFrameworks": [
-      "EU SDG 2018/1724",
+      "EU Single Digital Gateway Regulation 2018/1724",
       "eIDAS 2.0",
       "GDPR Art. 6(1)(e)",
       "WCAG 2.1 AA",
       "EU AI Act Annex III point 5(a)",
-      "ISO 9241-210:2019"
+      "ISO 9241-210"
     ],
     "contentStatus": "experimental",
     "description": "Citizens engaging in government services to lead law-abiding responsible lives — AI agents delivering public services with equity, accessibility, transparency, and accountability, covering digital service delivery, benefits administration, and public safety services.",
@@ -1084,7 +1084,7 @@
         "l5": "Conformance evidence per release for every channel including agent-generated content; SC 2.4.3 focus-order regression tests with manual assistive-technology checks; published Art. 7 statement with a feedback route; WCAG 2.2 conformance tracked for authentication steps",
         "regulatoryRef": "EU Web Accessibility Directive Art. 4, Art. 7; WCAG 2.1 AA; WCAG 2.2",
         "remediation": "Add automated WCAG 2.1 AA checks on agent-generated responses (headings, text alternatives, contrast, focus order) to the release pipeline for every channel, and publish the Art. 7 statement with a feedback route.",
-        "text": "Do all citizen-facing service channels the agent operates (web, mobile, chat, voice) meet WCAG 2.1 Level AA, the requirement applied to public-sector websites and apps by the EU Web Accessibility Directive Art. 4, with keyboard focus order (WCAG SC 2.4.3) covered by regression tests and an accessibility statement per Art. 7?",
+        "text": "Do all citizen-facing service channels the agent operates (web, mobile, chat, voice) meet WCAG 2.1 Level AA and the accessibility requirements that the EU Web Accessibility Directive Art. 4 sets for public-sector websites and apps (perceivable, operable, understandable, robust), with keyboard focus order (WCAG SC 2.4.3) covered by regression tests and an accessibility statement per Art. 7?",
         "weight": 12
       },
       {
@@ -1180,12 +1180,12 @@
         "keyRisk": 4,
         "l1": "No service quality framework; citizen service AI is deployed without user research, usability testing, or systematic quality measurement",
         "l2": "Feedback is collected after launch, but no user research or usability testing preceded the agent's deployment",
-        "l3": "Agent implements user feedback collection and basic usability assessment, but does not apply ISO 9241-210 human-centered design process or UN E-Government Survey quality standards",
+        "l3": "Agent implements user feedback collection and basic usability assessment, but does not apply ISO 9241-210 human-centered design process or measure citizen satisfaction",
         "l4": "Iterative human-centred design with representative citizen panels runs, but satisfaction is not measured systematically or not fed into an improvement cycle",
         "l5": "Full human-centered design with ISO 9241-210 iterative design process, user research with representative citizen panels, UN E-Government satisfaction measurement, continuous service improvement cycle, and accessible service design for diverse citizen needs",
-        "regulatoryRef": "ISO 9241-210:2019; UN E-Government Survey 2024",
+        "regulatoryRef": "ISO 9241-210; UN E-Government Survey 2024",
         "remediation": "Run usability tests of the agent's dialogues with a representative citizen panel, including older and low-literacy users, before each significant release, and block release on unresolved critical findings.",
-        "text": "Does the agent implement service quality assurance per ISO 9241-210:2019 human-centered design principles and UN E-Government Development Index citizen satisfaction requirements?",
+        "text": "Does the agent implement service quality assurance per ISO 9241-210 human-centered design principles and track citizen satisfaction, which the UN E-Government Survey 2024 assesses through evidence of user satisfaction with online services?",
         "weight": 8
       },
       {
@@ -1260,12 +1260,12 @@
         "keyRisk": 0,
         "l1": "One or more mandatory steps of an Annex II procedure require offline action with no documented exception",
         "l2": "Information and forms are online, but identification and evidence submission still need an office visit for most Annex II procedures",
-        "l3": "Most steps are online, but identification, evidence, payment or outcome delivery still require offline action for some procedures",
+        "l3": "Most steps are online, but identification, evidence, signature or outcome delivery still require offline action for some procedures",
         "l4": "Every Annex II procedure served completes online end to end with documented exceptions, but completion rates are not measured per procedure or for cross-border users",
         "l5": "Every Annex II procedure served is completable online end to end, exceptions are documented with their legal basis, and completion rates are measured per procedure including cross-border users",
-        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 6(1), Annex II (Regulation (EU) 2018/1724, Art. 6 applies from 12 Dec 2023)",
+        "regulatoryRef": "EU Single Digital Gateway Regulation Art. 6(1)-(3), Annex II (Regulation (EU) 2018/1724, Art. 6 applies from 12 Dec 2023)",
         "remediation": "Map each Annex II procedure the agent serves step by step, and add a test journey per procedure that fails if any step outside a documented exception sends the user offline.",
-        "text": "For each procedure listed in Annex II of the Single Digital Gateway Regulation that the agent serves, can a user complete every step online — identification, information, evidence submission, payment where required, and receipt of the outcome — as Art. 6(1) requires, with any offline step justified in a documented exception?",
+        "text": "For each procedure listed in Annex II of the Single Digital Gateway Regulation that the agent serves, can a user complete every step online — identification, information and evidence, signature and final submission, acknowledgement of receipt, and delivery and notification of the outcome — as Art. 6(1)-(2) requires, with any in-person step limited to the exceptions in Art. 6(3) and documented?",
         "weight": 12
       },
       {
@@ -1303,9 +1303,9 @@
         "l3": "Some pages meet focus order, but complex journeys (wizards/modals/dynamic forms) have inconsistent focus management and limited test evidence",
         "l4": "Focus order is tested end to end with automated and assistive-technology checks, but no change-control gate stops a regression from shipping",
         "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
-        "regulatoryRef": "WCAG 2.1 SC 2.4.3",
+        "regulatoryRef": "WCAG 2.1 SC 2.4.3, SC 2.4.7, SC 2.1.2",
         "remediation": "Add keyboard-only end-to-end tests for each journey the agent updates dynamically (decision notices, uploads, payments) and gate every release on them.",
-        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent ensure WCAG 2.1 SC 2.4.3 Focus Order is met (logical tab order, focus visibility where relevant, no focus traps, consistent focus management on dynamic updates), with automated regression tests and manual AT test evidence?",
+        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent meet WCAG 2.1 SC 2.4.3 Focus Order (logical tab order, consistent focus management on dynamic updates), SC 2.4.7 Focus Visible and SC 2.1.2 No Keyboard Trap, with automated regression tests and manual AT test evidence?",
         "weight": 12
       },
       {
@@ -1393,10 +1393,10 @@
       "EU Single Digital Gateway Regulation 2018/1724",
       "eIDAS 2.0 Regulation 2024/1183",
       "GDPR Art. 6(1)(e)",
-      "WCAG 2.1 AA / EU Accessibility Directive 2016/2102",
-      "ISO 9241-210:2019 (Human-Centered Design)",
+      "WCAG 2.1 AA / EU Web Accessibility Directive 2016/2102",
+      "ISO 9241-210 (Human-Centered Design)",
       "EU AI Act Annex III point 5(a); Art. 26, 27, 50, 86",
-      "UN E-Government Development Index Standards",
+      "UN E-Government Development Index (UN E-Government Survey 2024)",
       "Section 508",
       "28 CFR Part 35 (ADA Title II web and mobile accessibility)"
     ],
@@ -1437,7 +1437,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "WCAG 2.1 AA / EU Accessibility Directive 2016/2102",
+        "text": "WCAG 2.1 AA / EU Web Accessibility Directive 2016/2102",
         "url": "https://www.w3.org/TR/WCAG22/"
       },
       {
@@ -1446,7 +1446,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 9241-210:2019 (Human-Centered Design)",
+        "text": "ISO 9241-210 (Human-Centered Design)",
         "url": "https://www.iso.org/standard/77520.html"
       },
       {
@@ -1465,7 +1465,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN E-Government Development Index Standards"
+        "text": "UN E-Government Development Index (UN E-Government Survey 2024)"
       },
       {
         "citation": "Section 508 ICT Standards and Guidelines (36 CFR Part 1194)",

@@ -71,8 +71,8 @@
       "question": {
         "id": "GOV-CS-12",
         "dimension": "Accessibility",
-        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent ensure WCAG 2.1 SC 2.4.3 Focus Order is met (logical tab order, focus visibility where relevant, no focus traps, consistent focus management on dynamic updates), with automated regression tests and manual AT test evidence?",
-        "regulatoryRef": "WCAG 2.1 SC 2.4.3",
+        "text": "Across all citizen-service user journeys (including AI-assisted decision notices, identity steps, uploads, and payments), does the agent meet WCAG 2.1 SC 2.4.3 Focus Order (logical tab order, consistent focus management on dynamic updates), SC 2.4.7 Focus Visible and SC 2.1.2 No Keyboard Trap, with automated regression tests and manual AT test evidence?",
+        "regulatoryRef": "WCAG 2.1 SC 2.4.3, SC 2.4.7, SC 2.1.2",
         "l1": "No focus-order control: keyboard navigation order is illogical, dynamic steps trap focus, or assistive technology users cannot complete procedures",
         "l3": "Some pages meet focus order, but complex journeys (wizards/modals/dynamic forms) have inconsistent focus management and limited test evidence",
         "l5": "End-to-end focus-order compliance across all journeys with automated checks, AT-supported manual test evidence, and change-control gates preventing regressions",
