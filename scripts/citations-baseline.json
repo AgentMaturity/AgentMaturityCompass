@@ -11,8 +11,7 @@
       "issue": "P0-24",
       "reason": "P0-24: corrected superseded citations (OMB M-25-21, SR 26-2, QMSR, EEOC guidance withdrawn) and the ATLAS prompt-injection id; CIT001 is now zero tolerance; CIT002 keeps the two ISO/IEC 42001 A.5 labels and AML.T0019 for the expert",
       "counts": {
-        "src/domains/industryPackAudit.ts": 2,
-        "src/score/crossFrameworkMapping.ts": 1
+        "src/domains/industryPackAudit.ts": 2
       }
     },
     "CIT003": {
