@@ -12,8 +12,8 @@
 | **Evidence model** | Test results (plain JSON) | Test results (plain JSON) | Tamper-evident (Ed25519 + Merkle trees) |
 | **What it tests** | Prompt → response quality | Prompt → response quality | Security, governance, reliability, cost, observability, compliance |
 | **Maturity scoring** | ❌ | ❌ | L0–L5 maturity levels |
-| **Adversarial testing** | Basic red-team prompts | Basic red-team prompts | 85 adversarial assurance packs |
-| **Framework adapters** | Provider configs | Pytest-based | 15 adapters (LangChain, CrewAI, AutoGen, Claude Code, Hermes, OpenAI SDK…) |
+| **Adversarial testing** | Basic red-team prompts | Basic red-team prompts | 148 registered assurance packs (count on 2026-11-17; `amc assurance list` prints the current list) |
+| **Framework adapters** | Provider configs | Pytest-based | 16 built-in adapters (LangChain, CrewAI, AutoGen, Claude Code, Hermes, DeepSeek Harness, OpenAI SDK…; `amc adapters list` prints them) |
 | **Compliance mapping** | ❌ | ❌ | EU AI Act, OWASP LLM Top 10, SOC2, HIPAA |
 | **CI/CD gates** | Pass/fail thresholds | Pass/fail thresholds | Score gates + signed evidence chain |
 | **Agent vs. LLM** | LLM-focused | LLM-focused | Agent-native (tools, memory, delegation, autonomy) |
@@ -32,7 +32,7 @@
 | **Provider** | **Adapter** | Promptfoo providers wrap LLM APIs; AMC adapters wrap entire agent runtimes |
 | **Test case** | **Diagnostic question** | AMC has 730+ questions across 5 dimensions, not ad-hoc test cases |
 | **Assertion** (`contains`, `llm-rubric`, `similar`) | **Scoring module** | AMC scoring is multi-dimensional (security, governance, reliability…), not single pass/fail |
-| **Dataset** (vars + expected) | **Assurance pack** | Curated, versioned test suites — 85 packs including adversarial red-team |
+| **Dataset** (vars + expected) | **Assurance pack** | Curated, versioned test suites, including adversarial red-team packs |
 | **Red team** (`promptfoo redteam`) | **Adversarial assurance packs** | AMC ships TAP/PAIR, Crescendo, CPA-RAG, EchoLeak, skeleton key, and more |
 | **Eval result** (JSON) | **Signed evidence artifact** | AMC results are cryptographically signed and chain-linked |
 | **`promptfoo eval`** | **`amc score`** | Run a full maturity assessment |
@@ -263,7 +263,7 @@ This means your trust score is _provable_, not just _claimed_.
 
 ### Adversarial Testing at Scale
 
-AMC ships 85 adversarial assurance packs out of the box:
+AMC ships 148 registered assurance packs (count on 2026-11-17), among them:
 - **TAP/PAIR**: Tree-of-Attacks with Pruning, Prompt Automatic Iterative Refinement
 - **Crescendo / Skeleton Key**: Multi-turn jailbreak escalation
 - **CPA-RAG / MCP**: Context poisoning attacks for RAG and tool-use agents

@@ -1,6 +1,6 @@
 # Adapter Compatibility and Capability Proof
 
-AMC ships 14 built-in adapter definitions. A definition is not proof that its runtime is installed, that a framework package matches the host runtime, or that every provider event is visible.
+AMC ships 16 built-in adapter definitions (`amc adapters list` prints them). A definition is not proof that its runtime is installed, that a framework package matches the host runtime, or that every provider event is visible.
 
 Use the authoritative registry and a signed capability receipt instead of a static compatibility badge:
 
@@ -17,8 +17,10 @@ amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-ca
 | `autogen-cli` | AutoGen CLI when present, otherwise host Python only | No | Fallback Python version does not prove AutoGen |
 | `claude-cli` | Claude binary version | Allow, deny, ask, and corrective steer when a signed control hook is installed | Steer blocks the current call and returns bounded correction; it does not rewrite input or prove retry success |
 | `crewai-cli` | CrewAI CLI when present, otherwise host Python only | No | Fallback Python version does not prove CrewAI |
+| `deepseek-harness` | DeepSeek Harness binary version; launch requires a signed, hash-pinned config | No | Optional headless capture only ([deepseek-harness.md](adapters/deepseek-harness.md)) |
 | `gemini-cli` | Gemini CLI binary version | Allow and deny when a signed control hook is installed | Native ask and verified corrective steer are unavailable; both fail closed to deny |
 | `generic-cli` | Shell runtime only | No | Shell version does not identify the wrapped agent |
+| `hermes-cli` | Hermes binary version | No | Gateway/process evidence only ([hermes.md](adapters/hermes.md)) |
 | `langchain-node` | Host Node.js only | No | Node version does not prove LangChain package/version |
 | `langchain-python` | Host Python only | No | Python version does not prove LangChain package/version |
 | `langgraph-python` | Host Python only | No | Python version does not prove LangGraph package/version |
@@ -28,6 +30,8 @@ amc adapters capabilities --agent my-agent --adapter claude-cli --out adapter-ca
 | `openhands-cli` | OpenHands binary version | No AMC-managed native hook yet | Gateway/process evidence only |
 | `python-amc-sdk` | Installed AMC Python package version | No | SDK callbacks determine event depth |
 | `semantic-kernel` | Host Node.js only | No | Node version does not prove Semantic Kernel package/version |
+
+Two hook providers are not `amc adapters` ids and so are not in this table: Codex, observe mode only ([codex.md](adapters/codex.md)), and pi, through its own extension ([pi.md](adapters/pi.md)). Both are installed with `amc connect hooks install --provider codex|pi`.
 
 Every declaration includes exact events, controls, activation conditions, definition version, known omissions, verification authority, and fixture evidence references. Plugin adapters that predate this contract still load, but receive an explicit `unverified` declaration with no advertised event or control capability. Publisher self-attestation is never upgraded to AMC verification; all plugin receipts remain fail closed until the separate partner-certification lane exists.
 
