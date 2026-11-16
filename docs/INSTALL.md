@@ -84,8 +84,8 @@ What it does, step by step:
   `package.json` names, through Corepack. Then it builds (`pnpm run build`).
 - Keeps everything in one folder, `~/.amc-source` (about 2 GB with two builds and the package store), and puts a
   small `amc` launcher in `~/.amc-source/bin`. The launcher names the Node.js the script checked by its full path,
-  so `amc` never runs a `node` from your current folder. If you remove or replace that Node.js, run the install
-  command again.
+  so `amc` never runs a `node` from your current folder. If that Node.js is removed later (for example a version
+  manager's per-shell copy), `amc` says so; run the install command again.
 - Adds one line, marked `# AMC source install`, to your shell profile (`~/.zshrc` for zsh, `~/.bash_profile` for
   bash on macOS, `~/.bashrc` for bash on Linux, otherwise `~/.profile`), and only if that line is not there yet.
   It says which file it changed. Use `--no-modify-path` to change nothing and print the line instead. For fish it
@@ -119,7 +119,8 @@ irm https://agentmaturity.co/install-source.ps1 | iex
 ```
 
 It installs into `%USERPROFILE%\.amc-source` and adds `%USERPROFILE%\.amc-source\bin` to your user PATH once. To
-remove it, delete that folder and remove that entry from your user PATH.
+remove it, delete that folder and remove that entry from your user PATH. It needs Node.js in a folder whose name uses only plain
+English letters (the nodejs.org installer puts it in Program Files); otherwise it stops and says so.
 
 **Why not `npm install -g github:AgentMaturity/AgentMaturityCompass`?** It does not work for this repository. npm
 builds a package installed from git only when the package has a `prepare` script, and AMC has none, so npm would

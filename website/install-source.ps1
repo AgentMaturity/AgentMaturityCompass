@@ -131,9 +131,23 @@ function Install-AmcSource {
   $Bin = Join-Path $Prefix "bin"
   New-Item -ItemType Directory -Force -Path $Bin | Out-Null
   # cmd looks for a bare "node" in the current folder before PATH, so the launcher names the checked Node.js by its
-  # full path, and the version check below runs that same Node.js.
-  Set-Content -LiteralPath (Join-Path $Bin "amc.cmd") -Encoding ASCII -Value "@`"$($Node.Source)`" `"%~dp0..\current\dist\cli.js`" %*"
-  $Version = (& $Node.Source (Join-Path $CurrentLink "dist\cli.js") --version 2>$null)
+  # full path. cmd reads a batch file in the console code page, which can change, so only an ASCII path is written
+  # (anything else would turn into "?"); "%" is doubled so cmd does not expand it. The version check runs amc.cmd.
+  if ($Node.Source -notmatch '^[\x20-\x7E]+$') {
+    Stop-AmcInstall "The Node.js found is in a folder whose name has letters outside plain English ($($Node.Source)), and the amc launcher cannot name it safely. Install Node.js 22 or 24 from https://nodejs.org (it goes to Program Files) and run this again."
+  }
+  $NodeCmd = $Node.Source -replace '%', '%%'
+  $Launcher = @(
+    "@if not exist `"$NodeCmd`" goto gone",
+    "@`"$NodeCmd`" `"%~dp0..\current\dist\cli.js`" %*",
+    "@exit /b %errorlevel%",
+    ":gone",
+    "@echo The Node.js AMC was installed with is gone. Run the AMC install command again: irm https://agentmaturity.co/install-source.ps1 ^| iex 1>&2",
+    "@exit /b 1"
+  )
+  Set-Content -LiteralPath (Join-Path $Bin "amc.cmd") -Encoding ASCII -Value $Launcher
+  $Version = (& (Join-Path $Bin "amc.cmd") --version 2>$null)
+  if ($LASTEXITCODE -ne 0) { Stop-AmcInstall "AMC was built, but the amc launcher in $Bin did not start it. Run this again; if it fails the same way, report it." }
 
   $UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
   if ($NoModifyPath) {

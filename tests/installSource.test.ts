@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -102,10 +102,24 @@ describe.skipIf(process.platform === "win32")("source installer (website/install
     expect(installed.status, installed.stderr).toBe(0);
     expect(installed.stdout).toContain(`Using Node.js v${process.versions.node} (${join(s.nodeDir, "node")})`);
     const launcher = readFileSync(join(s.prefix, "bin", "amc"), "utf8");
-    expect(launcher).toBe(`#!/bin/sh\nexec '${join(s.nodeDir, "node")}' '${join(s.prefix, "current", "dist", "cli.js")}' "$@"\n`);
+    expect(launcher).toContain(`\nexec '${join(s.nodeDir, "node")}' '${join(s.prefix, "current", "dist", "cli.js")}' "$@"\n`);
+    expect(launcher.match(/^.*\bnode\b.*$/gm)!.every((line) => line.includes(`'${join(s.nodeDir, "node")}`) || line.includes("Node.js"))).toBe(true);
     const amc = spawnSync(join(s.prefix, "bin", "amc"), ["--version"], { cwd: project, env: { PATH: `:${s.nodeDir}:/usr/bin:/bin` }, encoding: "utf8" });
     expect(amc.stdout.trim()).toBe("9.9.9");
     expect(existsSync(planted)).toBe(false);
+  });
+
+  it("says the pinned Node.js is gone, and how to fix it, when it was removed after install", () => {
+    const s = sandbox();
+    const nodeDir = join(s.dir, "fnm_multishells", "123_456", "bin");
+    mkdirSync(nodeDir, { recursive: true });
+    symlinkSync(process.execPath, join(nodeDir, "node"));
+    expect(s.runIn(s.home, `${s.bin}:${nodeDir}:/usr/bin:/bin`).status).toBe(0);
+    rmSync(join(s.dir, "fnm_multishells"), { recursive: true });
+    const amc = spawnSync(join(s.prefix, "bin", "amc"), ["--version"], { env: { PATH: "/usr/bin:/bin" }, encoding: "utf8" });
+    expect(amc.status).toBe(1);
+    expect(amc.stderr).toBe(`The Node.js AMC was installed with is gone: ${join(nodeDir, "node")}\n`
+      + "Run the AMC install command again to use the Node.js you have now.\n");
   });
 
   it("refuses a Node.js older than package.json engines.node before any build", () => {
@@ -150,9 +164,14 @@ it("labels the PowerShell twin untested in its header and its help, and calls on
   expect(text.trimEnd().split("\n").at(-1)).toBe("Install-AmcSource @args");
 });
 
-it("writes amc.cmd with the checked Node.js's full path in quotes, never a bare node, and checks the version through it", () => {
+it("writes amc.cmd with the checked ASCII Node.js path in quotes and a gone-check, never a bare node, and checks the version through amc.cmd", () => {
   const text = readFileSync(ps1, "utf8");
-  expect(text).toContain('-Value "@`"$($Node.Source)`" `"%~dp0..\\current\\dist\\cli.js`" %*"');
+  expect(text).toContain('"@`"$NodeCmd`" `"%~dp0..\\current\\dist\\cli.js`" %*"');
+  expect(text).toContain('"@if not exist `"$NodeCmd`" goto gone"');
+  expect(text).toContain("$NodeCmd = $Node.Source -replace '%', '%%'");
   expect(text).not.toMatch(/@node\b/);
-  expect(text).toContain('& $Node.Source (Join-Path $CurrentLink "dist\\cli.js") --version');
+  // cmd reads amc.cmd in the console code page: a non-ASCII node path is refused, never written as "?".
+  expect(text).toContain("if ($Node.Source -notmatch '^[\\x20-\\x7E]+$')");
+  // The install-time check runs the launcher itself, so a broken amc.cmd fails at install, not later.
+  expect(text).toContain('$Version = (& (Join-Path $Bin "amc.cmd") --version 2>$null)');
 });

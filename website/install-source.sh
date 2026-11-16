@@ -138,7 +138,14 @@ amc_source_install() {
   # would take whatever node comes first on PATH, which can be one in the current folder. It replaces the symlink
   # that older installs have (mv, so nothing is written through the symlink into dist/cli.js).
   quote() { printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"; }
-  printf '#!/bin/sh\nexec %s %s "$@"\n' "$(quote "$node_found")" "$(quote "$prefix/current/dist/cli.js")" > "$prefix/bin/.amc-new"
+  # A version manager's per-shell node path can vanish later; then say so and name the fix, not "exec: not found".
+  {
+    printf '#!/bin/sh\n'
+    printf '[ -x %s ] || { printf '\''%%s\\n'\'' %s %s >&2; exit 1; }\n' "$(quote "$node_found")" \
+      "$(quote "The Node.js AMC was installed with is gone: $node_found")" \
+      "$(quote "Run the AMC install command again to use the Node.js you have now.")"
+    printf 'exec %s %s "$@"\n' "$(quote "$node_found")" "$(quote "$prefix/current/dist/cli.js")"
+  } > "$prefix/bin/.amc-new"
   chmod 755 "$prefix/bin/.amc-new"
   mv -f -- "$prefix/bin/.amc-new" "$prefix/bin/amc"
   version=$("$prefix/bin/amc" --version 2>/dev/null || echo unknown)
