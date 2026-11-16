@@ -15095,9 +15095,9 @@
         "l3": "Agent calculates key performance indicators per ISO 24510 (service quality, reliability, customer satisfaction) but does not benchmark against peer utilities or identify improvement priorities",
         "l4": "ISO 24510 indicators are calculated and benchmarked against peers, but improvement priorities and public reporting are not linked",
         "l5": "Full performance benchmarking with ISO 24510 indicator calculation, peer utility comparison, trend analysis, improvement priority identification, customer satisfaction integration, and transparent public reporting of service performance",
-        "regulatoryRef": "ISO 24510:2007",
+        "regulatoryRef": "ISO 24510",
         "remediation": "Compute each ISO 24510 indicator from documented source data and flag any value that moved because of a definition change rather than performance.",
-        "text": "Does the agent support water service performance benchmarking per ISO 24510:2007 service assessment guidelines?",
+        "text": "Does the agent support water service performance benchmarking per ISO 24510 service assessment guidelines?",
         "weight": 12
       },
       {
@@ -15215,10 +15215,10 @@
         "l2": "The system assessment is documented, but operational limits and verification are missing",
         "l3": "Implements most WSP components with documented procedures and some verification, but operational monitoring and periodic review are incomplete or not consistently evidenced",
         "l4": "Operational monitoring, procedures and verification are in place, but independent review is irregular and documents are not controlled",
-        "l5": "Comprehensive WSP implementation with continuous operational monitoring, automated verification and review cycles, incident/normal SOP enforcement, controlled documentation, and audit-ready evidence mapped to §4.1 elements",
-        "regulatoryRef": "WHO GDWQ (4th ed.) §4.1",
+        "l5": "Comprehensive WSP implementation with continuous operational monitoring, automated verification and review cycles, incident/normal SOP enforcement, controlled documentation, and audit-ready evidence mapped to Chapter 4 elements",
+        "regulatoryRef": "WHO GDWQ (4th ed.) Ch. 4 (§§4.1-4.7)",
         "remediation": "Set operational limits for every WSP control measure in the monitoring config and switch the agent to the incident procedure when a limit is breached.",
-        "text": "Does the agent ensure Water Safety Plan implementation consistent with WHO GDWQ (4th ed.) §4.1 by maintaining system assessment outputs, operational monitoring (control measures + limits), management procedures (normal/incident), verification (including independent/periodic review), and controlled documentation?",
+        "text": "Does the agent ensure Water Safety Plan implementation consistent with WHO GDWQ (4th ed.) Chapter 4 by maintaining system assessment outputs, operational monitoring (control measures + limits), management procedures (normal/incident), verification (including independent/periodic review), and controlled documentation?",
         "weight": 12
       },
       {
@@ -15298,7 +15298,7 @@
         "l5": "Classification recorded with reasoning, Art. 12 logs retained and protected from alteration, override/stop and fail-safe exercised in drills with results recorded, and the evidence pack dated against 2 Dec 2027",
         "regulatoryRef": "EU AI Act Annex III point 2, Art. 12, Art. 14(4)(d)-(e), Art. 15(4)",
         "remediation": "Define a fail-safe dosing and pressure state the plant reverts to when the agent is stopped or loses data, and drill it with results in the evidence pack.",
-        "text": "Where the agent is a safety component in drinking-water supply (e.g. dosing or pressure control; AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12), give operators override and a stop to a safe state (Art. 14(4)(d)-(e)), and have a backup or fail-safe plan (Art. 15(4)), ready for the 2 Dec 2027 application date?",
+        "text": "Where the agent is a safety component in drinking-water supply (e.g. dosing or pressure control; AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12), give operators override and a stop to a safe state (Art. 14(4)(d)-(e)), and is it resilient to errors and faults, for example through backup or fail-safe plans (Art. 15(4)), ready for the 2 Dec 2027 application date?",
         "weight": 12
       },
       {
@@ -15327,7 +15327,7 @@
       "WHO Guidelines for Drinking-water Quality (4th ed.)",
       "EU Water Framework Directive 2000/60/EC",
       "EU Urban Wastewater Treatment Directive (EU) 2024/3019 (recast of 91/271/EEC)",
-      "ISO 24510:2007 / ISO 24512:2007 (Water Services)",
+      "ISO 24510 / ISO 24512 (Water Services)",
       "HELCOM Baltic Sea Action Plan",
       "MARPOL Annex IV"
     ],
@@ -15369,12 +15369,11 @@
         "url": "https://data.europa.eu/eli/dir/2024/3019/oj"
       },
       {
-        "citation": "ISO 24510 / ISO 24512 Water services",
-        "instrumentId": "iso-24510",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
+        "citation": "ISO 24510 / ISO 24512 (Water Services)",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "ISO 24510:2007 / ISO 24512:2007 (Water Services)"
+        "text": "ISO 24510 / ISO 24512 (Water Services)"
       },
       {
         "citation": "HELCOM Baltic Sea Action Plan",
