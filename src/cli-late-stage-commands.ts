@@ -455,8 +455,7 @@ export function registerLateStageCliCommands({
           output: opts.output,
           noSign: opts.sign === false,
           evilMcp: opts.evilMcp,
-          mcpAttackCategories: opts.mcpAttacks,
-          ...redTeamExtras(opts, workspace),
+          mcpAttackCategories: opts.mcpAttacks, ...redTeamExtras(opts, workspace),
         });
       } catch (error) {
         // Fail closed: reporting "no vulnerabilities" without attacking
