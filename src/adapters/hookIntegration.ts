@@ -14,8 +14,8 @@ import { CLAUDE_NOT_GOVERNED_NOTE, claudeCodeGovernance, type ClaudeCodeGovernan
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
 import {
-  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_OBSERVE_SESSION_HOOKS, CLAUDE_STATUS_MESSAGE, claudeActionId, claudeCodeBindingSchema,
-  measureClaudeCode, type ClaudeCodeBinding, type ClaudeCodeInstall,
+  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_OBSERVE_SESSION_HOOKS, CLAUDE_OBSERVE_SESSION_HOOKS_MISSING, CLAUDE_STATUS_MESSAGE, claudeActionId,
+  claudeCodeBindingSchema, claudeObserveWithoutSessionHooks, measureClaudeCode, type ClaudeCodeBinding, type ClaudeCodeInstall,
 } from "./hookProviders/claudeCode.js";
 import { cachedFileSha256, clearPiDigestCache } from "./pi/piInstall.js";
 import { approvalPolicyPath, approvalPolicySigPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -242,18 +242,6 @@ function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "contr
         { eventName: "BeforeTool", phase: "requested", eventType: "action.requested" },
       ];
 }
-
-/**
- * A Claude Code observe manifest signed before AMC observed whole sessions: its handlers are the three tool hooks only.
- * Still a valid installation (tool calls are observed); status asks for a reinstall to add the session hooks.
- */
-function claudeObserveWithoutSessionHooks(provider: ConfigHookProvider, manifest: HookManifest): boolean {
-  return provider === "claude-code" && manifest.mode === "observe" && manifest.v === 2
-    && canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
-      providerHookSpecs(provider, "observe").filter((spec) => spec.eventType !== null).map(({ eventName, phase }) => ({ eventName, phase })));
-}
-const CLAUDE_OBSERVE_SESSION_HOOKS_MISSING = "installed without the session hooks (session start and end, prompts, sub-agents, compaction); "
-  + "run `amc connect hooks install --provider claude-code --mode observe` to add them";
 
 function providerObservedEventTypes(provider: ConfigHookProvider): Array<"action.requested" | "action.completed" | "action.failed"> {
   return provider === "claude-code"
@@ -589,7 +577,7 @@ function validateManifestPaths(workspace: string, provider: ConfigHookProvider, 
       && manifest.observation.correlation === (provider === "claude-code" ? "provider-call-id" : "derived-event-id")
     : (canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
         providerHookSpecs(provider, manifest.mode).map(({ eventName, phase }) => ({ eventName, phase })),
-      ) || claudeObserveWithoutSessionHooks(provider, manifest))
+      ) || (provider === "claude-code" && claudeObserveWithoutSessionHooks(manifest)))
       && canonicalize(manifest.observation.eventTypes) === canonicalize(providerObservedEventTypes(provider))
       && manifest.observation.correlation === (
         provider === "claude-code" ? "provider-call-id" : "derived-request-id-with-terminal-resolution"
@@ -1001,10 +989,8 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
     issues.push("managed hook handler set differs from the signed installation manifest");
     configOwned = false;
   }
-  if (manifest?.v === 1) {
-    issues.push("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
-  }
-  if (manifestValid && manifest && claudeObserveWithoutSessionHooks(provider, manifest)) issues.push(CLAUDE_OBSERVE_SESSION_HOOKS_MISSING);
+  if (manifest?.v === 1) issues.push("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
+  if (manifestValid && provider === "claude-code" && manifest?.v === 2 && claudeObserveWithoutSessionHooks(manifest)) issues.push(CLAUDE_OBSERVE_SESSION_HOOKS_MISSING);
   if (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256) {
     issues.push("provider config changed after installation");
   }

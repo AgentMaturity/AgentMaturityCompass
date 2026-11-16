@@ -39,6 +39,16 @@ export const CLAUDE_CONTROL_STATUS_MESSAGE = "AMC Control [amc-control-v1]";
  */
 export const CLAUDE_OBSERVE_SESSION_HOOKS = ["SessionStart", "SessionEnd", "UserPromptSubmit", "Stop", "StopFailure", "SubagentStart", "SubagentStop",
   "PreCompact", "PostCompact", "PermissionRequest", "PermissionDenied"] as const;
+/**
+ * Whether an observe manifest was signed before AMC observed whole sessions: its handlers are the three tool hooks only.
+ * Still a valid installation (tool calls are observed); status asks for a reinstall to add the session hooks.
+ */
+export function claudeObserveWithoutSessionHooks(manifest: { mode: string; handlers: ReadonlyArray<{ eventName: string; phase: string }> }): boolean {
+  const before = [["PostToolUse", "completed"], ["PostToolUseFailure", "failed"], ["PreToolUse", "requested"]];
+  return manifest.mode === "observe" && JSON.stringify(manifest.handlers.map(({ eventName, phase }) => [eventName, phase])) === JSON.stringify(before);
+}
+export const CLAUDE_OBSERVE_SESSION_HOOKS_MISSING = "installed without the session hooks (session start and end, prompts, sub-agents, compaction); "
+  + "run `amc connect hooks install --provider claude-code --mode observe` to add them";
 /** File-based managed settings (managed-settings.json plus managed-settings.d/*.json), per the managed settings docs. */
 export const CLAUDE_MANAGED_SETTINGS_DIRS: Partial<Record<NodeJS.Platform, string>> = {
   darwin: "/Library/Application Support/ClaudeCode",
