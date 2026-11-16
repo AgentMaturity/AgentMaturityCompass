@@ -8133,7 +8133,7 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": null,
+        "instrumentId": "eu-emfa",
         "label": "European Media Freedom Act 2024/1083"
       }
     ],
@@ -8550,7 +8550,7 @@
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
       "European Media Freedom Act (Regulation (EU) 2024/1083)",
-      "DMCA 17 U.S.C. §512"
+      "DMCA §512 (17 U.S.C. §512)"
     ],
     "regulatoryReferences": [
       {
@@ -8613,18 +8613,22 @@
         "url": "https://data.europa.eu/eli/dir/2019/790/oj"
       },
       {
-        "citation": "European Media Freedom Act (Regulation (EU) 2024/1083)",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
-        "status": "unverified",
-        "text": "European Media Freedom Act (Regulation (EU) 2024/1083)"
+        "citation": "Regulation (EU) 2024/1083 (European Media Freedom Act)",
+        "effectiveDate": "2024-05-07",
+        "instrumentId": "eu-emfa",
+        "jurisdiction": "EU",
+        "lastReviewed": "2026-10-03",
+        "status": "in-force",
+        "text": "European Media Freedom Act (Regulation (EU) 2024/1083)",
+        "url": "https://data.europa.eu/eli/reg/2024/1083/oj"
       },
       {
-        "citation": "DMCA 17 U.S.C. §512",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "citation": "DMCA §512 (17 U.S.C. §512)",
+        "instrumentId": "us-dmca-512",
+        "jurisdiction": "US",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "DMCA 17 U.S.C. §512"
+        "text": "DMCA §512 (17 U.S.C. §512)"
       }
     ],
     "riskTier": "high",
@@ -10388,7 +10392,7 @@
         "l3": "Some neutrality/separation controls exist, but segregation, security measures, and audit evidence are incomplete or inconsistently enforced across services/partners",
         "l4": "Separation, security measures and monitoring are enforced across services, but evidence bundles or periodic attestations are incomplete for some partners.",
         "l5": "Full Art. 12 implementation with enforced non-use constraints, operational separation, technical/organizational controls, continuous monitoring, and audit-ready evidence bundles aligned to competent authority expectations",
-        "regulatoryRef": "EU DGA 2022/868 Art. 12",
+        "regulatoryRef": "EU Data Governance Act 2022/868 Art. 12",
         "remediation": "Run intermediation workloads in a separate tenant with distinct credentials, and alert when any principal from the commercial side reads intermediation storage.",
         "text": "If the agent provides data intermediation services, does it operationalize DGA Art. 12 by enforcing neutrality and separation (no data use for other purposes, ring-fenced operations), implementing appropriate technical and organizational measures for secure intermediation, and maintaining audit-ready evidence (policies, access logs, segregation controls, and periodic compliance attestations)?",
         "weight": 15
@@ -10632,8 +10636,9 @@
       },
       {
         "citation": "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "instrumentId": "oidc-oauth21",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "OpenID Connect Core 1.0 / OAuth 2.0 (RFC 6749)"
       }
@@ -11719,8 +11724,9 @@
       },
       {
         "citation": "ITIL 4",
-        "instrumentId": null,
-        "jurisdiction": "unresolved",
+        "instrumentId": "itil-4",
+        "jurisdiction": "INT",
+        "lastReviewed": "2026-10-03",
         "status": "unverified",
         "text": "ITIL 4"
       },
@@ -11754,14 +11760,14 @@
     "version": "2026.10"
   },
   "partnerships-prosperity": {
-    "certificationPath": "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source compliance → L4 Full SDG 17 partnership framework → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
+    "certificationPath": "L1 Basic partnership governance → L2 IP rights management → L3 FRAND/open source licence controls in place → L4 Full SDG 17 partnership framework → L5 Autonomous partnership orchestration with verified equity, IP protection, and measurable prosperity outcomes",
     "certificationThreshold": 68,
     "complianceFrameworkRefs": [
       {
         "external": true,
         "frameworkId": null,
         "instrumentId": "eu-data-act",
-        "label": "EU Data Act 2023/2854 Ch. V"
+        "label": "EU Data Act 2023/2854"
       },
       {
         "external": true,
@@ -11779,7 +11785,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-26000",
-        "label": "ISO 26000:2010"
+        "label": "ISO 26000"
       },
       {
         "external": true,
@@ -11789,15 +11795,15 @@
       }
     ],
     "complianceFrameworks": [
-      "EU Data Act 2023/2854 Ch. V",
+      "EU Data Act 2023/2854",
       "TRIPS Agreement",
       "WIPO Copyright Treaty",
-      "ISO 26000:2010",
+      "ISO 26000",
       "UN SDG 17"
     ],
     "contentStatus": "experimental",
     "description": "Global collaboration and sharing to create intellectual property in an open shared environment — AI agents facilitating multi-stakeholder partnerships, open innovation ecosystems, and IP co-creation with emphasis on governance, fair access, and prevention of exploitation.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo a third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts directly with people or generates synthetic content",
     "id": "partnerships-prosperity",
     "keyRisks": [
       "IP exploitation by dominant partners through AI-facilitated access",
@@ -11819,14 +11825,14 @@
         "failureMode": "The agent attributes a jointly developed design to the partner that hosts the collaboration workspace, handing that partner the IP.",
         "id": "TECH-PP-1",
         "keyRisk": 0,
-        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or TRIPS-compliant protection",
+        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or attention to the protections TRIPS requires Members to provide",
         "l2": "Ownership of joint outputs is discussed per project, without written allocation.",
-        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not implement automated TRIPS compliance or proactive IP conflict detection",
+        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not check outputs against TRIPS-based protections automatically or detect IP conflicts proactively",
         "l4": "Ownership is tracked with agreements and AI authorship disclosure, but contribution tracking or IP conflict detection is partial.",
-        "l5": "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
+        "l5": "Full IP governance with automated rights management that reflects TRIPS-based protections, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
         "regulatoryRef": "TRIPS Agreement Art. 10, 27-34",
         "remediation": "Record every partner and AI contribution to a joint output in a contribution ledger at creation, and check new outputs against existing IP claims before release.",
-        "text": "Does the agent manage IP rights in partnership ecosystems per TRIPS Agreement Articles 27-34 patent rights and Article 10 copyright protection for AI-generated collaborative outputs?",
+        "text": "Does the agent manage IP rights in partnership outputs, including AI-assisted ones, in line with the patent rights WTO Members must provide under TRIPS Agreement Articles 27-34 and the protection of computer programs and compilations of data under Article 10?",
         "weight": 15
       },
       {
@@ -11864,9 +11870,9 @@
         "l3": "Agent monitors partnership contribution metrics and flags imbalanced participation, but does not act on flags through a documented process.",
         "l4": "Metrics, thresholds and recorded actions exist per partner, but governance reports do not reach the partners.",
         "l5": "Contribution and benefit metrics per partner on a fixed schedule; documented thresholds; each imbalance triggers a recorded action; governance reporting to partners.",
-        "regulatoryRef": "ISO 26000:2010 §6.8",
+        "regulatoryRef": "ISO 26000 (community involvement and development)",
         "remediation": "Compute contribution and benefit per partner each quarter and open a recorded action when any partner, including developing-economy partners, falls below threshold.",
-        "text": "Does the agent implement equitable partnership governance per ISO 26000:2010 §6.8 (community involvement and development), with partner participation measured and imbalances acted on?",
+        "text": "Does the agent implement equitable partnership governance in line with ISO 26000 guidance on community involvement and development, with partner participation measured and imbalances acted on?",
         "weight": 10
       },
       {
@@ -11926,7 +11932,7 @@
         "l5": "Classified trade-secret inventory; access controls and logging cover AI inputs, logs and outputs; confidentiality agreements with every partner; misappropriation response procedure exercised; evidence assembled for the Art. 2(1)(c) 'reasonable steps' test.",
         "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2, 4",
         "remediation": "Classify trade secrets and apply DLP to prompts, logs and outputs of partnership AI tools so classified content is blocked or redacted before reaching the model.",
-        "text": "Does the agent protect trade secrets in partnership AI systems per EU Trade Secrets Directive 2016/943 Articles 2 and 4 reasonable measures requirements?",
+        "text": "Does the agent keep information shared in partnership AI systems under the reasonable steps that make it a trade secret (EU Trade Secrets Directive 2016/943 Art. 2(1)(c)) and guard it against the unlawful acquisition, use and disclosure defined in Art. 4?",
         "weight": 12
       },
       {
@@ -11941,12 +11947,12 @@
         "keyRisk": 2,
         "l1": "No partnership impact measurement; collaborative outcomes are not systematically measured against SDG targets or GRI economic impact standards",
         "l2": "Activity counts are reported, with no economic impact estimate.",
-        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not implement UN SDG 17 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
+        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not support SDG 17.16 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
         "l4": "SDG 17 and GRI 203 reporting are in place, but prosperity distribution across partners is not analysed.",
         "l5": "Full impact measurement with SDG 17 indicator 17.16.1 tracking, GRI 203 indirect economic impact reporting, prosperity distribution analysis across partners, and transparent partnership impact disclosure for stakeholders",
-        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI 203",
+        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI Standards 203 (Indirect Economic Impacts)",
         "remediation": "Report GRI 203 indirect economic impacts per partner alongside activity metrics, and disclose how value created by the partnership is distributed.",
-        "text": "Does the agent implement partnership impact measurement per UN SDG 17 indicator 17.16.1 multi-stakeholder monitoring frameworks and GRI 203 Indirect Economic Impacts?",
+        "text": "Does the agent measure partnership impact, report indirect economic impacts under GRI 203, and support the multi-stakeholder development effectiveness monitoring that SDG indicator 17.16.1 tracks (a count of countries reporting progress)?",
         "weight": 12
       },
       {
@@ -11979,14 +11985,14 @@
         "failureMode": "The agent exports AI-generated partnership models without protection measures, and a departing partner walks away with the full asset.",
         "id": "TECH-PP-9",
         "keyRisk": 3,
-        "l1": "No trade secret or TPM compliance; AI collaboration environments lack Art. 2 reasonable measures for confidential information and WIPO WCT Art. 11 technological protection for AI-generated IP",
+        "l1": "No trade secret or technological protection measures; AI collaboration environments lack Art. 2(1)(c) reasonable steps for confidential information and technological measures on partnership works",
         "l2": "Generic access controls cover partnership data; AI-generated IP has no technological protection.",
-        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2 reasonable measures standard or WIPO WCT Art. 11 technological protection for AI-generated collaborative IP",
+        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2(1)(c) reasonable steps or technological measures on partnership works",
         "l4": "AI-specific classification, protection measures and an inventory exist, but misappropriation detection or the audit trail is partial.",
-        "l5": "Full EU Trade Secrets Directive Art. 2 reasonable measures with AI-specific access classification, WIPO WCT Art. 11 technological protection for AI-generated IP, trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
-        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11",
+        "l5": "Full EU Trade Secrets Directive Art. 2(1)(c) reasonable steps with AI-specific access classification, technological measures on partnership works (WCT Art. 11 context), trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
+        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO Copyright Treaty Art. 11",
         "remediation": "Apply technological protection measures to AI-generated partnership assets at export, and alert when an asset is accessed outside the partner's entitlement.",
-        "text": "Does the agent implement EU Trade Secrets Directive 2016/943 Article 2 reasonable measures standard for AI collaboration environments and WIPO Copyright Treaty Article 11 technological protection measures for AI-generated partnership IP?",
+        "text": "Does the agent apply the reasonable steps of EU Trade Secrets Directive 2016/943 Article 2(1)(c) in AI collaboration environments, and use technological measures on partnership works of the kind WIPO Copyright Treaty Article 11 requires Contracting Parties to protect against circumvention?",
         "weight": 12
       },
       {
@@ -12084,7 +12090,7 @@
         "l3": "Maintains a mapping in documentation, but it is not kept current with workflow changes or used to gate AI content operations",
         "l4": "A versioned mapping with legal review exists, but it is not used to gate AI content operations.",
         "l5": "Robust mapping governance with versioning, legal review, and workflow gating so that WCT/WPPT obligations are correctly applied and evidence is produced per right/article",
-        "regulatoryRef": "WIPO WCT/WPPT (mapping governance)",
+        "regulatoryRef": "WIPO Copyright Treaty; WIPO WPPT",
         "remediation": "Map each content workflow step (capture, reproduction, distribution, TPM) to the WCT or WPPT article it implicates and gate the agent's workflow on that rights check.",
         "text": "Does the program maintain a WIPO treaty-to-right mapping (WCT vs WPPT) for partnership outputs (authors rights vs performers neighboring rights), ensuring each content workflow (capture, reproduction, distribution, TPM/DRM) is mapped to the correct treaty article(s) and reviewed periodically by legal/compliance?",
         "weight": 6
@@ -12211,14 +12217,12 @@
       }
     ],
     "regulatoryBasis": [
-      "EU Data Act 2023/2854 Ch. V",
-      "Creative Commons Licensing",
+      "EU Data Act 2023/2854 (Ch. II, IV, VII)",
+      "Creative Commons licences 4.0 International",
       "TRIPS Agreement",
       "WIPO Internet Treaties",
-      "EU FRAND Licensing Guidelines",
-      "WTO IP Framework",
-      "UN SDG 17 Partnership Framework",
-      "ISO 26000:2010"
+      "UN SDG 17, target 17.16",
+      "ISO 26000"
     ],
     "regulatoryReferences": [
       {
@@ -12228,7 +12232,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU Data Act 2023/2854 Ch. V",
+        "text": "EU Data Act 2023/2854 (Ch. II, IV, VII)",
         "url": "https://data.europa.eu/eli/reg/2023/2854/oj"
       },
       {
@@ -12237,7 +12241,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "Creative Commons Licensing"
+        "text": "Creative Commons licences 4.0 International"
       },
       {
         "citation": "WTO TRIPS Agreement",
@@ -12256,28 +12260,12 @@
         "text": "WIPO Internet Treaties"
       },
       {
-        "citation": "EU FRAND licensing guidance",
-        "instrumentId": "eu-frand",
-        "jurisdiction": "EU",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "EU FRAND Licensing Guidelines"
-      },
-      {
-        "citation": "WTO TRIPS Agreement",
-        "instrumentId": "trips",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "WTO IP Framework"
-      },
-      {
         "citation": "UN 2030 Agenda Sustainable Development Goals",
         "instrumentId": "un-sdgs",
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "UN SDG 17 Partnership Framework"
+        "text": "UN SDG 17, target 17.16"
       },
       {
         "citation": "ISO 26000:2010 Guidance on social responsibility",
@@ -12285,7 +12273,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "ISO 26000:2010"
+        "text": "ISO 26000"
       }
     ],
     "riskTier": "high",

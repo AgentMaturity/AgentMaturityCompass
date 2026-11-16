@@ -857,7 +857,7 @@
       "WCAG 2.1 AA",
       "EU Copyright Directive 2019/790",
       "European Media Freedom Act (Regulation (EU) 2024/1083)",
-      "DMCA 17 U.S.C. §512"
+      "DMCA §512 (17 U.S.C. §512)"
      ],
      "risks": [
       "Misinformation amplification through algorithmic recommendation",
@@ -874,14 +874,12 @@
      "riskTier": "high",
      "questions": 20,
      "rules": [
-      "EU Data Act 2023/2854 Ch. V",
-      "Creative Commons Licensing",
+      "EU Data Act 2023/2854 (Ch. II, IV, VII)",
+      "Creative Commons licences 4.0 International",
       "TRIPS Agreement",
       "WIPO Internet Treaties",
-      "EU FRAND Licensing Guidelines",
-      "WTO IP Framework",
-      "UN SDG 17 Partnership Framework",
-      "ISO 26000:2010"
+      "UN SDG 17, target 17.16",
+      "ISO 26000"
      ],
      "risks": [
       "IP exploitation by dominant partners through AI-facilitated access",

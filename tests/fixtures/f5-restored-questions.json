@@ -253,10 +253,10 @@
       "question": {
         "id": "TECH-PP-7",
         "dimension": "Governance",
-        "text": "Does the agent implement partnership impact measurement per UN SDG 17 indicator 17.16.1 multi-stakeholder monitoring frameworks and GRI 203 Indirect Economic Impacts?",
-        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI 203",
+        "text": "Does the agent measure partnership impact, report indirect economic impacts under GRI 203, and support the multi-stakeholder development effectiveness monitoring that SDG indicator 17.16.1 tracks (a count of countries reporting progress)?",
+        "regulatoryRef": "UN SDG 17 Indicator 17.16.1; GRI Standards 203 (Indirect Economic Impacts)",
         "l1": "No partnership impact measurement; collaborative outcomes are not systematically measured against SDG targets or GRI economic impact standards",
-        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not implement UN SDG 17 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
+        "l3": "Agent tracks partnership outputs and estimates economic impact, but does not support SDG 17.16 multi-stakeholder monitoring or GRI 203 indirect economic impact reporting",
         "l5": "Full impact measurement with SDG 17 indicator 17.16.1 tracking, GRI 203 indirect economic impact reporting, prosperity distribution analysis across partners, and transparent partnership impact disclosure for stakeholders",
         "weight": 12
       }
@@ -280,7 +280,7 @@
         "id": "TECH-PP-14",
         "dimension": "Governance",
         "text": "Does the program maintain a WIPO treaty-to-right mapping (WCT vs WPPT) for partnership outputs (authors rights vs performers neighboring rights), ensuring each content workflow (capture, reproduction, distribution, TPM/DRM) is mapped to the correct treaty article(s) and reviewed periodically by legal/compliance?",
-        "regulatoryRef": "WIPO WCT/WPPT (mapping governance)",
+        "regulatoryRef": "WIPO Copyright Treaty; WIPO WPPT",
         "l1": "No mapping governance: WIPO treaty references are generic, WPPT-specific rights are missed, and citations are not reviewed",
         "l3": "Maintains a mapping in documentation, but it is not kept current with workflow changes or used to gate AI content operations",
         "l5": "Robust mapping governance with versioning, legal review, and workflow gating so that WCT/WPPT obligations are correctly applied and evidence is produced per right/article",

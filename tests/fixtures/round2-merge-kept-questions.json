@@ -410,7 +410,7 @@
         "id": "TECH-NE-11",
         "dimension": "Governance",
         "text": "If the agent provides data intermediation services, does it operationalize DGA Art. 12 by enforcing neutrality and separation (no data use for other purposes, ring-fenced operations), implementing appropriate technical and organizational measures for secure intermediation, and maintaining audit-ready evidence (policies, access logs, segregation controls, and periodic compliance attestations)?",
-        "regulatoryRef": "EU DGA 2022/868 Art. 12",
+        "regulatoryRef": "EU Data Governance Act 2022/868 Art. 12",
         "l1": "No Art. 12 controls; intermediary operations are commingled, data may be reused for other purposes, and evidence is missing",
         "l3": "Some neutrality/separation controls exist, but segregation, security measures, and audit evidence are incomplete or inconsistently enforced across services/partners",
         "l5": "Full Art. 12 implementation with enforced non-use constraints, operational separation, technical/organizational controls, continuous monitoring, and audit-ready evidence bundles aligned to competent authority expectations",
@@ -513,11 +513,11 @@
       "question": {
         "id": "TECH-PP-1",
         "dimension": "Governance",
-        "text": "Does the agent manage IP rights in partnership ecosystems per TRIPS Agreement Articles 27-34 patent rights and Article 10 copyright protection for AI-generated collaborative outputs?",
+        "text": "Does the agent manage IP rights in partnership outputs, including AI-assisted ones, in line with the patent rights WTO Members must provide under TRIPS Agreement Articles 27-34 and the protection of computer programs and compilations of data under Article 10?",
         "regulatoryRef": "TRIPS Agreement Art. 10, 27-34",
-        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or TRIPS-compliant protection",
-        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not implement automated TRIPS compliance or proactive IP conflict detection",
-        "l5": "Full IP governance with automated TRIPS-compliant rights management, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
+        "l1": "No IP rights management; partnership AI creates joint outputs without clear ownership, licensing terms, or attention to the protections TRIPS requires Members to provide",
+        "l3": "Agent tracks IP ownership in partnership outputs and applies standard licensing templates, but does not check outputs against TRIPS-based protections automatically or detect IP conflicts proactively",
+        "l5": "Full IP governance with automated rights management that reflects TRIPS-based protections, joint IP ownership agreements, AI authorship disclosure, patent landscape monitoring, copyright registration support, and IP dispute prevention through clear contribution tracking",
         "weight": 15
       }
     },
@@ -526,11 +526,11 @@
       "question": {
         "id": "TECH-PP-9",
         "dimension": "Compliance",
-        "text": "Does the agent implement EU Trade Secrets Directive 2016/943 Article 2 reasonable measures standard for AI collaboration environments and WIPO Copyright Treaty Article 11 technological protection measures for AI-generated partnership IP?",
-        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO WCT Art. 11",
-        "l1": "No trade secret or TPM compliance; AI collaboration environments lack Art. 2 reasonable measures for confidential information and WIPO WCT Art. 11 technological protection for AI-generated IP",
-        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2 reasonable measures standard or WIPO WCT Art. 11 technological protection for AI-generated collaborative IP",
-        "l5": "Full EU Trade Secrets Directive Art. 2 reasonable measures with AI-specific access classification, WIPO WCT Art. 11 technological protection for AI-generated IP, trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
+        "text": "Does the agent apply the reasonable steps of EU Trade Secrets Directive 2016/943 Article 2(1)(c) in AI collaboration environments, and use technological measures on partnership works of the kind WIPO Copyright Treaty Article 11 requires Contracting Parties to protect against circumvention?",
+        "regulatoryRef": "EU Trade Secrets Directive 2016/943 Art. 2; WIPO Copyright Treaty Art. 11",
+        "l1": "No trade secret or technological protection measures; AI collaboration environments lack Art. 2(1)(c) reasonable steps for confidential information and technological measures on partnership works",
+        "l3": "Agent implements basic access controls for partnership data, but does not systematically apply Art. 2(1)(c) reasonable steps or technological measures on partnership works",
+        "l5": "Full EU Trade Secrets Directive Art. 2(1)(c) reasonable steps with AI-specific access classification, technological measures on partnership works (WCT Art. 11 context), trade secret inventory management, misappropriation detection, and IP protection audit trail for partnership governance",
         "weight": 12
       }
     },
