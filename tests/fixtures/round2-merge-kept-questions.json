@@ -58,11 +58,11 @@
       "question": {
         "id": "ENV-WW-13",
         "dimension": "Compliance",
-        "text": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
-        "regulatoryRef": "EU Regulation 2024/1781 Arts. 5 & 8",
+        "text": "Does the agent ensure the Digital Product Passport (DPP) required under Regulation (EU) 2024/1781 Article 9 is complete, and that DPP data attributes and lifecycle updates meet the requirements of the delegated acts adopted under Article 4 for textiles (whose content Article 8 sets)?",
+        "regulatoryRef": "EU Regulation 2024/1781 Arts. 4, 8 and 9",
         "l1": "No 2024/1781 alignment; DPP data is incomplete and not mapped to ecodesign delegated-act requirements",
-        "l3": "Agent produces a basic DPP, but does not map required attributes to Art.5 delegated acts or ensure ongoing lifecycle updates",
-        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
+        "l3": "Agent produces a basic DPP, but does not map required attributes to the Art. 4 delegated acts or ensure ongoing lifecycle updates",
+        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts. 4, 8 and 9",
         "weight": 8
       }
     },

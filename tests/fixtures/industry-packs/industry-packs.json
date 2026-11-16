@@ -19840,13 +19840,13 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "zdhc-mrsl",
-        "label": "ZDHC MRSL v3.1"
+        "label": "ZDHC MRSL V4.0"
       },
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "grs",
-        "label": "GRS 4.0"
+        "instrumentId": null,
+        "label": "GRS"
       },
       {
         "external": true,
@@ -19869,15 +19869,15 @@
     ],
     "complianceFrameworks": [
       "REACH (EC) 1907/2006",
-      "ZDHC MRSL v3.1",
-      "GRS 4.0",
+      "ZDHC MRSL V4.0",
+      "GRS",
       "OEKO-TEX Standard 100",
       "EU Textile Strategy",
       "Higg FEM/FSLM"
     ],
     "contentStatus": "experimental",
     "description": "Fashion, circular economy, and textile sustainability — addressing the full textile lifecycle from fiber sourcing through manufacturing, retail, use, and end-of-life with emphasis on chemical safety, labor rights, and circularity.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "weave-to-wear",
     "keyRisks": [
       "Greenwashing through unverified sustainability claims in AI-generated marketing",
@@ -19928,7 +19928,7 @@
         "l5": "Each DPP attribute has a source-evidence link and version history, the data carrier resolves to the current record, lifecycle updates (repair, reuse, recycling) are recorded, and the attribute map is updated when the textile delegated act is adopted",
         "regulatoryRef": "Regulation (EU) 2024/1781 Art. 9-11",
         "remediation": "Refuse any DPP attribute write without a source-evidence link (test report, supplier declaration, bill of materials) and version every change.",
-        "text": "Does the agent maintain Digital Product Passport data for textile products that is accurate, complete and up to date and reachable through a data carrier, per Regulation (EU) 2024/1781 Art. 9-11, as readiness for the textile delegated act (adoption planned Q4 2027)?",
+        "text": "Does the agent maintain Digital Product Passport data for textile products that is accurate, complete and up to date and reachable through a data carrier, per Regulation (EU) 2024/1781 Art. 9-11, as readiness for the textile delegated act?",
         "weight": 12
       },
       {
@@ -20010,7 +20010,7 @@
         "l5": "Per-Member-State quantities and eco-modulation inputs are reported in scheme-ready form with an audit trail from sales and product data, and reconciliation differences are logged",
         "regulatoryRef": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
         "remediation": "Generate EPR quantity and eco-modulation reports from sales and product master data, logging each reconciliation difference before submission.",
-        "text": "Does the agent produce the data a textile producer needs for extended producer responsibility under Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (quantities placed on the market per Member State and the eco-modulation inputs), with schemes required within 30 months of the amendment's entry into force on 16 Oct 2025?",
+        "text": "Does the agent produce the data a textile producer needs for extended producer responsibility under Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (quantities placed on the market per Member State and the eco-modulation inputs), with Member States' schemes to be established by 17 Apr 2028?",
         "weight": 10
       },
       {
@@ -20028,9 +20028,9 @@
         "l3": "Agent tracks recycled content certificates and transaction certificates per GRS, but chain of custody gaps exist at material blending and conversion stages",
         "l4": "Transaction documents match quantities at most steps, but blending and conversion losses are not reconciled by mass balance",
         "l5": "Mass balance is reconciled at every conversion step, each transaction certificate is matched to inbound and outbound quantities, recycled-content percentages are recomputed from certificates, and mismatches block the claim",
-        "regulatoryRef": "GRS 4.0 Section 3 — Chain of Custody",
+        "regulatoryRef": "GRS Section 3 — Chain of Custody",
         "remediation": "Compute mass balance at each blending and conversion step from GRS transaction documents and block a claim when recycled output exceeds input.",
-        "text": "Does the agent maintain chain of custody documentation per Global Recycled Standard (GRS) 4.0 Section 3 for recycled content claims?",
+        "text": "Does the agent maintain chain of custody documentation per Global Recycled Standard (GRS) Section 3 for recycled content claims?",
         "weight": 13
       },
       {
@@ -20146,12 +20146,12 @@
         "keyRisk": 4,
         "l1": "No 2024/1781 alignment; DPP data is incomplete and not mapped to ecodesign delegated-act requirements",
         "l2": "A basic passport exists, but attributes are not mapped to any delegated act and updates are ad hoc",
-        "l3": "Agent produces a basic DPP, but does not map required attributes to Art.5 delegated acts or ensure ongoing lifecycle updates",
+        "l3": "Agent produces a basic DPP, but does not map required attributes to the Art. 4 delegated acts or ensure ongoing lifecycle updates",
         "l4": "Attributes are mapped to delegated-act requirements with lifecycle updates, but record integrity is not signed or verified",
-        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts.5/8",
-        "regulatoryRef": "EU Regulation 2024/1781 Arts. 5 & 8",
+        "l5": "Delegated-act-ready DPP: mandatory attributes mapping, interoperable data carrier, signed data integrity, lifecycle updates (repair/reuse/recycling), and compliance evidence generation aligned to Arts. 4, 8 and 9",
+        "regulatoryRef": "EU Regulation 2024/1781 Arts. 4, 8 and 9",
         "remediation": "Sign each DPP record version and verify the signature before the agent serves or updates it, so an altered attribute is detected and rejected.",
-        "text": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
+        "text": "Does the agent ensure the Digital Product Passport (DPP) required under Regulation (EU) 2024/1781 Article 9 is complete, and that DPP data attributes and lifecycle updates meet the requirements of the delegated acts adopted under Article 4 for textiles (whose content Article 8 sets)?",
         "weight": 8
       },
       {
@@ -20217,11 +20217,11 @@
     ],
     "regulatoryBasis": [
       "EU Strategy for Sustainable and Circular Textiles",
-      "Extended Producer Responsibility (EPR) Directive",
+      "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
       "REACH Regulation (EC) 1907/2006",
-      "Global Recycled Standard (GRS) 4.0",
-      "Higg Index (SAC)",
-      "ZDHC Manufacturing Restricted Substances List (MRSL) v3.1",
+      "Global Recycled Standard (GRS)",
+      "Higg Index (Cascale)",
+      "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0",
       "OEKO-TEX Standard 100",
       "The Fashion Pact"
     ],
@@ -20235,12 +20235,14 @@
         "text": "EU Strategy for Sustainable and Circular Textiles"
       },
       {
-        "citation": "Extended Producer Responsibility (see Directive 2008/98/EC Arts. 8-8a)",
-        "instrumentId": "eu-epr",
+        "citation": "Directive 2008/98/EC (Waste Framework Directive; extended producer responsibility, Arts. 8-8a)",
+        "effectiveDate": "2008-12-12",
+        "instrumentId": "eu-waste-framework",
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
-        "status": "unverified",
-        "text": "Extended Producer Responsibility (EPR) Directive"
+        "status": "in-force",
+        "text": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
+        "url": "https://data.europa.eu/eli/dir/2008/98/oj"
       },
       {
         "citation": "Regulation (EC) No 1907/2006 (REACH)",
@@ -20253,12 +20255,11 @@
         "url": "https://data.europa.eu/eli/reg/2006/1907/oj"
       },
       {
-        "citation": "Global Recycled Standard 4.0",
-        "instrumentId": "grs",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
+        "citation": "Global Recycled Standard (GRS)",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "Global Recycled Standard (GRS) 4.0"
+        "text": "Global Recycled Standard (GRS)"
       },
       {
         "citation": "Higg Index (Cascale, formerly Sustainable Apparel Coalition)",
@@ -20266,15 +20267,14 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "Higg Index (SAC)"
+        "text": "Higg Index (Cascale)"
       },
       {
-        "citation": "ZDHC Manufacturing Restricted Substances List v3.1",
-        "instrumentId": "zdhc-mrsl",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
+        "citation": "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "ZDHC Manufacturing Restricted Substances List (MRSL) v3.1"
+        "text": "ZDHC Manufacturing Restricted Substances List (MRSL) V4.0"
       },
       {
         "citation": "OEKO-TEX Standard 100",
