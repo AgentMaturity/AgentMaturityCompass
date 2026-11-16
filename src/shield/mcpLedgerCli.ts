@@ -9,11 +9,11 @@ import { buildMcpTrustReceipt, previousHashMap, type McpLedgerEntry, type McpTru
 
 type RecordedServers = Array<Pick<McpLedgerEntry, "path" | "serverName" | "tools">>;
 
-/** The servers and tool digests the last scan recorded in this workspace's ledger, or null when there is none; throws when unreadable. */
+/** The servers and tool digests the newest intact scan recorded in this workspace's ledger, or null when there is none; throws when unreadable. */
 function lastRecorded(workspace: string): RecordedServers | null {
   const ledger = openLedger(workspace);
   try {
-    return recordedMcpHashScans(ledger).at(-1)?.servers ?? null;
+    return recordedMcpHashScans(workspace, ledger, true).at(-1)?.servers ?? null;
   } finally {
     ledger.close();
   }

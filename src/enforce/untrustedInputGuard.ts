@@ -19,16 +19,17 @@
  * ponytail: two calls a provider starts at the same moment can both be decided before either row is written; a
  * per-session lock across decide-and-record is the upgrade. Deleting ledger rows lowers labels: ledger chain checks own that.
  */
-import { lstatSync, realpathSync } from "node:fs";
+import { lstatSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { z } from "zod";
 import { parseShellCommandPlan } from "./shellCommandPlan.js";
 import { openLedger } from "../ledger/ledger.js";
+import { readEventPayload } from "../session/eventPayload.js";
 import { nativeMcpToolName } from "../mcp/nativeMcpClient.js";
 import { HOME_SECRET_PATHS, shellSecretPaths } from "../sandbox/shellSecretPaths.js";
 import type { ToolDefinition, ToolsConfig } from "../toolhub/toolsSchema.js";
-import type { ActionClass } from "../types.js";
+import type { ActionClass, EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { inspectGuardrailControlStateReadOnly } from "./guardrailControlState.js";
 import type { InputGuardMode } from "./inputGuardProfile.js";
@@ -45,15 +46,17 @@ const CONSEQUENTIAL: ReadonlySet<ActionClass> = new Set(["NETWORK_EXTERNAL", "DA
  * (`--pre=x`, `-f/etc/x`) included, makes it an unknown program. rg, find, sort and jq are left out: they have options
  * that run another program or read the environment.
  */
-const GREP = { short: "0123456789ABCEFHLRcdhilnoqrsvwx" };
+// No grep -R or -d (-d dereference-recurse), diff -r or cp -r: they follow symlinks inside the folders they walk, which
+// no argument names. diff given a folder follows them even without -r, so classifyCall counts that as reaching outside.
+const GREP = { short: "0123456789ABCEFHLchilnoqrsvwx" };
 const LOCAL_PROGRAMS: Record<string, { short: string; long?: readonly string[] }> = {
   ls: { short: "1ACFRSadhlrtu" }, cat: { short: "benstuv" }, head: { short: "0123456789cn" }, tail: { short: "0123456789Ffcnr" },
   wc: { short: "clmw" }, grep: GREP, egrep: GREP, fgrep: GREP, echo: { short: "Een" }, printf: { short: "" }, pwd: { short: "LP" },
-  uniq: { short: "cdiu" }, cut: { short: "bcdfs" }, tr: { short: "Ccds" }, diff: { short: "BNbiqruw" }, cmp: { short: "ls" },
+  uniq: { short: "cdiu" }, cut: { short: "bcdfs" }, tr: { short: "Ccds" }, diff: { short: "BNbiquw" }, cmp: { short: "ls" },
   file: { short: "Lbi" }, stat: { short: "L" }, du: { short: "0123456789achks" }, df: { short: "hkP" }, date: { short: "u" },
   true: { short: "" }, false: { short: "" }, test: { short: "LSabcdefgklnopqrstuwxz" }, which: { short: "as" },
   basename: { short: "a" }, dirname: { short: "" }, realpath: { short: "e" }, readlink: { short: "fn" }, tee: { short: "a" },
-  touch: { short: "c" }, mkdir: { short: "pv" }, cp: { short: "RafinprPv" }, mv: { short: "finv" }, rm: { short: "Rdfirv" },
+  touch: { short: "c" }, mkdir: { short: "pv" }, cp: { short: "RafinpPv" }, mv: { short: "finv" }, rm: { short: "Rdfirv" },
   ln: { short: "fnsv" }, chmod: { short: "Rv" },
 };
 /** `git status` and `git commit` with the subcommand first (no global option such as -C, -c or --git-dir) and these options. */
@@ -132,19 +135,22 @@ function secretPath(workspace: string, path: string): boolean {
 }
 
 /** What the arguments of a shell program reach: a URL, a path outside the workspace, a secret, or something AMC cannot read. */
-function argumentReach(workspace: string, argv: readonly unknown[]): { outside: boolean; secret: boolean } {
-  let outside = false, secret = false;
+function argumentReach(workspace: string, argv: readonly unknown[]): { outside: boolean; secret: boolean; folder: boolean } {
+  let outside = false, secret = false, folder = false, words = false;
   for (const raw of argv) {
-    const token = String(raw);
-    if (token.startsWith("-") && !token.includes("=")) continue;
-    const value = token.includes("=") && token.startsWith("-") ? token.slice(token.indexOf("=") + 1) : token;
+    const token = String(raw), option = !words && token.startsWith("-") && token !== "-";
+    if (!words && token === "--") { words = true; continue; }
+    if (option && !token.includes("=")) continue;
+    // After `--` every token is a path, even one that starts with a dash.
+    const value = option ? token.slice(token.indexOf("=") + 1) : token;
     if (/:\/\/|[$`]/.test(value)) { outside = true; continue; }
     if (value === "") continue;
     const path = value.startsWith("~") ? resolve(homedir(), value.slice(value.startsWith("~/") ? 2 : 1)) : resolve(workspace, value);
     if (!inProject(workspace, path)) outside = true;
     if (secretPath(workspace, path)) secret = true;
+    try { folder ||= statSync(path).isDirectory(); } catch { /* not there: not a folder */ }
   }
-  return { outside, secret };
+  return { outside, secret, folder };
 }
 
 /**
@@ -172,7 +178,7 @@ export function classifyCall(workspace: string, request: GuardRequest, def: Tool
   } else if (program !== null) {
     const argv = Array.isArray(args.argv) ? args.argv : [];
     const reach = argumentReach(workspace, argv);
-    if (!localProgram(args.binary, argv)) { untrusted ??= `the output of a program that can reach outside this project (${shownAs}: ${program})`; outbound = true; }
+    if (!localProgram(args.binary, argv) || (program === "diff" && reach.folder)) { untrusted ??= `the output of a program that can reach outside this project (${shownAs}: ${program})`; outbound = true; }
     else if (reach.outside) untrusted ??= `a file outside this project (${shownAs}: ${program})`;
     if (reach.secret) priv ??= `a secret file (${shownAs}: ${program})`;
   } else if (Object.hasOwn(GIT_LOCAL, name) && request.segment) {
@@ -252,14 +258,20 @@ const scanPayloadSchema = z.object({
 export type McpHashScan = z.infer<typeof scanPayloadSchema> & { ts: number };
 
 /**
- * Every MCP hash scan `amc shield mcp-ledger` recorded, oldest first, found by the row's exact audit type and source (never
- * by text that any row's metadata may contain). Throws when a scan row does not parse: callers count every tool as changed.
+ * The MCP hash scans `amc shield mcp-ledger` recorded, oldest first (only the newest with `newestOnly`), found by the row's
+ * exact audit type and source (never by text that any row's metadata may contain). A scan whose payload retention removed
+ * is skipped; an encrypted one is opened. Throws when a scan that should be there cannot be read: callers count every tool
+ * as changed.
  */
-export function recordedMcpHashScans(ledger: { db: { prepare(sql: string): { all(...params: unknown[]): unknown[] } } }): McpHashScan[] {
-  const rows = ledger.db.prepare("SELECT ts, payload_inline FROM evidence_events WHERE event_type = 'audit' "
+export function recordedMcpHashScans(workspace: string, ledger: Ledger, newestOnly = false): McpHashScan[] {
+  const rows = ledger.db.prepare("SELECT * FROM evidence_events WHERE event_type = 'audit' AND payload_pruned = 0 "
     + "AND json_extract(meta_json, '$.auditType') = ? AND json_extract(meta_json, '$.source') = 'ops' ORDER BY ts, rowid")
-    .all(MCP_HASHES_AUDIT) as Array<{ ts: number; payload_inline: string | null }>;
-  return rows.map((row) => ({ ...scanPayloadSchema.parse(JSON.parse(row.payload_inline ?? "null")), ts: row.ts }));
+    .all(MCP_HASHES_AUDIT) as EvidenceEvent[];
+  return (newestOnly ? rows.slice(-1) : rows).map((row) => {
+    const read = readEventPayload(workspace, row);
+    if (read.status !== "ok") throw new Error(read.status === "missing" ? read.detail : `scan ${row.id} was pruned`);
+    return { ...scanPayloadSchema.parse(JSON.parse(read.bytes.toString("utf8"))), ts: row.ts };
+  });
 }
 
 /** MCP tools whose recorded description or schema changed (shield mcp-ledger) and that no call has run since, as ToolHub names. */
@@ -269,7 +281,7 @@ function changedMcpTools(workspace: string, defs: readonly ToolDefinition[]): Se
   const ledger = openLedger(workspace);
   try {
     const flagged = new Set<string>();
-    for (const scan of recordedMcpHashScans(ledger)) {
+    for (const scan of recordedMcpHashScans(workspace, ledger)) {
       for (const { server, tool } of scan.changedTools) {
         for (const def of mcp) {
           const context = def.context?.kind === "mcp" ? def.context.server : null;

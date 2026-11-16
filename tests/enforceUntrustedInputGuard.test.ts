@@ -38,7 +38,7 @@ function workspaceWith(mode: InputGuardMode, readIsPrivate = true): string {
   const tools = defaultToolsConfig();
   for (const tool of tools.tools.allowedTools) {
     if (tool.name === "http.fetch") Object.assign(tool, { actionClass: "READ_ONLY", allow: { hostAllowlist: ["example.com"] } });
-    if (tool.name === "process.spawn") Object.assign(tool, { actionClass: "READ_ONLY", requireExecTicket: false, allow: { binariesAllowlist: ["/usr/bin/curl", "/bin/echo", "/bin/cat"] } });
+    if (tool.name === "process.spawn") Object.assign(tool, { actionClass: "READ_ONLY", requireExecTicket: false, allow: { binariesAllowlist: ["/usr/bin/curl", "/bin/echo", "/bin/cat", "/usr/bin/diff", "/usr/bin/grep"] } });
     if (tool.name === "fs.read" && readIsPrivate) tool.labels = ["private-data"];
   }
   initToolsConfig(workspace, tools);
@@ -258,6 +258,29 @@ describe("untrusted-input guard rules", () => {
     }
   });
 
+  test("a program that walks a folder into a nested symlink out of the project marks the session untrusted", () => {
+    const workspace = workspaceWith("enforce"), outside = mkdtempSync(join(tmpdir(), "amc-guard-outside-"));
+    try {
+      writeFileSync(join(outside, "hosts"), "text from elsewhere");
+      for (const dir of ["d1", "d2", "src"]) mkdirSync(join(workspace, dir));
+      symlinkSync(join(outside, "hosts"), join(workspace, "d1", "h"));
+      writeFileSync(join(workspace, "d2", "h"), "");
+      symlinkSync(outside, join(workspace, "src", "linkdir"));
+      symlinkSync(join(outside, "hosts"), join(workspace, "-link"));
+      const spawn = (binary: string, argv: string[]) => classifyCall(workspace, { name: "process.spawn", args: { binary, argv } }, null, "Bash");
+      for (const [binary, argv] of [["diff", ["-r", "d1", "d2"]], ["diff", ["d1", "d2"]], ["grep", ["-R", "localhost", "."]],
+        ["grep", ["-d", "dereference-recurse", "localhost", "."]], ["cp", ["-r", "src", "copy"]], ["cat", ["--", "-link"]]] as const) {
+        expect(spawn(binary, [...argv]).untrusted, `${binary} ${argv.join(" ")}`).not.toBeNull();
+      }
+      expect(spawn("diff", ["d2/h", "d2/h"])).toMatchObject({ untrusted: null, outbound: false });
+      const session = String(recorded("SessionStart-startup", workspace).session_id);
+      call(workspace, session, "PreToolUse-bash", { command: `'/usr/bin/diff' '-r' '${join(workspace, "d1")}' '${join(workspace, "d2")}'`, description: "compare" });
+      expect(curl(workspace, session).reason).toContain("This session earlier read the output of a program that can reach outside this project (Bash: diff)");
+    } finally {
+      rmSync(outside, { recursive: true, force: true });
+    }
+  });
+
   test("untrusted input, then a read inside the project's AMC folder, then a send is denied", () => {
     const workspace = workspaceWith("enforce", false), session = String(recorded("SessionStart-startup", workspace).session_id);
     expect(fetchPage(workspace, session).requestedDecision).toBe("allow");
@@ -292,6 +315,40 @@ describe("untrusted-input guard rules", () => {
       expect(scan().changedTools).toEqual([{ server: "s", tool: "lookup", changed: ["description"] }]);
       appendOpsAuditEvent({ workspace, auditType: MCP_HASHES_AUDIT, payload: { note: "no servers" } });
       expect(scan().changedTools).toEqual([{ server: "s", tool: "lookup", changed: ["description", "schema"] }]);
+    } finally {
+      log.mockRestore();
+      rmSync(defs, { recursive: true, force: true });
+    }
+  });
+
+  test("a scan whose payload retention removed neither poisons the next scan nor flags MCP tools", () => {
+    const workspace = workspaceWith("enforce"), defs = mkdtempSync(join(tmpdir(), "amc-guard-mcp-"));
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      writeFileSync(join(defs, "s.json"), JSON.stringify({ name: "s", tools: [{ name: "lookup", description: "look a thing up" }] }));
+      const scan = () => {
+        log.mockClear();
+        runMcpLedgerCli({ workspace, targets: [defs], now: Date.now(), json: true });
+        return JSON.parse(String(log.mock.calls.at(-1)?.[0])) as { changedTools: unknown };
+      };
+      // An old scan that flagged the tool, then two scans of the unchanged server.
+      appendOpsAuditEvent({ workspace, auditType: MCP_HASHES_AUDIT, payload: { servers: [], changedTools: [{ server: "s", tool: "lookup", changed: ["description"] }] } });
+      scan();
+      expect(scan().changedTools).toEqual([]);
+      const ledger = openLedger(workspace);
+      try {
+        const oldest = ledger.db.prepare("SELECT id FROM evidence_events WHERE json_extract(meta_json, '$.auditType') = ? ORDER BY ts, rowid LIMIT 1").get(MCP_HASHES_AUDIT) as { id: string };
+        ledger.pruneEventPayloadColumns([oldest.id], Date.now());
+      } finally {
+        ledger.close();
+      }
+      expect(scan().changedTools).toEqual([]);
+      const name = nativeMcpToolName("s", "lookup");
+      const config = loadToolsConfig(workspace);
+      const tools = { tools: { ...config.tools, allowedTools: [...config.tools.allowedTools,
+        { name, actionClass: "WRITE_HIGH" as const, context: { kind: "mcp" as const, server: { id: "s", name: "s" } } }] } };
+      expect(applyInputGuard({ workspace, agentId: "a", provider: "claude-code", sessionId: "fresh-session", shownAs: "mcp__s__lookup",
+        requests: [{ name, args: {} }], tools, today: { decision: "allow" as const, reason: "allowed" } }).decision).toBe("allow");
     } finally {
       log.mockRestore();
       rmSync(defs, { recursive: true, force: true });
