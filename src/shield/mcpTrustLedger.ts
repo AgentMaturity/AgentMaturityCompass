@@ -28,14 +28,14 @@ export interface McpLedgerEntry {
   contentHash: string;
 }
 
-export interface McpToolHashes {
+interface McpToolHashes {
   name: string;
   descriptionSha256: string;
   schemaSha256: string;
 }
 
 /** A tool of a known server whose description or input schema differs from the previous receipt's. */
-export interface McpChangedTool {
+interface McpChangedTool {
   server: string;
   tool: string;
   changed: Array<"description" | "schema">;

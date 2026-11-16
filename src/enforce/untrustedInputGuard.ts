@@ -145,7 +145,7 @@ function actionWords(call: CallLabels): string {
 }
 
 /** The guard's setting. A setting AMC cannot read counts as on (enforce), so a broken file never loosens anything. */
-export function inputGuardMode(workspace: string): { mode: InputGuardMode; unreadable: boolean } {
+function inputGuardMode(workspace: string): { mode: InputGuardMode; unreadable: boolean } {
   const snapshot = inspectGuardrailControlStateReadOnly(workspace);
   if (snapshot.integrity === "invalid") return { mode: "enforce", unreadable: true };
   return { mode: snapshot.state?.untrustedInputGuard ?? "off", unreadable: false };
