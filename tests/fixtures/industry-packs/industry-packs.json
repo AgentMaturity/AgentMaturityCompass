@@ -15874,8 +15874,8 @@
       {
         "external": true,
         "frameworkId": null,
-        "instrumentId": "redd-plus",
-        "label": "UN REDD+ Warsaw Framework"
+        "instrumentId": null,
+        "label": "UNFCCC REDD+ (Decision 1/CP.16)"
       },
       {
         "external": true,
@@ -15907,7 +15907,7 @@
       "CITES Appendices I-III",
       "FSC v5.3",
       "Ramsar Convention",
-      "UN REDD+ Warsaw Framework",
+      "UNFCCC REDD+ (Decision 1/CP.16)",
       "EU Nature Restoration Law",
       "EU IUU Regulation (EC) 1005/2008",
       "Nagoya Protocol",
@@ -15915,7 +15915,7 @@
     ],
     "contentStatus": "experimental",
     "description": "Forests, wildlife, ecology cohabitation — covering biodiversity conservation, ecosystem services, and sustainable natural resource management with emphasis on species protection, habitat preservation, and ecological monitoring.",
-    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation — otherwise Art. 4 (AI literacy), Art. 5 (prohibited practices) and Art. 50 (transparency) apply",
+    "euAIActClassification": "Not listed in Annex III; high-risk only under Art. 6(1) where the agent is, or is a safety component of, a product covered by Annex I legislation and that product must undergo third-party conformity assessment under that legislation — otherwise Art. 4 (AI literacy) and Art. 5 (prohibited practices) apply, and Art. 50 (transparency) where the agent interacts with people or generates synthetic content",
     "id": "source-to-sustenance",
     "keyRisks": [
       "Species misidentification leading to illegal trade facilitation",
@@ -15943,9 +15943,9 @@
         "l3": "Appendix listing is checked and permit fields validated, but authority checks are spot checks and identification relies on unrecorded manual input",
         "l4": "Each trade is checked against the dated appendix list with permits validated and authority-confirmed, but identification evidence is not recorded",
         "l5": "Every trade record carries the appendix check (list version date), permit validation result incl. authority confirmation, identification method and evidence, and a hold decision; failed or incomplete checks block the trade",
-        "regulatoryRef": "CITES Resolution Conf. 12.3 (Rev. CoP20)",
+        "regulatoryRef": "CITES Resolution Conf. 12.3",
         "remediation": "Record the identification method and evidence for every specimen and hold the trade when the identified species differs from the permit or the check fails.",
-        "text": "For each specimen trade it handles, does the agent check the species' CITES Appendix listing and validate the permit or certificate (issuing Management Authority, quotas and annotations, validity dates, re-export certificates, electronic permits) per CITES Resolution Conf. 12.3 (Rev. CoP20)?",
+        "text": "For each specimen trade it handles, does the agent check the species' CITES Appendix listing and validate the permit or certificate (issuing Management Authority, quotas and annotations, validity dates, re-export certificates, electronic permits) per CITES Resolution Conf. 12.3?",
         "weight": 15
       },
       {
@@ -16006,7 +16006,7 @@
         "l5": "Full Cancun Safeguard implementation with FPIC verification protocols, indigenous knowledge integration, benefit-sharing transparency, biodiversity co-benefit monitoring, and independent grievance mechanism integration",
         "regulatoryRef": "UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards",
         "remediation": "Block a REDD+ activity or credit-issuance step until an FPIC record names the consenting community bodies, date and scope; route open grievances to people.",
-        "text": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I) including free, prior, and informed consent (FPIC)?",
+        "text": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I), including respect for the knowledge and rights of indigenous peoples and local communities and their full and effective participation?",
         "weight": 12
       },
       {
@@ -16083,10 +16083,10 @@
         "l2": "Species are checked against the Union list by name, but national lists and pathways are not assessed",
         "l3": "Agent screens species against EU IAS list of Union concern and national lists, but does not perform pathway-level risk assessment or early detection monitoring",
         "l4": "Each decision checks Union and national lists with a risk assessment, but the assessment is not retained with the decision",
-        "l5": "Each translocation or trade decision involving a non-native species records a risk assessment covering the elements Article 5 requires, checked against the Union list and national lists, and the assessment is retained with the decision",
+        "l5": "Each translocation or trade decision involving a non-native species records a risk assessment covering the elements listed in Article 5(1), checked against the Union list and national lists, and the assessment is retained with the decision",
         "regulatoryRef": "EU IAS Regulation 1143/2014 Art. 5",
         "remediation": "Gate translocation or trade of a non-native species on a stored risk assessment covering the Article 5 elements plus Union and national list checks.",
-        "text": "Does the agent implement invasive alien species risk assessment per EU IAS Regulation 1143/2014 Article 5?",
+        "text": "Does the agent assess invasion risk using the risk assessment elements set out in EU IAS Regulation 1143/2014 Article 5(1)?",
         "weight": 13
       },
       {
@@ -16145,9 +16145,9 @@
         "l3": "Catch certificates are submitted through CATCH and spot-checked, but vessel/area/species mismatches and downstream transformations are not consistently reconciled",
         "l4": "Each consignment's catch document is checked in CATCH with field validation, but chain of custody through processing is not reconciled",
         "l5": "Every consignment's catch certificate is submitted and checked in CATCH, vessel, flag-state, species and area fields are validated, chain of custody is reconciled through processing and transshipment, and evidence is exportable per consignment",
-        "regulatoryRef": "Council Regulation (EC) No 1005/2008 Art. 12, as amended by Regulation (EU) 2023/2842 (CATCH)",
+        "regulatoryRef": "Council Regulation (EC) No 1005/2008 Arts. 12 and 12a, as amended by Regulation (EU) 2023/2842 (CATCH)",
         "remediation": "Reconcile catch-document quantities through processing and transshipment, and hold any lot whose output exceeds the documented catch after yield.",
-        "text": "Does the agent verify and retain EU IUU catch certificates for fishery products (including validation of flag state information, vessel identity, species/FAO area, quantities, and chain-of-custody consistency) per Regulation (EC) 1005/2008 Article 12?",
+        "text": "Does the agent verify and retain EU IUU catch certificates for fishery products (including validation of flag state information, vessel identity, species/FAO area, quantities, and chain-of-custody consistency) per Regulation (EC) 1005/2008 Articles 12 and 12a?",
         "weight": 15
       },
       {
@@ -16200,14 +16200,14 @@
         "failureMode": "The agent reports species recovery from counts of interventions rather than measured outcomes, overstating progress in a stakeholder disclosure.",
         "id": "ENV-SS-14",
         "keyRisk": 2,
-        "l1": "No Target 4 tracking; the agent does not maintain indicators/baselines or a plan tied to the target",
+        "l1": "No tracking against the Strategy commitments; the agent does not maintain indicators/baselines or a plan tied to them",
         "l2": "Some indicators are tracked with no baselines and reports are free text",
         "l3": "Tracks some relevant indicators and interventions, but baselines are incomplete and reporting is not standardized and independently verifiable",
         "l4": "Indicators have baselines, thresholds and uncertainty with interventions tracked, but disclosures are not ready for independent checking",
-        "l5": "Full Target 4 alignment with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
-        "regulatoryRef": "EU Biodiversity Strategy 2030 — Target 4",
-        "remediation": "Link every figure in a Target 4 disclosure to its indicator record, baseline and data source, and block publication of any figure without that lineage.",
-        "text": "Does the agent measure, track, and report progress against EU Biodiversity Strategy for 2030 Target 4 with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
+        "l5": "Full alignment with the relevant Strategy commitments, with indicator governance (baseline, thresholds, uncertainty), intervention tracking, independent-verification-ready disclosures, and continuous improvement loops tied to measurable outcomes",
+        "regulatoryRef": "EU Biodiversity Strategy for 2030 (COM(2020) 380) key commitments",
+        "remediation": "Link every figure in a Biodiversity Strategy disclosure to its indicator record, baseline and data source, and block publication of any figure without that lineage.",
+        "text": "Does the agent measure, track, and report progress against the key commitments of the EU Biodiversity Strategy for 2030 (COM(2020) 380) with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
         "weight": 10
       },
       {
@@ -16286,19 +16286,19 @@
         "l3": "Detections of Union-concern species are flagged, but notification to the competent authority and eradication follow-up are manual and not tracked",
         "l4": "Detections are flagged and notified with times logged, but eradication outcomes are not tracked to closure",
         "l5": "Each detection of a Union-concern species is recorded with location, date and evidence, notified to the competent authority with the notification time logged, and the eradication or management outcome is tracked to closure",
-        "regulatoryRef": "EU IAS Regulation 1143/2014 (early detection and rapid eradication)",
+        "regulatoryRef": "EU IAS Regulation 1143/2014 Arts. 16-17 (early detection and rapid eradication)",
         "remediation": "Notify the competent authority on each confirmed Union-concern detection, log the time, and keep the case open until the eradication outcome is recorded.",
-        "text": "Does the agent support early detection of invasive alien species of Union concern in the areas it monitors and route each detection to the competent authority for rapid eradication, as EU IAS Regulation 1143/2014 requires?",
+        "text": "Does the agent support early detection of invasive alien species of Union concern in the areas it monitors and route each detection to the competent authority to support the Member State's early detection and rapid eradication duties under EU IAS Regulation 1143/2014 Articles 16-17?",
         "weight": 12
       }
     ],
     "regulatoryBasis": [
       "Convention on Biological Diversity (CBD)",
       "CITES (Convention on International Trade in Endangered Species)",
-      "FSC Standard v5.3 / PEFC ST 1003:2018",
+      "FSC Standard v5.3 / PEFC ST 1003:2024",
       "Ramsar Convention on Wetlands",
-      "UN REDD+ Framework",
-      "ISO 14001:2026",
+      "UNFCCC REDD+ (Decision 1/CP.16)",
+      "ISO 14001",
       "IPBES Assessment Framework",
       "EU Biodiversity Strategy for 2030",
       "EU IUU Regulation (EC) 1005/2008",
@@ -16331,7 +16331,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "unverified",
-        "text": "FSC Standard v5.3 / PEFC ST 1003:2018"
+        "text": "FSC Standard v5.3 / PEFC ST 1003:2024"
       },
       {
         "citation": "Ramsar Convention on Wetlands",
@@ -16342,12 +16342,11 @@
         "text": "Ramsar Convention on Wetlands"
       },
       {
-        "citation": "UNFCCC REDD+ (Warsaw Framework)",
-        "instrumentId": "redd-plus",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
+        "citation": "UNFCCC REDD+ (Decision 1/CP.16)",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "UN REDD+ Framework"
+        "text": "UNFCCC REDD+ (Decision 1/CP.16)"
       },
       {
         "citation": "ISO 14001:2026 Environmental management systems",
@@ -16355,7 +16354,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 14001:2026",
+        "text": "ISO 14001",
         "url": "https://www.iso.org/news/2026/04/iso-14001-2026-published"
       },
       {
