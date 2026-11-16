@@ -201,6 +201,10 @@ export async function handleToolsRoute(
       try {
         if (!currentActor()) return true;
         const { name, mode } = guardrailProfileBodySchema.parse(await bodyJson<unknown>(req));
+        if (mode !== undefined && name !== 'untrusted-input-guard') {
+          apiError(res, 400, 'mode applies only to untrusted-input-guard.');
+          return true;
+        }
         if (!currentActor()) return true;
         const { applyGuardrailControlProfile, recoverGuardrailControlState } = await import('../enforce/guardrailControlState.js');
         if (!currentActor()) return true;
