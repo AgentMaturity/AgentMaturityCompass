@@ -461,11 +461,11 @@
       "question": {
         "id": "TECH-OS-10",
         "dimension": "Resilience",
-        "text": "Does the agent implement threat-led penetration testing (TLPT) governance and execution aligned to the Councils required mapping for EU DORA Art. 9(4), including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
-        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)",
+        "text": "Where the financial entity must perform threat-led penetration testing (TLPT) under EU DORA Art. 26, does the agent support TLPT governance and execution, including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
+        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 26",
         "l1": "No TLPT: no threat-led testing program, no governance, and no evidence bundles",
-        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to the required DORA anchor",
-        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to the required DORA Art. 9(4) anchor",
+        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to DORA Art. 26",
+        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to DORA Art. 26",
         "weight": 15
       }
     },
@@ -474,11 +474,11 @@
       "question": {
         "id": "TECH-OS-12",
         "dimension": "Resilience",
-        "text": "Does the agent implement ISO 22301:2019 §8.4.4 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
-        "regulatoryRef": "ISO 22301:2019 §8.4.4",
+        "text": "Does the agent implement ISO 22301 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
+        "regulatoryRef": "ISO 22301 (recovery procedures)",
         "l1": "No recovery procedures: BC plans are high-level and not executable, exercised, or evidenced",
         "l3": "Has recovery runbooks and exercises some scenarios, but invocation criteria, communications roles, and evidence bundles are incomplete",
-        "l5": "§8.4.4 controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
+        "l5": "Recovery procedure controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
         "weight": 12
       }
     },
@@ -487,8 +487,8 @@
       "question": {
         "id": "TECH-OS-14",
         "dimension": "Operations",
-        "text": "Does the agent operationalize the ITIL v4 §5.2.7 practice expectations by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
-        "regulatoryRef": "ITIL v4 §5.2.7",
+        "text": "Does the agent operationalize ITIL 4 service management practices by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
+        "regulatoryRef": "ITIL 4 (service management practices)",
         "l1": "No ITIL practice operationalization: no practice KPIs, runbooks, or continual improvement evidence",
         "l3": "Some ITIL-like processes exist, but KPIs, ownership, and evidence outputs are incomplete or inconsistent",
         "l5": "Full ITIL practice operationalization with owned KPIs, runbooks, continual improvement, and audit-ready evidence demonstrating sustained execution",
@@ -500,11 +500,11 @@
       "question": {
         "id": "TECH-OS-7",
         "dimension": "Security",
-        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21 for essential entity digital infrastructure?",
+        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21, where the operator is an essential or important entity?",
         "regulatoryRef": "EU NIS2 2022/2555 Art. 21",
-        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement essential entity security requirements per Art. 21",
+        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement the Art. 21 risk-management measures",
         "l3": "Agent implements several Art. 21 security measures including incident handling and supply chain security, but does not address all required measures",
-        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
+        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour early warning capability for significant incidents (Art. 23(4)(a)), supply chain security, cryptographic controls, access control (Art. 21(2)(i)), and regular assessment of the effectiveness of the measures (Art. 21(2)(f))",
         "weight": 12
       }
     },

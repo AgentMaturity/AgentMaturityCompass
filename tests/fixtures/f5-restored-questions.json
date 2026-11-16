@@ -214,11 +214,11 @@
       "question": {
         "id": "TECH-OS-4",
         "dimension": "Transparency",
-        "text": "Does the agent implement outcome accountability per GRI Standards 201-207 economic performance reporting and UN SDG impact measurement framework?",
-        "regulatoryRef": "GRI Standards 201-207; UN SDG Impact Standards",
+        "text": "Does the agent implement outcome accountability by reporting under the GRI economic topic Standards (GRI 201 Economic Performance to GRI 207 Tax) and by integrating impact management into decisions as the UNDP SDG Impact Standards describe?",
+        "regulatoryRef": "GRI Standards 201-207; UNDP SDG Impact Standards for Enterprises",
         "l1": "No outcome accountability; orchestration system optimizes for efficiency without measuring or reporting social and economic outcomes",
         "l3": "Agent tracks economic performance metrics and generates basic GRI-aligned reports, but does not implement full SDG impact measurement or stakeholder outcome reporting",
-        "l5": "Full outcome accountability with GRI 201-207 economic reporting, UN SDG impact measurement per SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
+        "l5": "Full outcome accountability with GRI 201-207 economic reporting, impact management per the UNDP SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
         "weight": 12
       }
     },
@@ -227,11 +227,11 @@
       "question": {
         "id": "TECH-OS-15",
         "dimension": "Governance",
-        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact Council-required article/section and evidence expectations remain audit-defensible over time?",
+        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact article or section it relies on and evidence expectations remain audit-defensible over time?",
         "regulatoryRef": "Citation mapping governance",
         "l1": "No mapping governance: citations drift and controls are not traceably anchored",
         "l3": "Mapping exists but review/versioning is manual and can lag updates",
-        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the Council-required anchors consistently",
+        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the article or section they rely on consistently",
         "weight": 6
       }
     },

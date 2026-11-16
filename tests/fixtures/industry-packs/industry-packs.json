@@ -11180,14 +11180,14 @@
     "version": "2026.10"
   },
   "os-sustainable-outcomes": {
-    "certificationPath": "L1 Basic operational monitoring → L2 ITIL/ISO 20000 service management → L3 SOC 2 + ISO 27001-aligned controls → L4 DORA compliant resilience → L5 Autonomous sustainable orchestration with verified outcomes and continuous accountability",
+    "certificationPath": "L1 Basic operational monitoring → L2 ITIL/ISO 20000 service management → L3 SOC 2 + ISO 27001-aligned controls → L4 DORA resilience controls in place → L5 Autonomous sustainable orchestration with verified outcomes and continuous accountability",
     "certificationThreshold": 78,
     "complianceFrameworkRefs": [
       {
         "external": false,
         "frameworkId": "ISO_27001",
         "instrumentId": "iso-27001",
-        "label": "ISO 27001:2022"
+        "label": "ISO/IEC 27001"
       },
       {
         "external": false,
@@ -11205,7 +11205,7 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-22301",
-        "label": "ISO 22301:2019"
+        "label": "ISO 22301"
       },
       {
         "external": false,
@@ -11217,20 +11217,20 @@
         "external": true,
         "frameworkId": null,
         "instrumentId": "iso-20000-1",
-        "label": "ISO/IEC 20000-1:2018"
+        "label": "ISO/IEC 20000-1"
       }
     ],
     "complianceFrameworks": [
-      "ISO 27001:2022",
+      "ISO/IEC 27001",
       "SOC 2 Type II",
       "EU DORA Art. 9",
-      "ISO 22301:2019",
+      "ISO 22301",
       "EU NIS2 2022/2555",
-      "ISO/IEC 20000-1:2018"
+      "ISO/IEC 20000-1"
     ],
     "contentStatus": "experimental",
     "description": "The transactional system orchestrating strategic movement of people, goods, and money — creating wealth and value while enabling sustainable outcomes — AI agents as the core orchestration layer for economic and social systems with resilience, accountability, and outcome measurement.",
-    "euAIActClassification": "Annex III §2 (critical digital infrastructure) and §4 (workers' management) where those uses apply",
+    "euAIActClassification": "Annex III §2 (safety components in the management and operation of critical digital infrastructure) and §4 (employment and workers' management) where those uses apply",
     "id": "os-sustainable-outcomes",
     "keyRisks": [
       "Systemic failure propagation through interconnected orchestration failures",
@@ -11277,9 +11277,9 @@
         "l3": "Service catalogue, SLAs, incident and change records exist, but SLA attainment is not reported or improvement actions are not tracked.",
         "l4": "Catalogue, SLAs and monthly attainment reports exist, but incident, problem and change records are not linked or improvement actions stall.",
         "l5": "Every orchestration service is in the catalogue with SLAs; SLA attainment is reported monthly; incident, problem and change records are linked; improvement actions are tracked to closure.",
-        "regulatoryRef": "ISO/IEC 20000-1:2018 §8",
+        "regulatoryRef": "ISO/IEC 20000-1 (service management system)",
         "remediation": "Register each agent-run orchestration service in the catalogue with an SLA, and require every agent-initiated change to carry a change record linked to the service.",
-        "text": "Does the agent maintain service management per ISO/IEC 20000-1:2018 §8 service delivery requirements?",
+        "text": "Does the agent maintain service management for its orchestration services under an ISO/IEC 20000-1 service management system?",
         "weight": 12
       },
       {
@@ -11292,14 +11292,14 @@
         "failureMode": "The agent's service account holds standing production access outside the SOC 2 scope, so its privileged changes are never reviewed.",
         "id": "TECH-OS-3",
         "keyRisk": 1,
-        "l1": "No mapping of controls to TSC CC6-CC9 and no SOC 2 report.",
+        "l1": "No mapping of controls to the Trust Services Criteria and no SOC 2 report.",
         "l2": "Access controls exist but are not mapped to the TSC, and no auditor has examined the agent.",
-        "l3": "Controls mapped to CC6-CC7 with evidence; CC8 change management or CC9 risk mitigation controls are unmapped, or no Type II report covers the agent.",
-        "l4": "CC6-CC9 are mapped with automated evidence and a Type II report exists, but its system description omits the agent layer or exceptions remain open.",
-        "l5": "Controls mapped to CC6-CC9 with automated evidence collection; a current SOC 2 Type II report whose system description includes the agent orchestration layer; exceptions remediated with records.",
-        "regulatoryRef": "SOC 2 Type II CC6-CC9",
-        "remediation": "Bring the agent's service accounts, tool permissions and change pipeline into the SOC 2 system description and collect CC6-CC9 evidence for them automatically.",
-        "text": "Does the agent implement security operations per SOC 2 Type II Trust Service Criteria CC6-CC9 logical and physical access controls and system operations?",
+        "l3": "Access and system operations controls mapped with evidence; change management or risk mitigation controls are unmapped, or no Type II report covers the agent.",
+        "l4": "Access, operations, change and risk mitigation criteria are mapped with automated evidence and a Type II report exists, but its system description omits the agent layer or exceptions remain open.",
+        "l5": "Access, system operations, change management and risk mitigation controls mapped with automated evidence collection; a current SOC 2 Type II report whose system description includes the agent orchestration layer; exceptions remediated with records.",
+        "regulatoryRef": "SOC 2 Type II (Trust Services Criteria)",
+        "remediation": "Bring the agent's service accounts, tool permissions and change pipeline into the SOC 2 system description and collect Trust Services Criteria evidence for them automatically.",
+        "text": "Does the agent implement security operations against the AICPA Trust Services Criteria used in SOC 2 reports, covering logical and physical access, system operations, change management and risk mitigation?",
         "weight": 12
       },
       {
@@ -11316,10 +11316,10 @@
         "l2": "Only throughput and cost metrics are tracked; no economic or social outcome measures exist.",
         "l3": "Agent tracks economic performance metrics and generates basic GRI-aligned reports, but does not implement full SDG impact measurement or stakeholder outcome reporting",
         "l4": "GRI 201-207 reporting and SDG impact measurement are in place, but stakeholder outcome distribution or negative externalities are not analysed.",
-        "l5": "Full outcome accountability with GRI 201-207 economic reporting, UN SDG impact measurement per SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
-        "regulatoryRef": "GRI Standards 201-207; UN SDG Impact Standards",
+        "l5": "Full outcome accountability with GRI 201-207 economic reporting, impact management per the UNDP SDG Impact Standards, stakeholder outcome distribution analysis, negative externality identification, and transparent sustainable outcome reporting",
+        "regulatoryRef": "GRI Standards 201-207; UNDP SDG Impact Standards for Enterprises",
         "remediation": "Add outcome metrics per stakeholder group beside efficiency metrics in the orchestration objective, and report the negative externalities the optimisation produces.",
-        "text": "Does the agent implement outcome accountability per GRI Standards 201-207 economic performance reporting and UN SDG impact measurement framework?",
+        "text": "Does the agent implement outcome accountability by reporting under the GRI economic topic Standards (GRI 201 Economic Performance to GRI 207 Tax) and by integrating impact management into decisions as the UNDP SDG Impact Standards describe?",
         "weight": 12
       },
       {
@@ -11337,9 +11337,9 @@
         "l3": "RTO/RPO set and continuity plans documented for core pathways, but exercises do not measure achieved recovery times or some critical pathways are not covered.",
         "l4": "The BIA covers every critical pathway and exercises measure achieved RTO/RPO, but gaps found in exercises are not tracked to closure.",
         "l5": "Business impact analysis covers every critical pathway; documented recovery procedures; exercises at least annually measure achieved RTO/RPO against targets; gaps tracked to closure.",
-        "regulatoryRef": "ISO 22301:2019 §8.4",
+        "regulatoryRef": "ISO 22301 (business continuity plans)",
         "remediation": "Set RTO and RPO for each critical orchestration pathway in the BIA and run a failover exercise that measures achieved recovery time against them.",
-        "text": "Does the agent implement business continuity per ISO 22301:2019 §8.4 business continuity plans with RTO/RPO verification for critical orchestration pathways?",
+        "text": "Does the agent implement business continuity under an ISO 22301 business continuity management system, with business continuity plans and RTO/RPO verification for critical orchestration pathways?",
         "weight": 12
       },
       {
@@ -11357,7 +11357,7 @@
         "l3": "Disparities measured for some groups or ad hoc, without documented thresholds or remediation.",
         "l4": "Disparity metrics and thresholds run on schedule with tracked remediation, but results are not reported to stakeholders.",
         "l5": "Disparity metrics per defined group on a fixed schedule; thresholds documented; each breach triggers tracked remediation; results reported to stakeholders.",
-        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI (2021): Fairness and non-discrimination",
+        "regulatoryRef": "UNESCO Recommendation on the Ethics of AI: Fairness and non-discrimination",
         "remediation": "Compute access and outcome rates per defined user group weekly from orchestration logs and open a remediation ticket whenever a gap exceeds the documented threshold.",
         "text": "Does the agent measure disparities in access to and outcomes of its orchestration services across defined user groups and act on them, per the UNESCO Recommendation on the Ethics of AI principle 'Fairness and non-discrimination'?",
         "weight": 10
@@ -11372,14 +11372,14 @@
         "failureMode": "The agent's orchestration network has no segmentation, so one compromised connector propagates to every downstream transaction system.",
         "id": "TECH-OS-7",
         "keyRisk": 0,
-        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement essential entity security requirements per Art. 21",
+        "l1": "No NIS2 cybersecurity measures; orchestration system does not implement the Art. 21 risk-management measures",
         "l2": "A few security measures (backups, MFA) exist with no mapping to Art. 21.",
         "l3": "Agent implements several Art. 21 security measures including incident handling and supply chain security, but does not address all required measures",
         "l4": "Most Art. 21 measures are in place with regular testing, but at least one, such as cryptography or supply chain, lacks evidence for the orchestration system.",
-        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour incident notification capability, supply chain security, cryptographic controls, access control, and regular cybersecurity testing per Art. 21(2)(i)",
+        "l5": "NIS2 controls in place, with all Art. 21 measures, 24-hour early warning capability for significant incidents (Art. 23(4)(a)), supply chain security, cryptographic controls, access control (Art. 21(2)(i)), and regular assessment of the effectiveness of the measures (Art. 21(2)(f))",
         "regulatoryRef": "EU NIS2 2022/2555 Art. 21",
         "remediation": "Build an Art. 21(2) coverage matrix for the orchestration system with one evidence link per measure, and schedule recurring security tests of the agent's tool interfaces.",
-        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21 for essential entity digital infrastructure?",
+        "text": "Does the agent implement NIS2 cybersecurity measures per EU NIS2 Directive 2022/2555 Article 21, where the operator is an essential or important entity?",
         "weight": 12
       },
       {
@@ -11435,12 +11435,12 @@
         "keyRisk": 0,
         "l1": "No TLPT: no threat-led testing program, no governance, and no evidence bundles",
         "l2": "Annual penetration tests and occasional scenario exercises run, with no TLPT policy or independence controls.",
-        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to the required DORA anchor",
+        "l3": "Performs some penetration testing and occasional scenario exercises, but TLPT governance, independence, and evidence bundles are incomplete or not mapped to DORA Art. 26",
         "l4": "TLPT policy, governance, threat-intelligence red teaming and remediation exist, but evidence bundles lack retest outcomes or rules of engagement.",
-        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to the required DORA Art. 9(4) anchor",
-        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 9(4) (TLPT anchor)",
+        "l5": "Full TLPT program with governance, scoped threat-led testing, independence controls, remediation + retesting, and supervisor-ready evidence mapped to DORA Art. 26",
+        "regulatoryRef": "EU DORA (EU) 2022/2554 Art. 26",
         "remediation": "Write a TLPT policy whose scoping includes agent attack paths such as prompt injection driving tool calls, and assemble an evidence bundle per test with retests.",
-        "text": "Does the agent implement threat-led penetration testing (TLPT) governance and execution aligned to the Councils required mapping for EU DORA Art. 9(4), including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
+        "text": "Where the financial entity must perform threat-led penetration testing (TLPT) under EU DORA Art. 26, does the agent support TLPT governance and execution, including (1) a TLPT policy and scoping methodology, (2) engagement governance and independence, (3) red-team execution with threat intelligence, (4) findings remediation tracking, and (5) an auditor/supervisor-ready evidence bundle (scope, rules of engagement, reports, remediation, and retest outcomes)?",
         "weight": 15
       },
       {
@@ -11477,10 +11477,10 @@
         "l2": "A high-level continuity plan exists; recovery steps live in individual engineers' heads.",
         "l3": "Has recovery runbooks and exercises some scenarios, but invocation criteria, communications roles, and evidence bundles are incomplete",
         "l4": "Executable runbooks with invocation criteria and roles are exercised, but after-action improvements are not fed back into the runbooks.",
-        "l5": "§8.4.4 controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
-        "regulatoryRef": "ISO 22301:2019 §8.4.4",
+        "l5": "Recovery procedure controls in place, with executable recovery procedures, role/communication plans, regular exercises, after-action improvements, and auditor-ready evidence",
+        "regulatoryRef": "ISO 22301 (recovery procedures)",
         "remediation": "Write an executable runbook per critical orchestration pathway with invocation criteria, including how to pause the agent and drain its queue, and exercise it.",
-        "text": "Does the agent implement ISO 22301:2019 §8.4.4 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
+        "text": "Does the agent implement ISO 22301 recovery procedures by defining invocation criteria, step-by-step recovery runbooks for critical orchestration pathways, communications/roles during recovery, exercise/testing outputs, and evidence retention that demonstrates procedures are current and effective?",
         "weight": 12
       },
       {
@@ -11498,9 +11498,9 @@
         "l3": "Targets set for some services; dependency mapping incomplete or plans not tested in the last 12 months.",
         "l4": "Targets per service, mapped dependencies and annual tests exist, but exceptions are approved informally or availability trend is not reported.",
         "l5": "Availability and continuity targets per service; critical dependencies mapped; plans tested at least annually with reports; exceptions approved and corrective actions tracked; availability trend reported monthly.",
-        "regulatoryRef": "ISO/IEC 20000-1:2018 §8.6",
+        "regulatoryRef": "ISO/IEC 20000-1 (service continuity and availability)",
         "remediation": "Map every model provider, tool API and data store each orchestration service depends on, and set availability targets that account for the weakest dependency.",
-        "text": "Does the agent implement ISO/IEC 20000-1:2018 §8.6 by defining service continuity and availability targets for orchestration services, mapping critical dependencies (third parties and internal components), testing continuity/availability plans, managing exceptions, and producing evidence packs (targets, test reports, corrective actions, and trend metrics)?",
+        "text": "Does the agent support ISO/IEC 20000-1 service continuity and availability management by defining service continuity and availability targets for orchestration services, mapping critical dependencies (third parties and internal components), testing continuity/availability plans, managing exceptions, and producing evidence packs (targets, test reports, corrective actions, and trend metrics)?",
         "weight": 12
       },
       {
@@ -11518,9 +11518,9 @@
         "l3": "Some ITIL-like processes exist, but KPIs, ownership, and evidence outputs are incomplete or inconsistent",
         "l4": "Owned KPIs, runbooks and an improvement backlog exist, but evidence of sustained execution over several periods is missing.",
         "l5": "Full ITIL practice operationalization with owned KPIs, runbooks, continual improvement, and audit-ready evidence demonstrating sustained execution",
-        "regulatoryRef": "ITIL v4 §5.2.7",
+        "regulatoryRef": "ITIL 4 (service management practices)",
         "remediation": "Name a practice owner, publish MTTR, availability and drill-success KPIs for agent-run services, and review the improvement backlog monthly.",
-        "text": "Does the agent operationalize the ITIL v4 §5.2.7 practice expectations by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
+        "text": "Does the agent operationalize ITIL 4 service management practices by defining practice ownership, KPIs (availability, incident MTTR, recovery drill success), runbooks/workflows, continual improvement backlog, and evidence outputs that demonstrate the practice is executed and improved over time for orchestration services?",
         "weight": 10
       },
       {
@@ -11537,10 +11537,10 @@
         "l2": "Control citations were copied into a spreadsheet once and never revisited.",
         "l3": "Mapping exists but review/versioning is manual and can lag updates",
         "l4": "The mapping is versioned and reviewed, but no automated check flags controls whose cited clause changed.",
-        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the Council-required anchors consistently",
+        "l5": "Strong mapping governance with versioning, periodic review, and checks that controls cite the article or section they rely on consistently",
         "regulatoryRef": "Citation mapping governance",
         "remediation": "Version the control-to-clause map, run a CI check that every control cites a mapped article, and log each periodic review.",
-        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact Council-required article/section and evidence expectations remain audit-defensible over time?",
+        "text": "Does the program maintain a versioned control-to-clause mapping (DORA/ISO/ITIL/GDPR) with periodic review, so each question/control is anchored to the exact article or section it relies on and evidence expectations remain audit-defensible over time?",
         "weight": 6
       },
       {
@@ -11665,13 +11665,13 @@
       }
     ],
     "regulatoryBasis": [
-      "ISO 27001:2022",
+      "ISO/IEC 27001",
       "SOC 2 Type II",
-      "EU DORA Art. 9 ICT risk management",
-      "ISO 22301:2019",
+      "EU DORA Art. 9 (protection and prevention)",
+      "ISO 22301",
       "EU NIS2 Directive 2022/2555",
-      "ITIL v4",
-      "ISO/IEC 20000-1:2018",
+      "ITIL 4",
+      "ISO/IEC 20000-1",
       "GDPR Art. 32"
     ],
     "regulatoryReferences": [
@@ -11681,7 +11681,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 27001:2022",
+        "text": "ISO/IEC 27001",
         "url": "https://www.iso.org/standard/27001"
       },
       {
@@ -11699,7 +11699,7 @@
         "jurisdiction": "EU",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "EU DORA Art. 9 ICT risk management",
+        "text": "EU DORA Art. 9 (protection and prevention)",
         "url": "https://data.europa.eu/eli/reg/2022/2554/oj"
       },
       {
@@ -11708,7 +11708,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO 22301:2019",
+        "text": "ISO 22301",
         "url": "https://www.iso.org/standard/88412.html"
       },
       {
@@ -11723,11 +11723,10 @@
       },
       {
         "citation": "ITIL 4",
-        "instrumentId": "itil-4",
-        "jurisdiction": "INT",
-        "lastReviewed": "2026-10-03",
+        "instrumentId": null,
+        "jurisdiction": "unresolved",
         "status": "unverified",
-        "text": "ITIL v4"
+        "text": "ITIL 4"
       },
       {
         "citation": "ISO/IEC 20000-1:2018 Service management system requirements",
@@ -11735,7 +11734,7 @@
         "jurisdiction": "INT",
         "lastReviewed": "2026-10-03",
         "status": "in-force",
-        "text": "ISO/IEC 20000-1:2018",
+        "text": "ISO/IEC 20000-1",
         "url": "https://www.iso.org/standard/70636.html"
       },
       {
