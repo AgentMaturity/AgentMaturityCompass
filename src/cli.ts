@@ -4288,18 +4288,13 @@ const connect = program
   .option("--json", "emit activation status as JSON (requires --status)", false)
   .option("--print-env", "print environment export lines", false)
   .option("--print-cmd", "print only command line", false)
+  .option("--runtime <runtime>", "with --print-env: print the OpenTelemetry settings that send this runtime's telemetry to AMC (claude-code|gemini-cli|otel|codex)")
   .action(
     async (opts: {
-      agent?: string;
-      adapter?: string;
-      tokenFile?: string;
-      bridgeUrl?: string;
-      mode?: "supervise" | "sandbox";
-      status: boolean;
-      json: boolean;
-      printEnv: boolean;
-      printCmd: boolean;
+      agent?: string; adapter?: string; tokenFile?: string; bridgeUrl?: string; mode?: "supervise" | "sandbox";
+      status: boolean; json: boolean; printEnv: boolean; printCmd: boolean; runtime?: string;
     }) => {
+      if (opts.runtime !== undefined) return (await import("./watch/otlpConnect.js")).printOtlpConnect(process.cwd(), resolveAgentId(process.cwd(), opts.agent ?? activeAgent(program)), opts);
       if (opts.status) {
         if (opts.tokenFile || opts.printEnv || opts.printCmd || opts.mode || opts.adapter || opts.bridgeUrl) {
           throw new Error("--status cannot be combined with connection mutation or output options");
