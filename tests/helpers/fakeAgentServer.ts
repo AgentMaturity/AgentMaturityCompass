@@ -23,7 +23,7 @@ export interface StartFakeAgentOptions {
   /** When set, the server responds with this HTTP status instead of a reply. */
   failWithStatus?: number;
   /** When set, the agent answers with these tool calls and no text (`content: null`). */
-  toolCalls?: (prompt: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
+  toolCalls?: (prompt: string, requestBody: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
   /**
    * Extra response headers, e.g. a forged `x-amc-request-receipt` the agent under test might send (fix3 S12), or a
    * function of the exact request and response bodies, e.g. a gateway receipt bound to this exchange (fix3 S12c).
@@ -82,7 +82,7 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
         ? {
             role: "assistant",
             content: null,
-            tool_calls: options.toolCalls(prompt).map((call, index) => ({
+            tool_calls: options.toolCalls(prompt, requestBody).map((call, index) => ({
               id: `call_${index}`,
               type: "function",
               function: { name: call.name, arguments: JSON.stringify(call.arguments) }

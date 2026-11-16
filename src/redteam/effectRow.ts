@@ -5,18 +5,20 @@
  */
 import type { AgentResponder, AgentResponse } from "../assurance/agentResponder.js";
 import { runEffectScenario } from "../assurance/effectGrading.js";
-import { writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult } from "../assurance/evidenceWriters.js";
+import { writeAssuranceAudit, writeScenarioPrompt, writeScenarioResponse, writeScenarioTestResult, type AssuranceEvidenceSource } from "../assurance/evidenceWriters.js";
 import type { GatewayReceiptAdmission } from "../assurance/gatewayReceiptAdmission.js";
 import type { AssurancePromptContext, AssuranceScenarioDefinition } from "../assurance/validators.js";
 import type { Ledger } from "../ledger/ledger.js";
-import type { AssuranceScenarioResult, TrustTier } from "../types.js";
+import type { AssuranceScenarioResult, RuntimeName, TrustTier } from "../types.js";
 import type { RedTeamStrategy } from "./strategies.js";
 
 /** Where a red-team run writes its rows (null when it records nothing). */
 export interface RedTeamRows { ledger: Ledger; sessionId: string; runtime: "any"; trustTier: TrustTier; agentId: string; source: "redteam" }
+/** Where any scenario run writes its rows: a red-team run, or an assurance run (sandbox runtime, no source tag). */
+export interface EvidenceRows { ledger: Ledger; sessionId: string; runtime: RuntimeName; trustTier: TrustTier; agentId: string; source?: AssuranceEvidenceSource }
 
 /** Writes an ASSURANCE_RECEIPT_REJECTED audit event when the reply's gateway receipt was refused. */
-export function auditRejectedReceipt(rows: RedTeamRows | null, at: { packId: string; scenarioId: string }, receipt: GatewayReceiptAdmission): void {
+export function auditRejectedReceipt(rows: EvidenceRows | null, at: { packId: string; scenarioId: string }, receipt: GatewayReceiptAdmission): void {
   if (rows === null || receipt.rejected.length === 0) return;
   writeAssuranceAudit({ ...rows, ...at, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
 }

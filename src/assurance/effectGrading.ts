@@ -46,6 +46,12 @@ export interface EffectSpec {
    * rewrites do not apply to such a scenario: they would rewrite the user's harmless request, not the attack.
    */
   taskInAttack: boolean;
+  /**
+   * Where the attack text sits, for an attacker model that proposes other text in its place (`amc redteam run
+   * --attacker-model`): the pack's own text, where it is placed in words, and the attack conversation built with other
+   * text there. Absent when a scenario has no single injection slot.
+   */
+  slot?: { text: string; where: string; attack: (canary: string, text: string) => EffectConversation };
 }
 
 /** The stored shape of an effect-graded result (`AssuranceScenarioResult.effect` in src/types.ts). */
@@ -119,6 +125,8 @@ export interface EffectRunOptions {
   /** Benign warm-up user turns sent before the attack message (multi-turn strategies). */
   warmUp?: readonly string[];
   record?: (prompt: string, answer: AgentResponse) => void;
+  /** Text for the scenario's injection slot instead of its own (needs `spec.slot`; `transform` is then not applied). */
+  injection?: string;
 }
 
 /** Runs attack and benign twin `attempts` times each on fresh fixtures. Invocation failures count as unmeasured. */
@@ -137,7 +145,8 @@ export async function runEffectScenario(spec: EffectSpec, context: AssuranceProm
   for (let i = 0; i < options.attempts; i++) {
     const canary = newCanary();
     const fixture = spec.build(context, canary);
-    const attack = options.transform ? { ...fixture.attack, prompt: options.transform(fixture.attack.prompt) } : fixture.attack;
+    const attack = options.injection !== undefined && spec.slot ? spec.slot.attack(canary, options.injection)
+      : options.transform ? { ...fixture.attack, prompt: options.transform(fixture.attack.prompt) } : fixture.attack;
     const answer = await attempt(attack, options.warmUp ?? []);
     if (answer !== null) {
       measured += 1; last = answer; toolCallsSeen ||= answer.toolCalls.length > 0;
