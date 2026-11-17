@@ -102,11 +102,21 @@ describe.skipIf(process.platform === "win32")("source installer (website/install
     expect(installed.status, installed.stderr).toBe(0);
     expect(installed.stdout).toContain(`Using Node.js v${process.versions.node} (${join(s.nodeDir, "node")})`);
     const launcher = readFileSync(join(s.prefix, "bin", "amc"), "utf8");
-    expect(launcher).toContain(`\nexec '${join(s.nodeDir, "node")}' '${join(s.prefix, "current", "dist", "cli.js")}' "$@"\n`);
+    expect(launcher).toContain(`\nt='${join(s.prefix, "current", "dist", "amc.js")}'; [ -f "$t" ] || t='${join(s.prefix, "current", "dist", "cli.js")}'\nexec '${join(s.nodeDir, "node")}' "$t" "$@"\n`);
     expect(launcher.match(/^.*\bnode\b.*$/gm)!.every((line) => line.includes(`'${join(s.nodeDir, "node")}`) || line.includes("Node.js"))).toBe(true);
     const amc = spawnSync(join(s.prefix, "bin", "amc"), ["--version"], { cwd: project, env: { PATH: `:${s.nodeDir}:/usr/bin:/bin` }, encoding: "utf8" });
     expect(amc.stdout.trim()).toBe("9.9.9");
     expect(existsSync(planted)).toBe(false);
+  });
+
+  it("the amc launcher runs the fast-start entry dist/amc.js when the build has one, and dist/cli.js otherwise", () => {
+    const s = sandbox();
+    expect(s.run().status).toBe(0);
+    const amc = () => spawnSync(join(s.prefix, "bin", "amc"), ["--version"], { encoding: "utf8" }).stdout.trim();
+    // The fake build writes only cli.js, as a build of an older ref would.
+    expect(amc()).toBe("9.9.9");
+    writeFileSync(join(s.prefix, "current", "dist", "amc.js"), 'console.log("fast " + process.argv.slice(2).join(" "))\n');
+    expect(amc()).toBe("fast --version");
   });
 
   it("says the pinned Node.js is gone, and how to fix it, when it was removed after install", () => {
@@ -167,6 +177,8 @@ it("labels the PowerShell twin untested in its header and its help, and calls on
 it("writes amc.cmd with the checked ASCII Node.js path in quotes and a gone-check, never a bare node, and checks the version through amc.cmd", () => {
   const text = readFileSync(ps1, "utf8");
   expect(text).toContain('"@`"$NodeCmd`" `"%~dp0..\\current\\dist\\cli.js`" %*"');
+  // The fast-start entry when the build has it; a build of an older ref has only cli.js.
+  expect(text).toContain('"@if not exist `"%~dp0..\\current\\dist\\amc.js`" goto slow",\n    "@`"$NodeCmd`" `"%~dp0..\\current\\dist\\amc.js`" %*",\n    "@exit /b %errorlevel%",\n    ":slow",');
   expect(text).toContain('"@if not exist `"$NodeCmd`" goto gone"');
   expect(text).toContain("$NodeCmd = $Node.Source -replace '%', '%%'");
   expect(text).not.toMatch(/@node\b/);
