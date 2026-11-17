@@ -8,32 +8,14 @@
  * Regulation (EU) 2026/1744 (Digital Omnibus on AI).
  */
 
-/**
- * Application dates (Art. 113 and Art. 111 as amended by Regulation (EU)
- * 2026/1744), read on 2026-10-03 from the Commission's AI Act Service Desk.
- * Each key must equal the verified keyDate of the same id in the regulatory
- * register entry "eu-ai-act" (src/compliance/regulatory/register.json);
- * tests/euAiActTimeline.test.ts enforces the parity.
- */
-export const EU_AI_ACT_TIMELINE = {
-  entryIntoForce: "2024-08-01",
-  prohibitionsAndAiLiteracy: "2025-02-02",
-  gpaiObligationsAndGovernance: "2025-08-02",
-  omnibusEntryIntoForce: "2026-07-27",
-  generalApplication: "2026-08-02",
-  newProhibitionsAndArt50_2Transition: "2026-12-02",
-  gpaiLegacyModelsDeadline: "2027-08-02",
-  annexIIIHighRisk: "2027-12-02",
-  article6_1AnnexIHighRisk: "2028-08-02",
-  // Art. 111(2) as amended (OJ text of Regulation (EU) 2026/1744, CELEX 32026R1744) and Art. 111(1)
-  // (CELEX 32024R1689), read 2026-10-04 via https://publications.europa.eu/resource/celex/<CELEX> by the
-  // round-2 register batch (program-records/2026-10-03/round2/register-eu-intl).
-  publicAuthorityHighRiskDeadline: "2030-08-02",
-  annexXLargeScaleIt: "2030-12-31",
-} as const;
+import { EU_AI_ACT_TIMELINE } from "./euAiActTimeline.js";
+import { euAiActDuties, type EuAiActDuty } from "./euAiActDuties.js";
+
+export { EU_AI_ACT_TIMELINE };
+export type { EuAiActDuty };
 
 export interface EuAiActApplicationDate {
-  basis: "Art. 5" | "Art. 6(2) + Annex III" | "Art. 6(1) + Annex I" | "Art. 50";
+  basis: "Art. 5" | "Art. 5(1)(ba)-(bb)" | "Art. 6(2) + Annex III" | "Art. 6(1) + Annex I" | "Art. 50";
   /** YYYY-MM-DD from EU_AI_ACT_TIMELINE. */
   appliesFrom: string;
 }
@@ -65,12 +47,24 @@ export interface AgentCapabilities {
   subliminalManipulation?: boolean;
   /** Exploitation of vulnerabilities (age, disability, social situation) */
   exploitsVulnerabilities?: boolean;
+  /** Predicting a person's risk of committing a crime based solely on profiling or personality traits (Art. 5(1)(d)) */
+  crimePredictionProfiling?: boolean;
+  /** Building or expanding facial recognition databases by untargeted scraping of faces from the internet or CCTV (Art. 5(1)(e)) */
+  facialImageScraping?: boolean;
   /** Emotion recognition (inferring emotions) in the workplace or in education institutions; prohibited by Art. 5(1)(f) */
   emotionRecognition?: boolean;
+  /** Biometric categorisation that infers race, political opinions, union membership, religion, sex life or orientation (Art. 5(1)(g)) */
+  sensitiveBiometricCategorisation?: boolean;
+  /** Generating or manipulating realistic intimate images of an identifiable person without consent (Art. 5(1)(ba), from 2 Dec 2026) */
+  nonConsensualIntimateImagery?: boolean;
+  /** Generating or manipulating child sexual abuse material (Art. 5(1)(bb), from 2 Dec 2026) */
+  childSexualAbuseMaterial?: boolean;
   /** Chatbot / conversational agent (must disclose AI nature) */
   chatbot?: boolean;
   /** Generates synthetic text, images, audio, video */
   syntheticContentGeneration?: boolean;
+  /** Publishes deep fakes, or AI-written text meant to inform the public (deployer disclosure, Art. 50(4)) */
+  deepFakes?: boolean;
   /** AI system intended to interact with humans */
   humanInteraction?: boolean;
   /** Safety component of regulated product (machinery, medical device, vehicle, etc.) */
@@ -100,6 +94,8 @@ export interface EuAiActClassification {
   summary: string;
   /** When the obligations behind this tier apply (empty for MINIMAL). */
   applicationDates?: EuAiActApplicationDate[];
+  /** Provider duties and deployer duties, each with the date it applies from. */
+  duties?: EuAiActDuty[];
   classifiedAt: number;
 }
 
@@ -122,161 +118,85 @@ export interface EuAiActComplianceRoadmap {
   generatedAt: number;
 }
 
+interface Rule { flag: keyof AgentCapabilities; article: string; title: string; description: string }
+
+const NEW_PROHIBITIONS = new Set(["Art. 5(1)(ba)", "Art. 5(1)(bb)"]);
+
+// Art. 5(1) as amended by Regulation (EU) 2026/1744 (points (ba) and (bb), and paragraphs 1a and 1b).
+const UNACCEPTABLE_RULES: Rule[] = [
+  { flag: "socialScoring", article: "Art. 5(1)(c)", title: "Social scoring",
+    description: "Systems that evaluate or classify persons based on social behaviour or personal characteristics, leading to detrimental or unfavourable treatment, are prohibited." },
+  { flag: "subliminalManipulation", article: "Art. 5(1)(a)", title: "Subliminal manipulation",
+    description: "Systems that manipulate persons through subliminal techniques are prohibited." },
+  { flag: "exploitsVulnerabilities", article: "Art. 5(1)(b)", title: "Exploitation of vulnerabilities",
+    description: "Systems that exploit vulnerabilities of specific groups (age, disability) are prohibited." },
+  { flag: "crimePredictionProfiling", article: "Art. 5(1)(d)", title: "Crime prediction from profiling alone",
+    description: "Systems that assess or predict the risk of a person committing a criminal offence based solely on profiling or on personality traits are prohibited." },
+  { flag: "facialImageScraping", article: "Art. 5(1)(e)", title: "Untargeted scraping of facial images",
+    description: "Systems that create or expand facial recognition databases through untargeted scraping of facial images from the internet or CCTV footage are prohibited." },
+  { flag: "emotionRecognition", article: "Art. 5(1)(f)", title: "Emotion recognition in the workplace or education",
+    description: "Systems that infer emotions of natural persons in the areas of workplace and education institutions are prohibited (since 2 Feb 2025), except where intended for medical or safety reasons." },
+  { flag: "sensitiveBiometricCategorisation", article: "Art. 5(1)(g)", title: "Biometric categorisation by sensitive attributes",
+    description: "Systems that categorise people by their biometric data to infer race, political opinions, trade union membership, religious or philosophical beliefs, sex life or sexual orientation are prohibited." },
+  { flag: "realtimeBiometricPublicSpaces", article: "Art. 5(1)(h)", title: "Real-time remote biometric identification in public spaces",
+    description: "Real-time remote biometric identification in publicly accessible spaces by law enforcement is prohibited (with narrow exceptions)." },
+  { flag: "nonConsensualIntimateImagery", article: "Art. 5(1)(ba)", title: "Intimate images of a real person without consent",
+    description: "Systems that generate or manipulate realistic intimate images, video or audio of an identifiable person without that person's explicit consent are prohibited from 2 Dec 2026 (added by Regulation (EU) 2026/1744)." },
+  { flag: "childSexualAbuseMaterial", article: "Art. 5(1)(bb)", title: "Child sexual abuse material",
+    description: "Systems that generate or manipulate child sexual abuse material are prohibited from 2 Dec 2026 (added by Regulation (EU) 2026/1744)." },
+];
+
+const HIGH_RISK_RULES: Rule[] = [
+  { flag: "biometricIdentification", article: "Art. 6(2) + Annex III(1)", title: "Biometric identification and categorisation",
+    description: "AI for remote biometric identification of natural persons is high-risk." },
+  { flag: "criticalInfrastructure", article: "Art. 6(2) + Annex III(2)", title: "Critical infrastructure management",
+    description: "AI used as safety components in critical infrastructure is high-risk." },
+  { flag: "education", article: "Art. 6(2) + Annex III(3)", title: "Education and vocational training",
+    description: "AI used to determine access/assess students in education is high-risk." },
+  { flag: "employment", article: "Art. 6(2) + Annex III(4)", title: "Employment and worker management",
+    description: "AI for recruitment, promotion, or termination decisions is high-risk." },
+  { flag: "essentialServices", article: "Art. 6(2) + Annex III(5)", title: "Access to essential private/public services",
+    description: "AI for creditworthiness, benefit eligibility, or emergency dispatch is high-risk." },
+  { flag: "lawEnforcement", article: "Art. 6(2) + Annex III(6)", title: "Law enforcement",
+    description: "AI assisting law enforcement in assessment, profiling, or evidence evaluation is high-risk." },
+  { flag: "migrationBorderControl", article: "Art. 6(2) + Annex III(7)", title: "Migration, asylum and border control",
+    description: "AI used in migration risk assessment or border checks is high-risk." },
+  { flag: "justiceAdministration", article: "Art. 6(2) + Annex III(8)", title: "Administration of justice and democratic processes",
+    description: "AI assisting judicial decisions or influencing democratic processes is high-risk." },
+  { flag: "safetyComponent", article: "Art. 6(1)", title: "Safety component of regulated product",
+    description: "AI that is a safety component of a product covered by Union harmonisation legislation is high-risk." },
+];
+
+const TRANSPARENCY_RULES: Rule[] = [
+  { flag: "chatbot", article: "Art. 50(1)", title: "Chatbot transparency obligation",
+    description: "AI systems intended to interact with humans must disclose they are AI, unless obvious from context." },
+  { flag: "syntheticContentGeneration", article: "Art. 50(2)", title: "Synthetic content labelling",
+    description: "AI-generated synthetic audio, image, video, or text content must be labelled as artificially generated." },
+  { flag: "humanInteraction", article: "Art. 50(1)", title: "Disclosure of interaction with an AI system",
+    description: "Providers must design AI systems intended to interact directly with natural persons so those persons are informed they are interacting with an AI system, unless obvious from context." },
+  { flag: "deepFakes", article: "Art. 50(4)", title: "Deep fake disclosure",
+    description: "Deployers must disclose that deep fake image, audio or video content, and AI-written text published to inform the public, was artificially generated or manipulated." },
+];
+
+function matches(capabilities: AgentCapabilities, rules: Rule[], severity: EuAiActFinding["severity"], articles: Set<string>): EuAiActFinding[] {
+  return rules.filter((rule) => capabilities[rule.flag]).map(({ article, title, description }) => {
+    articles.add(article);
+    return { article, title, description, severity };
+  });
+}
+
 /**
- * Classify an AI agent into EU AI Act risk tiers.
+ * Classify an AI agent into EU AI Act risk tiers. A high-risk agent keeps its Art. 50 transparency findings: the
+ * two sets of duties add up, they do not replace each other.
  */
 export function classifyEuAiActRisk(capabilities: AgentCapabilities): EuAiActClassification {
-  const findings: EuAiActFinding[] = [];
   const articles = new Set<string>();
-  let riskTier: EuAiActRiskTier = "MINIMAL";
-
-  // ── UNACCEPTABLE RISK (Art. 5) ─────────────────────────────────────────
-  const unacceptableFlags: Array<{ flag: keyof AgentCapabilities; article: string; title: string; description: string }> = [
-    {
-      flag: "socialScoring",
-      article: "Art. 5(1)(c)",
-      title: "Social scoring",
-      description: "Systems that evaluate or classify persons based on social behaviour or personal characteristics, leading to detrimental or unfavourable treatment, are prohibited."
-    },
-    {
-      flag: "subliminalManipulation",
-      article: "Art. 5(1)(a)",
-      title: "Subliminal manipulation",
-      description: "Systems that manipulate persons through subliminal techniques are prohibited."
-    },
-    {
-      flag: "exploitsVulnerabilities",
-      article: "Art. 5(1)(b)",
-      title: "Exploitation of vulnerabilities",
-      description: "Systems that exploit vulnerabilities of specific groups (age, disability) are prohibited."
-    },
-    {
-      flag: "emotionRecognition",
-      article: "Art. 5(1)(f)",
-      title: "Emotion recognition in the workplace or education",
-      description: "Systems that infer emotions of natural persons in the areas of workplace and education institutions are prohibited (since 2 Feb 2025), except where intended for medical or safety reasons."
-    },
-    {
-      flag: "realtimeBiometricPublicSpaces",
-      article: "Art. 5(1)(h)",
-      title: "Real-time remote biometric identification in public spaces",
-      description: "Real-time remote biometric identification in publicly accessible spaces by law enforcement is prohibited (with narrow exceptions)."
-    }
-  ];
-
-  for (const { flag, article, title, description } of unacceptableFlags) {
-    if (capabilities[flag]) {
-      riskTier = "UNACCEPTABLE";
-      articles.add(article);
-      findings.push({ article, title, description, severity: "CRITICAL" });
-    }
-  }
-
-  if (riskTier === "UNACCEPTABLE") {
-    return buildResult("UNACCEPTABLE", articles, findings);
-  }
-
-  // ── HIGH RISK (Art. 6) ────────────────────────────────────────────────
-  const highRiskFlags: Array<{ flag: keyof AgentCapabilities; article: string; title: string; description: string }> = [
-    {
-      flag: "biometricIdentification",
-      article: "Art. 6(2) + Annex III(1)",
-      title: "Biometric identification and categorisation",
-      description: "AI for remote biometric identification of natural persons is high-risk."
-    },
-    {
-      flag: "criticalInfrastructure",
-      article: "Art. 6(2) + Annex III(2)",
-      title: "Critical infrastructure management",
-      description: "AI used as safety components in critical infrastructure is high-risk."
-    },
-    {
-      flag: "education",
-      article: "Art. 6(2) + Annex III(3)",
-      title: "Education and vocational training",
-      description: "AI used to determine access/assess students in education is high-risk."
-    },
-    {
-      flag: "employment",
-      article: "Art. 6(2) + Annex III(4)",
-      title: "Employment and worker management",
-      description: "AI for recruitment, promotion, or termination decisions is high-risk."
-    },
-    {
-      flag: "essentialServices",
-      article: "Art. 6(2) + Annex III(5)",
-      title: "Access to essential private/public services",
-      description: "AI for creditworthiness, benefit eligibility, or emergency dispatch is high-risk."
-    },
-    {
-      flag: "lawEnforcement",
-      article: "Art. 6(2) + Annex III(6)",
-      title: "Law enforcement",
-      description: "AI assisting law enforcement in assessment, profiling, or evidence evaluation is high-risk."
-    },
-    {
-      flag: "migrationBorderControl",
-      article: "Art. 6(2) + Annex III(7)",
-      title: "Migration, asylum and border control",
-      description: "AI used in migration risk assessment or border checks is high-risk."
-    },
-    {
-      flag: "justiceAdministration",
-      article: "Art. 6(2) + Annex III(8)",
-      title: "Administration of justice and democratic processes",
-      description: "AI assisting judicial decisions or influencing democratic processes is high-risk."
-    },
-    {
-      flag: "safetyComponent",
-      article: "Art. 6(1)",
-      title: "Safety component of regulated product",
-      description: "AI that is a safety component of a product covered by Union harmonisation legislation is high-risk."
-    }
-  ];
-
-  for (const { flag, article, title, description } of highRiskFlags) {
-    if (capabilities[flag]) {
-      if (riskTier !== "HIGH") riskTier = "HIGH";
-      articles.add(article);
-      findings.push({ article, title, description, severity: "HIGH" });
-    }
-  }
-
-  if (riskTier === "HIGH") {
-    return buildResult("HIGH", articles, findings);
-  }
-
-  // ── LIMITED RISK (Art. 50) ────────────────────────────────────────────
-  const limitedRiskFlags: Array<{ flag: keyof AgentCapabilities; article: string; title: string; description: string }> = [
-    {
-      flag: "chatbot",
-      article: "Art. 50(1)",
-      title: "Chatbot transparency obligation",
-      description: "AI systems intended to interact with humans must disclose they are AI, unless obvious from context."
-    },
-    {
-      flag: "syntheticContentGeneration",
-      article: "Art. 50(2)",
-      title: "Synthetic content labelling",
-      description: "AI-generated synthetic audio, image, video, or text content must be labelled as artificially generated."
-    },
-    {
-      flag: "humanInteraction",
-      article: "Art. 50(1)",
-      title: "Disclosure of interaction with an AI system",
-      description: "Providers must design AI systems intended to interact directly with natural persons so those persons are informed they are interacting with an AI system, unless obvious from context."
-    }
-  ];
-
-  for (const { flag, article, title, description } of limitedRiskFlags) {
-    if (capabilities[flag]) {
-      if (riskTier !== "LIMITED") riskTier = "LIMITED";
-      articles.add(article);
-      findings.push({ article, title, description, severity: "MEDIUM" });
-    }
-  }
-
-  return buildResult(riskTier, articles, findings);
+  const prohibited = matches(capabilities, UNACCEPTABLE_RULES, "CRITICAL", articles);
+  if (prohibited.length > 0) return buildResult("UNACCEPTABLE", articles, prohibited);
+  const highRisk = matches(capabilities, HIGH_RISK_RULES, "HIGH", articles);
+  const transparency = matches(capabilities, TRANSPARENCY_RULES, "MEDIUM", articles);
+  const tier: EuAiActRiskTier = highRisk.length > 0 ? "HIGH" : transparency.length > 0 ? "LIMITED" : "MINIMAL";
+  return buildResult(tier, articles, [...highRisk, ...transparency]);
 }
 
 function buildResult(
@@ -284,35 +204,66 @@ function buildResult(
   articles: Set<string>,
   findings: EuAiActFinding[]
 ): EuAiActClassification {
-  const remediation = buildRemediation(tier, findings);
-  const summary = buildSummary(tier, findings);
-
+  const art50 = [...new Set([...articles].filter((a) => a.startsWith("Art. 50")))];
+  const annexIII = [...articles].filter((a) => a.includes("Annex III"));
   return {
     riskTier: tier,
     articles: Array.from(articles),
     findings,
-    remediation,
-    summary,
+    remediation: buildRemediation(tier, findings, articles),
+    summary: buildSummary(tier, findings),
     applicationDates: buildApplicationDates(tier, articles),
+    duties: euAiActDuties({
+      prohibited: tier === "UNACCEPTABLE" ? findings.map((f) => ({ article: f.article, appliesFrom: prohibitionDate(f.article) })) : [],
+      annexIII: annexIII.length > 0,
+      annexIIIPoint2Only: annexIII.length > 0 && annexIII.every((a) => a.endsWith("Annex III(2)")),
+      annexI: articles.has("Art. 6(1)"),
+      art50,
+    }),
     classifiedAt: Date.now()
   };
 }
 
+function prohibitionDate(article: string): string {
+  return NEW_PROHIBITIONS.has(article) ? EU_AI_ACT_TIMELINE.newProhibitionsAndArt50_2Transition : EU_AI_ACT_TIMELINE.prohibitionsAndAiLiteracy;
+}
+
 function buildApplicationDates(tier: EuAiActRiskTier, articles: Set<string>): EuAiActApplicationDate[] {
-  if (tier === "UNACCEPTABLE") return [{ basis: "Art. 5", appliesFrom: EU_AI_ACT_TIMELINE.prohibitionsAndAiLiteracy }];
-  if (tier === "LIMITED") return [{ basis: "Art. 50", appliesFrom: EU_AI_ACT_TIMELINE.generalApplication }];
-  if (tier !== "HIGH") return [];
+  const list = [...articles];
+  if (tier === "UNACCEPTABLE") {
+    const dates: EuAiActApplicationDate[] = [];
+    if (list.some((a) => !NEW_PROHIBITIONS.has(a))) dates.push({ basis: "Art. 5", appliesFrom: EU_AI_ACT_TIMELINE.prohibitionsAndAiLiteracy });
+    if (list.some((a) => NEW_PROHIBITIONS.has(a))) dates.push({ basis: "Art. 5(1)(ba)-(bb)", appliesFrom: EU_AI_ACT_TIMELINE.newProhibitionsAndArt50_2Transition });
+    return dates;
+  }
   const dates: EuAiActApplicationDate[] = [];
-  if ([...articles].some((a) => a.includes("Annex III"))) {
+  if (list.some((a) => a.includes("Annex III"))) {
     dates.push({ basis: "Art. 6(2) + Annex III", appliesFrom: EU_AI_ACT_TIMELINE.annexIIIHighRisk });
   }
   if (articles.has("Art. 6(1)")) {
     dates.push({ basis: "Art. 6(1) + Annex I", appliesFrom: EU_AI_ACT_TIMELINE.article6_1AnnexIHighRisk });
   }
+  if (list.some((a) => a.startsWith("Art. 50"))) dates.push({ basis: "Art. 50", appliesFrom: EU_AI_ACT_TIMELINE.generalApplication });
   return dates;
 }
 
-function buildRemediation(tier: EuAiActRiskTier, findings: EuAiActFinding[]): EuAiActRemediationItem[] {
+function transparencyItems(findings: EuAiActFinding[]): EuAiActRemediationItem[] {
+  const items: EuAiActRemediationItem[] = findings.filter((f) => f.article.startsWith("Art. 50")).map((finding) => ({
+    priority: "SHORT_TERM" as const,
+    action: `Implement transparency notification required by ${finding.article}: ${finding.title}.`,
+    article: finding.article
+  }));
+  if (findings.some((f) => f.article === "Art. 50(2)" || f.article === "Art. 50(4)")) {
+    items.push({
+      priority: "MEDIUM_TERM",
+      action: "Follow the Commission's work on codes of practice for marking and labelling AI-generated content (Art. 50(7)).",
+      article: "Art. 50(7)"
+    });
+  }
+  return items;
+}
+
+function buildRemediation(tier: EuAiActRiskTier, findings: EuAiActFinding[], articles: Set<string>): EuAiActRemediationItem[] {
   const items: EuAiActRemediationItem[] = [];
 
   if (tier === "UNACCEPTABLE") {
@@ -330,11 +281,12 @@ function buildRemediation(tier: EuAiActRiskTier, findings: EuAiActFinding[]): Eu
   }
 
   if (tier === "HIGH") {
-    items.push({
-      priority: "IMMEDIATE",
-      action: "Register the AI system in the EU AI Act database (Art. 71) before deployment.",
-      article: "Art. 71"
-    });
+    const annexIII = [...articles].filter((a) => a.includes("Annex III"));
+    if (annexIII.length > 0 && annexIII.every((a) => a.endsWith("Annex III(2)"))) {
+      items.push({ priority: "IMMEDIATE", action: "Register the AI system at national level (critical infrastructure, Art. 49(5)) before deployment.", article: "Art. 49(5)" });
+    } else if (annexIII.length > 0) {
+      items.push({ priority: "IMMEDIATE", action: "Register the AI system in the EU database (Art. 49, database under Art. 71) before placing it on the market or putting it into service.", article: "Art. 49" });
+    }
     items.push({
       priority: "IMMEDIATE",
       action: "Implement risk management system (Art. 9) with documented risk assessment.",
@@ -380,24 +332,10 @@ function buildRemediation(tier: EuAiActRiskTier, findings: EuAiActFinding[]): Eu
       action: "Set up post-market monitoring system (Art. 72) with incident reporting.",
       article: "Art. 72"
     });
+    items.push(...transparencyItems(findings));
   }
 
-  if (tier === "LIMITED") {
-    for (const finding of findings) {
-      if (finding.article.startsWith("Art. 50")) {
-        items.push({
-          priority: "SHORT_TERM",
-          action: `Implement transparency notification required by ${finding.article}: ${finding.title}.`,
-          article: finding.article
-        });
-      }
-    }
-    items.push({
-      priority: "MEDIUM_TERM",
-      action: "Review voluntary Code of Conduct for GPAI models (Art. 56) if applicable.",
-      article: "Art. 56"
-    });
-  }
+  if (tier === "LIMITED") items.push(...transparencyItems(findings));
 
   if (tier === "MINIMAL") {
     items.push({
@@ -412,15 +350,16 @@ function buildRemediation(tier: EuAiActRiskTier, findings: EuAiActFinding[]): Eu
 
 function buildSummary(tier: EuAiActRiskTier, findings: EuAiActFinding[]): string {
   const count = findings.length;
+  const transparency = findings.filter((f) => f.article.startsWith("Art. 50")).length;
   switch (tier) {
     case "UNACCEPTABLE":
-      return `⛔ UNACCEPTABLE RISK: This agent uses ${count} prohibited AI practice(s) under Art. 5 of the EU AI Act. Deployment is illegal in the EU without fundamental redesign.`;
+      return `⛔ UNACCEPTABLE RISK: This agent uses ${count} prohibited AI practice(s) under Art. 5 of the EU AI Act. Placing it on the EU market or using it there is prohibited without fundamental redesign.`;
     case "HIGH":
-      return `🔴 HIGH RISK: This agent triggers ${count} high-risk classification(s) under Art. 6 + Annex III. Strict conformity obligations apply before EU deployment.`;
+      return `🔴 HIGH RISK: This agent triggers ${count - transparency} high-risk classification(s) under Art. 6${transparency > 0 ? ` and ${transparency} transparency obligation(s) under Art. 50` : ""}. Strict conformity obligations apply before EU deployment.`;
     case "LIMITED":
       return `🟡 LIMITED RISK: This agent has ${count} transparency obligation(s) under Art. 50. Disclosure notices required but no conformity assessment needed.`;
     case "MINIMAL":
-      return `🟢 MINIMAL RISK: This agent presents minimal EU AI Act risk. No mandatory requirements, but voluntary codes of conduct are recommended.`;
+      return `🟢 MINIMAL RISK: This agent presents minimal EU AI Act risk. No mandatory requirements beyond AI literacy (Art. 4), but voluntary codes of conduct are recommended.`;
   }
 }
 
@@ -536,8 +475,8 @@ export function generateEuAiActRoadmap(classification: EuAiActClassification): E
       phase: "Phase 4 — Conformity & Registration (Weeks 12-16)",
       step: 9,
       title: "EU Database Registration",
-      description: "Register the AI system in the EU AI Act database per Art. 71 before deployment or placing on market.",
-      articles: ["Art. 71"],
+      description: "Register the provider and the AI system in the EU database per Art. 49 (the database is set up under Art. 71) before placing it on the market or putting it into service. Critical infrastructure systems (Annex III point 2) are registered at national level instead (Art. 49(5)).",
+      articles: ["Art. 49"],
       estimatedWeeks: 1,
       priority: "HIGH"
     });

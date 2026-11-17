@@ -2,7 +2,8 @@
  * `amc connect hooks install|status|remove --provider codex` (P2-17), observe mode only.
  *
  * Codex 0.165.0's PreToolUse fails open (docs/source-reviews/P2-17-codex-hooks.md), so AMC installs no control hook.
- * The installer writes `.codex/hooks.json` with one PostToolUse command hook that runs AMC's forwarder
+ * The installer writes `.codex/hooks.json` with a PostToolUse command hook, and one for each session hook Codex documents
+ * (sessionObservations.ts SESSION_EVENTS, recorded leniently as Codex's own word), all running AMC's forwarder
  * (codexObserveForwarder.ts), plus the signed manifest, the dedicated observe lease and the .gitignore block the
  * other providers use. It refuses to touch a `.codex/hooks.json` it did not write. Codex runs a project hook only after
  * the user trusts it (its trusted hash), so nothing is observed until then. Claim: "observed" only.
@@ -16,10 +17,13 @@ import { writeFileAtomic } from "../../utils/fs.js";
 import { sha256Hex } from "../../utils/hash.js";
 import type { HookIntegrationStatus, HookMutationResult, InstallHookIntegrationOptions, RemoveHookIntegrationOptions } from "../hookIntegration.js";
 import { verifyManagedLease } from "../managedHookLease.js";
+import { codexLostObservationsPath } from "../codex/codexObserveForwarder.js";
+import { escapeTerminalControls } from "../../tools/builtin/askUserTool.js";
 import { stableNodePath } from "./nodePath.js";
+import { SESSION_EVENTS } from "../../bridge/sessionObservations.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, fileChange, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError, hasManagedIgnoreBlock,
-  ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeInstallationFiles, restore, snapshot, withInstallLock,
+  ignoreBlockHash, leaseManifestFields, loadSignedHookManifest, managedLeaseStatus, obtainHookLease, parseInstallOptions, relativePortable, removeDirIfEmpty, removeInstallationFiles, restore, snapshot, withInstallLock,
   type HookFileChange,
 } from "./installFiles.js";
 
@@ -32,7 +36,7 @@ import {
 export const CODEX_NEXT_STEPS: readonly string[] = Object.freeze([
   "sign in to Codex if you have not: codex login (AMC never sees or stores the sign-in)",
   "start codex in this folder and trust the folder when Codex asks",
-  "in Codex, run /hooks and trust the hook labelled \"AMC records this tool call\"",
+  "in Codex, run /hooks and trust the hooks labelled \"AMC records this tool call\" and \"AMC records this session event\"",
   "run a task in Codex; each tool call it reports is then recorded by AMC as observed"
 ]);
 
@@ -69,10 +73,21 @@ function codexPaths(workspace: string) {
     signature: `${base}.json.sig`, lock: `${base}.lock` };
 }
 
+/** Whether `.codex/hooks.json` names every session hook AMC installs (an install made before AMC observed sessions does not). */
+function sessionHooksInstalled(configPath: string): boolean {
+  try {
+    const hooks = (JSON.parse(readFileSync(configPath, "utf8")) as { hooks?: Record<string, unknown> }).hooks ?? {};
+    return SESSION_EVENTS.codex.every((event) => Object.hasOwn(hooks, event));
+  } catch {
+    return false;
+  }
+}
+
 const LIMITATIONS = [
   "observation only: Codex's PreToolUse lets a call run when its hook fails, so AMC controls no Codex call",
   "Codex runs this project hook only after you trust it in Codex; nothing is observed until then",
   "AMC records what Codex reports at PostToolUse (digests of input and output, never their contents); calls Codex does not report are not covered",
+  "AMC records Codex's session hooks (start and end, prompts as digests, turn ends, sub-agents, compaction, interrupts) as Codex's own report; a payload AMC cannot read is recorded as unreadable",
 ];
 
 /** One shell word for `$SHELL -lc`: single-quoted; a path holding a single quote or a control character is refused. */
@@ -81,17 +96,35 @@ function shellWord(value: string): string {
   return `'${value}'`;
 }
 
-/** `.codex/hooks.json` (Codex HooksFile): one PostToolUse command hook for every tool, running AMC's forwarder. */
+/**
+ * `.codex/hooks.json` (Codex HooksFile): a PostToolUse command hook for every tool and one per session hook, running AMC's
+ * forwarder. SessionEnd and Interrupt allow Codex at most 3 seconds (https://learn.chatgpt.com/docs/hooks, read 2026-11-16).
+ */
 function hooksFile(workspace: string, forwarderPath: string): Buffer {
   const command = [stableNodePath(), forwarderPath, workspace].map(shellWord).join(" ");
+  const session = Object.fromEntries(SESSION_EVENTS.codex.map((event) => [event, [{ hooks: [{ type: "command", command,
+    timeout: event === "SessionEnd" || event === "Interrupt" ? 3 : 10, statusMessage: "AMC records this session event" }] }]]));
   const file = { description: "AMC managed observation hook; written by `amc connect hooks install --provider codex`. Do not edit.",
-    hooks: { PostToolUse: [{ hooks: [{ type: "command", command, timeout: 10, statusMessage: "AMC records this tool call" }] }] } };
+    hooks: { PostToolUse: [{ hooks: [{ type: "command", command, timeout: 10, statusMessage: "AMC records this tool call" }] }], ...session } };
   return Buffer.from(`${JSON.stringify(file, null, 2)}\n`, "utf8");
 }
 
 const loadManifest = (workspace: string, paths: ReturnType<typeof codexPaths>): CodexManifest | null => loadSignedHookManifest(workspace, paths, codexManifestSchema, "Codex");
 
 const fileSha = (path: string): string | null => (existsSync(path) ? sha256Hex(readFileSync(path)) : null);
+
+/** What the hook noted it could not hand to AMC (codexObserveForwarder.ts): a count, and the latest time and reason. */
+function lostObservations(workspace: string): HookIntegrationStatus["lostObservations"] {
+  let lines: string[];
+  try { lines = readFileSync(codexLostObservationsPath(workspace), "utf8").split("\n").filter((line) => line.trim().length > 0); }
+  catch { return undefined; }
+  if (lines.length === 0) return undefined;
+  let last: { ts?: unknown; reason?: unknown } = {};
+  try { last = JSON.parse(lines.at(-1)!) as typeof last; } catch { /* a torn last line still counts */ }
+  return { count: lines.length, lastTs: typeof last.ts === "number" ? last.ts : 0,
+    // The file sits in the workspace, where the agent can write: its reason is shown escaped, on one line, bounded.
+    lastReason: typeof last.reason === "string" ? escapeTerminalControls(last.reason.replace(/\s+/g, " ").slice(0, 300)) : "unknown" };
+}
 
 function result(operation: "install" | "remove", dryRun: boolean, applied: boolean, files: HookFileChange[],
   lease: { leaseId: string | null; expiresTs: number | null }): HookMutationResult {
@@ -178,6 +211,10 @@ export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
   }
   const configOwned = manifest !== null && fileSha(paths.config) === manifest.configSha256;
   if (manifest && !configOwned) issues.push(".codex/hooks.json is missing or changed after installation");
+  if (configOwned && !sessionHooksInstalled(paths.config)) {
+    issues.push("installed without the session hooks (session start and end, prompts, sub-agents, compaction); "
+      + "run `amc connect hooks install --provider codex` again to observe whole sessions");
+  }
   const forwarderMissing = manifest !== null && !existsSync(manifest.forwarderPath);
   if (forwarderMissing) issues.push("AMC's Codex forwarder is missing; build or reinstall AMC");
   const ignoreProtected = hasManagedIgnoreBlock(existsSync(paths.ignore) ? readFileSync(paths.ignore, "utf8") : null);
@@ -185,8 +222,15 @@ export function codexHookStatus(workspaceInput: string): HookIntegrationStatus {
   const lease = managedLeaseStatus(workspace, paths.token, manifest, issues);
   const state: HookIntegrationStatus["state"] = !manifest || (!lease.valid && !lease.expired) || !ignoreProtected ? "invalid"
     : lease.expired ? "expired" : !configOwned || forwarderMissing ? "drifted" : "installed";
+  const lost = lostObservations(workspace);
+  if (lost) {
+    issues.push(`${lost.count} Codex tool call report${lost.count === 1 ? " was" : "s were"} not recorded by AMC`
+      + `${lost.lastTs > 0 ? ` (latest ${new Date(lost.lastTs).toISOString()}: ${lost.lastReason})` : ""}. `
+      + "Those calls ran in Codex but are missing from AMC's records. Check that AMC Studio is running (amc up) and that AMC is up to date.");
+  }
   return { ...base, agentId: manifest?.agentId ?? null, mode: manifest ? "observe" : null, state, configOwned, manifestValid: manifest !== null,
-    leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null, issues };
+    leaseValid: lease.valid, leaseId: lease.payload?.leaseId ?? manifest?.leaseId ?? null, expiresTs: lease.payload?.expiresTs ?? manifest?.leaseExpiresTs ?? null, issues,
+    ...(lost ? { lostObservations: lost } : {}) };
 }
 
 /** Revoke the lease, then remove AMC's own files through the deletion gate; a changed `.codex/hooks.json` is left in place. */
@@ -201,12 +245,17 @@ export function removeCodexHook(options: RemoveHookIntegrationOptions): HookMuta
     if (existsSync(paths.config) && fileSha(paths.config) !== manifest.configSha256) {
       throw new HookIntegrationError("HOOK_OWNERSHIP_CONFLICT", ".codex/hooks.json differs from the signed installation manifest");
     }
-    const targets = [paths.config, paths.token, paths.manifest, paths.signature];
+    // The hook's own note of lost reports goes with the installation; it is AMC's file under .amc/hooks/.
+    const lostNote = codexLostObservationsPath(workspace);
+    assertAllPathsSafe(workspace, [lostNote]);
+    const targets = [paths.config, paths.token, paths.manifest, paths.signature, ...(existsSync(lostNote) ? [lostNote] : [])];
     const files = targets.map((path) => fileChange(path, path === paths.token, snapshot(path), null, dryRun));
     const lease = { leaseId: manifest.leaseId, expiresTs: manifest.leaseExpiresTs };
     if (dryRun) return result("remove", true, false, files, lease);
     revokeLeaseForCli({ workspace, leaseId: manifest.leaseId, reason: "AMC Codex hook integration removed" });
     removeInstallationFiles(workspace, "hook-codex-remove", targets);
+    // Only the folder this installation created (the signed manifest says so), and only when nothing else is in it.
+    if (manifest.createdDirs.includes(".codex")) removeDirIfEmpty(dirname(paths.config));
     return result("remove", false, true, files, lease);
   };
   return dryRun ? execute() : withInstallLock(workspace, paths.lock, execute);

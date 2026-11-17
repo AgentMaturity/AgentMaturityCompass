@@ -2,7 +2,7 @@
  * `amc keys list|rotate|revoke|export-public` (P1-08, freeze exception P1-08). Rotation and revocation write signed,
  * anchored statements and lists in this workspace; they never change a verifier's pins by themselves.
  */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import type { Command } from "commander";
 import { exportPublicKey, listKeys, resumeKeyRotation, revokeKeyAsync, rotatePurposeKeys, type KeyRevocationReason } from "./purposeKeys.js";
 import { acceptAdoptedKeyset, boundProviderKey, quarantineUnboundPurposeFiles, restoreCommittedKeyset } from "./keyset.js";
@@ -16,7 +16,7 @@ import { isLocalPurpose, type LocalPurpose } from "../vault/vaultPayload.js";
 import { transitionConfigSignatureProvider } from "./configProviderTransition.js";
 import { resumeArtifactBlobAnchors } from "./artifactBlobAnchors.js";
 import { CONFIG_REL } from "./keysConfig.js";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { vaultPassphraseFromEnv } from "../vault/passphraseFile.js";
 
 function purposeOption(value: string | undefined): LocalPurpose {
@@ -83,6 +83,28 @@ export async function rotateKeysForCli(workspace: string, opts: RotateOptions): 
   });
 }
 
+/** `amc keys revoke --passport`: records the revocation here and publishes the signed list; 1 when the list was not signed. */
+async function revokePassportForCli(workspace: string, target: string, reason: string): Promise<number> {
+  assertOwnerMode(workspace, "keys revoke --passport");
+  const { passportRevokeForApi } = await import("../passport/passportApi.js");
+  const { inspectPassportArtifact } = await import("../passport/passportArtifact.js");
+  // A .amcpass file, or the id of one under .amc/passport/exports.
+  const file = target.endsWith(".amcpass") && existsSync(resolve(workspace, target)) ? resolve(workspace, target) : undefined;
+  const passportId = file === undefined ? target : inspectPassportArtifact(file).passport.passportId;
+  const out = passportRevokeForApi({ workspace, passportId, reason, ...(file === undefined ? {} : { file }) });
+  if (out === null) throw new Error(`no passport ${passportId} was exported from this workspace; pass its .amcpass file instead`);
+  console.log(`Passport ${passportId} is revoked on this machine.`);
+  if (out.signedList === null) {
+    console.error(`The signed passport revocation list was not published, so people outside this workspace cannot see it yet: ${out.signedListError}`);
+    console.error("Unlock the vault (amc vault unlock) and run this command again.");
+    return 1;
+  }
+  console.log(`Signed revocation list: ${out.signedList.path}`);
+  console.log(`List ${out.signedList.listId}, sequence ${out.signedList.sequence}, issued ${out.signedList.issuedAt}.`);
+  console.log("Share this file with the people who check your passports; amc-verify reads it with --revocation-list.");
+  return 0;
+}
+
 export function registerKeysCommands(program: Command): void {
   const keys = program.command("keys").description("Purpose signing keys: list, rotate, revoke and export public keys");
   keys.command("list")
@@ -114,11 +136,14 @@ export function registerKeysCommands(program: Command): void {
       console.log(JSON.stringify(await rotateKeysForCli(process.cwd(), opts), null, 2));
     });
   keys.command("revoke")
-    .description("Record a retired key's revocation in the workspace's signed, anchored key revocation list")
-    .requiredOption("--purpose <purpose>", "the purpose the key served")
-    .requiredOption("--key-id <id>", "64 hex key id")
-    .requiredOption("--reason <reason>", "key-compromise, superseded or unspecified")
-    .action(async (opts: { purpose: string; keyId: string; reason: string }) => {
+    .description("Record a retired key's revocation in the workspace's signed, anchored key revocation list; with --passport, a passport's revocation in the signed passport revocation list others can check")
+    .option("--purpose <purpose>", "the purpose the key served (required without --passport)")
+    .option("--key-id <id>", "64 hex key id (required without --passport)")
+    .option("--passport <id|file.amcpass>", "revoke this passport instead of a key, and publish the signed passport revocation list")
+    .requiredOption("--reason <reason>", "key-compromise, superseded or unspecified; for a passport, a short reason in words")
+    .action(async (opts: { purpose?: string; keyId?: string; passport?: string; reason: string }) => {
+      if (opts.passport !== undefined) { process.exitCode = await revokePassportForCli(process.cwd(), opts.passport, opts.reason); return; }
+      if (opts.purpose === undefined || opts.keyId === undefined) throw new Error("amc keys revoke needs --purpose and --key-id, or --passport <passportId>");
       const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase (owner):"));
       const revoked = await revokeKeyAsync(process.cwd(), purposeOption(opts.purpose), opts.keyId, opts.reason as KeyRevocationReason, passphrase);
       console.log(JSON.stringify(revoked, null, 2));

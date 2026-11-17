@@ -35,8 +35,10 @@ interface SessionState {
 
 const SPAN_KIND = { INTERNAL: 1, CLIENT: 3 } as const;
 const STATUS = { UNSET: 0, OK: 1, ERROR: 2 } as const;
+/** Token fields and their OTel semconv 1.41.0 attribute names (`gen_ai.usage.<name>`); only input and output have a `gen_ai.token.type` in 1.41.0. */
 const TOKEN_METRICS = [["inputTokens", "input_tokens"], ["outputTokens", "output_tokens"], ["cacheReadTokens", "cache_read.input_tokens"],
-  ["cacheWriteTokens", "cache_write.input_tokens"], ["reasoningTokens", "reasoning.output_tokens"]] as const;
+  ["cacheWriteTokens", "cache_creation.input_tokens"], ["reasoningTokens", "reasoning.output_tokens"]] as const;
+const TOKEN_TYPES: Partial<Record<typeof TOKEN_METRICS[number][0], string>> = { inputTokens: "input", outputTokens: "output" };
 
 function meta(event: EvidenceEvent): Record<string, unknown> {
   try { const parsed: unknown = JSON.parse(event.meta_json); return parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : {}; } catch { return {}; }
@@ -113,7 +115,7 @@ export class NativeSpanFolder {
         if (header === null) break;
         state.requests.set(event.id, { spanId: spanIdFor(event.id), parentSpanId: state.turns.get(envelope.turn ?? -1)?.spanId ?? state.segment?.spanId, name: `chat ${header.model}`, kind: SPAN_KIND.CLIENT,
           startTs: event.ts, events: [], event,
-          attributes: otelAttrs([attr("gen_ai.operation.name", "chat"), attr("gen_ai.provider.name", header.providerId), attr("gen_ai.system", header.providerId),
+          attributes: otelAttrs([attr("gen_ai.operation.name", "chat"), attr("gen_ai.provider.name", header.providerId),
             attr("gen_ai.request.model", header.model), attr("gen_ai.conversation.id", event.session_id), attr("amc.request.digest", header.requestDigest),
             attr("amc.turn", envelope.turn), attr("amc.step", envelope.step)]) });
         break;
@@ -133,9 +135,9 @@ export class NativeSpanFolder {
           ...TOKEN_METRICS.map(([field, suffix]) => attr(`gen_ai.usage.${suffix}`, classified.tokens[field]))]);
         close(open, durationMs === null ? event.ts : open.startTs + durationMs, extra, event.event_type === "request/failure" ? { code: STATUS.ERROR, message: str(failure?.code) ?? "request failed" } : { code: STATUS.OK });
         const scope = otelAttrs([attr("gen_ai.operation.name", "chat"), attr("gen_ai.provider.name", str(meta(open.event).providerId)), attr("gen_ai.request.model", str(meta(open.event).model))]);
-        for (const [field, suffix] of TOKEN_METRICS) {
-          const value = classified.tokens[field];
-          if (value !== null) out.metrics.push({ kind: "sum", name: `gen_ai.client.inference.usage.${suffix}`, unit: "{token}", value, attributes: scope });
+        for (const [field] of TOKEN_METRICS) {
+          const value = classified.tokens[field], type = TOKEN_TYPES[field];
+          if (value !== null && type) out.metrics.push({ kind: "histogram", name: "gen_ai.client.token.usage", unit: "{token}", value, attributes: [...scope, ...otelAttrs([attr("gen_ai.token.type", type)])] });
         }
         if (classified.costUsd !== null) out.metrics.push({ kind: "sum", name: "amc.request.cost.usd", unit: "USD", value: classified.costUsd, attributes: [...scope, ...otelAttrs([attr("amc.cost.basis", classified.costBasis)])] });
         if (durationMs !== null) out.metrics.push({ kind: "histogram", name: "gen_ai.client.operation.duration", unit: "s", value: durationMs / 1000, attributes: [...scope, ...otelAttrs([attr("error.type", event.event_type === "request/failure" ? str(failure?.code) ?? "failed" : null)])] });

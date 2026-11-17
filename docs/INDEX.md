@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://agentmaturity.co/og-card.png" width="900" alt="Agent Maturity Compass — Run one command. Get the full score. Fix the gaps. Evidence over claims." />
+  <img src="https://agentmaturity.co/og-card.png" width="900" alt="Agent Maturity Compass. Build an AI agent for work that gets audited. Evidence over claims." />
 </p>
 
 <p align="center">
@@ -12,11 +12,14 @@
 
 # AMC Documentation
 
+**Build an AI agent for work that gets audited.** Build, run and check AI agents for regulated work. *Evidence over claims.*
+
 Use this page to reach the shortest evidence-backed path for your task. AMC's public documentation is organized for users. Implementation plans and internal roadmaps are not promoted as product guidance, and retired guides, audit working papers and persona transcripts are kept in `docs/archive/` as historical records, not evidence.
 
 ## Start Here
 
-- **New to AMC? Type `amc` and follow along** → [Your First Five Minutes](FIRST_FIVE_MINUTES.md)
+- **New to AMC? Type `amc` and follow along** → [Your First Five Minutes](FIRST_FIVE_MINUTES.md) (it ends with a short glossary)
+- **Build an agent for your industry** → [A4 Forge](A4_FORGE.md) and [Industry Packs](DOMAIN_PACKS.md)
 - **Install AMC and get the first full score** → [Start Here](START_HERE.md)
 - **Watch Claude Code or Codex with their own sign-in** → [Sign in with Claude or ChatGPT](SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)
 - **Choose a verified installation path** → [Install](INSTALL.md)
@@ -43,16 +46,16 @@ Use this page to reach the shortest evidence-backed path for your task. AMC's pu
 | Score | Establish an evidence-weighted maturity baseline | [Getting Started](GETTING_STARTED.md) |
 | Shield | Run adversarial assurance before attackers do | [Red Teaming Guide](RED_TEAMING_GUIDE.md) |
 | Enforce | Apply runtime policy, approvals, and scoped controls | [Shield and Enforce Reference](SHIELD_ENFORCE_REFERENCE.md) |
-| Vault | Protect secrets and sign evidence | [Vault](VAULT.md) |
+| Vault | Keep a signed record of what happened | [Vault](VAULT.md) |
 | Watch | Detect drift, incidents, and evidence loss | [Continuous Monitoring](CONTINUOUS_MONITORING.md) |
 | Fleet | Govern and compare multiple agents | [Fleet](FLEET.md) |
-| Passport | Carry signed trust identity between environments | [Agent Passport](AGENT_PASSPORT.md) |
-| Comply | Map technical proof to regulatory frameworks | [Compliance](COMPLIANCE.md) |
+| Passport | Hand others a self-issued, signed summary they can check | [Agent Passport](AGENT_PASSPORT.md) |
+| Comply | Map technical evidence to regulatory frameworks (evidence of conformity, not a compliance verdict) | [Compliance](COMPLIANCE.md) |
 
 ## Industry Packs And A4 Forge
 
-- [Industry Domain Packs](DOMAIN_PACKS.md): 41 self-reported sector questionnaires whose content is experimental; free in the current source build, while the published 1.1.1 release still asks for a licence ([Pricing](PRICING.md))
-- [A4 Forge](A4_FORGE.md): a preview in the current source build only, off unless the operator sets `AMC_A4_PREVIEW=1`
+- [Industry Domain Packs](DOMAIN_PACKS.md): 41 self-reported sector questionnaires whose content is experimental, AI-drafted and not legal advice (citations checked by an AI agent on 2026-11-16, not by an expert); free in the current source build, while the published 1.1.1 release still asks for a licence ([Pricing](PRICING.md))
+- [A4 Forge](A4_FORGE.md): a preview in the current source build only, on by default (`AMC_A4_PREVIEW=0` turns it off)
 
 ## Native Agent Orchestration
 

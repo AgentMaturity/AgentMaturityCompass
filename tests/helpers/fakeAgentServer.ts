@@ -23,7 +23,7 @@ export interface StartFakeAgentOptions {
   /** When set, the server responds with this HTTP status instead of a reply. */
   failWithStatus?: number;
   /** When set, the agent answers with these tool calls and no text (`content: null`). */
-  toolCalls?: (prompt: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
+  toolCalls?: (prompt: string, requestBody: string) => Array<{ name: string; arguments: Record<string, unknown> }>;
   /**
    * Extra response headers, e.g. a forged `x-amc-request-receipt` the agent under test might send (fix3 S12), or a
    * function of the exact request and response bodies, e.g. a gateway receipt bound to this exchange (fix3 S12c).
@@ -70,7 +70,8 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
         const body = JSON.parse(requestBody || "{}") as {
           messages?: Array<{ content?: unknown }>;
         };
-        const content = body.messages?.[0]?.content;
+        // The prompt is the newest user turn; earlier turns are conversation history.
+        const content = body.messages?.at(-1)?.content;
         prompt = typeof content === "string" ? content : JSON.stringify(content ?? "");
       } catch {
         prompt = "";
@@ -81,7 +82,7 @@ export async function startFakeAgentServer(options: StartFakeAgentOptions = {}):
         ? {
             role: "assistant",
             content: null,
-            tool_calls: options.toolCalls(prompt).map((call, index) => ({
+            tool_calls: options.toolCalls(prompt, requestBody).map((call, index) => ({
               id: `call_${index}`,
               type: "function",
               function: { name: call.name, arguments: JSON.stringify(call.arguments) }
@@ -145,11 +146,16 @@ export function useFakeAgentEnv(baseUrl: string, model = "fake-model"): () => vo
  * Required for tests that use `spawnSync`: that call blocks the calling
  * process's event loop, so an in-process server could never answer the child.
  */
-export async function startFakeAgentProcess(): Promise<FakeAgentServer> {
+export async function startFakeAgentProcess(options: { toolCalls?: Array<{ name: string; arguments: Record<string, unknown> }> } = {}): Promise<FakeAgentServer> {
   const { spawn } = await import("node:child_process");
+  // With toolCalls the agent answers every prompt with those calls and no text.
+  const message = options.toolCalls
+    ? { role: "assistant", content: null, tool_calls: options.toolCalls.map((call, index) => ({ id: `call_${index}`, type: "function",
+        function: { name: call.name, arguments: JSON.stringify(call.arguments) } })) }
+    : { role: "assistant", content: compliantReply() };
   const script = `
 const http = require("node:http");
-const reply = ${JSON.stringify(compliantReply())};
+const message = ${JSON.stringify(message)};
 const server = http.createServer((req, res) => {
   const chunks = [];
   req.on("data", (c) => chunks.push(c));
@@ -158,7 +164,7 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify({
       id: "fake-completion",
       model: "fake-model",
-      choices: [{ index: 0, message: { role: "assistant", content: reply }, finish_reason: "stop" }],
+      choices: [{ index: 0, message, finish_reason: message.tool_calls ? "tool_calls" : "stop" }],
       usage: { prompt_tokens: 10, completion_tokens: 20 }
     }));
   });

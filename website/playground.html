@@ -2,20 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AMC Playground | Score and stress-test an AI agent</title>
-  <meta name="description" content="Use AMC's local browser lab to score an AI agent, test adversarial responses, and preview the assurance-pack catalog without creating an account.">
+  <title>AMC Playground | Try scoring an AI agent in your browser</title>
+  <meta name="description" content="A browser lab for a quick, self-reported agent maturity score, attack scenarios and a preview of the assurance-pack catalog. Nothing to install, no account.">
   <meta name="theme-color" content="#0a0a0a">
   <link rel="canonical" href="https://agentmaturity.co/playground.html">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="AMC Playground | Score and stress-test an AI agent">
-  <meta property="og:description" content="A local browser lab for a quick agent maturity score, adversarial scenarios, and assurance-pack previews.">
+  <meta property="og:title" content="AMC Playground | Try scoring an AI agent in your browser">
+  <meta property="og:description" content="A browser lab for a quick, self-reported agent maturity score, attack scenarios and assurance-pack previews.">
   <meta property="og:url" content="https://agentmaturity.co/playground.html">
   <meta property="og:image" content="https://agentmaturity.co/og-card.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-family='monospace' font-size='18' font-weight='700'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="playground.css?v=20260710a">
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <link rel="stylesheet" href="playground.css?v=20261115">
   <script defer data-domain="agentmaturity.co" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
@@ -24,28 +28,47 @@
   <div class="tour-overlay" id="tourOverlay" aria-hidden="true"></div>
   <div class="tour-tooltip" id="tourTooltip" role="dialog" aria-modal="true" aria-live="polite" tabindex="-1" hidden></div>
 
-  <header class="playground-topbar">
-    <div class="playground-topbar-inner">
-      <div class="playground-identity">
-        <a href="./" class="playground-wordmark" aria-label="Agent Maturity Compass home">amc<span class="brand-cursor">_</span><span class="surface-name">playground</span></a>
-        <span class="playground-tagline">Evidence over claims.</span>
-      </div>
-      <div class="playground-tools">
-        <div id="langSwitcherPlayground"></div>
-        <div class="playground-actions">
-          <button type="button" class="utility-btn" id="tourTrigger" onclick="startTour(this)" data-i18n="btnTakeTour">Tour</button>
-          <button type="button" class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Switch to light theme" aria-pressed="false"><span class="theme-glyph" aria-hidden="true">◐</span><span class="theme-label">Light</span></button>
-          <a href="docs/index.html" class="topbar-link">Docs</a>
-        </div>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
       </div>
     </div>
-  </header>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-  <main id="main-content" class="playground-main">
+
+  <main id="main-content" class="playground-main" tabindex="-1">
+    <div class="playground-tools" aria-label="Playground settings">
+      <div id="langSwitcherPlayground"></div>
+      <button type="button" class="utility-btn" id="tourTrigger" onclick="startTour(this)" data-i18n="btnTakeTour">Tour</button>
+    </div>
     <section class="playground-intro" aria-labelledby="playground-title">
       <p class="eyebrow">Local browser lab</p>
       <h1 id="playground-title" data-i18n="playgroundTitle">AMC Playground</h1>
-      <p class="subtitle">Score an AI agent with 15 guided questions, test 33 adversarial scenarios, and browse a curated browser preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs. No account or install required.</p>
+      <p class="subtitle">Score an AI agent with 15 guided questions, test 33 adversarial scenarios, and browse a curated browser preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs. No account or install required. You give the answers, so the score is self-reported.</p>
     </section>
 
     <section class="live-demo-panel" aria-labelledby="live-demo-title">
@@ -116,7 +139,7 @@
 
     <div class="tab-panel" id="panel-packs" role="tabpanel" aria-labelledby="tab-packs">
       <p class="dim-desc pack-summary">
-        Browse a curated preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs. These summaries help you find the right test lane; run the CLI pack to produce evidence.
+        Browse a curated preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs. These summaries help you find the right test lane; run the CLI pack to produce evidence.
       </p>
       <label class="sr-only" for="packSearch">Search assurance-pack previews</label>
       <input type="search" class="pack-search" id="packSearch" aria-label="Search assurance-pack previews" placeholder="Search previews by risk, regulation, or pack name" oninput="filterPacks()">
@@ -126,16 +149,20 @@
     </div>
   </main>
 
-  <footer class="playground-footer">
-    <div class="playground-footer-inner">
-      <p>Agent Maturity Compass · Local browser lab · Evidence over claims.<br>This page counts visits with Plausible Analytics, loaded from plausible.io: it sends the page address, the referrer, scroll depth and time on page, and sets no cookies.</p>
-      <nav class="footer-links" aria-label="Playground footer">
-        <a href="./">Home</a>
-        <a href="docs/index.html">Docs</a>
-        <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
-      </nav>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+      <p class="footer-copy footer-note">This page counts visits with Plausible Analytics, loaded from plausible.io: it sends the page address, the referrer, scroll depth and time on page, and sets no cookies.</p>
     </div>
   </footer>
+
 
 <script>
 /* ═══════════════════════════════════════════
@@ -181,7 +208,7 @@ const QUESTIONS = [
     levels: ['No human oversight', 'Ad-hoc oversight', 'Defined escalation rules', 'Measured escalation effectiveness', 'Autonomous oversight with human ratification'] },
   { id: 'SO-03', dim: 'Strategic Agent Ops', text: 'Are all agent decisions logged with audit trails?',
     eli5: '💡 Can you go back and see exactly what the AI did and why?',
-    levels: ['No logging', 'Console output only', 'Structured logs', 'Queryable audit trail', 'Immutable cryptographic audit log'] },
+    levels: ['No logging', 'Console output only', 'Structured logs', 'Queryable audit trail', 'Signed, linked audit log anchored outside the system'] },
   { id: 'SK-01', dim: 'Skills', text: 'How does the agent handle prompt injection attempts?',
     eli5: '💡 If someone tries to trick the AI into doing something bad, can it resist?',
     levels: ['No injection defense', 'Basic input filtering', 'Documented defenses', 'Active injection detection + blocking', 'Adversarial-tested + auto-updating defenses'] },
@@ -815,7 +842,7 @@ const PACKS = [
   { id: 'gdpr-soc', title: 'GDPR & SOC 2', cat: 'compliance', desc: 'Tests data protection compliance (GDPR) and SOC 2 trust service criteria.', scenarios: ['Data minimization', 'Right to erasure', 'Access controls', 'Audit logging'] },
   { id: 'nist-rmf', title: 'NIST AI RMF', cat: 'compliance', desc: 'Validates alignment with NIST AI Risk Management Framework categories.', scenarios: ['Risk identification', 'Impact assessment', 'Mitigation planning', 'Monitoring'] },
   { id: 'iso-42005', title: 'ISO 42005', cat: 'compliance', desc: 'Tests conformance with ISO 42005 AI management system requirements.', scenarios: ['Management commitment', 'Resource allocation', 'Performance evaluation'] },
-  { id: 'owasp-genai', title: 'OWASP GenAI Top 10', cat: 'compliance', desc: 'Maps to OWASP Generative AI Top 10 risks — injection, data leakage, insecure plugins.', scenarios: ['LLM01 Injection', 'LLM02 Data Leakage', 'LLM03 Insecure Plugins', 'LLM06 Sensitive Info'] },
+  { id: 'owasp-genai', title: 'OWASP Top 10 for LLM Applications (2025)', cat: 'compliance', desc: 'Maps tests to the 2025 OWASP list: prompt injection, information disclosure, excessive agency and more. A mapping, not a test result.', scenarios: ['LLM01:2025 Prompt Injection', 'LLM02:2025 Sensitive Information Disclosure', 'LLM06:2025 Excessive Agency', 'LLM07:2025 System Prompt Leakage'] },
   { id: 'global-ai-regulatory', title: 'Global AI Regulatory', cat: 'compliance', desc: 'Cross-jurisdiction compliance — EU, US, UK, China, Brazil AI governance requirements.', scenarios: ['Multi-jurisdiction mapping', 'Regulatory conflict resolution', 'Reporting requirements'] },
   { id: 'healthcare-phi', title: 'Healthcare (PHI/HIPAA)', cat: 'compliance', desc: 'Tests protection of Protected Health Information under HIPAA requirements.', scenarios: ['PHI detection', 'Minimum necessary', 'Breach notification'] },
   { id: 'financial-model-risk', title: 'Financial Model Risk', cat: 'compliance', desc: 'SR 11-7 model risk management for AI systems in financial services.', scenarios: ['Model validation', 'Risk appetite alignment', 'Explainability'] },
@@ -963,32 +990,8 @@ renderPacks();
 /* ═══════════════════════════════════════════
    THEME & TOUR
    ═══════════════════════════════════════════ */
-function toggleTheme() {
-  const isClean = document.body.classList.toggle('clean-theme');
-  updateThemeControl(isClean);
-  try { localStorage.setItem('amc-theme', isClean ? 'clean' : 'terminal'); } catch(e) {}
-  updateScore();
-}
-
-function updateThemeControl(isLight) {
-  const themeToggle = document.getElementById('themeToggle');
-  themeToggle.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
-  themeToggle.setAttribute('aria-pressed', String(isLight));
-  themeToggle.querySelector('.theme-label').textContent = isLight ? 'Dark' : 'Light';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', isLight ? '#ffffff' : '#0a0a0a');
-}
-
-(function initTheme() {
-  let isClean = false;
-  try {
-    const saved = localStorage.getItem('amc-theme');
-    if (saved === 'clean') {
-      document.body.classList.add('clean-theme');
-      isClean = true;
-    }
-  } catch(e) {}
-  updateThemeControl(isClean);
-})();
+// The site is dark only, like the home page. An older visit may have saved the light theme; forget it.
+try { localStorage.removeItem('amc-theme'); } catch(e) {}
 
 /* Keyboard nav */
 document.getElementById('questions').addEventListener('keydown', function(e) {
@@ -1057,7 +1060,7 @@ function showTourStep() {
 
 function tourNext() { tourStep++; showTourStep(); }
 function tourPrev() { if (tourStep > 0) { tourStep--; showTourStep(); } }
-function endTour() {
+function endTour(returnFocus = true) {
   tourActive = false;
   const overlay = document.getElementById('tourOverlay');
   overlay.classList.remove('active');
@@ -1065,7 +1068,7 @@ function endTour() {
   document.getElementById('tourTooltip').hidden = true;
   if (prevHighlight) { prevHighlight.classList.remove('tour-highlight'); prevHighlight = null; }
   try { localStorage.setItem('amc-tour-done', '1'); } catch(e) {}
-  tourTrigger?.focus();
+  if (returnFocus) tourTrigger?.focus();
 }
 
 document.addEventListener('keydown', (e) => {
@@ -1087,7 +1090,14 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-document.getElementById('tourOverlay').addEventListener('click', endTour);
+// The dimmed overlay never swallows a click: a click anywhere outside the tour box ends the tour and still reaches
+// the button or link under it.
+document.addEventListener('click', (e) => {
+  if (!tourActive) return;
+  const tooltip = document.getElementById('tourTooltip');
+  if (tooltip.contains(e.target) || (tourTrigger && tourTrigger.contains(e.target))) return;
+  endTour(false);
+}, true);
 </script>
 <script src="i18n.js"></script>
 <script>
@@ -1097,6 +1107,8 @@ if (typeof AMC_I18N !== 'undefined') {
   AMC_I18N.setLang(AMC_I18N.getLang());
 }
 </script>
+<script src="script.js?v=14"></script>
+<script src="home.js?v=3"></script>
 <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
 </body>
 </html>

@@ -79,7 +79,9 @@ describe("native session span folder", () => {
     expect(spans[0]!.traceId).toBe(traceIdFor(sessionId));
     // Stub zeros are synthetic: never exported as observed tokens or cost (the fabrication rule).
     expect(spans.flatMap((span) => span.attributes).some((a) => a.key.startsWith("gen_ai.usage.") || a.key === "amc.cost.usd")).toBe(false);
-    expect(metrics.filter((point) => point.name.startsWith("gen_ai.client.inference.usage") || point.name === "amc.request.cost.usd")).toHaveLength(0);
+    expect(metrics.filter((point) => point.name === "gen_ai.client.token.usage" || point.name === "amc.request.cost.usd")).toHaveLength(0);
+    // One declared vocabulary (semconv 1.41.0): the deprecated gen_ai.system is not sent.
+    for (const chat of chats) { expect(attrOf(chat, "gen_ai.system")).toBeUndefined(); expect(attrOf(chat, "gen_ai.provider.name")).toBeDefined(); }
     expect(metrics.filter((point) => point.name === "gen_ai.client.operation.duration")).toHaveLength(chats.length);
     expect(metrics.filter((point) => point.name === "amc.tool.duration")).toHaveLength(1);
     // Mutation check: a non-native row is never folded.
@@ -158,6 +160,7 @@ describe("exporter metrics and env", () => {
     expect(sum.sum.dataPoints[0].startTimeUnixNano).toBeDefined();
     const histogram = list.find((m) => m.name === "gen_ai.client.operation.duration")!;
     expect(histogram.histogram.dataPoints[0].count).toBe(1);
+    expect((metrics as unknown as { resourceMetrics: Array<{ schemaUrl: string }> }).resourceMetrics[0]!.schemaUrl).toBe("https://opentelemetry.io/schemas/1.41.0");
     expect(histogram.histogram.dataPoints[0].bucketCounts.reduce((a: number, b: number) => a + b, 0)).toBe(1);
     expect(histogram.histogram.dataPoints[0].explicitBounds.length + 1).toBe(histogram.histogram.dataPoints[0].bucketCounts.length);
   });
@@ -210,7 +213,7 @@ describe("end to end: a stub run exports a GenAI trace to a loopback OTLP collec
     expect(metricsBodies.length).toBeGreaterThan(0);
     const metricNames = metricsBodies.flatMap((r) => ((r.body as any).resourceMetrics[0].scopeMetrics[0].metrics as Array<{ name: string }>).map((m) => m.name));
     expect(metricNames).toContain("gen_ai.client.operation.duration");
-    expect(metricNames.some((name) => name.startsWith("gen_ai.client.inference.usage")), "stub usage is synthetic: no token sums").toBe(false);
+    expect(metricNames.some((name) => name === "gen_ai.client.token.usage"), "stub usage is synthetic: no token counts").toBe(false);
 
     // otel-preview prints the same span tree offline and never the header value or the endpoint's full URL.
     const program = new Command();
@@ -266,6 +269,15 @@ describe("flush and buffers", () => {
     // Both drops are known when the exit flush returns: its own (no budget left) and the earlier flush's timeout.
     expect(takeDroppedTelemetry()).toBe(2);
     await closing;
+  });
+
+  it("buckets token usage with the GenAI convention's token bounds, not the duration bounds", () => {
+    const exporter = new ObservabilityOTELExporter({ enabled: false, targets: [{ kind: "otlp", endpoint: "http://127.0.0.1:4318" }] });
+    exporter.recordMetricPoint({ kind: "histogram", name: "gen_ai.client.token.usage", unit: "{token}", value: 100, attributes: [{ key: "gen_ai.token.type", value: { stringValue: "input" } }] });
+    const list = (exporter.previewRequests().find((r) => r.signal === "metrics")!.payload as any).resourceMetrics[0].scopeMetrics[0].metrics as Array<Record<string, any>>;
+    const point = list.find((m) => m.name === "gen_ai.client.token.usage")!.histogram.dataPoints[0];
+    expect(point.explicitBounds.slice(0, 5)).toEqual([1, 4, 16, 64, 256]);
+    expect(point.bucketCounts[4]).toBe(1); // 64 < 100 <= 256
   });
 
   it("keeps one metric stream per workspace scope, so a point recorded for workspace B never merges into A's stream", () => {

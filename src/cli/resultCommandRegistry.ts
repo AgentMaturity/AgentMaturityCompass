@@ -101,7 +101,8 @@ export const RESULT_COMMANDS: readonly ResultCommand[] = [
   self("fleet score", "fleet:score"),
   self("fleet report", "fleet:report"),
   self("fleet overview", "fleet:health"),
-  self("fleet status", "fleet:health"),
+  // The inventory and freeze options print facts and an action, not a health result.
+  self("fleet status", "fleet:health", (o) => !o.inventory && !o.csv && o.freeze === undefined),
   self("fleet health", "fleet:health"),
   self("fleet trust-report", "fleet:trust-composition"),
   self("fleet slo status", "fleet:health"),
@@ -297,6 +298,7 @@ export const NON_RESULT_COMMANDS: readonly NonResultCommand[] = [
   non("fp-submit", "files a false-positive report"),
   non("identity init", "creates the host identity configuration"),
   non("identity workload-trust", GROUP),
+  non("keys revoke", "writes a key or passport revocation to a signed revocation list; no result is evaluated"),
   non("leaderboard", GROUP),
   non("lint", "lints configuration files for schema errors; no maturity or compliance result"),
   non("mcp sign", "writes the workspace signature for a reviewed project MCP config digest"),

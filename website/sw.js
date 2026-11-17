@@ -1,10 +1,15 @@
 /* AMC Service Worker — fresh release shells online, offline fallback for cached assets */
-const CACHE_NAME = 'amc-v9';
+const CACHE_NAME = 'amc-v10';
 const STATIC_ASSETS = [
   'style.css',
   'particles.js',
   'i18n.js',
-  'manifest.json'
+  'manifest.json',
+  'favicon.ico',
+  'favicon-32.png',
+  'apple-touch-icon.png',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

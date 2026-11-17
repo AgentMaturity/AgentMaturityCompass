@@ -223,10 +223,11 @@ describe("amc up in a terminal with a vault that already exists", () => {
 
   it("asks whether to remember a passphrase the operator entered", async () => {
     seam.vaultExists = false;
-    seam.answers = { choice: "custom", customPass: "my-own-passphrase", rememberChoice: false };
+    seam.answers = { choice: "custom", value: "my-own-passphrase", rememberChoice: false };
     logged();
     await ensureUpVaultPassphrase("/nonexistent/amc-up-ws", true);
-    expect(seam.asked.map((question) => question.name)).toEqual(["choice", "customPass", "rememberChoice"]);
+    // CLI-07: the passphrase is asked twice (entry and repeat) before anything is created.
+    expect(seam.asked.map((question) => question.name)).toEqual(["choice", "value", "value", "rememberChoice"]);
     expect(seam.events).not.toContain("store");
   });
 });

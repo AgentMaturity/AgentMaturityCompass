@@ -4,7 +4,7 @@
  * Package integrity and per-case results: qualification/2026-10-12-P1-22/pi-conformance.json. Add a version only with a
  * passing conformance receipt for it.
  */
-export const QUALIFIED_PI_VERSIONS: readonly string[] = ["1.0.2", "1.0.4"];
+export const QUALIFIED_PI_VERSIONS: readonly string[] = ["1.0.2", "1.0.4", "1.5.2"];
 
 /** What AMC's Pi extension sends when it cannot read Pi's version. */
 export const UNKNOWN_PI_VERSION = "unknown";

@@ -15,7 +15,7 @@ import { serveDashboard } from "./dashboard/serve.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { pathExists, readUtf8 } from "./utils/fs.js";
 import { runAttackPlugins, listAttackPlugins, renderAttackPluginReport } from "./redteam/attackPlugins.js";
-import { runRedTeam, renderRedTeamMarkdown, listStrategies } from "./redteam/index.js";
+import { runRedTeam, renderRedTeamMarkdown, listStrategies, redTeamExtras, withRedTeamExtras, type RedTeamExtraOptions } from "./redteam/index.js";
 import { registerTransparencyReportCommands } from "./transparency/transparencyReportCli.js";
 import { registerMcpCommands } from "./mcp/mcpCli.js";
 import { registerLintCommands } from "./lint/lintCli.js";
@@ -422,7 +422,7 @@ export function registerLateStageCliCommands({
     .command("redteam")
     .description("Run red-team attack simulations against a target agent");
 
-  redteamCmd
+  withRedTeamExtras(redteamCmd
     .command("run [agentId]")
     .description("Execute red-team plugins with chosen attack strategies and generate a vulnerability report")
     .option("--plugins <ids...>", "Assurance-pack IDs to run as attack plugins (default: all)")
@@ -432,8 +432,8 @@ export function registerLateStageCliCommands({
     .option("--evil-mcp", "Also run built-in Evil MCP agent-provider attack scenarios")
     .option("--mcp-attacks <categories...>", "MCP attack categories for --evil-mcp (default: all; aliases: tool_poison, data_exfil, priv_esc, prompt_inject)")
     .option("--model <modelId>", "model id of the agent under attack (or set AMC_ASSURANCE_MODEL)")
-    .option("--json", "Print JSON report to stdout")
-    .action(async (agentId: string | undefined, opts: {
+    .option("--json", "Print JSON report to stdout"))
+    .action(async (agentId: string | undefined, opts: RedTeamExtraOptions & {
       plugins?: string[];
       strategies?: string[];
       output?: string;
@@ -455,7 +455,7 @@ export function registerLateStageCliCommands({
           output: opts.output,
           noSign: opts.sign === false,
           evilMcp: opts.evilMcp,
-          mcpAttackCategories: opts.mcpAttacks,
+          mcpAttackCategories: opts.mcpAttacks, ...redTeamExtras(opts, workspace),
         });
       } catch (error) {
         // Fail closed: reporting "no vulnerabilities" without attacking
@@ -1136,8 +1136,8 @@ export function registerLateStageCliCommands({
 
   watch
     .command("connect")
-    .description("Connect to an observability provider (langfuse, helicone, otlp, datadog, webhook)")
-    .requiredOption("--provider <provider>", "Provider type: otlp | langfuse | helicone | datadog | webhook")
+    .description("Poll an observability backend for traces (trace-query, langfuse, helicone, datadog, webhook); to receive OTLP from an agent, see amc connect --print-env --runtime")
+    .requiredOption("--provider <provider>", "Provider type: trace-query (a tracing backend's query API, Jaeger-compatible; old name: otlp) | langfuse | helicone | datadog | webhook")
     .requiredOption("--endpoint <url>", "Provider API endpoint URL")
     .option("--api-key <key>", "API key for authentication (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)").option("--secret-key-file <path>", "Langfuse: read the secret key from this private file (or set AMC_WATCH_SECRET_KEY)")
     .option("--poll-interval <ms>", "Poll interval in milliseconds", "10000")
@@ -1176,14 +1176,14 @@ export function registerLateStageCliCommands({
     .action(async (opts: { agent?: string }) => {
       console.log(chalk.cyan("Watch Providers"));
       console.log(chalk.gray("Use `amc watch connect` to connect an observability provider."));
-      console.log(chalk.gray("Supported: otlp, langfuse, helicone, datadog, webhook"));
+      console.log(chalk.gray("Supported: trace-query (old name: otlp), langfuse, helicone, datadog, webhook"));
     });
 
   monitor
     .command("live")
     .description("Start real-time monitoring with live assurance checks on incoming traces")
     .option("--agent <agentId>", "Agent ID")
-    .option("--provider <provider>", "Observability provider", "otlp")
+    .option("--provider <provider>", "Observability provider", "trace-query")
     .option("--endpoint <url>", "Provider endpoint")
     .option("--api-key <key>", "Provider API key (visible in ps; prefer --api-key-file)").option("--api-key-file <path>", "read the API key from this private file (or set AMC_WATCH_API_KEY)").option("--secret-key-file <path>", "Langfuse: read the secret key from this private file (or set AMC_WATCH_SECRET_KEY)")
     .option("--budget <usd>", "Cost budget in USD", "100")
@@ -1198,10 +1198,10 @@ export function registerLateStageCliCommands({
         workspace: process.cwd(),
         agentId,
         providers: opts.endpoint ? [{
-          provider: (opts.provider ?? "otlp") as any,
+          provider: (opts.provider ?? "trace-query") as any,
           endpoint: opts.endpoint,
           apiKey: watchApiKey(opts),
-          headers: watchSecretHeaders({ ...opts, provider: opts.provider ?? "otlp" }),
+          headers: watchSecretHeaders({ ...opts, provider: opts.provider ?? "trace-query" }),
         }] : [],
       });
 

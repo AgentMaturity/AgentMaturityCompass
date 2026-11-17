@@ -19,7 +19,7 @@ import { listContainedDir, readContained, readContainedOrNull } from "../utils/c
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import {
-  encryptedVaultBytes, forgetVaultEnvelope, getVaultPurposeKeyPem, keyIdsOf, markWrittenHistories, purposeKeyPaths, unlockVault, vaultEnvelopeKeyIds,
+  currentVaultIterations, encryptedVaultBytes, forgetVaultEnvelope, getVaultPurposeKeyPem, keyIdsOf, markWrittenHistories, purposeKeyPaths, unlockVault, vaultEnvelopeKeyIds,
   unlockedPayloadForKeyChange, vaultMetaBytes, vaultPaths, type VaultKeyKind
 } from "../vault/vault.js";
 import {
@@ -321,7 +321,7 @@ function resignedKeyRevocations(workspace: string, after: VaultPayloadV2): { wri
 function rotationWrites(workspace: string, before: VaultPayloadV2, after: VaultPayloadV2, targets: ReadonlySet<LocalPurpose>, compromised: ReadonlySet<string>, passphrase: string): KeysetWrite[] {
   const paths = vaultPaths(workspace);
   const writes: KeysetWrite[] = [
-    { path: paths.vaultFile, bytes: encryptedVaultBytes(after, passphrase), mode: 0o600 },
+    { path: paths.vaultFile, bytes: encryptedVaultBytes(after, passphrase, currentVaultIterations(workspace)), mode: 0o600 },
     { path: paths.metaFile, bytes: vaultMetaBytes(after), mode: 0o644 }
   ];
   const pem = (payload: VaultPayloadV2, purpose: LocalPurpose) => publicKeyFromPrivate(payload.keys[purpose]!.privateKeyPem);

@@ -3,11 +3,12 @@
  * forwarder posts what Codex reports to the Bridge's Codex route, which records digests only and claims "observed".
  * No Codex binary runs here (pending): payloads follow Codex's own post-tool-use input schema at the pin.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { CODEX_FORWARD_PATH, forwardCodexObservation } from "../src/adapters/codex/codexObserveForwarder.js";
+import { CODEX_FORWARD_PATH, codexLostObservationsPath, forwardCodexObservation, runCodexObserveForwarder } from "../src/adapters/codex/codexObserveForwarder.js";
+import { inspectHookHealth } from "../src/watch/hookHealthDiagnostics.js";
 import { codexActionId } from "../src/adapters/codex/codexIdentity.js";
 import { registerHookIntegrationCommands } from "../src/adapters/hookIntegrationCli.js";
 import { getHookIntegrationStatus, installHookIntegration, removeHookIntegration } from "../src/adapters/hookIntegration.js";
@@ -18,6 +19,8 @@ import { handleHookControlRequest } from "../src/bridge/hookControlRoute.js";
 import { HookControlError } from "../src/bridge/hookProviders.js";
 import { revokeLeaseForCli } from "../src/leases/leaseCli.js";
 import { openLedger } from "../src/ledger/ledger.js";
+import { signFileWithAuditor } from "../src/org/orgSigner.js";
+import { sha256Hex } from "../src/utils/hash.js";
 import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
 
 const agentId = "codex-observed";
@@ -70,16 +73,37 @@ describe("Codex hook CLI output", () => {
 });
 
 describe("Codex observe installation", () => {
-  test("install writes one PostToolUse command hook running AMC's forwarder, with single-quoted paths", () => {
+  test("install writes a PostToolUse and the session command hooks running AMC's forwarder, with single-quoted paths", () => {
     const workspace = controlledWorkspace(agentId);
     const result = installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
     expect(result).toMatchObject({ applied: true, provider: "codex", mode: "observe" });
     const file = JSON.parse(readFileSync(join(workspace, ".codex", "hooks.json"), "utf8")) as { hooks: Record<string, Array<{ hooks: Array<Record<string, unknown>> }>> };
-    expect(Object.keys(file.hooks)).toEqual(["PostToolUse"]);
+    // PostToolUse plus every session hook Codex documents (whole-session observation; never blocks).
+    expect(Object.keys(file.hooks)).toEqual(["PostToolUse", "SessionStart", "SessionEnd", "UserPromptSubmit", "Stop", "SubagentStart", "SubagentStop", "PreCompact",
+      "PostCompact", "Interrupt"]);
+    expect(file.hooks.SessionEnd![0]!.hooks[0]!.timeout).toBe(3);
     const handler = file.hooks.PostToolUse![0]!.hooks[0]!;
     expect(handler).toMatchObject({ type: "command", timeout: 10 });
     expect(handler.command).toMatch(/^'[^']+node[^']*' '[^']+codexObserveForwarder\.js' '[^']+'$/);
     expect(getHookIntegrationStatus({ workspace, provider: "codex" }).state).toBe("installed");
+  });
+
+  test("an install made before session hooks says to reinstall, and a reinstall adds them", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    // The earlier shape: PostToolUse only, in hooks.json and in the signed manifest's digest of it.
+    const configPath = join(workspace, ".codex", "hooks.json");
+    const manifestPath = join(workspace, ".amc", "hooks", "codex.json");
+    const file = JSON.parse(readFileSync(configPath, "utf8")) as { hooks: Record<string, unknown> };
+    const earlier = `${JSON.stringify({ ...file, hooks: { PostToolUse: file.hooks.PostToolUse } }, null, 2)}\n`;
+    writeFileSync(configPath, earlier);
+    writeFileSync(manifestPath, JSON.stringify({ ...JSON.parse(readFileSync(manifestPath, "utf8")), configSha256: sha256Hex(Buffer.from(earlier, "utf8")) }));
+    signFileWithAuditor(workspace, manifestPath);
+    const status = getHookIntegrationStatus({ workspace, provider: "codex" });
+    expect(status.state).toBe("installed");
+    expect(status.issues.join("\n")).toContain("amc connect hooks install --provider codex");
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    expect(getHookIntegrationStatus({ workspace, provider: "codex" }).issues).toEqual([]);
   });
 
   test("control mode is refused: Codex's PreToolUse fails open", () => {
@@ -95,12 +119,32 @@ describe("Codex observe installation", () => {
     expect(readFileSync(join(workspace, ".codex", "hooks.json"), "utf8")).toBe("{\"hooks\":{}}\n");
   });
 
-  test("remove revokes the lease and removes AMC's hook file", () => {
+  test("remove revokes the lease and removes AMC's hook file, and the .codex folder only when AMC made it and it is empty", () => {
     const workspace = controlledWorkspace(agentId);
     installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
     expect(removeHookIntegration({ workspace, provider: "codex" }).applied).toBe(true);
     expect(existsSync(join(workspace, ".codex", "hooks.json"))).toBe(false);
+    expect(existsSync(join(workspace, ".codex"))).toBe(false);
     expect(getHookIntegrationStatus({ workspace, provider: "codex" }).state).toBe("not-installed");
+    // A folder AMC made but that now holds the person's own file stays, and so does a folder that was there before.
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    writeFileSync(join(workspace, ".codex", "config.toml"), "# mine\n");
+    removeHookIntegration({ workspace, provider: "codex" });
+    expect(readFileSync(join(workspace, ".codex", "config.toml"), "utf8")).toBe("# mine\n");
+    rmSync(join(workspace, ".codex", "config.toml"));
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    removeHookIntegration({ workspace, provider: "codex" });
+    expect(existsSync(join(workspace, ".codex"))).toBe(true);
+  });
+
+  test("health accepts codex and counts its observations", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe" });
+    expect(inspectHookHealth({ workspace, provider: "codex" })).toMatchObject({ provider: "codex", status: "awaiting_first_event" });
+    recordCodexPostToolUse({ workspace, authenticatedAgentId: agentId, rawInput: JSON.stringify(report()) });
+    const health = inspectHookHealth({ workspace, provider: "codex" });
+    expect(health.evidence.eventCount).toBe(1);
+    expect(health.evidence.lastEvent?.actionId).toBe(codexActionId("codex-session", "call-1"));
   });
 
   test("the hook control route never accepts Codex", () => {
@@ -129,11 +173,20 @@ describe("Codex observations", () => {
       .toThrow(/conflicts/);
   });
 
+  // These two were refused before: a field or mode a newer Codex adds must not lose the observation (H-08).
   test.each([
-    ["an unknown field", report({ extra: 1 })],
+    ["an unknown extra field", report({ extra: 1, tool_use_id: "call-extra" })],
+    ["a permission mode AMC does not know yet", report({ permission_mode: "autoReview", tool_use_id: "call-mode" })],
+  ])("a report with %s is recorded", (_label, body) => {
+    const workspace = controlledWorkspace(agentId);
+    expect(recordCodexPostToolUse({ workspace, authenticatedAgentId: agentId, rawInput: JSON.stringify(body) }).idempotentReplay).toBe(false);
+    expect(Object.keys(ledgerRow(workspace, "cxpost_") ?? {})).not.toContain("extra");
+  });
+
+  test.each([
     ["another event", report({ hook_event_name: "PreToolUse" })],
     ["a missing tool_use_id", (({ tool_use_id: _omit, ...rest }) => rest)(report())],
-    ["an unknown permission mode", report({ permission_mode: "yolo" })],
+    ["a permission mode that is not a word", report({ permission_mode: "\u001b[2J" })],
   ])("a report with %s is refused", (_label, body) => {
     const workspace = controlledWorkspace(agentId);
     expect(() => recordCodexPostToolUse({ workspace, authenticatedAgentId: agentId, rawInput: JSON.stringify(body) })).toThrow(/does not match its schema/);
@@ -148,10 +201,34 @@ describe("Codex observations", () => {
       installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe", bridgeBase: `http://127.0.0.1:${port}` });
       await forwardCodexObservation(workspace, JSON.stringify(report({ tool_use_id: "call-forwarded" })));
       expect(ledgerRow(workspace, "cxpost_")).toMatchObject({ toolUseId: "call-forwarded", leaseId: expect.stringMatching(/./) });
-      await expect(forwardCodexObservation(workspace, JSON.stringify(report({ extra: 1 })))).rejects.toThrow(/HTTP 400/);
+      const missing = JSON.stringify((({ tool_use_id: _omit, ...rest }) => rest)(report()));
+      await expect(forwardCodexObservation(workspace, missing)).rejects.toThrow(/HTTP 400/);
+      // The hook run itself: exit 1 with a line on stderr and a lost-report note that status and health show (H-08).
+      const stderr: string[] = [];
+      expect(await runCodexObserveForwarder(workspace, async () => missing, (text) => stderr.push(text))).toBe(1);
+      expect(stderr.join("")).toMatch(/AMC did not record this Codex tool call: .*HTTP 400.*amc connect hooks status --provider codex/);
+      expect(readFileSync(codexLostObservationsPath(workspace), "utf8")).not.toContain("codex-session");
+      const status = getHookIntegrationStatus({ workspace, provider: "codex" });
+      expect(status.lostObservations).toMatchObject({ count: 1, lastReason: expect.stringMatching(/HTTP 400/) });
+      expect(status.issues.join("\n")).toMatch(/1 Codex tool call report was not recorded by AMC/);
+      expect(await runCodexObserveForwarder(workspace, async () => JSON.stringify(report({ tool_use_id: "call-ok" })), () => {})).toBe(0);
+      removeHookIntegration({ workspace, provider: "codex" });
+      expect(existsSync(codexLostObservationsPath(workspace))).toBe(false);
     } finally {
       await bridge.close();
     }
+  });
+
+  test("a lost-report reason planted in the workspace reaches status escaped, never as terminal control", () => {
+    const workspace = controlledWorkspace(agentId);
+    installHookIntegration({ workspace, provider: "codex", agentId, mode: "observe", bridgeBase: "http://127.0.0.1:1" });
+    writeFileSync(codexLostObservationsPath(workspace), `${JSON.stringify({ ts: 1, reason: "x\u001b[2J\u001b]0;pwned\u0007\u001b[32mAll reports recorded\n‮ok" })}\n`);
+    const status = getHookIntegrationStatus({ workspace, provider: "codex" });
+    const shown = status.issues.join("\n");
+    expect(shown).toContain("\\u001b[2J");
+    expect(shown).not.toMatch(/[\u001b\u0007‮]/);
+    expect(status.lostObservations?.lastReason).not.toContain("\n");
+    removeHookIntegration({ workspace, provider: "codex" });
   });
 
   test("a revoked lease is refused", async () => {

@@ -1,0 +1,119 @@
+import type { AMCTraceV1 } from "../correlation/traceSchema.js";
+import type { ProductionTrace } from "../agents/traceIngestion.js";
+import type { EpisodeRecord } from "../lifecycle/episodeRecord.js";
+import type { DiagnosticReport } from "../types.js";
+export type TraceFailureClass = "prompt_error" | "tool_misuse" | "invalid_schema" | "refusal_overreach" | "hallucinated_claim" | "unsafe_action" | "latency_timeout" | "cost_spike" | "retrieval_error" | "memory_error" | "human_review_gap" | "orchestration_dead_end" | "policy_violation" | "unknown_failure";
+export type TraceFailureOutcome = "ok" | "warning" | "error" | "unknown";
+export type TraceFailureSeverity = "info" | "low" | "medium" | "high" | "critical";
+export interface TraceFailureIndexEntry {
+    entryId: string;
+    traceId: string;
+    runId: string;
+    episodeId: string | null;
+    lifecycleRunId: string | null;
+    agentId: string;
+    tool: string | null;
+    model: string | null;
+    provider: string | null;
+    lifecycleStage: string | null;
+    /** Source event time; null when the source recorded no valid timestamp. */
+    timestamp: string | null;
+    outcome: TraceFailureOutcome;
+    policyDecision: string | null;
+    scoreImpact: number;
+    failureClass: TraceFailureClass;
+    severity: TraceFailureSeverity;
+    reasons: string[];
+    evidenceRefs: string[];
+    rawTraceRef: string | null;
+    redactedSnippet: string;
+}
+export interface TraceFailureCluster {
+    clusterId: string;
+    failureClass: TraceFailureClass;
+    fingerprint: string;
+    count: number;
+    severity: TraceFailureSeverity;
+    scoreImpact: number;
+    agents: string[];
+    runs: string[];
+    episodes: string[];
+    tools: string[];
+    models: string[];
+    firstSeenAt: string | null;
+    lastSeenAt: string | null;
+    sampleEntryIds: string[];
+    sampleEvidenceRefs: string[];
+    sampleSnippet: string;
+    recommendationIds: string[];
+    suggestedRepairInput: {
+        failureClass: TraceFailureClass;
+        reasons: string[];
+        affectedAgents: string[];
+        affectedRuns: string[];
+    };
+}
+export interface TraceFailureIndex {
+    schemaVersion: "2026-05-22" | "2026-09-08";
+    indexId: string;
+    workspace: string;
+    agentId: string;
+    runId: string;
+    episodeId: string | null;
+    lifecycleRunId: string | null;
+    generatedAt: string;
+    rawTraceStorage: {
+        policy: "separate";
+        refsOnly: boolean;
+        redacted: boolean;
+    };
+    entries: TraceFailureIndexEntry[];
+    clusters: TraceFailureCluster[];
+    summary: {
+        entryCount: number;
+        clusterCount: number;
+        topFailureClass: TraceFailureClass | null;
+        totalScoreImpact: number;
+        affectedAgents: string[];
+    };
+    signaturePath: string | null;
+}
+export interface TraceFailureIndexRef {
+    indexId: string;
+    path: string;
+    clusterCount: number;
+    entryCount: number;
+}
+export interface BuildTraceFailureIndexInput {
+    workspace: string;
+    agentId?: string;
+    report?: DiagnosticReport;
+    episode?: EpisodeRecord;
+    traces?: Array<AMCTraceV1 | ProductionTrace>;
+    runId?: string;
+}
+export declare function buildTraceFailureIndex(input: BuildTraceFailureIndexInput): TraceFailureIndex;
+export declare function writeTraceFailureIndex(input: BuildTraceFailureIndexInput): {
+    index: TraceFailureIndex;
+    path: string;
+    signaturePath: string | null;
+    ref: TraceFailureIndexRef;
+};
+export declare function listTraceFailureIndexes(input: {
+    workspace: string;
+    agentId?: string;
+    limit?: number;
+    redacted?: boolean;
+}): TraceFailureIndex[];
+export declare function loadTraceFailureIndex(input: {
+    workspace: string;
+    selector: string;
+    agentId?: string;
+    redacted?: boolean;
+}): TraceFailureIndex;
+export declare function topTraceFailureClusters(input: {
+    workspace: string;
+    agentId?: string;
+    limit?: number;
+    redacted?: boolean;
+}): TraceFailureCluster[];

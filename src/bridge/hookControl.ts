@@ -296,6 +296,7 @@ function normalizeProviderRequest(input: {
     rawInputSha256,
     call,
     toolInput: parsed.tool_input,
+    sessionId: call?.sessionId ?? parsed.session_id ?? null,
   };
 }
 
@@ -693,6 +694,7 @@ function* evaluateHookControl(input: HookControlInput): Generator<HookApprovalOp
       providerResponseSha256: materialized.providerResponseSha256,
       rawPayloadStored: false,
       ...bound,
+      ...(requested.inputGuard ? { inputGuard: requested.inputGuard } : {}),
       ...(request.call ? { authorizationRecord: authorization?.ok ? authorization.record : null } : {}),
     };
     underRegistration = enforced;
@@ -727,6 +729,7 @@ function* evaluateHookControl(input: HookControlInput): Generator<HookApprovalOp
         providerResponseSha256: materialized.providerResponseSha256,
         bodySha256: materialized.providerResponseSha256,
         ...bound,
+        ...(requested.inputGuard ? { inputGuard: requested.inputGuard } : {}),
       },
       receipt: {
         kind: request.call ? "action_state" : "guard_check",

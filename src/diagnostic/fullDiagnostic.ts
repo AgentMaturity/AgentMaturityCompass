@@ -73,13 +73,12 @@ function clampLevel(value: number): number {
   return Math.max(0, Math.min(5, Math.round(value)));
 }
 
-function levelFromPercent(pct: number): FullDiagnosticResult["overallLevel"] {
-  if (pct >= 85) return "L5";
-  if (pct >= 70) return "L4";
-  if (pct >= 50) return "L3";
-  if (pct >= 30) return "L2";
-  if (pct > 0) return "L1";
-  return "L0";
+/**
+ * CLI-08: the overall level is the level the average answer has reached (levels are cumulative, so 0.08 is L0), on the
+ * same L0-L5 scale as the layer lines. A percentage band said L1 for 2% while every layer read L0.
+ */
+function levelFromAverage(average: number): FullDiagnosticResult["overallLevel"] {
+  return `L${Math.max(0, Math.min(5, Math.floor(average + 1e-9)))}` as FullDiagnosticResult["overallLevel"];
 }
 
 function firstSentence(text: string): string {
@@ -178,7 +177,7 @@ export function scoreFullDiagnostic(
   const totalScore = questionScores.reduce((s, q) => s + q.level, 0);
   const maxScore = questionScores.length * 5;
   const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
-  const overallLevel = levelFromPercent(percentage);
+  const overallLevel = levelFromAverage(questionScores.length > 0 ? totalScore / questionScores.length : 0);
 
   // Recommendations: lowest-scoring questions, up to 10
   const recommendations = questionScores

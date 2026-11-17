@@ -13,6 +13,7 @@ import { localVaultPassphrasePath } from "./localPassphrase.js";
 import { vaultPassphraseFromEnv } from "./passphraseFile.js";
 import { forgetVaultPassphrase, operatorRememberedPassphrase } from "./passphraseStore.js";
 import { generateKeyPairSync } from "node:crypto";
+import { promptNewSecret } from "../cli/initPassphrase.js";
 
 export async function promptPassphrase(message: string): Promise<string> {
   const answers = await inquirer.prompt<{ passphrase: string }>([
@@ -36,7 +37,7 @@ export async function initVaultInteractive(workspace: string): Promise<{ vaultFi
     };
   }
 
-  const passphrase = vaultPassphraseFromEnv() ?? (await promptPassphrase("Vault passphrase:"));
+  const passphrase = vaultPassphraseFromEnv() ?? (await promptNewSecret("Vault passphrase", 8));
   if (!passphrase || passphrase.length < 8) {
     throw new Error("Vault passphrase must be at least 8 characters.");
   }

@@ -12,6 +12,7 @@ import {
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { canonicalize } from "../utils/json.js";
 import { AVAILABLE_GUARDRAILS, GUARDRAIL_PROFILES } from "./guardrailProfiles.js";
+import { INPUT_GUARD_PROFILE, assertInputGuardAuthority, auditInputGuardChange, inputGuardState, type InputGuardMode } from "./inputGuardProfile.js";
 
 export const GUARDRAIL_CONTROL_SCHEMA_VERSION = "2026-07-10" as const;
 
@@ -30,6 +31,8 @@ const guardrailControlStateSchema = z.object({
   revision: z.number().int().nonnegative(),
   requestedGuardrails: z.array(z.string().min(1)).max(AVAILABLE_GUARDRAILS.length),
   activeProfile: z.string().min(1).nullable(),
+  // The untrusted-input guard's mode (src/enforce/untrustedInputGuard.ts); absent is off. Changed only by its profile.
+  untrustedInputGuard: z.enum(["enforce", "log_only"]).optional(),
   updatedAt: z.iso.datetime(),
   updatedBy: z.object({
     source: z.enum(["cli", "api", "studio"]),
@@ -302,6 +305,11 @@ function commitState(workspace: string, state: GuardrailControlState): Guardrail
   return validated;
 }
 
+/** The guard mode a state carries, for a change that is not about the guard: every other change keeps it as it is. */
+export function keepInputGuard(state: GuardrailControlState): Pick<GuardrailControlState, "untrustedInputGuard"> {
+  return state.untrustedInputGuard === undefined ? {} : { untrustedInputGuard: state.untrustedInputGuard };
+}
+
 export function nextBaseState(snapshot: GuardrailControlSnapshot): GuardrailControlState {
   return snapshot.state ?? {
     schemaVersion: GUARDRAIL_CONTROL_SCHEMA_VERSION,
@@ -332,6 +340,7 @@ export function setGuardrailRequested(input: {
       revision: current.revision + 1,
       requestedGuardrails: [...requested].sort((left, right) => left.localeCompare(right)),
       activeProfile: null,
+      ...keepInputGuard(current),
       updatedAt: new Date().toISOString(),
       updatedBy: { source: input.source, actor: input.actor.trim() || "local-user" }
     });
@@ -343,10 +352,23 @@ export function applyGuardrailControlProfile(input: {
   profileName: string;
   source: GuardrailControlSource;
   actor: string;
+  /** Only for the untrusted-input guard: enforce (default), log_only or off. */
+  mode?: InputGuardMode;
 }): { state: GuardrailControlState; unsupported: string[] } {
   const profile = GUARDRAIL_PROFILES.find((candidate) => candidate.name === input.profileName);
   if (!profile) {
     throw new GuardrailControlError("UNKNOWN_PROFILE", `Unknown guardrail profile: ${input.profileName}`);
+  }
+  if (profile.name === INPUT_GUARD_PROFILE) {
+    assertInputGuardAuthority(input.workspace, input.source);
+    let before: InputGuardMode = "off";
+    const state = withGuardrailControlLock(input.workspace, () => {
+      const current = nextBaseState(readGuardrailControlStateUnlocked(input.workspace, true));
+      before = current.untrustedInputGuard ?? "off";
+      return commitState(input.workspace, inputGuardState(current, input.mode ?? "enforce", input.source, input.actor));
+    });
+    auditInputGuardChange(input.workspace, before, state);
+    return { state, unsupported: [] };
   }
   const requested = profile.guardrails.filter(isBoundGuardrailName).sort((left, right) => left.localeCompare(right));
   const unsupported = profile.guardrails.filter((name) => !isBoundGuardrailName(name)).sort((left, right) => left.localeCompare(right));
@@ -358,6 +380,7 @@ export function applyGuardrailControlProfile(input: {
       revision: current.revision + 1,
       requestedGuardrails: requested,
       activeProfile: profile.name,
+      ...keepInputGuard(current),
       updatedAt: new Date().toISOString(),
       updatedBy: { source: input.source, actor: input.actor.trim() || "local-user" }
     });

@@ -51,15 +51,26 @@ export function normalizeSpanUsage(model: string | undefined, input: number | un
   };
 }
 
-export function attributeUsage(model: string | undefined, attrs: Record<string, string | undefined>): Pick<NormalizedSpan, "tokenUsage" | "reportedTotalTokens" | "costUsd" | "costSource"> {
+/**
+ * Token counts from span attributes: OTel GenAI semconv 1.41 names (`gen_ai.usage.*`, with the older prompt/completion
+ * names and main's `cache_write`) and OpenInference (`llm.token_count.*`). Cache and reasoning counts are kept apart as
+ * reported, never added to input or output, because whether a provider's input count already includes them differs.
+ */
+export function attributeUsage(model: string | undefined, attrs: Record<string, string | undefined>): Pick<NormalizedSpan, "tokenUsage" | "tokenDetails" | "reportedTotalTokens" | "costUsd" | "costSource"> {
   const numeric = (...keys: string[]): number | undefined => {
     const value = keys.map(key => attrs[key]).find(value => value !== undefined);
     return value === undefined || value.trim() === "" ? undefined : Number(value);
   };
-  return normalizeSpanUsage(model,
+  const count = (...keys: string[]): number | undefined => { const value = numeric(...keys); return value !== undefined && Number.isSafeInteger(value) && value >= 0 ? value : undefined; };
+  const details = Object.entries({
+    cacheRead: count("gen_ai.usage.cache_read.input_tokens", "llm.token_count.prompt_details.cache_read"),
+    cacheWrite: count("gen_ai.usage.cache_creation.input_tokens", "gen_ai.usage.cache_write.input_tokens", "llm.token_count.prompt_details.cache_write"),
+    reasoning: count("gen_ai.usage.reasoning.output_tokens", "llm.token_count.completion_details.reasoning"),
+  }).filter((entry): entry is [string, number] => entry[1] !== undefined);
+  return { ...(details.length > 0 ? { tokenDetails: Object.fromEntries(details) } : {}), ...normalizeSpanUsage(model,
     numeric("gen_ai.usage.input_tokens", "gen_ai.usage.prompt_tokens", "llm.token_count.prompt"),
     numeric("gen_ai.usage.output_tokens", "gen_ai.usage.completion_tokens", "llm.token_count.completion"),
-    numeric("gen_ai.usage.total_tokens", "llm.token_count.total"), numeric("gen_ai.usage.cost", "llm.cost"));
+    numeric("gen_ai.usage.total_tokens", "llm.token_count.total"), numeric("gen_ai.usage.cost", "llm.cost")) };
 }
 
 export function buildTrace(traceId: string, spans: NormalizedSpan[], sessionId?: string, name?: string): NormalizedTrace {

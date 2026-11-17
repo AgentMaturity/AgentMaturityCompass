@@ -4,6 +4,7 @@
  * ("1.0.2=/abs/prefix,1.0.4=/abs/prefix", each an npm prefix holding @earendil-works/pi-coding-agent), else each
  * qualified version is installed with npm into a temp prefix. AMC_PI_CONFORMANCE_OUT names a JSON file for the
  * per-case results; AMC_PI_CONFORMANCE_FIXTURES=1 rewrites tests/fixtures/harness-hooks/pi/<version>/events.jsonl.
+ * AMC_CONFORMANCE_PORTS="<model>,<bridge>" pins the two loopback ports (default: any free port).
  */
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
@@ -25,6 +26,7 @@ import { inspectHookActionLifecycle } from "../../src/watch/hookActionLifecycle.
 import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "../helpers/piHookFixtures.js";
 
 const enabled = process.env.AMC_PI_CONFORMANCE === "1";
+const pinnedPorts = (process.env.AMC_CONFORMANCE_PORTS ?? "").split(",").map(Number).filter((port) => Number.isInteger(port) && port > 0);
 const agentId = "pi-conformance-agent";
 const UNAVAILABLE = "AMC control unavailable; action denied.";
 
@@ -125,7 +127,7 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
             res.writeHead(200, { "content-type": "text/event-stream" }).end(sse(script.shift() ?? { text: "done" }));
           });
         });
-        await new Promise<void>((done) => model.listen(0, "127.0.0.1", done));
+        await new Promise<void>((done) => model.listen(pinnedPorts[0] ?? 0, "127.0.0.1", done));
         const address = model.address();
         if (!address || typeof address === "string") throw new Error("model server did not bind");
         const agentDir = join(scratch, "pi-agent");
@@ -134,7 +136,7 @@ describe.runIf(enabled)("Pi tool_call conformance (P1-22)", () => {
           baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "scripted", models: [{ id: "scripted" }] } } }));
         writeFileSync(join(scratch, "probe.js"), PROBE_EXTENSION);
         writeFileSync(join(scratch, "override.js"), OVERRIDE_EXTENSION);
-        const port = await freePort();
+        const port = pinnedPorts[1] ?? await freePort();
         bridgeBase = `http://127.0.0.1:${port}`;
         bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
         // The latency case sends 100 calls in a burst on top of the other runs: room above the default 120 a minute per route.

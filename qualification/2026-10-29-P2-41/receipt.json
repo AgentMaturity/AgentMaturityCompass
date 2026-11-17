@@ -78,27 +78,27 @@
   },
   "artifacts": [
     {
-      "path": "check:api-ref.txt",
+      "path": "check-api-ref.txt",
       "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
     },
     {
-      "path": "check:counts.txt",
+      "path": "check-counts.txt",
       "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
     },
     {
-      "path": "check:dead-code.txt",
+      "path": "check-dead-code.txt",
       "sha256": "55249e7bc6ad18e7ce809a708ea92386ff7b95aa77e4880e760442a15be5fb8b"
     },
     {
-      "path": "check:docs-drift.txt",
+      "path": "check-docs-drift.txt",
       "sha256": "d069ee3964690a5068b1dabe858ed30d571d77fefea0290a221beb4b480d9bc6"
     },
     {
-      "path": "check:duplicates.txt",
+      "path": "check-duplicates.txt",
       "sha256": "b543e2fabc40e6524309ff9ce4939dea37d9f77733a1fb488074425e5407839f"
     },
     {
-      "path": "check:gates.txt",
+      "path": "check-gates.txt",
       "sha256": "e59398d6b10bd12bbfdd3ab4f1094f5a49247370760dfafe11996cce02f585f1"
     },
     {

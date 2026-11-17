@@ -1,8 +1,8 @@
 /**
  * The Bridge's Codex observation route (P2-17): loopback only, authenticated by the Codex installation's hook lease
  * (`hook:observe`), rate-limited like the other hook routes, through the workspace's hook audit latch. AMC's Codex
- * forwarder (src/adapters/codex/codexObserveForwarder.ts) posts each PostToolUse payload here; codexObservations.ts
- * records it. Nothing here can block a Codex call: it is observe-only.
+ * forwarder (src/adapters/codex/codexObserveForwarder.ts) posts each hook payload here; codexObservations.ts records
+ * PostToolUse, sessionObservations.ts every session hook. Nothing here can block a Codex call: it is observe-only.
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { isLoopback, readCapped } from "../standards/acs/acsGuardianHttp.js";
@@ -13,6 +13,10 @@ import { guardHookAudit } from "./hookAuditLatch.js";
 import { MAX_CONTROL_HOOK_BODY_BYTES } from "./hookControl.js";
 import { consumeObservedHookRateLimit } from "./hookIngress.js";
 import { HookControlError } from "./hookProviders.js";
+import { recordSessionEvent } from "./sessionObservations.js";
+
+/** Whether the payload names Codex's PostToolUse (its own strict route); anything else is a session hook. */
+const isPostToolUse = (rawInput: string): boolean => { try { return (JSON.parse(rawInput) as { hook_event_name?: unknown })?.hook_event_name === "PostToolUse"; } catch { return false; } };
 
 const CODEX_OBSERVE_ROUTE = "/hooks/codex/v1";
 export const CODEX_OBSERVE_PATH = `/bridge${CODEX_OBSERVE_ROUTE}`;
@@ -38,6 +42,13 @@ export async function handleCodexObserveHttp(options: { workspace: string; req: 
     const rawInput = await readCapped(req, MAX_CONTROL_HOOK_BODY_BYTES);
     if (rawInput === null) return refuse(res, 413, "Codex observation exceeds 256 KiB");
     const lease = auth.payload;
+    // Session hooks (SessionStart, Stop, Subagent*, *Compact, Interrupt, …) are recorded as self-reported under the same
+    // audit latch and intake caps as tool observations (recordLeasedObservation), so they can be refused with 429 or 503.
+    if (!isPostToolUse(rawInput)) {
+      const session = recordSessionEvent({ workspace, agentId: lease.agentId, provider: "codex", rawInput, leaseId: lease.leaseId });
+      writeControlJson(res, 201, { ok: true, observed: true, claim: "self-reported", ...session });
+      return true;
+    }
     const recorded = guardHookAudit(workspace, (message) => new HookControlError("HOOK_CONTROL_LEDGER_UNAVAILABLE", 503, message),
       () => recordCodexPostToolUse({ workspace, authenticatedAgentId: lease.agentId, rawInput, lease }));
     writeControlJson(res, recorded.idempotentReplay ? 200 : 201, { ok: true, observed: true, claim: "observed", ...recorded });

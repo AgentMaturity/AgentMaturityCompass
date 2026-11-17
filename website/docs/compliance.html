@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compliance Guide — AMC Documentation</title>
   <meta name="description" content="EU AI Act compliance, 7 industry domains, 41 domain packs, and regulatory mapping with Agent Maturity Compass.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710c">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/docs/compliance.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Compliance Guide — AMC Documentation">
+  <meta property="og:description" content="EU AI Act compliance, 7 industry domains, 41 domain packs, and regulatory mapping with Agent Maturity Compass.">
+  <meta property="og:url" content="https://agentmaturity.co/docs/compliance.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=6">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../docs-pages.css?v=1">
   <style>
     .deadline-banner {
       background: var(--orange-pale);
@@ -20,14 +33,14 @@
     }
     .deadline-banner .countdown small { font-size: 0.7rem; color: var(--text-muted); display: block; font-weight: 400; }
     .deadline-banner .detail { flex: 1; }
-    .deadline-banner .detail h3 { margin: 0 0 4px; font-size: 1.1rem; }
+    .deadline-banner .detail :is(h2, h3) { margin: 0 0 4px; padding: 0; border: 0; font-size: 1.1rem; }
     .deadline-banner .detail p { margin: 0; color: var(--text-muted); font-size: 0.9rem; }
     .domain-card {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
       min-width: 0;
       padding: 20px 24px; margin-bottom: 12px;
     }
-    .domain-card h4 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
+    .domain-card :is(h3, h4) { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; }
     .domain-card .stats { display: flex; gap: 16px; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; }
     .domain-card .stats span { display: flex; align-items: center; gap: 4px; }
     .framework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
@@ -35,62 +48,73 @@
   </style>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<div class="topbar">
-  <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
-  <span class="topbar-tagline">Evidence over claims.</span>
-  <nav class="topbar-nav">
-    <a href="getting-started.html">Getting Started</a>
-    <a href="cli.html">CLI Reference</a>
-    <a href="adapters.html">Adapters</a>
-    <a href="compliance.html" class="active">Compliance</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub ↗</a>
-  </nav>
-</div>
-
-<div class="layout">
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-section">
-      <h4>Compliance Guide</h4>
-      <a href="#overview" class="active">Overview</a>
-      <a href="#eu-ai-act">EU AI Act</a>
-      <a href="#risk-classification">Risk Classification</a>
-      <a href="#article-mapping">Article Mapping</a>
-      <a href="#compliance-workflow">Compliance Workflow</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Domain Packs</h4>
-      <a href="#domains">7 Domains Overview</a>
-      <a href="#domain-environment" class="sub">Environment</a>
-      <a href="#domain-health" class="sub">Health</a>
-      <a href="#domain-wealth" class="sub">Wealth</a>
-      <a href="#domain-education" class="sub">Education</a>
-      <a href="#domain-mobility" class="sub">Mobility</a>
-      <a href="#domain-technology" class="sub">Technology</a>
-      <a href="#domain-governance" class="sub">Governance</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Frameworks</h4>
-      <a href="#other-frameworks">Other Frameworks</a>
-      <a href="#audit-binder">Audit Binder</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Also in Docs</h4>
-      <a href="getting-started.html">Getting Started</a>
-      <a href="cli.html">CLI Reference</a>
-      <a href="adapters.html">Adapter Guides</a>
-      <a href="methodology.html">Scoring Methodology</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html" aria-current="page">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-  <main id="main-content" tabindex="-1" class="main">
-    <div class="content">
-
-      <h1 id="overview">Compliance Guide</h1>
-      <p class="subtitle">Map your agent's maturity to regulatory requirements. AMC supports EU AI Act, ISO 42001, NIST AI RMF, SOC 2, and OWASP LLM Top 10 — with 41 industry-specific domain packs across 7 sectors.</p>
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main" class="doc-page">
+    <div class="wrap doc-layout">
+      <nav class="doc-side" aria-label="On this page">
+        <details open>
+          <summary>On this page</summary>
+          <h2>Compliance Guide</h2>
+          <a href="#overview">Overview</a>
+          <a href="#eu-ai-act">EU AI Act</a>
+          <a href="#risk-classification">Risk level</a>
+          <a href="#article-mapping">Article Mapping</a>
+          <a href="#compliance-workflow">Compliance Workflow</a>
+          <h2>Domain Packs</h2>
+          <a href="#domains">7 Domains Overview</a>
+          <a href="#domain-environment" class="sub">Environment</a>
+          <a href="#domain-health" class="sub">Health</a>
+          <a href="#domain-wealth" class="sub">Wealth</a>
+          <a href="#domain-education" class="sub">Education</a>
+          <a href="#domain-mobility" class="sub">Mobility</a>
+          <a href="#domain-technology" class="sub">Technology</a>
+          <a href="#domain-governance" class="sub">Governance</a>
+          <h2>Frameworks</h2>
+          <a href="#other-frameworks">Other Frameworks</a>
+          <a href="#audit-binder">Audit Binder</a>
+          <h2>Other docs pages</h2>
+          <a href="getting-started.html">Getting Started</a>
+          <a href="cli.html">CLI Reference</a>
+          <a href="adapters.html">Adapter Guides</a>
+          <a href="methodology.html">Scoring Methodology</a>
+        </details>
+      </nav>
+      <article class="doc">
+<h1 id="overview">Compliance guide</h1>
+      <p class="subtitle">Line up what your agent did against a framework such as the EU AI Act, ISO/IEC 42001, the NIST AI RMF, SOC 2 or the OWASP Top 10 for LLM Applications, and see which parts have records behind them. AMC does not certify that you comply, and none of this is legal advice.</p>
 
       <!-- Current official timeline -->
       <div class="deadline-banner" id="deadline-banner">
@@ -99,14 +123,14 @@
           <small>Annex III timeline</small>
         </div>
         <div class="detail">
-          <h3>EU AI Act — current high-risk timeline</h3>
-          <p>Following the AI Omnibus political agreement, Annex III high-risk rules apply from 2 December 2027 and product-integrated high-risk rules from 2 August 2028. Confirm the current position in the official guidance.</p>
+          <h2>EU AI Act — current high-risk timeline</h2>
+          <p>The European Commission's AI Act page gives 2 December 2027 for the high-risk rules in sensitive areas (Annex III) and 2 August 2028 for AI built into regulated products, after changes made by the AI Omnibus. The <a href="../compliance.html">Frameworks page</a> lists every date with its source. Check the Commission's page for later changes.</p>
         </div>
       </div>
 
       <!-- EU AI Act -->
       <h2 id="eu-ai-act">EU AI Act Compliance</h2>
-      <p>The EU AI Act (Regulation (EU) 2024/1689) uses a <strong>risk-based approach</strong>. AMC's compliance engine supports <code>EU_AI_ACT</code> as a first-class framework, mapping your maturity dimensions and evidence infrastructure directly to regulatory obligations.</p>
+      <p>The EU AI Act (Regulation (EU) 2024/1689) sets duties by risk. <code>amc compliance report --framework EU_AI_ACT</code> lines up your agent's records against its high-risk duties and says, for each one, whether there are records behind it. In a new folder every line reads "not evaluated", because nothing has been recorded yet.</p>
 
       <pre><code><span class="comment"># Generate EU AI Act compliance report</span>
 amc compliance report --framework EU_AI_ACT --window 30d --out reports/eu-ai-act.md
@@ -119,67 +143,27 @@ amc audit binder create --scope workspace --out binder.amcaudit</code></pre>
 
       <div class="callout callout-teal">
         <strong>Important disclaimer</strong>
-        AMC provides deterministic, evidence-linked compliance <em>signals</em> — not legal certifications. A signed or <code>VALID</code> report proves artifact integrity, not evidence sufficiency; use mappings externally only when evidence readiness is <code>READY</code>. AMC does not certify legal compliance. Always consult qualified legal counsel. See the <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>.
+        A report shows which duties have records behind them. It is not a certificate. A signature on the report shows who made it and that it is unchanged, not that the records are enough or true; use a report outside your team only when its evidence readiness reads <code>READY</code>. AMC does not certify legal compliance. Always consult qualified legal counsel. See the <a href="https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems">European Commission high-risk guidance</a>.
       </div>
 
       <!-- Risk Classification -->
-      <h2 id="risk-classification">Risk Classification</h2>
-      <p>AMC uses <strong>Domain Risk Classification</strong> to determine which governance tier applies to your agent:</p>
-
-      <table>
-        <thead><tr><th>Domain Risk Class</th><th>EU AI Act Tier</th><th>AMC Governance Requirements</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>critical</code></td>
-            <td>Unacceptable (Art. 5)</td>
-            <td>Prohibited unless exempted; AMC blocks deployment</td>
-          </tr>
-          <tr>
-            <td><code>high</code></td>
-            <td>High-risk (Annex III)</td>
-            <td>Full Art. 9–15, 17 obligations; strict human oversight</td>
-          </tr>
-          <tr>
-            <td><code>elevated</code></td>
-            <td>Limited risk</td>
-            <td>Transparency obligations (Art. 50); moderate oversight</td>
-          </tr>
-          <tr>
-            <td><code>standard</code></td>
-            <td>Minimal risk</td>
-            <td>Voluntary codes of practice; baseline AMC governance</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p>High-risk domains per Annex III include: <strong>healthcare, finance, employment, education, law enforcement, critical infrastructure, and immigration/asylum</strong>.</p>
-
-      <h3>Autonomy Duration Factor</h3>
-      <p>Teams can configure stricter AMC policy targets as autonomy duration grows. These are AMC operating targets, not statutory maturity thresholds:</p>
-      <table>
-        <thead><tr><th>Autonomy Duration</th><th>Suggested Oversight</th><th>Example AMC Policy Target</th></tr></thead>
-        <tbody>
-          <tr><td>&lt; 1 minute</td><td>Standard approval gates</td><td>L3+</td></tr>
-          <tr><td>1–15 minutes</td><td>Enhanced monitoring + circuit breakers</td><td>L4+</td></tr>
-          <tr><td>15–60 minutes</td><td>Continuous oversight + auto-pause</td><td>L4+ with drift alerts</td></tr>
-          <tr><td>&gt; 60 minutes</td><td>Mandatory periodic human checkpoints</td><td>L5 only, with FRIA</td></tr>
-        </tbody>
-      </table>
+      <h2 id="risk-classification">Risk level</h2>
+      <p>Each Industry Pack carries a risk level that AMC suggests (high, very high or critical) for an agent in that area. A project started from a pack in A4 Forge uses it to set who must approve each step: every one of the 41 packs is high risk or above, so someone other than you approves. Whether the EU AI Act counts your agent as high-risk is a legal question for your own counsel; AMC does not decide it.</p>
 
       <!-- Article Mapping -->
       <h2 id="article-mapping">Article-to-AMC Mapping</h2>
-      <p>AMC maps 12 EU AI Act articles to specific dimensions, evidence modules, and diagnostic questions:</p>
+      <p>Some of the articles the EU AI Act report covers, and the kinds of records AMC lines up against them:</p>
 
       <table>
         <thead><tr><th>Article</th><th>Obligation</th><th>AMC Evidence</th></tr></thead>
         <tbody>
-          <tr><td><strong>Art. 9</strong></td><td>Risk Management System</td><td>Risk register, duality assurance pack, drift detection. ≥60% OBSERVED evidence required.</td></tr>
+          <tr><td><strong>Art. 9</strong></td><td>Risk Management System</td><td>Risk register, duality assurance pack, drift detection.</td></tr>
           <tr><td><strong>Art. 10</strong></td><td>Data Governance</td><td>DLP controls, exfiltration shield, data governance artifacts.</td></tr>
           <tr><td><strong>Art. 11</strong></td><td>Technical Documentation</td><td>Architecture map, BOM, capability documentation.</td></tr>
           <tr><td><strong>Art. 12</strong></td><td>Record-keeping</td><td>Transparency log, Merkle tree, signed evidence ledger.</td></tr>
           <tr><td><strong>Art. 13</strong></td><td>Transparency</td><td>Transparency reports, capability disclosures, output attestation.</td></tr>
           <tr><td><strong>Art. 14</strong></td><td>Human Oversight</td><td>Governor policies, approval workflows, escalation gates.</td></tr>
-          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
+          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td><!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
           <tr><td><strong>Art. 17</strong></td><td>Quality Management System</td><td>Continuous loop, drift alerts, scheduled assurance runs.</td></tr>
         </tbody>
       </table>
@@ -189,9 +173,9 @@ amc audit binder create --scope workspace --out binder.amcaudit</code></pre>
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
-          <h4>Classify your agent</h4>
+          <h3>Classify your agent</h3>
           <pre><code>amc compliance report --framework EU_AI_ACT</code></pre>
-          <p>AMC determines your risk classification based on domain and autonomy duration.</p>
+          <p>The report lists each duty and whether records support it.</p>
         </div>
       </div>
       <div class="step">
@@ -214,7 +198,7 @@ amc compliance report --framework EU_AI_ACT --window 30d</code></pre>
         <div class="step-num">4</div>
         <div class="step-content">
           <h4>Fix and verify</h4>
-          <pre><code>amc fix --target-level L3       <span class="comment"># Generate remediation toward defined controls</span>
+          <pre><code>amc fix                         <span class="comment"># Write fix files for the gaps found</span>
 amc guide --compliance EU_AI_ACT  <span class="comment"># Map gaps to regulatory obligations</span></code></pre>
         </div>
       </div>
@@ -223,7 +207,8 @@ amc guide --compliance EU_AI_ACT  <span class="comment"># Map gaps to regulatory
         <div class="step-content">
           <h4>Export audit evidence</h4>
           <pre><code>amc audit binder create --scope workspace --out binder.amcaudit  <span class="comment"># Generate compliance binder</span>
-amc bundle export                                <span class="comment"># Portable evidence bundle</span></code></pre>
+amc bundle export --run latest --out evidence.amcbundle  <span class="comment"># Portable evidence bundle</span></code></pre>
+          <p>Both sign what they write, so they need your vault passphrase in that shell.</p>
         </div>
       </div>
 
@@ -231,7 +216,7 @@ amc bundle export                                <span class="comment"># Portabl
 
       <!-- Domain Packs -->
       <h2 id="domains">7 Domains — 41 Industry Packs</h2>
-      <p>Domain packs extend AMC's 244-question default rubric with industry-specific, regulatory-grounded questions. Each pack references specific regulatory articles — not vague guidelines. AMC has 41 sector-specific packs across 7 domains, all free in the current source build, with no licence, account or payment (the published 1.1.1 release still asks for a licence). They are self-reported questionnaires whose content is experimental: AI-drafted until a named expert signs it.</p>
+      <p>Industry Packs add questions for one area of work to AMC's 244 default questions, and name the rules that area works under. AMC has 41 sector-specific packs across 7 domains, all free in the current source build, with no licence, account or payment (the published 1.1.1 release still asks for a licence). They are self-reported questionnaires whose content is experimental: AI-drafted until a named expert signs it.</p>
 
       <pre><code>amc domain list                                   <span class="comment"># See all 7 domains + packs</span>
 amc domain assess --domain health --agent my-agent  <span class="comment"># Assess against a domain</span>
@@ -240,7 +225,7 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
 
       <!-- Environment -->
       <div class="domain-card" id="domain-environment">
-        <h4>Environment</h4>
+        <h3>Environment</h3>
         <div class="stats">
           <span>6 packs</span>
           <span>104 questions</span>
@@ -323,7 +308,7 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
       <h2 id="other-frameworks">Other Compliance Frameworks</h2>
       <div class="framework-grid">
         <div class="card">
-          <h4>ISO 42001</h4>
+          <h3>ISO 42001</h3>
           <p>AI management system standard. Clauses 4–10 mapped to AMC dimensions.</p>
           <pre><code>amc compliance report --framework ISO_42001</code></pre>
         </div>
@@ -338,9 +323,9 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
           <pre><code>amc compliance report --framework SOC2</code></pre>
         </div>
         <div class="card">
-          <h4>OWASP LLM Top 10</h4>
-          <p>Full 10/10 coverage of the OWASP Large Language Model Top 10 risks.</p>
-          <pre><code>amc compliance report --framework OWASP_LLM_TOP_10</code></pre>
+          <h4>OWASP Top 10 for LLM Applications</h4>
+          <p>Lines up records against the ten risks of the OWASP Top 10 for LLM Applications 2025, which is community guidance rather than a law.</p>
+          <pre><code>amc compliance report --framework OWASP_LLM</code></pre>
         </div>
       </div>
 
@@ -361,35 +346,32 @@ amc audit binder export-request
 amc audit binder export-execute</code></pre>
 
       <div class="callout callout-green">
-        <strong>Every domain pack includes:</strong> risk tier classification, EU AI Act classification, SDG alignment, certification path, key risks, and regulatory article references.
+        <strong>Every Industry Pack names</strong> a suggested risk level, the rules its area works under and its main risks. Pack content is experimental and AI-drafted, not reviewed by a qualified expert, and not legal advice.
       </div>
 
-      <div class="doc-footer">
-        <span>← <a href="adapters.html">Adapter Guides</a></span>
+        <nav class="doc-next" aria-label="More docs">
+          <span>← <a href="adapters.html">Adapter Guides</a></span>
         <span>Next: <a href="methodology.html">Scoring Methodology →</a></span>
-      </div>
-
+        </nav>
+      </article>
     </div>
   </main>
-</div>
 
-<script>
-// Copy buttons
-document.querySelectorAll('pre').forEach(pre => {
-  const btn = document.createElement('button');
-  btn.className = 'copy-btn'; btn.textContent = 'Copy';
-  btn.onclick = () => {
-    navigator.clipboard.writeText(pre.querySelector('code').textContent.trim());
-    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1500);
-  };
-  pre.appendChild(btn);
-});
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(a => {
-  a.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar a').forEach(s => s.classList.remove('active'));
-    a.classList.add('active');
-  });
-});
-</script>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=14"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
 </body>
 </html>

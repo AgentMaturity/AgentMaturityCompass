@@ -62,10 +62,12 @@ export function registerAgentGuideCommands(group: Command, io: AgentLoopCliIo): 
           auth: server.transport === "streamable-http" ? server.auth ?? null : null,
           allowlistNames: catalog.tools.map(tool => ({ remoteName: tool.name, amcToolName: nativeMcpToolName(catalog.serverId, tool.name) })),
           grantsCreated: false,
-          next: "Review every tool schema. Pin digest as expectedCatalogDigest, add explicit name/actionClass grants, and separately review and sign matching amcToolName/actionClass allowlist entries. Run requires --tools workspace and --approve-tools; no policy was changed."
+          next: "Review every tool schema. To allow the tools in one step, use amc mcp add (it shows this catalog and asks). By hand: put expectedCatalogDigest and grants (name and actionClass per tool) at the top level of the config, next to server; add each amcToolName with the same actionClass, and tool_search as READ_ONLY, to .amc/tools.yaml; run amc tools sign. Run requires --tools workspace and --approve-tools; no policy was changed."
         };
         if (!opts.json) io.log("MCP catalog discovered; the configured server has been disposed. This command executed a local program and created no tool grants.");
-        io.log(JSON.stringify(receipt, null, 2));
+        // Tool names, descriptions and instructions are the server's text: bidi and other hidden characters are escaped too.
+        const { jsonForTerminal } = await import("./mcp/mcpAddReview.js");
+        io.log(jsonForTerminal(receipt));
       } catch (error) {
         // These classes carry fixed local diagnostics only, never server or network text.
         const fixed = error instanceof NativeMcpConfigError || (error instanceof Error && ["NativeMcpHttpRefused", "NativeMcpProtocolRefused"].includes(error.name));

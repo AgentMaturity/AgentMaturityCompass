@@ -14,8 +14,8 @@ import { CLAUDE_NOT_GOVERNED_NOTE, claudeCodeGovernance, type ClaudeCodeGovernan
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
 import { CLAUDE_HOOK_TIMEOUT_SECONDS } from "./hookDeadline.js";
 import {
-  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_SESSION_HOOKS, CLAUDE_STATUS_MESSAGE, claudeActionId, claudeCodeBindingSchema,
-  measureClaudeCode, type ClaudeCodeBinding, type ClaudeCodeInstall,
+  CLAUDE_CODE_HOOK_SOURCE, CLAUDE_CONTROL_STATUS_MESSAGE, CLAUDE_OBSERVE_SESSION_HOOKS, CLAUDE_OBSERVE_SESSION_HOOKS_MISSING, CLAUDE_STATUS_MESSAGE, claudeActionId,
+  claudeCodeBindingSchema, claudeObserveWithoutSessionHooks, measureClaudeCode, type ClaudeCodeBinding, type ClaudeCodeInstall,
 } from "./hookProviders/claudeCode.js";
 import { cachedFileSha256, clearPiDigestCache } from "./pi/piInstall.js";
 import { approvalPolicyPath, approvalPolicySigPath, initApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
@@ -27,13 +27,14 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { stableNodePath } from "./hookProviders/nodePath.js";
+import { unqualifiedReleaseIssue } from "./hookProviders/releaseQualification.js";
 import { limitations } from "./hookLimitations.js";
 import { isSafeProviderActionId, resolveProviderHookRequestIdentity, type HookActionIdentitySource } from "../bridge/hookActionIdentity.js";
 import {
   addManagedIgnoreBlock, assertAllPathsSafe, assertControlBridgeLocal, assertManagedPathSafe, controlApprovalPolicy, managedLeaseStatus,
   leaseManifestFields, obtainHookLease, parseInstallOptions, fileChange, HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HOOK_TOKEN_MODE, HookIntegrationError,
   hasManagedIgnoreBlock, hookModeSchema, ignoreBlockHash, integrationId, leaseScopes, normalizeBridgeBase, parseMode, relativePortable,
-  removeManagedIgnoreBlock, restore, snapshot, validateAgentId, withInstallLock, type HookFileChange, type HookMode,
+  removeDirIfEmpty, removeManagedIgnoreBlock, restore, snapshot, validateAgentId, withInstallLock, type HookFileChange, type HookMode,
 } from "./hookProviders/installFiles.js";
 export { HOOK_CONTROL_INTEGRATION_ID, HOOK_INTEGRATION_ID, HookIntegrationError, type HookFileChange, type HookMode } from "./hookProviders/installFiles.js";
 
@@ -68,8 +69,8 @@ type ConfigHookProvider = Exclude<HookProvider, "pi" | "acs" | "dsh">;
 export type { HookProvider };
 export type HookIntegrationProvider = HookProvider | "codex"; // what `amc connect hooks` installs: Codex observes only (P2-17)
 const hookProviderSchema = z.enum(["claude-code", "gemini-cli"]);
-const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_SESSION_HOOKS]);
-const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed", "session-start", "turn-end", "prompt-submit"]);
+const nativeHookEventNameSchema = z.enum(["AfterTool", "BeforeTool", "PostToolUse", "PostToolUseFailure", "PreToolUse", ...CLAUDE_OBSERVE_SESSION_HOOKS]);
+const lifecyclePhaseSchema = z.enum(["requested", "completed", "failed", "completed-or-failed", "session-start", "turn-end", "prompt-submit", "session-event"]);
 const sourceSchema = z.object({
   provider: hookProviderSchema,
   contract: z.string().min(1),
@@ -87,6 +88,8 @@ const manifestCommonSchema = z.object({
   tokenPath: z.string().min(1),
   ...leaseManifestFields,
   configExistedBefore: z.boolean(),
+  /** True when the install created the provider's config folder (.claude, .gemini); `remove` then deletes it if it is empty. Absent on older installs: the folder is kept. */
+  configDirCreated: z.boolean().optional(),
   ignoreExistedBefore: z.boolean(),
   ignoreBlockSha256: z.string().regex(/^[a-f0-9]{64}$/),
   configSha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -172,6 +175,8 @@ export interface HookIntegrationStatus {
   files: { config: string; ignore: string; token: string; manifest: string; signature: string };
   /** Pi and Claude Code control: what AMC may claim for the agent's sessions, from verified session registrations. */
   governance?: PiGovernance | ClaudeCodeGovernance;
+  /** Codex: reports the hook could not hand to AMC, from its own unsigned local note; a lower bound (a hook that never ran writes nothing). */
+  lostObservations?: { count: number; lastTs: number; lastReason: string };
 }
 
 export interface InstallHookIntegrationOptions {
@@ -219,10 +224,10 @@ interface ProviderHookSpec {
   eventType: "action.requested" | "action.completed" | "action.failed" | null;
 }
 
-/** The hooks an installation in `mode` writes. Claude Code control adds SessionStart, Stop and UserPromptSubmit. */
+/** The hooks an installation in `mode` writes. Claude Code control adds SessionStart, Stop and UserPromptSubmit; observe adds every session hook. */
 function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "control"): ProviderHookSpec[] {
   return provider === "claude-code"
-    ? [
+    ? ([
         { eventName: "PostToolUse", phase: "completed", eventType: "action.completed" },
         { eventName: "PostToolUseFailure", phase: "failed", eventType: "action.failed" },
         { eventName: "PreToolUse", phase: "requested", eventType: "action.requested" },
@@ -230,8 +235,8 @@ function providerHookSpecs(provider: ConfigHookProvider, mode: HookMode = "contr
           { eventName: "SessionStart", phase: "session-start", eventType: null },
           { eventName: "Stop", phase: "turn-end", eventType: null },
           { eventName: "UserPromptSubmit", phase: "prompt-submit", eventType: null },
-        ] as const : []),
-      ]
+        ] as const : CLAUDE_OBSERVE_SESSION_HOOKS.map((eventName) => ({ eventName, phase: "session-event" as const, eventType: null }))),
+      ] satisfies ProviderHookSpec[]).sort((left, right) => left.eventName.localeCompare(right.eventName)) // bindings compare in event-name order
     : [
         { eventName: "AfterTool", phase: "completed-or-failed", eventType: "action.completed" },
         { eventName: "BeforeTool", phase: "requested", eventType: "action.requested" },
@@ -255,7 +260,7 @@ function parseProvider(provider: unknown): ConfigHookProvider {
   if (!parsed.success) {
     throw new HookIntegrationError(
       "HOOK_PROVIDER_UNSUPPORTED",
-      `unsupported hook provider: ${String(provider)}; supported providers: claude-code, gemini-cli`
+      `unsupported hook provider: ${String(provider)}; supported providers: claude-code, gemini-cli, pi, dsh, codex (codex: observe mode only)`
     );
   }
   return parsed.data;
@@ -310,9 +315,7 @@ function parseUnambiguousJson(text: string, kind: "config" | "input"): unknown {
   return parsed;
 }
 
-function isJsonObject(value: unknown): value is JsonObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
+const isJsonObject = (value: unknown): value is JsonObject => typeof value === "object" && value !== null && !Array.isArray(value);
 
 function loadConfig(path: string): { value: JsonObject; existed: boolean; raw: string | null; mode: number } {
   if (!existsSync(path)) return { value: {}, existed: false, raw: null, mode: 0o600 };
@@ -455,7 +458,7 @@ function isOwnedHandler(provider: ConfigHookProvider, handler: unknown): handler
 
 function locateOwnedHandlers(config: JsonObject, provider: ConfigHookProvider): LocatedHandler[] {
   const found: LocatedHandler[] = [];
-  for (const { eventName } of providerHookSpecs(provider)) {
+  for (const eventName of new Set([...providerHookSpecs(provider), ...providerHookSpecs(provider, "observe")].map((spec) => spec.eventName))) {
     const groups = eventGroups(config, eventName, false) ?? [];
     groups.forEach((group, groupIndex) => {
       if (!isJsonObject(group)) {
@@ -572,9 +575,9 @@ function validateManifestPaths(workspace: string, provider: ConfigHookProvider, 
   const lifecycleBindingValid = manifest.v === 1
     ? manifest.observation.eventType === "action.requested"
       && manifest.observation.correlation === (provider === "claude-code" ? "provider-call-id" : "derived-event-id")
-    : canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
+    : (canonicalize(manifest.handlers.map(({ eventName, phase }) => ({ eventName, phase }))) === canonicalize(
         providerHookSpecs(provider, manifest.mode).map(({ eventName, phase }) => ({ eventName, phase })),
-      )
+      ) || (provider === "claude-code" && claudeObserveWithoutSessionHooks(manifest)))
       && canonicalize(manifest.observation.eventTypes) === canonicalize(providerObservedEventTypes(provider))
       && manifest.observation.correlation === (
         provider === "claude-code" ? "provider-call-id" : "derived-request-id-with-terminal-resolution"
@@ -661,6 +664,7 @@ function claudeControlStatus(workspace: string, manifest: HookManifest, issues: 
       ? "Claude Code on disk changed after installation (upgrade, edit or removal); reinstall to bind it" : null,
   ].filter((issue): issue is string => issue !== null);
   if (binding && !binding.install) issues.push("the control installation binds no Claude Code (none was given or on PATH at install); sessions cannot register and are not governed");
+  const release = binding?.install ? unqualifiedReleaseIssue("claude-code", binding.install.version) : null; if (release) issues.push(release);
   issues.push(...drift);
   let governance: ClaudeCodeGovernance;
   try {
@@ -806,6 +810,7 @@ export function installHookIntegration(options: InstallHookIntegrationOptions): 
       leaseIssuedTs: leasePayload.issuedTs,
       leaseExpiresTs: leasePayload.expiresTs,
       configExistedBefore: existingManifest?.configExistedBefore ?? config.existed,
+      configDirCreated: existingManifest ? existingManifest.configDirCreated ?? false : !existsSync(dirname(paths.config)),
       ignoreExistedBefore: existingManifest?.ignoreExistedBefore ?? ignoreBefore.existed,
       ignoreBlockSha256: ignoreBlockHash(),
       configSha256: sha256Hex(configBytes),
@@ -984,9 +989,8 @@ export function getHookIntegrationStatus(input: { workspace: string; provider: H
     issues.push("managed hook handler set differs from the signed installation manifest");
     configOwned = false;
   }
-  if (manifest?.v === 1) {
-    issues.push("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
-  }
+  if (manifest?.v === 1) issues.push("legacy single-handler manifest requires reinstall for terminal lifecycle coverage");
+  if (manifestValid && provider === "claude-code" && manifest?.v === 2 && claudeObserveWithoutSessionHooks(manifest)) issues.push(CLAUDE_OBSERVE_SESSION_HOOKS_MISSING);
   if (manifest && config.raw !== null && sha256Hex(Buffer.from(config.raw, "utf8")) !== manifest.configSha256) {
     issues.push("provider config changed after installation");
   }
@@ -1110,28 +1114,16 @@ export function removeHookIntegration(options: RemoveHookIntegrationOptions): Ho
       writeFileAtomic(paths.ignore, nextIgnore, ignoreBefore.mode);
     }
     try {
-      revokeLeaseForCli({
-        workspace,
-        leaseId: manifest.leaseId,
-        reason: "AMC provider hook integration removed"
-      });
+      revokeLeaseForCli({ workspace, leaseId: manifest.leaseId, reason: "AMC provider hook integration removed" });
     } catch (error) {
       restore(paths.config, before.config);
       restore(paths.ignore, before.ignore);
       throw error;
     }
-    for (const path of [paths.token, paths.manifest, paths.signature]) {
-      if (existsSync(path)) unlinkSync(path);
-    }
+    for (const path of [paths.token, paths.manifest, paths.signature]) if (existsSync(path)) unlinkSync(path);
+    if (manifest.configDirCreated === true) removeDirIfEmpty(dirname(paths.config));
     return {
-      operation: "remove",
-      provider,
-      mode: manifest.mode,
-      source: providerSource(provider),
-      dryRun: false,
-      applied: true,
-      changed: true,
-      files,
+      operation: "remove", provider, mode: manifest.mode, source: providerSource(provider), dryRun: false, applied: true, changed: true, files,
       lease: { scope: "hook:observe", scopes: leaseScopes(manifest.mode), route: "/hooks", leaseId: manifest.leaseId, expiresTs: manifest.leaseExpiresTs },
       limitations: limitations(provider, manifest.mode)
     };

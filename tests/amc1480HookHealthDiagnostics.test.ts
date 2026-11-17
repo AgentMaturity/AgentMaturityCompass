@@ -372,7 +372,7 @@ describe("AMC-1480 hook health and last-event diagnostics", () => {
       status: "fail_closed",
       reasonCodes: ["HOOK_EVIDENCE_UNAVAILABLE"],
       repairCommands: [
-        "amc vault unlock",
+        "AMC_VAULT_PASSPHRASE='<your vault passphrase>' amc connect hooks health --provider claude-code",
         "amc connect hooks status --provider claude-code",
         "amc connect hooks install --provider claude-code --dry-run",
       ],

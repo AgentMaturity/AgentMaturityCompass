@@ -16,8 +16,8 @@ Levels are cumulative: each level includes every level below it. The table is ge
 | L1 | Self-declared | rows tagged to the question, or bound to it by its evidence map, that a registered emitter admits by provenance; self-reported input never yields more than L1 | 1 to 1.99 |
 | L2 | Configuration evidence | observed rows from every emitter the question's evidence map lists for L2; the map, never the row's own tag, binds them | 2 to 2.99 |
 | L3 | Runtime evidence | observed runtime or executed test rows from every emitter the question's evidence map lists for L3, bound by the map; keyword matches never count | 3 to 3.99 |
-| L4 | Continuity, anchoring and sampling | not evaluated until anchoring (P1-25, P1-26) and sampling emitters exist | 4 to 4.74 |
-| L5 | Independently attested | not evaluated until a registry issues scoped attestations under pinned trust (P0-09, P3-04) | 4.75 to 5 |
+| L4 | Continuity, anchoring and sampling | not evaluated until anchoring and sampling emitters exist | 4 to 4.74 |
+| L5 | Independently attested | not evaluated until a registry issues scoped attestations under pinned trust | 4.75 to 5 |
 <!-- /amc:spec:levels -->
 
 1. L1 MUST NOT exceed self-declared evidence: self-reported input never yields more than L1.

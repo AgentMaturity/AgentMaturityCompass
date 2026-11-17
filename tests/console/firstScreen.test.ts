@@ -4,6 +4,7 @@
  * hero card with one primary action, one progress line, and everything else under "More".
  */
 import { readdirSync, readFileSync } from "node:fs";
+import vm from "node:vm";
 import { describe, expect, test } from "vitest";
 import { activationHelpHtml, installWelcomeGuide, progressLineText } from "../../src/console/assets/welcomeGuide.js";
 import { initShell, topbarHtml } from "../../src/console/assets/shell.js";
@@ -24,13 +25,16 @@ describe("welcome guide", () => {
 describe("hero card", () => {
   const hero = fnBody("function firstUseCard(agentId, demoMode)");
 
-  test("has exactly one primary action, a link to Native Tasks with the sample prompt", () => {
-    expect(hero.match(/class="button"/g) ?? []).toHaveLength(1);
-    expect(hero).toContain('id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}"');
+  test("is the quieter second card: Watch an agent I already use, and Try a sample task (Native Tasks with the sample prompt)", () => {
+    expect(hero.match(/class="button"/g) ?? []).toHaveLength(0);
+    expect(hero).toContain('class="button secondary" id="firstUsePrimary" href="${htmlEscape(primaryActionHref(agentId))}"');
     for (const button of hero.match(/<button[^>]*>/g) ?? []) expect(button).toContain('class="secondary"');
-    expect(hero).toContain("See what your AI agent really does.");
+    expect(hero).toContain("See what an AI agent really does");
+    expect(hero).toContain('"Try a sample task"');
     expect(hero).toContain("No setup. Runs on this computer with no model or tools.");
-    expect(hero).toContain(">Connect my agent</button>");
+    expect(hero).toContain(">Watch an agent I already use</button>");
+    // Without the build card, the sample task is the page's one primary action.
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toContain("#a4HomeCard[hidden] ~ #app #firstUsePrimary");
     expect(hero).toContain("I already have records: score them");
     expect(hero).toContain("Available in your own workspace: in the app choose Studio &gt; Open My Workspace, or run <code>amc up</code> in a terminal.");
   });
@@ -59,7 +63,8 @@ describe("hero card", () => {
 
 describe("progress line", () => {
   test("counts the four outcomes and names the next one in plain words", () => {
-    expect(progressLineText(null)).toBe("Your progress: 0 of 4. Next: run one task.");
+    expect(progressLineText(null)).toBe("Your progress: 0 of 4. Next: run one task with a real model or your connected agent (the stand-in model does not count).");
+    expect(progressLineText({ agentId: "default", progress: { completed: 0, total: 4 }, milestones: [] })).toMatch(/^Your progress for agent default: 0 of 4\./);
     const rows = (statuses: string[]) => ["connected_agent", "observed_action", "control_decision", "signed_proof"]
       .map((id, index) => ({ id, status: statuses[index] }));
     expect(progressLineText({ progress: { completed: 2, total: 4 }, milestones: rows(["COMPLETE", "COMPLETE", "WAITING", "WAITING"]) }))
@@ -89,6 +94,43 @@ describe("status strip and session line", () => {
     expect(plain).toContain('"No results yet"');
     expect(plain).toContain("Records check out");
     expect(plain).toContain("<strong>Needs attention:</strong>");
+  });
+
+  test("a newest run whose seal fails is named as a problem, never \"Records check out\"", () => {
+    const context = vm.createContext({ htmlEscape: (text: string) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;"),
+      currentWorkspaceLabel: () => "local" });
+    vm.runInContext(fnBody("function plainStatusLine(") + "\n}", context);
+    const line = context.plainStatusLine as (state: Record<string, unknown>) => string;
+    const healthy = { readOnly: false, notaryBroken: false, transparencyOk: true, hasResult: true };
+    const broken = line({ ...healthy, latestSealVerified: false });
+    expect(broken).toContain("<strong>Needs attention:</strong>");
+    expect(broken).toContain("does not pass its seal check");
+    expect(broken).not.toContain("Records check out");
+    expect(broken).not.toContain("Results ready");
+    expect(line({ ...healthy, latestSealVerified: true })).toContain("Results ready · Records check out");
+    expect(line({ ...healthy, hasResult: false, latestSealVerified: null })).toContain("No results yet · Records check out");
+    const banner = fnBody("async function refreshUnifiedBanner()");
+    expect(banner).toContain("latestSealVerified: agentStatus?.latestRun ? agentStatus.latestRun.sealVerified === true : null");
+  });
+
+  test("a run whose seal fails never shows the file's own trust label, integrity or claim state", () => {
+    const context = vm.createContext({ htmlEscape: (text: string) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;"),
+      formatTime: String, shortId: String });
+    const src = app.slice(app.indexOf("const UNTRUSTED_SEAL_LABEL"), app.indexOf("// Studio has no work-order read route"));
+    vm.runInContext(src.replace("const UNTRUSTED_SEAL_LABEL", "var UNTRUSTED_SEAL_LABEL"), context);
+    const tampered = { runId: "r1", status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
+    const summary = (context.runStateSummary as (a: string, r: unknown) => string)("a", tampered);
+    expect(summary).toContain("UNTRUSTED (seal check fails)");
+    expect(summary).not.toContain("HIGH TRUST");
+    expect(summary).toContain("status <strong>INVALID</strong>");
+    expect(summary).not.toContain("ELIGIBLE");
+    expect((context.runStateWarning as (r: unknown) => string)(tampered)).toContain("does not pass its seal check");
+    expect((context.runStateWarning as (r: unknown) => string)({ ...tampered, sealVerified: true })).toBe("");
+    const banner = fnBody("async function refreshUnifiedBanner()");
+    const guard = banner.slice(banner.indexOf("if (runSealFails(agentStatus.latestRun))"));
+    expect(guard.slice(0, guard.indexOf("}"))).toMatch(/trustLabel = UNTRUSTED_SEAL_LABEL;\s+integrity = null;\s+claimEligible = false;/);
+    expect(banner.indexOf("if (runSealFails(agentStatus.latestRun))")).toBeGreaterThan(banner.indexOf("trustLabel = String(report.trustLabel"));
+    expect(banner.indexOf("if (runSealFails(agentStatus.latestRun))")).toBeLessThan(banner.indexOf("<summary>Details</summary>"));
   });
 
   test("one wording: Signed in as <name>, with (view only) for a viewer", () => {

@@ -29,7 +29,7 @@ interface NaturalMapping {
 
 const NATURAL_MAPPINGS: NaturalMapping[] = [
   // ════════════════════════════════════════════════════
-  // A4 FORGE (preview: AMC_A4_PREVIEW=1)
+  // A4 FORGE (preview, on by default; AMC_A4_PREVIEW=0 turns it off)
   // ════════════════════════════════════════════════════
   {
     patterns: [/^a4\s+status\s+(a4p_[0-9a-f]{32})$/i],

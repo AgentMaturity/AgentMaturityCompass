@@ -1,3 +1,4 @@
+import { hookReleaseDoctorChecks } from "../watch/hookReleaseCheck.js";
 import { randomBytes } from "node:crypto";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -83,6 +84,8 @@ function pushAdapterChecks(checks: DoctorCheck[], workspace: string, includePlug
   for (const row of adaptersDetectCli({ workspace, timeoutMs: 250, includePlugins })) {
     checks.push({ id: `adapter-${row.adapterId}`, ...adapterDoctorCheck(row) });
   }
+  // Control hooks after a self-update: a release AMC has not qualified is denied every call; name observe mode.
+  checks.push(...hookReleaseDoctorChecks(workspace));
 }
 
 /**
@@ -275,7 +278,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         id: "vault",
         status: "WARN",
         message: "Vault locked in this shell: signing commands (amc firewall enable, amc agent-loop run) will refuse with \"Vault locked\"",
-        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>' (interactive alternative: amc vault unlock). "
+        fixHint: "Run: export AMC_VAULT_PASSPHRASE='<your vault passphrase>' in this shell, or set AMC_VAULT_PASSPHRASE_FILE (amc vault unlock lasts only for its own command). "
           + `A passphrase \`amc up\` remembered is kept in ${rememberedStores()}; `
           + (gate.ok ? "amc commands you run in this workspace from your own terminal unlock with it."
             : `it is not used here because ${operatorRefusalText(gate)} (it unlocks only for commands you run from your own terminal, outside agent mode).`)

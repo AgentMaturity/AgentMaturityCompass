@@ -5,7 +5,8 @@ import { z } from "zod";
 import { getPublicKeyPem, verifyHexDigestAny } from "../crypto/keys.js";
 import { assertKeysetComplete, boundProviderKey, keysetDeclared } from "../keys/keyset.js";
 import { getPurposeKeyHistory, readHistory } from "../keys/signingKeys.js";
-import { assertOwnerMode } from "../mode/mode.js";
+import { assertOwnerMode, getMode } from "../mode/mode.js";
+import { agentMarker } from "../vault/operatorContext.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { prepareFreezeSignature, prepareFreezeSignatureAsync, type PreparedFreezeSignature } from "./freezePreparation.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
@@ -320,7 +321,21 @@ function prepareLift(input: LiftFreezeParams) {
     source: { path: sourcePath, bytes: sourceBytes }, digest: sha256Hex(canonicalize(payload)) };
 }
 
+/** Lifting a freeze needs a person. Every lift path (CLI, SDK, Studio routes, router fallbacks) reaches liftFreeze or
+ * liftFreezeForAuthority, which call this first: a process carrying an agent marker, or a workspace in agent mode, is refused
+ * (the same gate as the untrusted-input guard switch), so an agent cannot unfreeze itself or another agent. */
+class FreezeLiftRefused extends Error {
+  readonly code = "PERSON_REQUIRED" as const;
+}
+export function assertPersonLifts(workspace: string): void {
+  const marker = agentMarker();
+  if (marker === null && getMode(workspace) !== "agent") return;
+  throw new FreezeLiftRefused(`Lifting a freeze needs a person, and ${marker === null ? "this workspace is in agent mode"
+    : `this process carries the agent marker ${marker}`}. Run amc freeze lift yourself in your own terminal.`);
+}
+
 export function liftFreeze(params: LiftFreezeParams): { liftPath: string } {
+  assertPersonLifts(params.workspace);
   const prepared = prepareLift(params), signed = prepareFreezeSignature(prepared.workspace, prepared.digest);
   publishRecord(prepared.workspace, prepared.agentId, prepared.target, prepared.expected, { ...prepared.payload, signature: signed.signature }, signed, () => {}, prepared.source);
   return { liftPath: prepared.target };
@@ -332,7 +347,7 @@ export async function liftFreezeAsync(params: LiftFreezeParams): Promise<{ liftP
 
 /** Internal trusted caller handoff; mode and original purpose remain mandatory after the caller guard. */
 export async function liftFreezeForAuthority(input: LiftFreezeParams, beforePublish: () => void): Promise<{ liftPath: string }> {
-  const params = { ...input }; assertOwnerMode(params.workspace, "freeze lift");
+  const params = { ...input }; assertPersonLifts(params.workspace); assertOwnerMode(params.workspace, "freeze lift");
   const prepared = prepareLift(params); beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift");
   const signed = await prepareFreezeSignatureAsync(prepared.workspace, prepared.digest,
     freezePreparationGuard(prepared, () => { beforePublish(); assertOwnerMode(prepared.workspace, "freeze lift"); }));

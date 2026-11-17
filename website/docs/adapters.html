@@ -2,82 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Adapter Guides — AMC Documentation</title>
   <meta name="description" content="16 framework adapters plus lease-scoped provider-neutral action hooks for Agent Maturity Compass.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710c">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/docs/adapters.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Adapter Guides — AMC Documentation">
+  <meta property="og:description" content="16 framework adapters plus lease-scoped provider-neutral action hooks for Agent Maturity Compass.">
+  <meta property="og:url" content="https://agentmaturity.co/docs/adapters.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=6">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../docs-pages.css?v=1">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<div class="topbar">
-  <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="./" class="topbar-logo">amc<span class="brand-cursor">_</span> docs</a>
-  <span class="topbar-tagline">Evidence over claims.</span>
-  <nav class="topbar-nav">
-    <a href="getting-started.html">Getting Started</a>
-    <a href="cli.html">CLI Reference</a>
-    <a href="adapters.html" class="active">Adapters</a>
-    <a href="compliance.html">Compliance</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub ↗</a>
-  </nav>
-</div>
-
-<div class="layout">
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-section">
-      <h4>Adapter Guides</h4>
-      <a href="#overview" class="active">Overview</a>
-      <a href="#how-it-works">How Adapters Work</a>
-      <a href="#setup">Quick Setup</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>16 Adapters</h4>
-      <a href="#langchain" class="sub">LangChain (Python)</a>
-      <a href="#langchain-node" class="sub">LangChain (Node)</a>
-      <a href="#langgraph" class="sub">LangGraph</a>
-      <a href="#crewai" class="sub">CrewAI</a>
-      <a href="#autogen" class="sub">AutoGen</a>
-      <a href="#openai-agents" class="sub">OpenAI Agents SDK</a>
-      <a href="#llamaindex" class="sub">LlamaIndex</a>
-      <a href="#semantic-kernel" class="sub">Semantic Kernel</a>
-      <a href="#claude-code" class="sub">Claude Code</a>
-      <a href="#gemini" class="sub">Gemini</a>
-      <a href="#openclaw" class="sub">OpenClaw</a>
-      <a href="#openhands" class="sub">OpenHands</a>
-      <a href="#deepseek-harness" class="sub">DeepSeek Harness</a>
-      <a href="#hermes" class="sub">Hermes Agent</a>
-      <a href="#python-sdk" class="sub">Python AMC SDK</a>
-      <a href="#cli-agent" class="sub">Generic CLI Agent</a>
-      <a href="#openai-compatible" class="sub">OpenAI-Compatible</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Advanced</h4>
-      <a href="#capability-receipts">Capability Receipts</a>
-      <a href="#provider-neutral-hooks">Provider-Neutral Hooks</a>
-      <a href="#sdk-integration">SDK Integration</a>
-      <a href="#evidence-types">Evidence Types</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Also in Docs</h4>
-      <a href="getting-started.html">Getting Started</a>
-      <a href="cli.html">CLI Reference</a>
-      <a href="compliance.html">Compliance</a>
-      <a href="methodology.html">Scoring Methodology</a>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
   </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html" aria-current="page">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-  <main id="main-content" tabindex="-1" class="main">
-    <div class="content">
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main" class="doc-page">
+    <div class="wrap doc-layout">
+      <nav class="doc-side" aria-label="On this page">
+        <details open>
+          <summary>On this page</summary>
+          <h2>Adapter Guides</h2>
+          <a href="#overview">Overview</a>
+          <a href="#how-it-works">How Adapters Work</a>
+          <a href="#setup">Quick Setup</a>
+          <h2>16 Adapters</h2>
+          <a href="#langchain" class="sub">LangChain (Python)</a>
+          <a href="#langchain-node" class="sub">LangChain (Node)</a>
+          <a href="#langgraph" class="sub">LangGraph</a>
+          <a href="#crewai" class="sub">CrewAI</a>
+          <a href="#autogen" class="sub">AutoGen</a>
+          <a href="#openai-agents" class="sub">OpenAI Agents SDK</a>
+          <a href="#llamaindex" class="sub">LlamaIndex</a>
+          <a href="#semantic-kernel" class="sub">Semantic Kernel</a>
+          <a href="#claude-code" class="sub">Claude Code</a>
+          <a href="#gemini" class="sub">Gemini</a>
+          <a href="#openclaw" class="sub">OpenClaw</a>
+          <a href="#openhands" class="sub">OpenHands</a>
+          <a href="#deepseek-harness" class="sub">DeepSeek Harness</a>
+          <a href="#hermes" class="sub">Hermes Agent</a>
+          <a href="#python-sdk" class="sub">Python AMC SDK</a>
+          <a href="#cli-agent" class="sub">Generic CLI Agent</a>
+          <a href="#openai-compatible" class="sub">OpenAI-Compatible</a>
+          <h2>Advanced</h2>
+          <a href="#capability-receipts">Capability Receipts</a>
+          <a href="#provider-neutral-hooks">Provider-Neutral Hooks</a>
+          <a href="#sdk-integration">SDK Integration</a>
+          <a href="#evidence-types">Evidence Types</a>
+          <h2>Other docs pages</h2>
+          <a href="getting-started.html">Getting Started</a>
+          <a href="cli.html">CLI Reference</a>
+          <a href="compliance.html">Compliance</a>
+          <a href="methodology.html">Scoring Methodology</a>
+        </details>
+      </nav>
+      <article class="doc">
+<h1 id="overview">Adapter Guides</h1>
+      <p class="subtitle">Connect an agent you already run, so AMC records what it does. AMC has 16 built-in adapters for agent tools and frameworks, and hooks for Claude Code, Codex, Gemini CLI and pi.</p>
 
-      <h1 id="overview">Adapter Guides</h1>
-      <p class="subtitle">16 built-in adapters with versioned capability declarations, explicit lossiness, and signed proof of what is effective for this agent now.</p>
+      <div class="callout">
+        <strong>Using Claude Code, Codex, Gemini CLI or pi?</strong>
+        <p>The simplest way is the <code>amc</code> menu, which offers to watch Claude Code or Codex. From a terminal, start AMC in the project folder with <code>amc up</code>, then add a hook, for example <code>amc connect hooks install --provider claude-code</code>. A hook lets AMC see what the tool does (<code>--mode observe</code>, the default) or also stop calls your rules forbid (<code>--mode control</code>; Codex can only be observed). <code>amc connect hooks remove --provider claude-code</code> takes it out again.</p>
+      </div>
 
-      <div class="callout callout-teal">
-        <strong>The key insight</strong>
-        An adapter name is not a compatibility claim. AMC separates declared support, current signed configuration, detected runtime/version, effective events and controls, and known blind spots in one portable receipt.
+      <div class="callout callout-orange">
+        <strong>An adapter's name is not a promise it works with your version.</strong>
+        <p>For each agent, AMC records what the adapter claims to support, what is set up now, which version it found, which events and controls really work, and what it cannot see.</p>
       </div>
 
       <!-- How it works -->
@@ -85,7 +114,7 @@
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-content">
-          <h4>Lease minted</h4>
+          <h3>Lease minted</h3>
           <p>A short-lived, scoped <strong>lease token</strong> is automatically created for the session.</p>
         </div>
       </div>
@@ -129,7 +158,7 @@ amc adapters list
 <span class="comment"># Detect which adapter runtimes are installed</span>
 amc adapters detect
 
-<span class="comment"># Prove what is declared and effective for one agent</span>
+<span class="comment"># Show what is declared and in effect for one agent</span>
 amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></pre>
 
       <h2 id="capability-receipts">Signed Capability Receipts</h2>
@@ -139,6 +168,7 @@ amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></
   --adapter claude-cli \
   --out adapter-capabilities.json \
   --json</code></pre>
+      <p>Without <code>--agent</code> the command uses this folder's agent; without <code>--adapter</code> it uses the adapter that agent is set up with (<code>amc adapters configure</code>), or <code>generic-cli</code> when none is set. The receipt is signed, so the vault must be open: run the command in a terminal, or set <code>AMC_VAULT_PASSPHRASE_FILE</code> to a file that holds the passphrase.</p>
       <div class="callout callout-green">
         <strong>Honest by construction</strong>
         <code>verified</code> means AMC-owned declaration evidence and the inspected proof inputs are valid for this subject. <code>partial</code> records a host/shell-only version probe or an absent/observe-only optional hook. <code>fail_closed</code> records missing runtime/version, invalid signed config, unverified or publisher-only plugin metadata, or hook drift. Plugins cannot self-certify; partner certification remains a separate lane. A valid partial receipt is proof of a limitation, not a green badge.
@@ -151,7 +181,7 @@ amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></
       <h2 id="langchain">LangChain (Python)</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langchain-python</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install langchain langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code><span class="comment"># Set your agent's adapter</span>
@@ -169,7 +199,7 @@ amc adapters run --agent my-langchain --adapter langchain-python -- python my_ch
       <h2 id="langchain-node">LangChain (Node)</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Node.js</span> &nbsp; Adapter: <code>langchain-node</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>npm install langchain @langchain/openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-langchain-js --adapter langchain-node --route /openai --model gpt-4o --mode SUPERVISE
@@ -182,7 +212,7 @@ amc adapters run --agent my-langchain-js --adapter langchain-node -- node my_age
       <h2 id="langgraph">LangGraph</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>langgraph-python</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install langgraph langchain-openai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-graph --adapter langgraph-python --route /openai --model gpt-4o --mode SUPERVISE
@@ -194,7 +224,7 @@ amc adapters run --agent my-graph --adapter langgraph-python -- python my_graph.
       <h2 id="crewai">CrewAI</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>crewai-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install crewai</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-crew --adapter crewai-cli --route /openai --model gpt-4o --mode SUPERVISE
@@ -206,7 +236,7 @@ amc adapters run --agent my-crew --adapter crewai-cli -- python my_crew.py</code
       <h2 id="autogen">AutoGen</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>autogen-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install pyautogen</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-autogen --adapter autogen-cli --route /openai --model gpt-4o --mode SUPERVISE
@@ -218,7 +248,7 @@ amc adapters run --agent my-autogen --adapter autogen-cli -- python my_autogen.p
       <h2 id="openai-agents">OpenAI Agents SDK</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Node.js sample</span> &nbsp; Adapter: <code>openai-agents-sdk</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install openai-agents  <span class="comment"># Python</span>
 npm install openai         <span class="comment"># Node.js</span></code></pre>
         <h4>Configure &amp; Run</h4>
@@ -231,7 +261,7 @@ amc adapters run --agent my-oai --adapter openai-agents-sdk -- node my_agent.mjs
       <h2 id="llamaindex">LlamaIndex</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>llamaindex-python</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>pip install llama-index</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-llama --adapter llamaindex-python --route /openai --model gpt-4o --mode SUPERVISE
@@ -243,7 +273,7 @@ amc adapters run --agent my-llama --adapter llamaindex-python -- python my_index
       <h2 id="semantic-kernel">Semantic Kernel</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-orange">Node.js sample</span> &nbsp; Adapter: <code>semantic-kernel</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>dotnet add package Microsoft.SemanticKernel  <span class="comment"># C#</span>
 pip install semantic-kernel                    <span class="comment"># Python</span></code></pre>
         <h4>Configure &amp; Run</h4>
@@ -256,7 +286,7 @@ amc adapters run --agent my-sk --adapter semantic-kernel -- node my-agent.mjs</c
       <h2 id="claude-code">Claude Code</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>claude-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-claude --adapter claude-cli --route /anthropic --model claude-sonnet-4-6
@@ -273,7 +303,7 @@ amc adapters run --agent my-claude --adapter claude-cli -- claude --model claude
       <h2 id="gemini">Gemini</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>gemini-cli</code></div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <pre><code>npm install -g @google/gemini-cli</code></pre>
         <h4>Configure &amp; Run</h4>
         <pre><code>amc adapters configure --agent my-gemini --adapter gemini-cli --route /gemini --model gemini-flash --mode SUPERVISE
@@ -286,7 +316,7 @@ amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini
       <h2 id="openclaw">OpenClaw</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-dark">CLI</span> &nbsp; Adapter: <code>openclaw-cli</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code>amc adapters run --agent my-openclaw --adapter openclaw-cli -- openclaw run</code></pre>
         <p>Or configure OpenClaw to route all sessions through the AMC gateway permanently for continuous evidence capture.</p>
       </div>
@@ -295,7 +325,7 @@ amc adapters run --agent my-gemini --adapter gemini-cli -- gemini --model gemini
       <h2 id="openhands">OpenHands</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>openhands-cli</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code>amc adapters configure --agent my-openhands --adapter openhands-cli --route /openai --model gpt-4o --mode SUPERVISE
 amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code></pre>
         <p>The base adapter path records process evidence and conditionally routed model traffic. It does not claim provider-native file/tool lifecycle coverage.</p>
@@ -305,7 +335,7 @@ amc adapters run --agent my-openhands --adapter openhands-cli -- openhands</code
       <h2 id="deepseek-harness">DeepSeek Harness</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>deepseek-harness</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code><span class="comment"># dsh-launch.json pins the reviewed DSH executable (and optional entrypoint) by path and SHA-256</span>
 amc adapters configure --agent default --adapter deepseek-harness --route /deepseek --model deepseek-v4-flash --launch-config ./dsh-launch.json
 amc adapters run --agent default --adapter deepseek-harness -- <span class="string">"Summarize the README and explain the main entry point."</span></code></pre>
@@ -316,7 +346,7 @@ amc adapters run --agent default --adapter deepseek-harness -- <span class="stri
       <h2 id="hermes">Hermes Agent</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">CLI</span> &nbsp; Adapter: <code>hermes-cli</code></div>
-        <h4>Configure &amp; Run</h4>
+        <h3>Configure &amp; Run</h3>
         <pre><code>amc adapters configure --agent my-hermes --adapter hermes-cli --route /openai --model gpt-4o --mode SUPERVISE
 amc adapters run --agent my-hermes --adapter hermes-cli -- hermes</code></pre>
         <p>Detection runs <code>hermes --version</code>. AMC sets <code>OPENAI_BASE_URL</code>, <code>OPENAI_API_BASE</code>, <code>OPENAI_API_HOST</code> and <code>AMC_LLM_BASE_URL</code> to the gateway route and passes a lease, not a provider key, in <code>OPENAI_API_KEY</code>. Check what is effective for your agent with <code>amc adapters capabilities --agent my-hermes --adapter hermes-cli --json</code>.</p>
@@ -326,7 +356,7 @@ amc adapters run --agent my-hermes --adapter hermes-cli -- hermes</code></pre>
       <h2 id="python-sdk">Python AMC SDK</h2>
       <div class="adapter-card">
         <div class="meta"><span class="badge badge-teal">Python</span> &nbsp; Adapter: <code>python-amc-sdk</code> &nbsp; Package: <code>amc-sdk</code> (import <code>amc_sdk</code>)</div>
-        <h4>Install</h4>
+        <h3>Install</h3>
         <p>The SDK is not on PyPI yet (publication is pending). Install it from source; do not install a similarly named PyPI package, none is published by AMC.</p>
         <pre><code>pip install &quot;git+https://github.com/AgentMaturity/AgentMaturityCompass.git#subdirectory=sdk/python&quot;</code></pre>
         <p>The SDK drives AMC's native agent through <code>amc acp</code> and requires an AMC 1.2.x runtime, which is the current source build: it refuses the published 1.1.1 release. Initialize the workspace with <code>amc init</code> first.</p>
@@ -394,7 +424,7 @@ amc connect hooks install --provider gemini-cli --agent my-agent</code></pre>
 
       <div class="callout callout-green">
         <strong>Reversible and privacy-minimal</strong>
-        AMC preserves unrelated provider settings, signs the exact requested, completed, and failed handler set, keeps its dedicated <code>hook:observe</code> lease out of provider config with mode <code>0600</code>, and removes only its own handlers and ignore block. Hook health separates an intact installation awaiting its first event from the latest receipt-verified event and fail-closed drift, expiry, malformed metadata, tamper, or unavailable encrypted evidence. A locked Vault requires <code>amc vault unlock</code> or <code>AMC_VAULT_PASSPHRASE</code> in non-interactive use. Last-observed time is historical context, not a current-liveness claim. The lifecycle view verifies immutable receipts under one stable action ID; missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence must fail closed. Raw tool input, output, error messages, cwd, transcript paths, and session IDs are not retained. Observation does not allow, deny, or steer actions.
+        AMC preserves unrelated provider settings, signs the exact requested, completed, and failed handler set, keeps its dedicated <code>hook:observe</code> lease out of provider config with mode <code>0600</code>, and removes only its own handlers and ignore block. Hook health separates an intact installation awaiting its first event from the latest receipt-verified event and fail-closed drift, expiry, malformed metadata, tamper, or unavailable encrypted evidence. A locked Vault requires <code>amc vault unlock</code> or <code>AMC_VAULT_PASSPHRASE</code> in non-interactive use. Last-observed time is historical context, not a current-liveness claim. The lifecycle view verifies signed receipts under one stable action ID; missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence must fail closed. Raw tool input, output, error messages, cwd, transcript paths, and session IDs are not retained. Observation does not allow, deny, or steer actions.
         In control mode, supported shell calls receive a compound-command blast-radius review across every bounded segment. Existing signed controls decide each step and the most restrictive outcome wins. Unsupported expansion, malformed syntax, or untrusted authority fails closed without partial policy output. The signed review records bounded canonical names, action classes, outcomes, reason codes, and counts; the raw command and argument values are not retained.
       </div>
 
@@ -420,7 +450,7 @@ curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
 
       <div class="callout callout-teal">
         <strong>Observed, not conformant</strong>
-        AMC accepts four action events from an AMC-owned AEP 0.1 subset pinned to <code>2583cff9380f8f0a459d52c7112b6105c46496ed</code>. Observation remains separate from the opt-in AMC-owned control route; neither is an AEP conformance claim. Codex, Cursor, OpenCode, and other providers are not advertised until their per-tool hook contracts are pinned and fixture-tested. Raw observation bodies are hashed and discarded; encrypted redacted projections and signed receipts appear in Watch.
+        AMC accepts four action events from an AMC-owned AEP 0.1 subset pinned to <code>2583cff9380f8f0a459d52c7112b6105c46496ed</code>. Observation remains separate from the opt-in AMC-owned control route; neither is an AEP conformance claim. Cursor, OpenCode, and other providers are not advertised until their per-tool hook contracts are pinned and fixture-tested. Raw observation bodies are hashed and discarded; encrypted redacted projections and signed receipts appear in Watch.
       </div>
 
       <!-- SDK Integration -->
@@ -464,31 +494,29 @@ curl -sS http://127.0.0.1:3212/bridge/hooks/aep/0.1/events \
         Already have evaluation data? Import it: <code>amc score evidence-ingest --format openai-evals</code>
       </div>
 
-      <div class="doc-footer">
-        <span>← <a href="cli.html">CLI Reference</a></span>
+        <nav class="doc-next" aria-label="More docs">
+          <span>← <a href="cli.html">CLI Reference</a></span>
         <span>Next: <a href="compliance.html">Compliance Guide →</a></span>
-      </div>
-
+        </nav>
+      </article>
     </div>
   </main>
-</div>
 
-<script>
-document.querySelectorAll('pre').forEach(pre => {
-  const btn = document.createElement('button');
-  btn.className = 'copy-btn'; btn.textContent = 'Copy';
-  btn.onclick = () => {
-    navigator.clipboard.writeText(pre.querySelector('code').textContent.trim());
-    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1500);
-  };
-  pre.appendChild(btn);
-});
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(a => {
-  a.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar a').forEach(s => s.classList.remove('active'));
-    a.classList.add('active');
-  });
-});
-</script>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=14"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
 </body>
 </html>

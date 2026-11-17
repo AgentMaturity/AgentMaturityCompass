@@ -3,7 +3,7 @@ import { chmodSync, readFileSync, rmSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { ensureDir, pathExists, writeFileAtomic, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { decryptVaultPayload, encryptVaultPayload, type VaultEnvelope } from "./vaultCrypto.js";
+import { decryptVaultPayload, encryptVaultPayload, storedVaultIterations, VAULT_ITERATIONS, type VaultEnvelope } from "./vaultCrypto.js";
 import { buildKeyHistoryEntry } from "../crypto/keyHistoryChain.js";
 import { publicKeyFromPrivate, sealKeyHistory, verifyKeyHistoryEnvelope, type KeyHistorySubject } from "../crypto/keyHistoryEnvelope.js";
 import { keyHistoryMarkKey, nextKeyHistoryRevision, recordHighWater } from "../keys/highWater.js";
@@ -124,9 +124,15 @@ function roleKeyPem(payload: VaultPayload, role: VaultKeyKind): string {
 }
 
 /** The encrypted vault bytes for `payload`; the only form a v2 vault is written in. */
-export function encryptedVaultBytes(payload: VaultPayload, passphrase: string): string {
+export function encryptedVaultBytes(payload: VaultPayload, passphrase: string, iterations: number = VAULT_ITERATIONS): string {
   if (passphrase.length < 8) throw new Error("Vault passphrase must be at least 8 characters.");
-  return JSON.stringify(encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase), null, 2);
+  return JSON.stringify(encryptVaultPayload(Buffer.from(JSON.stringify(payload), "utf8"), passphrase, iterations), null, 2);
+}
+
+/** The count a rewrite keeps: the existing vault's own (never raised behind the owner's back), or the new default. */
+export function currentVaultIterations(workspace: string): number {
+  const file = vaultPaths(workspace).vaultFile;
+  return pathExists(file) ? storedVaultIterations(readUtf8(file)) : VAULT_ITERATIONS;
 }
 
 export function vaultMetaBytes(payload: VaultPayload): string {
@@ -273,7 +279,7 @@ function persistVault(workspace: string, payload: VaultPayload, passphrase: stri
   const existingVault = pathExists(paths.vaultFile);
   const writes: KeysetWrite[] = [
     ...extra,
-    { path: paths.vaultFile, bytes: encryptedVaultBytes(payload, passphrase), mode: 0o600 },
+    { path: paths.vaultFile, bytes: encryptedVaultBytes(payload, passphrase, currentVaultIterations(workspace)), mode: 0o600 },
     { path: paths.metaFile, bytes: vaultMetaBytes(payload), mode: 0o644 },
     ...publicKeyWrites(workspace, payload, existingVault),
     ...emptyKeyRevocationList(workspace, payload)
@@ -347,7 +353,7 @@ export function createVault(params: CreateVaultParams): { vaultFile: string; met
 export function unlockVault(workspace: string, passphrase?: string): void {
   const phrase = passphrase ?? process.env.AMC_VAULT_PASSPHRASE;
   if (!phrase || phrase.length === 0) {
-    throw new Error("Vault unlock requires passphrase (set AMC_VAULT_PASSPHRASE or use `amc vault unlock`).");
+    throw new Error("Vault unlock requires passphrase (export AMC_VAULT_PASSPHRASE, or set AMC_VAULT_PASSPHRASE_FILE, in the shell that runs the command).");
   }
   try {
     openVaultSession(workspace, phrase);
@@ -677,7 +683,7 @@ function rewriteUnlockedVault(workspace: string, payload: VaultPayload): void {
       throw new Error(`${kind} public key does not match the vault private key`);
     }
   }
-  writeFileAtomic(paths.vaultFile, encryptedVaultBytes({ ...payload, v: 2 }, passphrase), 0o600);
+  writeFileAtomic(paths.vaultFile, encryptedVaultBytes({ ...payload, v: 2 }, passphrase, currentVaultIterations(workspace)), 0o600);
   try { chmodSync(paths.vaultFile, 0o600); } catch { /* chmod not supported on this platform */ }
   session.envelopeDigest = null;
   unlockVault(workspace, passphrase);

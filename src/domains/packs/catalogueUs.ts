@@ -118,7 +118,7 @@ export const US_INSTRUMENTS: readonly RegulatoryInstrument[] = [
     }),
   verified("us-sec-climate", "SEC climate-related disclosure rules (Release 33-11275)", "US", "law", "unverified",
     `${FR}/2024/04/12/2024-07648/the-enhancement-and-standardization-of-climate-related-disclosures-for-investors-delay-of-effective`,
-    ["SEC ESG Rules", "SEC ESG Disclosure Rules"], {
+    ["SEC ESG Rules", "SEC ESG Disclosure Rules", "SEC climate disclosure rule"], {
       url: undefined, retrievedAt: undefined,
       note: "Adopted 2024-03-28; effective date stayed 2024-04-12 (FR 2024-07648). Current status not confirmed in this review.",
     }),

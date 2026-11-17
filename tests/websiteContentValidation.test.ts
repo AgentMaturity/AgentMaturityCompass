@@ -24,7 +24,8 @@ describe("website content validation", () => {
     expect(changelog).toContain("Make <code>amc doctor</code> report healthy install readiness");
     expect(changelog).toContain("supported Node.js 24 action versions");
     expect(changelog).toContain("Complete changelog");
-    expect(changelog).not.toContain("<script");
+    // The notes are static: the only scripts are the site's own nav scripts, none of them fetches the notes.
+    for (const tag of changelog.matchAll(/<script\b[^>]*>/g)) expect(tag[0]).toMatch(/^<script src="(?:script|home|pages)\.js\?v=\d+">$/);
     expect(changelog).not.toContain("raw.githubusercontent.com");
     expect(changelog).not.toContain("content of those pages not audited for staleness");
   });
@@ -86,24 +87,46 @@ describe("website content validation", () => {
 // person's own workspace (Keychain-kept vault passphrase, owner sign-in) and keeps the view-only demo one menu item away.
 describe("website hero truth", () => {
   test("the macOS app section says the app sets up your own workspace and keeps the demo one menu item away", () => {
-    const desktop = read("website/index.html").match(/<section id="desktop"[\s\S]*?<\/section>/)?.[0] ?? "";
+    const desktop = read("website/index.html").match(/<(article|section) id="desktop"[\s\S]*?<\/\1>/)?.[0] ?? "";
+    expect(desktop).not.toBe("");
     expect(desktop).toContain("On first launch the macOS app asks whether to set up your own workspace or try the demo.");
     expect(desktop).toContain("Studio &gt; Try the Demo switches to the view-only demo, and Studio &gt; Open My Workspace switches back.");
     expect(desktop).toContain("ad-hoc signed, not notarized");
     expect(desktop).toContain("No download of the current version is published");
-    const script = read("scripts/package-desktop-installers.mjs");
+    // The app's words live in its source (scripts/desktop/StudioApp.m), which the packager compiles.
+    const script = read("scripts/package-desktop-installers.mjs") + read("scripts/desktop/StudioApp.m");
     for (const label of ["Set Up My Workspace", "Try the Demo", "Open My Workspace", "/w/demo/console/"]) expect(script).toContain(label);
   });
 
-  test("the hero install route is the README's source build and its menu lines are the real front-door labels", () => {
-    const hero = read("website/index.html").match(/<section class="hero">[\s\S]*?<\/section>/)?.[0] ?? "";
+  test("the hero's Get AMC route is the README's source build and every menu line the page names is a real front-door label", () => {
+    const page = read("website/index.html");
+    const hero = page.match(/<section class="hero">[\s\S]*?<\/section>/)?.[0] ?? "";
     expect(hero).not.toMatch(/No terminal|Free forever|Download 1\.1\.1/);
-    expect(read("README.md")).toContain("pnpm install --frozen-lockfile && pnpm run build && npm link");
-    expect(hero).toContain("pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link");
+    expect(hero).toContain('href="#install"');
+    const install = page.match(/<section id="install"[\s\S]*?<\/section>/)?.[0] ?? "";
+    expect(read("README.md")).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
+    expect(install).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
+    // The three limits: a by-hand build if the address is not found, install.sh is 1.1.1, Windows is untested.
+    // Changed on purpose: "only after the website is published" made no sense on the published page.
+    expect(install).toContain("If the command says the address is not found, build by hand");
+    expect(install).not.toContain("only after the website is published");
+    expect(install).toContain("so you can type <code>amc</code> in any folder");
+    expect(install).toContain("installs the published 1.1.1");
+    expect(install).toContain("has not been tested on a real Windows machine");
+    // Every "choose: <line>" and "choose <line>." the page prints must be a line the amc menu really shows.
+    const named = [...page.matchAll(/then choose: ([^<\n]+)/g), ...page.matchAll(/menu, choose ([^.<]+)\./g)].map((m) => m[1].trim());
+    expect(named).toEqual(expect.arrayContaining(["Try a demo chat", "Just show my score", "Build an agent for my industry"]));
     const frontDoor = read("src/setup/frontDoor.ts");
-    for (const label of ["What do you want to do?", "as it works (signed in)", "Try a demo chat (no account or key needed)", "Open the console in my browser", "Just show my score"]) {
-      expect(frontDoor, label).toContain(label);
-      expect(hero, label).toContain(label);
+    for (const label of [...named, "Open the console in my browser"]) {
+      // The watch lines are built per agent: `Watch ${agent.name} as it works (signed in)`.
+      expect(frontDoor, label).toContain(label.replace(/^Watch (Claude Code|Codex) /, (_, name) => (frontDoor.includes(`name: "${name}"`) ? "Watch ${agent.name} " : `Watch ${name} `)));
+      expect(page, label).toContain(label);
     }
+  });
+
+  test("the home page calls the built-in model the stand-in model, so it is not confused with a practice project", () => {
+    const page = read("website/index.html");
+    expect(page).not.toMatch(/practice model/i);
+    expect(page).toContain("stand-in model");
   });
 });

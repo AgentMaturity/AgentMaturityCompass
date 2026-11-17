@@ -14,6 +14,8 @@
 import { readFileSync } from "node:fs";
 import { resolve, extname } from "node:path";
 import { spawnSync } from "node:child_process";
+import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 
 export type McpSecurityLevel = "L0" | "L1" | "L2" | "L3" | "L4" | "L5";
 export type McpFindingSeverity = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW" | "INFO";
@@ -33,6 +35,9 @@ export interface McpToolInfo {
   name: string;
   description?: string;
   hasInputSchema: boolean;
+  /** SHA-256 of the description and of the canonical input schema as the definition states them, so a changed one shows. */
+  descriptionSha256: string;
+  schemaSha256: string;
   parameterCount: number;
   hasRiskyKeywords: boolean;
   riskyKeywords: string[];
@@ -228,6 +233,8 @@ function extractServerInfo(parsed: unknown, rawContent: string): McpServerInfo {
           name,
           description,
           hasInputSchema,
+          descriptionSha256: sha256Hex(description ?? ""),
+          schemaSha256: sha256Hex(canonicalize(inputSchema ?? null)),
           parameterCount: params,
           hasRiskyKeywords: allRisky.length > 0,
           riskyKeywords: allRisky

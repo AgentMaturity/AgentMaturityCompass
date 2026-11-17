@@ -21,7 +21,8 @@ function toErrorMessage(error: unknown): string {
 
 export function registerVaultZkCommands(vault: Command): void {
   vault
-    .command("zk-range-proof")
+    // Hidden from help (CLI-22): an unsound construction is not offered in the command list; it still runs when named.
+    .command("zk-range-proof", { hidden: true })
     .description("Create a range commitment for an AMC score threshold (NOT a zero-knowledge proof; unsound, does not verify)")
     .requiredOption("--value <n>", "Score value (0-100 display scale)")
     .requiredOption("--threshold <n>", "Minimum threshold to prove")
@@ -51,7 +52,7 @@ export function registerVaultZkCommands(vault: Command): void {
     });
 
   vault
-    .command("zk-verify <proofJson>")
+    .command("zk-verify <proofJson>", { hidden: true })
     .description("Check a range commitment (NOT a zero-knowledge verification; unsound)")
     .action(async (proofJson: string) => {
       try {

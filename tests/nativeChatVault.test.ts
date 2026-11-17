@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { chatVaultPassphrase, type ChatVaultDeps } from "../src/setup/nativeChatVault.js";
 
@@ -6,6 +9,7 @@ const deps = (over: Partial<ChatVaultDeps> = {}): ChatVaultDeps => ({
   vaultExists: () => true,
   operator: () => true,
   remembered: () => "remembered-pass",
+  local: () => null,
   opensWith: (_workspace, passphrase) => passphrase === "remembered-pass" || passphrase === "typed-pass",
   ask: vi.fn(async () => "typed-pass"),
   ...over
@@ -33,7 +37,66 @@ describe("chat vault passphrase resolved in the parent", () => {
     await expect(chatVaultPassphrase("/ws", stale)).resolves.toBe("typed-pass");
     expect(stale.ask).toHaveBeenCalledTimes(1);
   });
+  it("uses the passphrase bare amc generated for the folder before asking, as the menu's chat does (H-05)", async () => {
+    const d = deps({ remembered: () => null, local: () => "typed-pass" });
+    await expect(chatVaultPassphrase("/ws", d)).resolves.toBe("typed-pass");
+    expect(d.ask).not.toHaveBeenCalled();
+    const agent = deps({ operator: () => false, local: vi.fn(() => "typed-pass") });
+    await expect(chatVaultPassphrase("/ws", agent)).resolves.toBeNull();
+    expect(agent.local).not.toHaveBeenCalled();
+  });
   it("returns null when the operator cancels the question", async () => {
     await expect(chatVaultPassphrase("/ws", deps({ remembered: () => null, ask: async () => null }))).resolves.toBeNull();
+  });
+});
+
+const defaults = vi.hoisted(() => ({
+  prompt: vi.fn(),
+  opens: vi.fn((_workspace: string, passphrase: string) => passphrase === "typed-pass"),
+  remembered: vi.fn((): { passphrase: string } | null => null),
+  operator: vi.fn(() => ({ ok: true }))
+}));
+vi.mock("inquirer", () => ({ default: { prompt: defaults.prompt } }));
+vi.mock("../src/vault/vault.js", () => ({ vaultExists: () => true, vaultOpensWith: defaults.opens }));
+vi.mock("../src/vault/passphraseStore.js", () => ({ operatorRememberedPassphrase: defaults.remembered }));
+vi.mock("../src/vault/operatorContext.js", () => ({ interactiveOperator: defaults.operator, agentMarker: () => null }));
+
+describe("chat vault passphrase with the default operator, store and question", () => {
+  it("asks with a masked question that accepts only a passphrase that opens the vault", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "");
+    let validate: ((value: string) => true | string) | undefined;
+    defaults.prompt.mockImplementationOnce(async (questions: Array<{ type: string; mask: string; validate: (value: string) => true | string }>) => {
+      expect(questions[0]).toMatchObject({ type: "password", mask: "*" });
+      validate = questions[0]!.validate;
+      return { passphrase: "typed-pass" };
+    });
+    await expect(chatVaultPassphrase("/ws")).resolves.toBe("typed-pass");
+    expect(defaults.operator).toHaveBeenCalledWith({ workspace: "/ws" });
+    expect(validate?.("typed-pass")).toBe(true);
+    expect(validate?.("wrong")).toBe("That passphrase does not open this workspace's vault.");
+    vi.unstubAllEnvs();
+  });
+  it("reads the folder's generated passphrase without asking and without putting it in this process's environment", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "");
+    const workspace = mkdtempSync(join(tmpdir(), "amc-chat-vault-"));
+    try {
+      mkdirSync(join(workspace, ".amc"));
+      writeFileSync(join(workspace, ".amc", "local-vault-passphrase"), "typed-pass\n", { mode: 0o600 });
+      defaults.prompt.mockClear();
+      await expect(chatVaultPassphrase(workspace)).resolves.toBe("typed-pass");
+      expect(defaults.prompt).not.toHaveBeenCalled();
+      expect(process.env.AMC_VAULT_PASSPHRASE).toBe("");
+    } finally { rmSync(workspace, { recursive: true, force: true }); vi.unstubAllEnvs(); }
+  });
+  it("uses the remembered passphrase, and a cancelled question (Ctrl-C) is null", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE_FILE", "");
+    defaults.remembered.mockReturnValueOnce({ passphrase: "typed-pass" });
+    await expect(chatVaultPassphrase("/ws")).resolves.toBe("typed-pass");
+    defaults.prompt.mockRejectedValueOnce(new Error("User force closed the prompt"));
+    await expect(chatVaultPassphrase("/ws")).resolves.toBeNull();
+    vi.unstubAllEnvs();
   });
 });

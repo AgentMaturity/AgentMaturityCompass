@@ -21,7 +21,7 @@ export interface ImportOriginalRef {
   sha256: string; bytes: number; mediaType: string;
   source: { format: string; version: string | number | null; sourceRevision: string | null } | null;
   storage: { kind: "encrypted-blob"; blobId: string; path: string; keyVersion: number }
-         | { kind: "not-retained"; reason: "operator-opt-out" };
+         | { kind: "not-retained"; reason: "operator-opt-out" | "text-kept-as-digest" };
 }
 
 export const ORIGINAL_NOT_RETAINED_LOSS = "Original bytes not retained by operator choice; only the SHA-256 digest is kept.";
@@ -123,9 +123,12 @@ export function retainImportOriginal(workspace: string, raw: Buffer, source: Imp
 
 /** Retains every candidate's original, or records the operator's opt-out; refuses the whole import before writing when any cannot be kept. */
 export function retainImportOriginals(workspace: string, candidates: Array<{ raw: Buffer; candidate: NeutralImportCandidate }>, retain: boolean): ImportOriginalRef[] {
-  if (retain) for (const { raw } of candidates) assertRetainable(workspace, raw.byteLength);
-  return candidates.map(({ raw, candidate }) => retain
+  // An imported session whose text is kept only as digests does not keep its original either: the original holds the text.
+  const digestOnly = (candidate: NeutralImportCandidate) => Boolean(candidate.sourceFormat && "textStored" in candidate.sourceFormat
+    && candidate.sourceFormat.textStored === "digest");
+  if (retain) for (const { raw, candidate } of candidates) if (!digestOnly(candidate)) assertRetainable(workspace, raw.byteLength);
+  return candidates.map(({ raw, candidate }) => retain && !digestOnly(candidate)
     ? retainImportOriginal(workspace, raw, importOriginalSource(candidate), importMediaType(candidate.format, candidate.path))
     : { sha256: sha256Hex(raw), bytes: raw.byteLength, mediaType: importMediaType(candidate.format, candidate.path), source: importOriginalSource(candidate),
-      storage: { kind: "not-retained", reason: "operator-opt-out" } });
+      storage: { kind: "not-retained", reason: retain ? "text-kept-as-digest" : "operator-opt-out" } });
 }

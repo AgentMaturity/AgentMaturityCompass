@@ -10,7 +10,7 @@ import { isA4CommentScopeRoute } from "../studio/nativeAdmission.js";
 import { parseCookieHeader, issueSessionToken, issueSessionTokenAsync, verifySessionToken, type SessionPayload } from "./sessionTokens.js";
 import { hashPassword, padFailedVerify, passwordHashNeedsUpgrade, PasswordPolicyError, rehashPassword, verifyPassword } from "./passwordHash.js";
 import { vaultStatus } from "../vault/vault.js";
-import { createUserRecord, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
+import { createUserRecord, normalizeUsername, UsernamePolicyError, usersFileSchema, type UserRecord, type UsersFile } from "./userSchema.js";
 import type { UserRole } from "./roles.js";
 import { enforceRoleOrAdmin, type AccessContext } from "./rbac.js";
 import { getPurposeKeyHistory } from "../keys/signingKeys.js";
@@ -212,7 +212,7 @@ export function addUser(params: {
 }): UserRecord {
   return withUsersConfigLock(params.workspace, () => {
   const config = loadUsersConfig(params.workspace);
-  if (config.users.some((user) => user.username.toLowerCase() === params.username.toLowerCase())) {
+  if (config.users.some((user) => user.username.toLowerCase() === normalizeUsername(params.username).toLowerCase())) {
     throw new Error(`user already exists: ${params.username}`);
   }
   const record = createUserRecord({
@@ -236,7 +236,7 @@ export function addUser(params: {
  * (revoke, roles) must leave one ACTIVE OWNER (LIVE-VAULT-17).
  */
 function withChangedUser(config: UsersFile, username: string, change: (user: UserRecord) => UserRecord, ownerCheck = true): { config: UsersFile; result: UserRecord } {
-  const index = config.users.findIndex((user) => user.username.toLowerCase() === username.toLowerCase());
+  const index = config.users.findIndex((user) => user.username.toLowerCase() === normalizeUsername(username).toLowerCase());
   if (index < 0) {
     throw new Error(`user not found: ${username}`);
   }
@@ -319,7 +319,7 @@ export function respondUsersMutationError(request: Pick<IncomingMessage, "method
   if (error instanceof UsersLastOwnerError) {
     send(409, { error: error.message }); return true;
   }
-  if (error instanceof PasswordPolicyError) {
+  if (error instanceof PasswordPolicyError || error instanceof UsernamePolicyError) {
     send(400, { error: error.message }); return true;
   }
   if (error instanceof KeyProviderError && Object.hasOwn(KEY_PROVIDER_ERRORS, error.code)) {
@@ -408,7 +408,7 @@ export async function addUserAsync(input: Parameters<typeof addUser>[0], opts: U
   const params = { ...input, roles: [...input.roles] };
   return recorded(params.workspace, "add", opts, await mutateUsersConfigAsync(params.workspace, current => {
     const config = current!;
-    if (config.users.some(user => user.username.toLowerCase() === params.username.toLowerCase())) throw new Error(`user already exists: ${params.username}`);
+    if (config.users.some(user => user.username.toLowerCase() === normalizeUsername(params.username).toLowerCase())) throw new Error(`user already exists: ${params.username}`);
     const record = createUserRecord({ username: params.username, roles: params.roles, passwordHash: hashPassword(params.password, { username: params.username }) });
     return { config: { ...config, updatedTs: Date.now(), users: [...config.users, record] }, result: record };
   }, opts));
@@ -461,7 +461,7 @@ export function authenticateUser(params: {
       error: String(error)
     };
   }
-  const user = config.users.find((row) => row.username === params.username);
+  const user = config.users.find((row) => row.username === params.username.normalize("NFC"));
   // LIVE-VAULT-05: these paths take the wrong-password time, so response time does not reveal which accounts exist.
   if (!user || user.status !== "ACTIVE") verifyPassword(params.password, dummyHash());
   if (!user) {

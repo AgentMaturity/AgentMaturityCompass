@@ -12,15 +12,15 @@ const score = (finalLevel: number): QuestionScore =>
   ({ questionId: blockedAtL2.id, finalLevel, flags: [] }) as unknown as QuestionScore;
 
 describe("hints past a not-evaluated level", () => {
-  test("the runner checklist says why instead of asking for a level it cannot evaluate", () => {
-    const [line] = collectEvidenceChecklist([score(1)], questionBank);
-    expect(line).toBe(`${blockedAtL2.id}: ${notEvaluatedLevel(blockedAtL2, 1, 3)!.notice}`);
-    expect(line).not.toContain(MULTI_SESSION);
+  // P12 (lane score): the checklist lists only steps that can move a level, so a question at its highest evaluable
+  // level gets no line, and below it the hint aims at that level without a notice about the levels beyond.
+  test("the runner checklist leaves out a question already at the highest level AMC can evaluate", () => {
+    expect(collectEvidenceChecklist([score(1)], questionBank)).toEqual([]);
   });
 
-  test("below an evaluable level the runner keeps its hint and names the level it stops at", () => {
+  test("below an evaluable level the runner keeps its hint, aimed at the level it can reach", () => {
     const [line] = collectEvidenceChecklist([score(0)], questionBank);
-    expect(line).toBe(`${blockedAtL2.id}: ${MULTI_SESSION} ${notEvaluatedLevel(blockedAtL2, 0, 3)!.notice}`);
+    expect(line).toBe(`${blockedAtL2.id}: ${MULTI_SESSION}`);
   });
 
   test("amc explain gives the reason, not the question-bank gate hints or L3 evidence", () => {

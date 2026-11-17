@@ -145,8 +145,8 @@ text, not a line number, so unrelated edits do not break a citation.
 | C22 | `src/domains/industryPackEntitlement.ts` | `Industry Packs are free: every pack's questions and runs are included, with no licence, account or payment.` |
 | C23 | `src/cli-domain-product-commands.ts` (`domain pack run`) | `Run with no answers: every question is not evaluated and no score is computed` |
 | C24 | `src/domains/packSelfAssessment.ts` | `The questions without an answer, in pack order: not evaluated, never a default level.` |
-| C25 | `src/cli.ts` (`compliance risk-classify`) | `capabilities = JSON.parse(opts.capabilities)` |
-| C26 | `src/cli.ts` | `const result = classifyEuAiActRisk(capabilities);` |
+| C25 | `src/compliance/euAiActCli.ts` (`compliance risk-classify`) | `capabilities = JSON.parse(opts.capabilities)` |
+| C26 | `src/compliance/euAiActCli.ts` | `const result = classifyEuAiActRisk(capabilities);` |
 | C27 | `src/doctor/firstRunPlan.ts` | `The replies are canned; every turn is recorded in a signed session log.` |
 | C28 | `src/cli-agent-commands.ts` | `Re-derive every model request in a session from the log and check the chains` |
 | C29 | `src/cli.ts` | `.option("--include-chain", "include hash chain verification fields")` |
@@ -162,7 +162,7 @@ text, not a line number, so unrelated edits do not break a citation.
 | C39 | `examples/regulated-industries/lib/runStation.mjs` | `artifacts: written.map((name) => ({ path: ` |
 | C40 | `examples/regulated-industries/lib/runStation.mjs` | `if (step.id === "init") pins = recordPins(workspace, join(workdir, "pins"));` |
 | C41 | `src/domains/packSelfAssessment.ts` | `What self-declared pack answers may claim: self-reported, at most L1, never a certification.` |
-| C42 | `src/cli.ts` (`compliance risk-classify`) | `const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });` |
+| C42 | `src/compliance/euAiActCli.ts` (`compliance risk-classify`) | `const claim = unverifiedClaim("compliance:euAiActRiskTier", 1, { regulated: true });` |
 | C43 | `src/assurance/evidenceWriters.ts` | `auditType: "ASSURANCE_RUN_ABORTED",` |
 | C44 | `examples/regulated-industries/lib/runStation.mjs` | `pins: { monitorSha256: pins.monitorSha256, auditorPubSha256: sha256(readFileSync(pins.auditorPub))` |
 | C45 | `examples/regulated-industries/lib/runStation.mjs` | `const TARGET_GATE_PACK = "injection";` |

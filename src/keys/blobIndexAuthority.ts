@@ -64,6 +64,6 @@ export function openBlobChild(bytes: Buffer, signed: SignedBlobIndexAuthority): 
 /** Bound decryption accepts only this existing codec's fixed parameters, before PBKDF2 consumes untrusted fields. */
 const b64 = (length: number) => z.string().refine(text => { const bytes = Buffer.from(text, "base64"); return bytes.length === length && bytes.toString("base64") === text; });
 export const blobChildEnvelopeSchema = z.strictObject({ v: z.literal(1),
-  kdf: z.strictObject({ name: z.literal("pbkdf2-sha256"), iterations: z.literal(210_000), keyLen: z.literal(32), digest: z.literal("sha256"), saltB64: b64(16) }),
+  kdf: z.strictObject({ name: z.literal("pbkdf2-sha256"), iterations: z.union([z.literal(210_000), z.literal(600_000)]), keyLen: z.literal(32), digest: z.literal("sha256"), saltB64: b64(16) }),
   cipher: z.strictObject({ name: z.literal("aes-256-gcm"), ivB64: b64(12), authTagB64: b64(16), ciphertextB64: z.string().min(4).max(16_384)
     .refine(text => Buffer.from(text, "base64").toString("base64") === text) }) });

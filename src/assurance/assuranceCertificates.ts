@@ -8,6 +8,7 @@ import YAML from "yaml";
 import { canonicalize } from "../utils/json.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { writeExportAttestation, type ExportAttestation } from "../attest/exportAttestation.js";
 import { appendTransparencyEntryAsync } from "../transparency/logChain.js";
 import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
@@ -111,11 +112,13 @@ export interface AssuranceIssueCertificateResult {
   transparencyHash: string;
   latestPath: string;
   timestampedPath: string;
+  /** `<outFile>.sigstore.json`, or why it was not written; the certificate stands either way. */
+  attestation: ExportAttestation;
 }
 
 class AssuranceTransparencyPublicationError extends Error {
   readonly code = "ASSURANCE_CERT_TRANSPARENCY_PUBLICATION_INCOMPLETE";
-  constructor(readonly publication: Omit<AssuranceIssueCertificateResult, "transparencyHash">, cause: unknown, readonly transparency: Awaited<ReturnType<typeof appendTransparencyEntryAsync>> | null = null) {
+  constructor(readonly publication: Omit<AssuranceIssueCertificateResult, "transparencyHash" | "attestation">, cause: unknown, readonly transparency: Awaited<ReturnType<typeof appendTransparencyEntryAsync>> | null = null) {
     super("Assurance certificate archive was published; transparency publication is incomplete", { cause });
     this.name = "AssuranceTransparencyPublicationError";
   }
@@ -328,7 +331,7 @@ export async function issueAssuranceCertificate(input: {
   assertPreparedCurrent();
   const tmp = mkdtempSync(join(tmpdir(), "amc-assurance-cert-"));
   const publishedPaths: string[] = []; let attemptedPath: string | null = null, failed = false, primary: unknown;
-  let publication: Omit<AssuranceIssueCertificateResult, "transparencyHash"> | null = null;
+  let publication: Omit<AssuranceIssueCertificateResult, "transparencyHash" | "attestation"> | null = null;
   let transparency: Awaited<ReturnType<typeof appendTransparencyEntryAsync>> | null = null;
   try {
     const root = join(tmp, "amc-cert");
@@ -369,7 +372,8 @@ export async function issueAssuranceCertificate(input: {
       transparency = await appendTransparencyEntryAsync({ workspace: params.workspace, type: "ASSURANCE_CERT_ISSUED",
         agentId: run.scope.type === "AGENT" ? run.scope.id : "workspace", artifact: { kind: "amccert", sha256, id: cert.certId } }, { beforeCommit: assertPreparedCurrent });
       assertContinuing(); assertSignedResponse(); assertOutputsCurrent(); // Own log progress must not be compared with its original proof-state snapshot.
-      return { outFile, sha256, cert, transparencyHash: transparency.hash, latestPath, timestampedPath };
+      return { outFile, sha256, cert, transparencyHash: transparency.hash, latestPath, timestampedPath,
+        attestation: writeExportAttestation(params.workspace, outFile, "amccert", sha256) };
     } catch (cause) { throw new AssuranceTransparencyPublicationError(published, cause, transparency); }
   } catch (cause) { failed = true; primary = cause; throw cause; }
   finally { try { cleanup(tmp); } catch (cleanupCause) {

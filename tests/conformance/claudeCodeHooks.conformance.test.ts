@@ -4,7 +4,8 @@
  * denied except loopback). Opt-in: AMC_CLAUDE_CODE_CONFORMANCE=1. The binary comes from AMC_CLAUDE_CODE_PREFIX (an npm
  * prefix holding @anthropic-ai/claude-code and its platform package), else the qualified version is installed with npm
  * into a temp prefix. AMC_CLAUDE_CODE_CONFORMANCE_OUT names a JSON file for the per-case results;
- * AMC_CLAUDE_CODE_LATENCY_N sets the latency sample size (default 200).
+ * AMC_CLAUDE_CODE_LATENCY_N sets the latency sample size (default 200). AMC_CLAUDE_CODE_VERSION picks the qualified release to run
+ * (default: the newest); AMC_CONFORMANCE_PORTS="<model>,<bridge>" pins the two loopback ports (default: any free port).
  */
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
@@ -17,6 +18,7 @@ import { getHookIntegrationStatus, installHookIntegration } from "../../src/adap
 import { QUALIFIED_CLAUDE_CODE_VERSIONS } from "../../src/adapters/hookProviders/claudeCode.js";
 import { startBridgeServer } from "../../src/bridge/bridgeServer.js";
 import { createFreezeIncident, liftFreeze } from "../../src/drift/freezeEngine.js";
+import { AGENT_ENV_MARKERS } from "../../src/vault/operatorContext.js";
 import { getPurposeKeyHistory } from "../../src/keys/signingKeys.js";
 import { openLedger, verifyEvidenceEventIntegrity } from "../../src/ledger/ledger.js";
 import { verifyReceipt } from "../../src/receipts/receipt.js";
@@ -25,7 +27,8 @@ import { controlledWorkspace, freePort, removeFixtureWorkspaces } from "../helpe
 
 const enabled = process.env.AMC_CLAUDE_CODE_CONFORMANCE === "1";
 const agentId = "claude-conformance-agent";
-const version = QUALIFIED_CLAUDE_CODE_VERSIONS[0]!;
+const version = process.env.AMC_CLAUDE_CODE_VERSION ?? QUALIFIED_CLAUDE_CODE_VERSIONS.at(-1)!;
+const pinnedPorts = (process.env.AMC_CONFORMANCE_PORTS ?? "").split(",").map(Number).filter((port) => Number.isInteger(port) && port > 0);
 type Step = { name: string; input: Record<string, unknown> };
 
 const MCP_SERVER = `import { createInterface } from "node:readline";
@@ -118,9 +121,10 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
           .end(sse(next ? { type: "tool_use", id: next.id, name: next.name, input: next.input } : { type: "text", text: "done" }));
       });
     });
-    await new Promise<void>((done) => model.listen(0, "127.0.0.1", done));
+    if (!QUALIFIED_CLAUDE_CODE_VERSIONS.includes(version)) throw new Error(`Claude Code ${version} has no payload schema in claudeCodePayloads.ts`);
+    await new Promise<void>((done) => model.listen(pinnedPorts[0] ?? 0, "127.0.0.1", done));
     modelBase = `http://127.0.0.1:${(model.address() as { port: number }).port}`;
-    const port = await freePort();
+    const port = pinnedPorts[1] ?? await freePort();
     bridgeBase = `http://127.0.0.1:${port}`;
     bridge = await startBridgeServer({ workspace, host: "127.0.0.1", port, gatewayBaseUrl: "http://127.0.0.1:1" });
     // Headroom over the default 120 requests a minute per route, which the 200-call latency loop would otherwise reach (and be denied).
@@ -210,7 +214,9 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
     };
     expect(existsSync(bashMarker)).toBe(false);
     expect(existsSync(writeTarget)).toBe(false);
-    expect(run.result(1)).toContain("not AMC approval");
+    // WP35d (846617db1): a Write that needs approval is denied pending a signed AMC approval request; Claude Code's
+    // own ask is never the approval (as tests/claudeHookFailClosed.test.ts asserts since e4b6cdf0e).
+    expect(run.result(1)).toMatch(/AMC approval pending: apprreq_\w+\. Approve through amc approvals/);
     expect(run.result(2)).toContain("is not mapped to an allowed ToolHub tool");
     expect(run.result(2)).not.toContain("mcp ran");
     expect(run.result(3)).toContain("AMC protects its hook configuration");
@@ -239,7 +245,11 @@ describe.runIf(enabled)(`Claude Code ${version} hook conformance (P1-23)`, { tim
       cases.admissionFreeze = { exit: run.status, modelRequests: mainRequests };
       expect(mainRequests).toBe(0);
     } finally {
-      liftFreeze({ workspace, agentId, incidentId: incident.incidentId, reason: "P1-23 conformance done" });
+      // Lifting needs a person: drop the agent markers of the harness running this test for the lift only.
+      const saved = AGENT_ENV_MARKERS.map((name) => [name, process.env[name]] as const);
+      for (const [name] of saved) delete process.env[name];
+      try { liftFreeze({ workspace, agentId, incidentId: incident.incidentId, reason: "P1-23 conformance done" }); }
+      finally { for (const [name, value] of saved) if (value !== undefined) process.env[name] = value; }
     }
   });
 

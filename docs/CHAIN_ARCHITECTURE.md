@@ -90,7 +90,9 @@ Evidence artifacts answer specific maturity questions:
 
 ### Evidence Trust Tiers (EPES)
 
-| Tier | Source | Multiplier | Chain Property |
+No trust weight is applied to a maturity level: a question's level is gated by evidence tier instead (only OBSERVED evidence can support L2 and above; self-reported and attested evidence support L1 at most). The weights in this table scale side scores only (confidence, citation quality, drift, community signals), from the one table in `src/score/trustWeights.ts`.
+
+| Tier | Source | Side-score weight | Chain Property |
 |------|--------|-----------|----------------|
 | `OBSERVED_HARDENED` | AMC-controlled traces + stronger assurance context | 1.1× | Hash-chained, notary-signed |
 | `OBSERVED` | Directly observed by AMC gateway/monitor | 1.0× | Hash-chained, vault-signed |
@@ -99,7 +101,7 @@ Evidence artifacts answer specific maturity questions:
 
 ### Key Difference from prior art
 
-the prior art's session blockchain links sessions together but entries are **not cryptographically signed** — verification is by timestamp convention. AMC's evidence chain is **cryptographically signed at every link** with the vault or notary key. The trust tier system means AMC can distinguish between "we observed this" (1.0×) and "the agent claims this" (0.4×) — a distinction prior art does not make.
+the prior art's session blockchain links sessions together but entries are **not cryptographically signed** — verification is by timestamp convention. AMC's evidence chain is **cryptographically signed at every link** with the vault or notary key. The trust tier system means AMC can distinguish between "we observed this" (can support L2 and above) and "the agent claims this" (L1 at most) — a distinction prior art does not make.
 
 ---
 
@@ -226,7 +228,7 @@ AMC can ingest evidence from systems that operate at Level 1 only:
 # Ingest external JSONL logs (e.g., from Codex or any agent)
 amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 
-# Evidence arrives as SELF_REPORTED (0.4× trust)
+# Evidence arrives as SELF_REPORTED (supports a level up to L1 at most)
 # Record who vouched; the rows stay SELF_REPORTED unless a third party whose key is
 # pinned for independent-attestation signed the bundle hash (docs/EVIDENCE_TRUST.md)
 amc attest --ingest-session <id> --attested-by <identity> --statement "verified against source logs" --attester-signature sig.json

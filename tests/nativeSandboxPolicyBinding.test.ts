@@ -157,7 +157,8 @@ describe("signed native shell mount policy", () => {
     for (const change of [
       { nativeSandbox: { kind: "seatbelt", writableDirectories: [] } },
       { nativeSandbox: { kind: "linux-bwrap", writableDirectories: [], allowUnconfined: true } },
-      ...["*.example.com", "example.com:443", "https://example.com", "Example.com"].map(host =>
+      // host:port is accepted since 2026-11-16 (an entry without a port covers only the default port); a bad port is not.
+      ...["*.example.com", "example.com:0", "example.com:65536", "https://example.com", "Example.com"].map(host =>
         ({ nativeSandbox: { kind: "os-native", writableDirectories: [], egress: { allowHosts: [host] } } })),
       { name: "replacement-shell" }, { actionClass: "READ_ONLY" },
       { context: { kind: "mcp", server: { id: "foreign", name: "Foreign" } } }

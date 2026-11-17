@@ -46,7 +46,7 @@ We tested a content moderation agent with two methods:
 ### For Your Engineering Team
 - **Evidence-weighted diagnostic scoring** that reveals exactly where agents are weak
 - **723 sector-specific questions** for regulated industries (healthcare, finance, education, etc.): experimental, self-reported questionnaires
-- **<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
+- **<!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs** that test real adversarial scenarios (prompt injection, data exfiltration, etc.)
 - **Auto-generated guardrails** that plug directly into agent config files
 - **CI/CD integration** — fail builds if agents don't meet maturity targets
 
@@ -60,12 +60,12 @@ We tested a content moderation agent with two methods:
 
 | Level | Name | What It Means | Evidence interpretation |
 |-------|------|---------------|-------------------------|
-| **L0** | Absent | No demonstrated safety controls | Major control gaps |
-| **L1** | Initial | Some intent, little operational proof | Early baseline |
-| **L2** | Developing | Partial controls, breaks at edges | Material gaps remain |
-| **L3** | Defined | Repeatable, measurable, auditable | Defined controls, subject to evidence readiness and use-case risk |
-| **L4** | Managed | Proactive, risk-calibrated, stress-tested | Stronger operating assurance |
-| **L5** | Optimizing | Self-correcting, continuously verified | Continuous assurance target |
+| **L0** | Absent | Not evidenced | Major control gaps |
+| **L1** | Initial | Self-declared | Early baseline; 240 of 244 questions cannot rise above L1 today |
+| **L2** | Developing | Configuration evidence AMC observed | Reachable today for 4 questions |
+| **L3** | Defined | Runtime evidence AMC observed | No question can reach it yet |
+| **L4** | Managed | Continuity, anchoring and sampling | Not evaluated yet |
+| **L5** | Optimizing | Independently attested | Not evaluated yet |
 
 No AMC level is a legal compliance threshold. A `VALID` signature proves artifact integrity; only evidence readiness `READY` permits AMC trust claims, and AMC does not certify legal compliance. The European Commission's current high-risk timeline applies Annex III rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 under Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI). See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
 
@@ -120,7 +120,7 @@ For the board interpretation of an L3 result, attach [What L3 Means For Business
 
 ## Cost
 
-AMC is MIT licensed and free: scoring, evidence, reports, Studio, adapters, CI gates and all 41 Industry Domain Packs. In the current source build (unreleased; the next release is 2.0.0) Industry Packs need no licence, account or payment; the published 1.1.1 release still asks for a licence before pack questions and runs. The packs are self-reported questionnaires whose content is experimental, and access never changes a result.
+AMC is MIT licensed and free: scoring, evidence, reports, Studio, adapters, CI gates and all 41 Industry Domain Packs. In the current source build (unreleased; the source reports version 1.2.0) Industry Packs need no licence, account or payment; the published 1.1.1 release still asks for a licence before pack questions and runs. The packs are self-reported questionnaires whose content is experimental, and access never changes a result.
 
 ## Contact
 

@@ -1,6 +1,7 @@
 import { emitGuardEvent } from './evidenceEmitter.js';
 /**
- * Data taint propagation tracker.
+ * Data taint propagation tracker. Not enforced: an in-memory demo that only `amc enforce taint` and the security API
+ * call; no hook or tool decision reads it. The enforced provenance check is src/enforce/untrustedInputGuard.ts.
  */
 
 

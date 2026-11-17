@@ -20,6 +20,7 @@
 .native-task-event pre { margin:10px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; max-height:420px; overflow:auto; }
 .native-task-event small, .native-task-identity code, .native-task-approval code, .native-task-scope-item code { overflow-wrap:anywhere; word-break:break-word; }
 .native-task-identity { margin:0; }
+#nativeTaskIdentity { overflow-wrap:anywhere; }
 .native-task-identity dt { color:var(--muted); font-size:.8rem; margin-top:12px; }
 .native-task-identity dd { margin:3px 0 0; overflow-wrap:anywhere; }
 .native-task-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }

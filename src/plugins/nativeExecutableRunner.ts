@@ -127,7 +127,7 @@ export class NativeExecutableRunner {
     let poll: ReturnType<typeof setInterval> | undefined;
     let deadline: ReturnType<typeof setTimeout> | undefined;
     try {
-      // Seatbelt's existing write-only backend is not a read/network boundary.
+      // Seatbelt's generic backend is not a read or process boundary.
       // Neither backend injection nor allowUnconfined is offered by this API.
       const sandbox = new SandboxRunner({ backends: [bwrapBackend()] });
       if (sandbox.select() === null) throw new NativeExecutableError("EXECUTABLE_ISOLATION_UNAVAILABLE", "Executable extensions require AMC's Linux Bubblewrap backend on x64/arm64. This platform has no admitted executable-extension confinement; no code was launched.");

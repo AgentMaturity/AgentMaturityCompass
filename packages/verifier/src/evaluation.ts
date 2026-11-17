@@ -4,7 +4,7 @@ import type { Dimension, DimensionStatus, Finding } from "./codes.js";
 import type { Admission, TrustContext } from "./trust.js";
 
 export type ArtifactKind = "scoped-attestation" | "receipt" | "external-evidence" | "trust-list" | "key-rotation" | "root-rotation"
-  | "revocation-list" | "dsse-intoto" | "unknown";
+  | "revocation-list" | "dsse-intoto" | "export-statement" | "passport" | "bundle-manifest" | "unknown";
 
 export interface DimResult<D extends Dimension> {
   status: DimensionStatus;

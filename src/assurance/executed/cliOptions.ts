@@ -2,8 +2,9 @@
 import { InvalidArgumentError, type Command } from "commander";
 import type { RunAssuranceInput } from "../assuranceRunner.js";
 import { STATION_QUESTION_CONVERSIONS } from "./registry.js";
+import { attackerFromOptions, withAttackerOptions, type AttackerCliOptions } from "../../redteam/attackerCli.js";
 
-export interface AssuranceRunCliOptions {
+export interface AssuranceRunCliOptions extends AttackerCliOptions {
   agent?: string;
   scope?: "workspace" | "node" | "agent";
   id?: string;
@@ -17,6 +18,8 @@ export interface AssuranceRunCliOptions {
   windowDays?: string;
   out?: string;
   model?: string;
+  /** Tries per effect-graded scenario (1-25). */
+  attempts?: number;
   sign: boolean; // Commander inverts --no-sign to sign=false
   executedAttempts?: 1 | 25;
   stationQuestions?: string[];
@@ -39,16 +42,22 @@ function parseStationQuestions(value: string): string[] {
   return ids;
 }
 
+function parseAttempts(value: string): number {
+  if (!/^(?:[1-9]|1\d|2[0-5])$/.test(value)) throw new InvalidArgumentError("--attempts must be a whole number from 1 to 25.");
+  return Number(value);
+}
+
 /** Add flags to the same command object; this registers no command or authority. */
 export function withExecutedAssuranceOptions(command: Command): Command {
-  return command
+  return withAttackerOptions(command)
+    .option("--attempts <n>", "tries per attack scenario graded by what the agent did, each with its ordinary-task twin (1-25; default 5, 1 with --demo)", parseAttempts)
     .option("--executed-attempts <1|25>", "seeded attempts: 1 smoke or 25 full (default: 25)", parseExecutedAttempts)
     .option("--station-questions <ids>", `experimental unreviewed partial aspects; comma-separated IDs: ${stationQuestionIds.join(", ")}`, parseStationQuestions);
 }
 
 /** runAssurance retains the authoritative input validation and native evidence caps. */
 export function selectExecutedAssuranceOptions(opts: AssuranceRunCliOptions):
-  Pick<RunAssuranceInput, "executedAttempts" | "stationQuestionIds" | "packIds"> {
+  Pick<RunAssuranceInput, "executedAttempts" | "stationQuestionIds" | "packIds" | "attacker"> {
   const hasQuestions = opts.stationQuestions !== undefined;
   const scope = (opts.scope ?? "agent").toLowerCase();
   if (hasQuestions && opts.demo) {
@@ -60,7 +69,12 @@ export function selectExecutedAssuranceOptions(opts: AssuranceRunCliOptions):
   if (opts.executedAttempts !== undefined && scope !== "agent") {
     throw new InvalidArgumentError("--executed-attempts is only supported for agent-scoped assurance runs.");
   }
+  if (opts.attackerModel !== undefined && scope !== "agent") {
+    throw new InvalidArgumentError("--attacker-model is only supported for agent-scoped assurance runs.");
+  }
+  const attacker = attackerFromOptions(opts, process.cwd());
   return {
+    ...(attacker ? { attacker } : {}),
     executedAttempts: opts.executedAttempts,
     stationQuestionIds: opts.stationQuestions,
     packIds: hasQuestions && !opts.pack && !opts.all && !opts.demo ? [] : undefined
@@ -70,6 +84,7 @@ export function selectExecutedAssuranceOptions(opts: AssuranceRunCliOptions):
 /** Preserve the explicit smoke mode and partial question selection in remediation reruns. */
 export function executedRerunFlags(opts: AssuranceRunCliOptions): string[] {
   return [
+    opts.attempts ? `--attempts ${opts.attempts}` : "",
     opts.executedAttempts ? `--executed-attempts ${opts.executedAttempts}` : "",
     opts.stationQuestions ? `--station-questions ${opts.stationQuestions.join(",")}` : ""
   ].filter(Boolean);

@@ -2,348 +2,196 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Getting Started — AMC Documentation</title>
-  <meta name="description" content="Install Agent Maturity Compass and get your first trust score in under 2 minutes.">
-  <meta property="og:title" content="Getting Started — AMC Docs">
-  <meta property="og:description" content="Install AMC and get your first AI agent trust score in 2 minutes.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0a0a'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='%234AEF79' font-size='18' font-weight='bold'%3Ea%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="shared.css?v=20260710c">
+  <title>Getting started | AMC docs</title>
+  <meta name="description" content="Install AMC from source, run amc in a folder, and build, watch or chat with an AI agent. Plain steps, each one checked.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/docs/getting-started.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Getting started | AMC docs">
+  <meta property="og:description" content="Install AMC from source, run amc in a folder, and build, watch or chat with an AI agent. Plain steps, each one checked.">
+  <meta property="og:url" content="https://agentmaturity.co/docs/getting-started.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../home.css?v=6">
+  <link rel="stylesheet" href="../pages.css?v=1">
+  <link rel="stylesheet" href="../docs-pages.css?v=1">
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-<!-- Topbar -->
-<div class="topbar">
-  <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-  <a href="./" class="topbar-logo">
-    amc<span class="brand-cursor">_</span> docs
-  </a>
-  <span class="topbar-tagline">Evidence over claims.</span>
-  <nav class="topbar-nav">
-    <a href="getting-started.html" class="active">Getting Started</a>
-    <a href="cli.html">CLI Reference</a>
-    <a href="adapters.html">Adapters</a>
-    <a href="compliance.html">Compliance</a>
-    <a href="methodology.html">Methodology</a>
-    <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub ↗</a>
-  </nav>
-</div>
-
-<!-- Layout -->
-<div class="layout">
-  <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar">
-    <div class="sidebar-section">
-      <h4>Getting Started</h4>
-      <a href="#overview" class="active">Overview</a>
-      <a href="#prerequisites">Prerequisites</a>
-      <a href="#install">Installation</a>
-      <a href="#first-score">Your First Score</a>
-      <a href="#understand-results">Understanding Results</a>
-      <a href="#surfaces">8 Surfaces</a>
-      <a href="#next-steps">Next Steps</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Also in Docs</h4>
-      <a href="cli.html">CLI Reference</a>
-      <a href="adapters.html">Adapter Guides</a>
-      <a href="compliance.html">Compliance</a>
-      <a href="methodology.html">Scoring Methodology</a>
-    </div>
-    <div class="sidebar-section">
-      <h4>Resources</h4>
-      <a href="../playground.html">Web Playground</a>
-      <a href="../">Home</a>
-      <a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank">GitHub ↗</a>
-    </div>
-  </nav>
-
-  <!-- Main -->
-  <main id="main-content" tabindex="-1" class="main">
-    <div class="content">
-
-      <h1 id="overview">Getting Started</h1>
-      <p class="subtitle">Install Agent Maturity Compass, run your first assessment, and get a trust score for your AI agent — all in under 2 minutes.</p>
-
-      <div class="callout callout-teal">
-        <strong>Try AMC before installing.</strong>
-        If you just want to try AMC without installing anything, use the <a href="../playground.html">Web Playground</a> — answer questions in your browser, explore scenarios, and get an instant score. Use the CLI when you want execution evidence, traces, datasets, and CI gates.
-      </div>
-
-      <!-- Prerequisites -->
-      <h2 id="prerequisites">Prerequisites</h2>
-      <p>AMC runs anywhere Node.js runs. You need:</p>
-      <ul>
-        <li><strong>Node.js 20+</strong> — <a href="https://nodejs.org" target="_blank">Download Node.js</a></li>
-        <li><strong>npm</strong> — included with Node.js</li>
-        <li>A terminal (macOS Terminal, Windows PowerShell, Linux shell)</li>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="../#a4-forge">Build an agent</a></li>
+        <li><a href="../#capabilities">Run it</a></li>
+        <li><a href="../#domains">Industries</a></li>
+        <li><a href="../a4.html">A4 Forge</a></li>
+        <li><a href="../docs/index.html" aria-current="page">Docs</a></li>
       </ul>
-      <p>Check your version:</p>
-      <pre><code>node --version   <span class="comment"># Should be v20.x or higher</span>
-npm --version    <span class="comment"># Should be v9+ or higher</span></code></pre>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="../#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="../#a4-forge">Build an agent</a>
+    <a href="../#capabilities">Run it</a>
+    <a href="../#domains">Industries</a>
+    <a href="../#paths">Already have an agent?</a>
+    <a href="../#install">Get AMC</a>
+    <a href="../#desktop">macOS app</a>
+    <a href="../#pricing">Price</a>
+    <a href="../a4.html">A4 Forge (preview)</a>
+    <a href="../docs/index.html" aria-current="page">Docs</a>
+    <a href="../executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
 
-      <!-- Install -->
-      <h2 id="install">Installation</h2>
-      <h3>macOS and Linux</h3>
-      <pre><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code></pre>
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main" class="doc-page">
+    <div class="wrap doc-layout">
+      <nav class="doc-side" aria-label="On this page">
+        <details open>
+          <summary>On this page</summary>
+          <h2>Getting started</h2>
+          <a href="#overview">What you get</a>
+          <a href="#prerequisites">What you need</a>
+          <a href="#install">Install AMC</a>
+          <a href="#first-run">Your first run</a>
+          <a href="#build">Build an agent</a>
+          <a href="#console">Open the console</a>
+          <a href="#score">Your score</a>
+          <a href="#surfaces">The eight tools</a>
+          <a href="#next-steps">Next steps</a>
+          <h2>Other docs pages</h2>
+          <a href="cli.html">CLI Reference</a>
+          <a href="adapters.html">Adapter Guides</a>
+          <a href="compliance.html">Compliance</a>
+          <a href="methodology.html">Scoring Methodology</a>
+        </details>
+      </nav>
+      <article class="doc">
+        <h1 id="overview">Getting started</h1>
+        <p class="subtitle">Install AMC from source, run <code>amc</code> in a folder, and pick what to do from a short menu: build an agent for your industry, watch Claude Code or Codex, chat, or open the Compass Console.</p>
 
-      <h3>Windows PowerShell</h3>
-      <pre><code>irm https://agentmaturity.co/install.ps1 | iex</code></pre>
+        <div class="callout">
+          <strong>Want a look first?</strong>
+          <p>The <a href="../playground.html">playground</a> runs in your browser with nothing to install. It is an illustration: its answers are your own, so its score is self-reported.</p>
+        </div>
 
-      <p>Both installers pin the published 1.1.1 GitHub release, download the platform archive and <code>SHA256SUMS</code>, and refuse to run the packaged installer when verification fails. Verify the installed CLI:</p>
-      <pre><code>amc --version
-amc doctor</code></pre>
-      <p>In a new directory, <code>amc doctor</code> verifies install readiness and exits successfully without pretending workspace configuration already exists. After initialization, it runs the full workspace checks. CI and production deployments should use <code>amc doctor --strict</code>.</p>
+        <h2 id="prerequisites">What you need</h2>
+        <ul>
+          <li><strong>macOS or Linux.</strong> The source build has not been tested on Windows.</li>
+          <li><strong>Node.js 20, 22 or 24.</strong> AMC is tested on Node.js 22 and 24; Node.js 25 and later lack Corepack (next line). <a href="https://nodejs.org" target="_blank" rel="noopener">Get Node.js</a>.</li>
+          <li><strong>Corepack and git.</strong> Corepack comes with Node.js 20, 22 and 24 and gives AMC the pnpm it builds with.</li>
+        </ul>
+        <pre><code>node --version
+git --version</code></pre>
 
-      <h3>Docker (zero setup)</h3>
-      <pre><code><span class="comment"># Build the quickstart image</span>
-docker build -t amc-quickstart -f docker/Dockerfile.quickstart .
-
-<span class="comment"># Check the CLI in the image</span>
-docker run --rm amc-quickstart --version
-
-<span class="comment"># Run the image's default command (amc quickscore, interactive)</span>
-docker run -it --rm amc-quickstart</code></pre>
-      <p>The image's entry point is already <code>amc</code>, so pass only its arguments (a second <code>amc</code> fails with "too many arguments"). Signing needs a vault passphrase: set a strong <code>AMC_VAULT_PASSPHRASE</code> of your own and pass it through with <code>docker run -e AMC_VAULT_PASSPHRASE …</code>, or let <code>amc init</code> prompt for one. Never use an example or guessable value. The image installs the published 1.1.1 release.</p>
-
-      <h3>From source</h3>
-      <pre><code>corepack enable
+        <h2 id="install">Install AMC</h2>
+        <p>The current version is the source build. It is not released yet, and the source reports version 1.2.0. On macOS or Linux, one command installs it:</p>
+        <pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
+        <p>It fetches AMC from GitHub, builds it on your computer (a few minutes, no administrator password) and puts <code>amc</code> on your PATH (the list of folders your terminal looks in, so you can type <code>amc</code> in any folder). It prints the commit it built. Open a new terminal afterwards. Run the same command again to update; if an update fails to build, the version you had keeps working. To remove it, delete the folder <code>~/.amc-source</code> and the line marked <code># AMC source install</code> in your shell profile. To pin a tag or commit, add <code>-s -- --ref &lt;tag or full commit id&gt;</code> after <code>sh</code>.</p>
+        <p>Three limits. If the command says the address is not found, build by hand as shown just below. The older <code>install.sh</code> installs the published 1.1.1 (see below). On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same, but it has not been tested on a real Windows machine.</p>
+        <p>To build by hand instead:</p>
+        <pre><code>corepack enable
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
-pnpm install --frozen-lockfile
-pnpm run build
-npm link</code></pre>
-      <p>AMC is a pnpm workspace, so <code>npm ci</code> fails here by design. The source build is the current, unreleased build; the installers above give the published 1.1.1.</p>
-
-      <!-- First Score -->
-      <h2 id="first-score">Your First Full Score in 2 Minutes</h2>
-      <p>One command from your agent project. That's it.</p>
-
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h4>Create a project</h4>
-          <pre><code>mkdir my-agent && cd my-agent</code></pre>
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</code></pre>
+        <p><code>npm link</code> makes the <code>amc</code> command available everywhere. Either way, check it:</p>
+        <pre><code>amc --version
+amc doctor</code></pre>
+        <p><code>amc --version</code> prints <code>1.2.0</code>. In a folder AMC has not set up yet, <code>amc doctor</code> checks only the install and ends with "CLI install checks passed".</p>
+        <div class="callout callout-orange">
+          <strong>The one-line installers give an older version.</strong>
+          <p><code>curl -fsSL https://agentmaturity.co/install.sh | sh</code>, the PowerShell installer and npm all install the published 1.1.1 release. It has no menu, no A4 Forge and no Claude Code or Codex sign-in. Use the source build above to follow this guide.</p>
         </div>
-      </div>
 
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h4>Run AMC</h4>
-          <pre><code>amc</code></pre>
-          <p>AMC creates the workspace if needed, detects what is available, runs the full maturity score, and prints the next action.</p>
-        </div>
-      </div>
+        <h2 id="first-run">Your first run</h2>
+        <p>Make a folder for your work and run <code>amc</code> in it:</p>
+        <pre><code>mkdir my-agent &amp;&amp; cd my-agent
+amc</code></pre>
+        <p>AMC sets up the folder (it writes a <code>.amc</code> folder there) and asks what you want to do. The choices are:</p>
+        <ul>
+          <li><strong>Watch Claude Code or Codex.</strong> If one of them is installed, AMC offers to watch it, or to sign in to it first. Sign-in happens in the vendor's own tool; AMC never sees a password, token or plan. <code>amc login status</code> shows where each one stands.</li>
+          <li><strong>Try a demo chat.</strong> No account or key needed. The replies come from the built-in stand-in model, which gives canned answers, so the chat says nothing about a real agent.</li>
+          <li><strong>Build an agent for my industry.</strong> Starts A4 Forge (below) in the Compass Console.</li>
+          <li><strong>Open the console in my browser.</strong> Starts AMC and opens the Compass Console.</li>
+          <li><strong>Just show my score.</strong> Scores the folder from the records AMC has. In a new folder it is empty, and the menu says so.</li>
+        </ul>
 
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h4>Open Studio when ready</h4>
-          <pre><code>amc up
+        <h2 id="build">Build an agent for regulated work</h2>
+        <p>A4 Forge is AMC's guided build for one AI agent. It is a preview and on by default; starting AMC with <code>AMC_A4_PREVIEW=0</code> turns it off. It takes the agent through four steps, Aspire, Assemble, Adapt and Activate, and the people you name approve each step. Each step goes into a signed record.</p>
+        <ul>
+          <li>Start from an <strong>Industry Pack</strong> to get suggested rules and risks for your sector. Pack content is experimental and AI-drafted, not reviewed by a qualified expert, and not legal advice. <code>amc domain pack list</code> lists all 41.</li>
+          <li>A project started from a pack always needs a second person to approve.</li>
+          <li>To try it alone, start a <strong>practice project</strong>. Alone you can get as far as building in Assemble. Assemble's final approval, Adapt and Activate each need two approvers who did not write, build or ask for the step: three people in all.</li>
+          <li>On a laptop a project ends after Adapt. The release step needs AMC running under Docker Compose or Helm.</li>
+        </ul>
+        <p>The <a href="../a4.html">A4 Forge page</a> walks through each step and who signs it off.</p>
+
+        <h2 id="console">Open the console</h2>
+        <pre><code>amc up
 amc user init --username &lt;you&gt;   # new workspace only: the first console login (asks for a password)</code></pre>
-          <p>Then sign in to the Compass Console at the URL amc up printed. If the workspace already has logins, an OWNER adds yours with <code>amc user add</code>.</p>
-          <p>Studio shows the same score, lifecycle evidence, reports, assurance packs, domain packs, run history, and advanced org runs in a local dashboard. The packaged macOS and Windows desktop apps launch Agent Maturity Compass Studio and open this same local console in your system browser.</p>
-        </div>
-      </div>
+        <p><code>amc up</code> starts AMC and its console, called the Compass Console, and prints the address to open. The first time, it asks for a passphrase for the folder's vault, the store of keys AMC signs records with. Then sign in to the Compass Console at the address <code>amc up</code> printed. If the workspace already has logins, an owner adds yours with <code>amc user add</code>. <code>amc down</code> stops AMC again.</p>
 
-      <div class="callout callout-orange">
-        <strong>Need a fast demo check?</strong>
-        Run <code>amc quickscore --rapid</code> only when you want a lightweight pulse check. Use <code>amc</code> for the full score.
-      </div>
+        <h2 id="score">Your score</h2>
+        <p>AMC scores an agent from records of what it did, in five areas, on a scale from L0 to L5. Today the highest level AMC gives is L2, and only behaviour AMC observed itself can reach it. 240 of the 244 questions cannot rise above L1 yet, and L3 to L5 are not evaluated. What an agent or its makers report about themselves reaches L1 at most. A score is not a certificate and does not show that an agent meets any law. <a href="methodology.html">How the score works</a>.</p>
 
-      <div class="callout">
-        <strong>Expanded lifecycle assessment:</strong>
-        Run <code>amc run --question-set lifecycle</code> when you want the explicit 264-question set covering lifecycle governance, evidence binding, runtime watch, proof exports, reasoning memory, and fleet operation. Default scoring stays on the stable 244-question set.
-      </div>
+        <h2 id="surfaces">The eight tools</h2>
+        <table>
+          <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Score</strong></td><td>Scores an agent from records of what it did.</td></tr>
+            <tr><td><strong>Shield</strong></td><td>Runs attack tests against an agent, such as prompt injection and data leaks.</td></tr>
+            <tr><td><strong>Enforce</strong></td><td>Sets rules for what an agent may do, and asks a person to approve risky actions.</td></tr>
+            <tr><td><strong>Vault</strong></td><td>Keeps the keys that sign AMC's records. A signature shows who wrote a record and that it is unchanged, not that it is true.</td></tr>
+            <tr><td><strong>Watch</strong></td><td>Follows an agent over time and points out changes.</td></tr>
+            <tr><td><strong>Comply</strong></td><td>Lines up records against frameworks such as the EU AI Act. It does not certify that you comply.</td></tr>
+            <tr><td><strong>Fleet</strong></td><td>Compares and governs several agents together.</td></tr>
+            <tr><td><strong>Passport</strong></td><td>Packs an agent's score and records into a signed file others can check with AMC.</td></tr>
+          </tbody>
+        </table>
 
-      <!-- Understanding Results -->
-      <h2 id="understand-results">Understanding Your Results</h2>
-      <p>Your full score output includes:</p>
+        <h2 id="next-steps">Next steps</h2>
+        <ul>
+          <li><a href="adapters.html">Connect an agent you already run</a>, so AMC sees what it does.</li>
+          <li><a href="compliance.html">Line up records against a framework</a>.</li>
+          <li><a href="cli.html">Look up a command</a>. <code>amc help &lt;command&gt;</code> explains any command in the terminal.</li>
+          <li><a href="index.html">Browse all guides</a>.</li>
+        </ul>
 
-      <div class="card-grid">
-        <div class="card">
-          <h4>Overall Maturity Level</h4>
-          <p>An L0–L5 maturity score with a percentage breakdown. No level is a legal threshold; external claims also require evidence readiness <code>READY</code>.</p>
-        </div>
-        <div class="card">
-          <h4>Dimension Scores</h4>
-          <p>5 dimension scores covering strategy, skills, resilience, leadership, and alignment.</p>
-        </div>
-        <div class="card">
-          <h4>Gap Analysis</h4>
-          <p>Specific gaps with severity, proof chains, evidence episodes, resource refs, and concrete actions to fix each one.</p>
-        </div>
-        <div class="card">
-          <h4>README Badge</h4>
-          <p>A shields.io badge showing your agent's trust level. Run <code>amc badge</code> to generate it.</p>
-        </div>
-      </div>
-
-      <h3>What each level means</h3>
-      <div class="level-scale">
-        <div class="level-item">
-          <div class="level-num">L0</div>
-          <div class="level-name">Absent</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L1</div>
-          <div class="level-name">Initial</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L2</div>
-          <div class="level-name">Developing</div>
-        </div>
-        <div class="level-item highlight">
-          <div class="level-num">L3</div>
-          <div class="level-name">Defined</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L4</div>
-          <div class="level-name">Managed</div>
-        </div>
-        <div class="level-item">
-          <div class="level-num">L5</div>
-          <div class="level-name">Optimizing</div>
-        </div>
-      </div>
-
-      <h2 id="surfaces">The 8 AMC Surfaces</h2>
-      <p>AMC stays simple by keeping every feature under one trust stack.</p>
-      <table>
-        <thead>
-          <tr><th>Surface</th><th>Promise</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><strong>Score</strong></td><td>Score trust before you ship</td><td>Evidence-weighted scoring across live execution behavior instead of brochure claims.</td></tr>
-          <tr><td><strong>Shield</strong></td><td>Attack your agent before attackers do</td><td>Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy.</td></tr>
-          <tr><td><strong>Enforce</strong></td><td>Wrap agent actions in policy</td><td>Approval gates, scoped permissions, and runtime controls for sensitive operations.</td></tr>
-          <tr><td><strong>Vault</strong></td><td>Cryptographically prove what happened</td><td>Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody.</td></tr>
-          <tr><td><strong>Watch</strong></td><td>See trust drift before it hurts you</td><td>Monitors posture over time and surfaces anomalies, regressions, and risky changes.</td></tr>
-          <tr><td><strong>Comply</strong></td><td>Map trust evidence to real frameworks</td><td>Turns technical evidence into regulator-readable artifacts for audits and risk reviews.</td></tr>
-          <tr><td><strong>Fleet</strong></td><td>Govern many agents like an actual platform</td><td>Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines.</td></tr>
-          <tr><td><strong>Passport</strong></td><td>Make trust portable between environments</td><td>Issues a portable, signed trust identity that can move between tools, teams, and environments.</td></tr>
-        </tbody>
-      </table>
-
-      <!-- Next Steps -->
-      <h2 id="next-steps">Next Steps</h2>
-      <p>Once you have your first score, here's what to explore:</p>
-
-      <div class="card-grid">
-        <div class="card">
-          <h4>Auto-fix your gaps</h4>
-          <p>Run <code>amc fix</code> to generate guardrails, CI gates, and governance docs. Use <code>amc guide --go</code> to auto-apply guardrails to your framework config.</p>
-        </div>
-        <div class="card">
-          <h4>Connect your agent</h4>
-          <p>Use <code>amc evidence collect</code> for a guided wizard, or set up an <a href="adapters.html">adapter</a> for your framework. One environment variable — zero code changes.</p>
-        </div>
-        <div class="card">
-          <h4>Verify runtime controls</h4>
-          <p>Run <code>amc guardrails list</code> to separate signed control requests from effective Runtime Firewall bindings. Catalog-only controls stay inactive instead of being presented as protection.</p>
-        </div>
-        <div class="card">
-          <h4>Generate reports</h4>
-          <p>Name a run with <code>amc run-alias set q1-assessment latest</code>, then run <code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code> for a static share bundle, or <code>amc report q1-assessment --executive</code> for a terminal summary.</p>
-        </div>
-        <div class="card">
-          <h4>Check compliance</h4>
-          <p>Use <code>amc compliance report --framework EU_AI_ACT</code> for EU AI Act mapping, or explore the full <a href="compliance.html">compliance guide</a>.</p>
-        </div>
-      </div>
-
-      <h3>Useful commands after your first score</h3>
-      <table>
-        <thead>
-          <tr><th>Command</th><th>What it does</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>amc fix</code></td><td>Generate remediation files (guardrails, CI gate, governance docs)</td></tr>
-          <tr><td><code>amc guide --go</code></td><td>Auto-detect framework and apply guardrails to config</td></tr>
-          <tr><td><code>amc guide --status</code></td><td>One-line health check</td></tr>
-          <tr><td><code>amc doctor</code></td><td>Check runtime and workspace health</td></tr>
-          <tr><td><code>amc up</code></td><td>Start AMC Studio (gateway, proxy, dashboard, API)</td></tr>
-          <tr><td><code>amc guardrails list</code></td><td>Show requested, effective, bound, and signature-verified guardrail status</td></tr>
-          <tr><td><code>amc guardrails enable prompt-injection-detection</code></td><td>Persist a signed additive Runtime Firewall control request</td></tr>
-          <tr><td><code>amc evidence collect</code></td><td>Interactive wizard to connect your agent</td></tr>
-          <tr><td><code>amc evidence lifecycle list|inspect|export --redacted</code></td><td>Open or export the lifecycle artifacts behind full-score runs</td></tr>
-          <tr><td><code>amc evidence episodes list|inspect|export --redacted</code></td><td>Open or export the evidence episodes behind full-score runs</td></tr>
-          <tr><td><code>amc evidence decisions list|inspect</code></td><td>Open recommendation and evidence-request receipts</td></tr>
-          <tr><td><code>amc evidence decisions observe &lt;run&gt;</code></td><td>Update older receipts with observed outcomes from a later full-score run</td></tr>
-          <tr><td><code>amc evidence observability list|inspect</code></td><td>Open component attribution, experience signals, and decision-chain records</td></tr>
-          <tr><td><code>amc memory writeback &lt;episode&gt;</code></td><td>Store a redacted, evidence-backed reasoning lesson with expiry and a receipt</td></tr>
-          <tr><td><code>amc memory retrieve --consumer studio</code></td><td>Retrieve active memory lessons with citations for score, recommendations, fixer, or Studio</td></tr>
-          <tr><td><code>amc run-alias set &lt;alias&gt; &lt;run&gt;</code></td><td>Name a diagnostic run for report, history, and customer-success workflows</td></tr>
-          <tr><td><code>amc report &lt;run|alias|latest&gt;</code></td><td>Review confidence, uncertainty, low-evidence downgrades, and auto-fix review gates</td></tr>
-          <tr><td><code>amc report &lt;alias&gt; --share --public-base-url &lt;url&gt;</code></td><td>Generate a static report bundle with local and public URLs for client review</td></tr>
-          <tr><td><code>amc trace index|failures</code></td><td>Inspect distilled trace indexes and recurring failure clusters</td></tr>
-          <tr><td><code>amc mechanic rca run &lt;run&gt;</code></td><td>Create RCA, regression tests, rollback pointers, and governed Enforce fix proposals</td></tr>
-          <tr><td><code>amc mechanic rca list|show</code></td><td>Review signed Fixer RCA reports</td></tr>
-          <tr><td><code>amc experiment optimize --rca latest</code></td><td>Create isolated candidates with held-out validation, leakage checks, Pareto ranking, and receipts</td></tr>
-          <tr><td><code>amc experiment optimizer-list|optimizer-show</code></td><td>Review accepted and rejected optimizer candidates</td></tr>
-          <tr><td><code>amc resource snapshot|validate|apply|rollback</code></td><td>Record, gate, accept, and rollback the resources governed by Enforce</td></tr>
-          <tr><td><code>amc firewall enable --mode block</code></td><td>Protect live Bridge/Gateway traffic with allow, warn, or block decisions</td></tr>
-          <tr><td><code>amc firewall events|export --redacted</code></td><td>Inspect and export signed runtime decisions for audit or SIEM review</td></tr>
-          <tr><td><code>amc firewall migrate-signature --approve-legacy-kind</code></td><td>Verify and preserve an exact legacy policy in the monotonic journal</td></tr>
-          <tr><td><code>amc shield confirm scope-write --file security-scope.json</code></td><td>Authorize controlled exploit confirmation with ownership, time window, safe mode, and allowed techniques</td></tr>
-          <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Convert an authorized finding into safe proof with hashes, signal refs, and receipts</td></tr>
-          <tr><td><code>amc shield confirm export &lt;proof&gt; --out safe-proof.json</code></td><td>Export redacted confirmation proof without exploit instructions</td></tr>
-          <tr><td><code>amc import &lt;path&gt; --dry-run</code></td><td>Detect neutral traces, runs, graphs, configs, memory, evaluator outputs, and benchmarks before writing</td></tr>
-          <tr><td><code>amc import &lt;path&gt;</code></td><td>Write redacted imported evidence into episodes, lifecycle runs, resource manifests, and trace indexes</td></tr>
-          <tr><td><code>amc strategy compare --file strategies.json</code></td><td>Compare inference strategies by score, cost, latency, risk, confidence, and evidence</td></tr>
-          <tr><td><code>amc strategy compare --file strategies.json --apply --approve</code></td><td>Commit the recommended model route only with policy approval, manifest evidence, and rollback data</td></tr>
-          <tr><td><code>amc runtime create|event|inspect</code></td><td>Persist connected-agent run state and redacted event streams shared by CLI and Studio</td></tr>
-          <tr><td><code>amc fleet graph write --file graph.json</code></td><td>Register typed nodes, handoffs, tools, contracts, policies, permissions, and invariants</td></tr>
-          <tr><td><code>amc fleet graph validate</code></td><td>Check graph contracts, unsafe permissions, cycles, and fan-out before fleet scoring</td></tr>
-          <tr><td><code>amc fleet score --all --stream</code></td><td>Full-score every configured agent with progressive results</td></tr>
-          <tr><td><code>amc fleet lifecycle list|show</code></td><td>Inspect parent/child fleet lifecycle evidence, topology, typed graph digest, and cascade failures</td></tr>
-          <tr><td><code>npm run release:gate</code></td><td>Run the release gate for CLI, Studio assets, OpenAPI, docs drift, domain packs, and receipt output</td></tr>
-          <tr><td><code>amc badge</code></td><td>Generate a maturity badge for your README</td></tr>
-          <tr><td><code>amc assurance run --scope full</code></td><td>Run the built-in red team across the full assurance library</td></tr>
-          <tr><td><code>amc observe timeline</code></td><td>See score progression, evidence volume, and recent anomalies</td></tr>
-          <tr><td><code>amc trace inspect</code></td><td>Inspect sessions, tool calls, decisions, and trust tiers</td></tr>
-          <tr><td><code>amc dataset create</code></td><td>Create a golden dataset for business-specific eval cases</td></tr>
-          <tr><td><code>amc dataset run</code></td><td>Run a curated dataset against your model or gateway endpoint</td></tr>
-          <tr><td><code>amc lite-score</code></td><td>Score a plain chatbot or LLM app without full agent wiring</td></tr>
-          <tr><td><code>amc business kpi</code></td><td>Map maturity levels to risk reduction and audit readiness</td></tr>
-          <tr><td><code>amc leaderboard show</code></td><td>Compare agent maturity scores across your fleet</td></tr>
-        </tbody>
-      </table>
-
-      <!-- Footer -->
-      <div class="doc-footer">
-        <span>Agent Maturity Compass — The credit score for AI agents.</span>
-        <span>Next: <a href="cli.html">CLI Reference →</a></span>
-      </div>
-
+        <nav class="doc-next" aria-label="More docs">
+          <span><a href="index.html">All docs</a></span>
+          <span>Next: <a href="cli.html">CLI Reference</a></span>
+        </nav>
+      </article>
     </div>
   </main>
-</div>
 
-<script>
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const id = a.getAttribute('href').slice(1);
-    const el = document.getElementById(id);
-    if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    // Update sidebar active
-    document.querySelectorAll('.sidebar a').forEach(s => s.classList.remove('active'));
-    a.classList.add('active');
-  });
-});
-// Copy buttons on pre blocks
-document.querySelectorAll('pre').forEach(pre => {
-  const btn = document.createElement('button');
-  btn.className = 'copy-btn'; btn.textContent = 'Copy';
-  btn.onclick = () => {
-    navigator.clipboard.writeText(pre.querySelector('code').textContent.trim());
-    btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 1500);
-  };
-  pre.appendChild(btn);
-});
-</script>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="../#a4-forge">Build an agent</a><a href="../#capabilities">Run it</a><a href="../#paths">Already have an agent?</a><a href="../#install">Get AMC</a><a href="../#desktop">macOS app</a><a href="../#products">Eight tools</a><a href="../executive.html">Executives</a><a href="../playground.html">Playground</a><a href="../docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="../a4.html">A4 Forge</a><a href="../methodology.html">Approach and research</a><a href="../compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="../#pricing">Price</a><a href="../#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="../#domains">All packs</a><a href="../station-environment.html">Environment</a><a href="../station-health.html">Health</a><a href="../station-wealth.html">Wealth</a><a href="../station-education.html">Education</a><a href="../station-mobility.html">Mobility</a><a href="../station-technology.html">Technology</a><a href="../station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="../accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="../script.js?v=14"></script>
+  <script src="../home.js?v=3"></script>
+  <script src="../pages.js?v=2"></script>
 </body>
 </html>

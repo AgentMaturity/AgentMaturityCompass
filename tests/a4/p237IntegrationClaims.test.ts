@@ -46,10 +46,10 @@ describe("IntegrationClaim from adapter claim manifests (P2-37)", () => {
     const claude = claims["claude-code"];
     expect(claimLabel(claude)).toBe("enforced at hook:PreToolUse");
     expect(claude).toMatchObject({ supported: "supported", evidenceTier: "observed", reason: null, source: `${CC} (amc.adapter-claim-manifest/v1)` });
-    expect(claude.conformanceReceipt).toMatchObject({ pinnedVersion: "2.1.296" });
+    expect(claude.conformanceReceipt).toMatchObject({ pinnedVersion: "2.1.296, 2.1.325" });
     expect(claude.conformanceReceipt!.sha256).toMatch(/^[0-9a-f]{64}$/);
     expect(claimLabel(claims.pi)).toBe("enforced at pi:tool_call");
-    expect(claims.pi.conformanceReceipt?.pinnedVersion).toBe("1.0.2, 1.0.4");
+    expect(claims.pi.conformanceReceipt?.pinnedVersion).toBe("1.0.2, 1.0.4, 1.5.2");
     for (const claim of Object.values(claims)) expect(a4IntegrationClaimV1Schema.safeParse(claim).success).toBe(true);
   });
 

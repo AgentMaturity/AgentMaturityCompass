@@ -1,6 +1,6 @@
 # AFTER_FIRST_SCORE.md — What to do after your first AMC score
 
-You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly. This page explains the next moves without drowning you in every command AMC has.
+You ran `amc` and got a full score: in a terminal, by choosing "Just show my score" in the start menu (or with `amc --no-menu`); in a script or CI, `amc` prints it directly (in a folder AMC has not set up yet, `amc --yes`). This page explains the next moves without drowning you in every command AMC has.
 
 ---
 
@@ -9,12 +9,12 @@ You ran `amc` and got a full score: in a terminal, by choosing "Just show my sco
 AMC scores trust maturity from **L0 to L5**.
 
 High level:
-- **L0 — Absent**: no demonstrated controls
-- **L1 — Initial**: minimal, mostly manual controls
-- **L2 — Developing**: repeatable controls with partial coverage
-- **L3 — Defined**: systematic, documented, evidence-backed controls
-- **L4 — Managed**: measured, proactive, proof-oriented controls
-- **L5 — Optimizing**: continuously verified improvement
+- **L0 — Absent**: not evidenced
+- **L1 — Initial**: self-declared (240 of the 244 questions cannot rise above L1 today)
+- **L2 — Developing**: configuration evidence AMC observed (4 questions can reach it today)
+- **L3 — Defined**: runtime evidence AMC observed (no question can reach it yet)
+- **L4 — Managed**: continuity, anchoring and sampling (not evaluated yet)
+- **L5 — Optimizing**: independently attested (not evaluated yet)
 
 The score matters, but the score alone is not the point.
 
@@ -28,7 +28,7 @@ Read the two trust lines separately:
 - **Artifact status** (`VALID`, `INVALID`, `UNSIGNED`) tells you whether the report and seal verify.
 - **Evidence readiness** (`READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, `UNVERIFIED`) tells you whether the evidence can support external claims.
 
-A clean first run commonly reports `VALID` plus `INSUFFICIENT_EVIDENCE`. That is not a contradiction. Signing proves integrity, not evidence sufficiency. Only `READY` is claim-eligible.
+A clean first run commonly reports `VALID` plus `INSUFFICIENT_EVIDENCE`. That is not a contradiction. A signature shows the record is unchanged, not that there is enough evidence. Only `READY` is claim-eligible.
 
 ---
 
@@ -115,4 +115,4 @@ That is how you move from exploratory scoring into execution evidence. Then scor
 - **Watch** — traces, anomalies, monitoring, and decision observability
 - **Comply** — framework mapping and audit reporting
 - **Fleet** — multi-agent comparison and governance
-- **Passport** — portable trust identity artifacts
+- **Passport** — a self-issued, signed summary of an agent's results that others can check

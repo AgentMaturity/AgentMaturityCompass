@@ -43,7 +43,8 @@ describe("What to do now: one next step per screen", () => {
   test("an unacknowledged item is acknowledged before approval is asked for", () => {
     const waiting = item("plan_unresolved", { nextAction: { label: "Answer the missing facts" } });
     const m = move(ctx({ project: project({ step: "proposed" }) }, { items: [waiting], allowed: { requestGate: { allowed: false, reasonCodes: ["plan_unresolved"] } } }));
-    expect(m.now).toContain("acknowledges plan_unresolved");
+    expect(m.now).toContain('acknowledges "Rules that depend on unknown facts"');
+    expect(m.now).not.toContain("plan_unresolved");
     expect(m.act?.focus).toContain("reason");
   });
   test("with no second person, it says so before a gate is requested, with the exact command when nobody else exists", () => {
@@ -57,7 +58,7 @@ describe("What to do now: one next step per screen", () => {
     const gates = { direction: { gateId: "g1", status: "PENDING", approvals: 0, required: 1 } };
     const author = move(ctx({ project: project({ step: "proposed" }), gates: [{ gateId: "g1", excludedKeys: ["LOCAL_USER:u1"] }] }, { gates }));
     expect(author.now).toContain("separation of duties");
-    expect(author.act).toBeUndefined();
+    expect(author.act).toEqual({ label: "Copy link to this page", copy: true }); // the waiting author sends the approver this page
     expect(move(ctx({ project: project({ step: "proposed" }) }, { gates: { direction: { gateId: "g1", status: "QUORUM_MET" } } })).act?.press).toBe("complete");
   });
   test("a step the viewer's roles cannot take is not their primary action", () => {
@@ -70,8 +71,8 @@ describe("What to do now: one next step per screen", () => {
     const readiness = { gates: { completion: { gateId: "g4", status: "PENDING", approvals: 0, required: 2 } },
       items: [item("sod", { reasonCodes: ["QUORUM_UNREACHABLE", "ELIGIBLE:1", "REQUIRED:2"] })] };
     const m = move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "reviewed" }), gates: [{ gateId: "g4", request: { rolesAllowed: ["APPROVER", "OWNER"] } }] }, readiness));
-    expect(m.now).toContain("needs 2 people who may approve it, and only 1 can");
-    expect(m.now).toContain("amc user add --username <name> --role APPROVER");
+    expect(m.now).toContain("needs 2 different people other than whoever wrote, built or asked for this step");
+    expect(m.now).toContain("Only 1 can approve it now");
   });
   test("a requirement that holds the step comes first, with its own button when a card has one", () => {
     const readiness = { gates: { completion: { gateId: "g5", status: "QUORUM_MET" } },
@@ -88,7 +89,8 @@ describe("What to do now: one next step per screen", () => {
     expect(m.now).toContain("amc user role set alice");
   });
   test("Assemble: close the build session before Review; open the effect gate after the completion quorum", () => {
-    expect(move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "built" }) })).now).toContain("Close and verify");
+    expect(move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "built" }), allowed: { review: { allowed: false, reasonCodes: ["BUILD_SESSION_OPEN"] } } })).now)
+      .toContain("Close and verify");
     const met = { gates: { completion: { gateId: "g3", status: "QUORUM_MET" } }, items: [item("effect_gate", { mandatory: false, reasonCodes: ["EFFECT_GATE_NOT_OPEN"] })] };
     expect(move(ctx({ stage: "assemble", project: project({ stage: "assemble", step: "reviewed" }) }, met)).act?.press).toBe("open-effect");
   });
@@ -105,7 +107,7 @@ describe("What to do now: one next step per screen", () => {
     const html = start.renderStartHere(ctx({ project: project({ step: "understood" }) }) as never);
     expect(html).toContain("An agent project takes one agent from a brief to a recorded deployment");
     expect(html).toContain('aria-current="step"');
-    expect(html).toContain("step 2 of 8");
+    expect(html).toContain("part 2 of 8, Check how AMC understood you");
     expect(html.match(/a4-primary/g)).toHaveLength(1);
     expect(html).toContain("not that it is true");
     expect(html).toContain("nothing here says the agent is safe, correct or lawful");
@@ -143,7 +145,7 @@ test("preview off and the demo say what A4 is and the way forward, keeping the p
   expect(start.previewOffHtml()).toContain("Agent projects are turned off in this workspace");
   expect(start.previewOffHtml()).toContain(view.previewNoticeHtml());
   expect(start.demoHtml()).toContain("view-only demo");
-  expect(start.demoHtml()).toContain("AMC_A4_PREVIEW=1 amc up");
+  expect(start.demoHtml()).toContain("<code>amc up</code>");
   const page = readFileSync("src/console/assets/a4.js", "utf8");
   expect(page).toContain("start.previewOffHtml()");
   expect(page.indexOf('me.userId === "local-demo"')).toBeLessThan(page.lastIndexOf("await previewOptions()"));
@@ -264,5 +266,13 @@ describe("starting an agent project from an Industry Pack (2026-11-14)", () => {
     expect(m.now).toContain("cannot show that two approvers are two different people");
     expect(m.also).toBe("#a4Missing");
     expect(start.renderStartHere(ctx({ project: project({ step: "proposed" }) }, { items: [item("sod.self_provisioned")], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } }) as never)).toContain('data-a4-also="#a4Missing"');
+  });
+
+  test("alone on a regulated project the guide names inviting a second person, not an acknowledgement that cannot help", () => {
+    const alone = item("sod.self_provisioned", { reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT", "NO_SECOND_APPROVER"] });
+    const m = move(ctx({ project: project({ step: "proposed" }) }, { items: [alone], allowed: { requestGate: { reasonCodes: ["sod.self_provisioned"] } } })) as { now: string; act?: { focus?: string } };
+    expect(m.now).toContain("Nobody else on this project can approve it");
+    expect(m.now).not.toContain("acknowledges");
+    expect(m.act?.focus).toBe(".a4-invite input");
   });
 });

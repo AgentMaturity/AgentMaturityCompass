@@ -150,6 +150,8 @@ export interface RequestFailureMeta extends RequestOutcomeMetaBase {
   /** AMC's decision at dispatch time — not a property of the failure. */
   readonly policy: { readonly mode: "normal" | "always"; readonly retryable: boolean };
   readonly credential: RecordedCredential;
+  /** The connection never opened (the code, e.g. ECONNREFUSED): no request byte reached the provider. Absent otherwise. */
+  readonly connectFailed?: string;
 }
 
 export type RequestOutcomeMeta = RequestResponseMeta | RequestFailureMeta;
@@ -207,6 +209,7 @@ export function buildRequestOutcomeMeta(
     failure: params.failure,
     ...(params.usage === undefined ? {} : { usage: params.usage }),
     policy: params.policy,
-    credential: params.credential
+    credential: params.credential,
+    ...(params.connectFailed === undefined ? {} : { connectFailed: params.connectFailed })
   };
 }

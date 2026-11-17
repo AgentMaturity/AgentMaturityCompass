@@ -25,6 +25,8 @@ import { CONTROL_HOOK_EVENTS, type HookCall, type HookControlDecision, type Hook
 export interface AuthorizationTarget {
   readonly toolName: string;
   readonly actionClass: ActionClass;
+  /** Raises the signed approval rule for this target (the untrusted-input guard asks for at least one person). */
+  readonly quorumFloor?: { readonly requiredApprovals: number };
 }
 
 /** The hook lease the Bridge verified for this request. */

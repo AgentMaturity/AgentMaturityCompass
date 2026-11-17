@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import chalk from "chalk";
 import {
+  acceptUnknownUsageAsync,
   budgetsPath,
   evaluateBudgetStatus,
   initBudgetsAsync,
@@ -53,14 +54,38 @@ export function registerBudgetCommands(program: Command): void {
     .action((opts: { agent: string }) => {
       const status = evaluateBudgetStatus(process.cwd(), opts.agent);
       console.log(JSON.stringify(status, null, 2));
-      if (!status.ok) process.exit(1);
+      if (!status.ok) {
+        // The JSON stays machine-readable on stdout; the person reads why and what to do on stderr.
+        console.error(chalk.red(`Budget for agent ${opts.agent} is blocking: ${status.reasons.join("; ")}.`));
+        for (const step of status.next) console.error(`Next: ${step}`);
+        process.exit(1);
+      }
     });
 
   budgets.command("reset")
+    .description("Record a budget-day reset (it does not restore allowance), or accept earlier unknown model usage")
     .requiredOption("--agent <agentId>", "agent ID")
-    .requiredOption("--day <yyyy-mm-dd>", "budget day to reset")
-    .action((opts: { agent: string; day: string }) => {
-      const eventId = resetBudgetDay({ workspace: process.cwd(), agentId: opts.agent, day: opts.day });
-      console.log(chalk.green(`Budget reset logged: ${eventId}`));
+    .option("--day <yyyy-mm-dd>", "budget day to record a reset for")
+    .option("--accept-unknown", "sign into budgets.yaml that model requests recorded so far with unknown usage no longer block this agent; limits are unchanged")
+    .action(async (opts: { agent: string; day?: string; acceptUnknown?: boolean }) => {
+      if (opts.day === undefined && opts.acceptUnknown !== true) {
+        console.error("Give --day <yyyy-mm-dd> to record a reset, or --accept-unknown to accept earlier unknown model usage.");
+        process.exitCode = 1;
+        return;
+      }
+      if (opts.day !== undefined) {
+        const eventId = resetBudgetDay({ workspace: process.cwd(), agentId: opts.agent, day: opts.day });
+        console.log(chalk.green(`Budget reset logged: ${eventId}`));
+      }
+      if (opts.acceptUnknown === true) {
+        try {
+          const accepted = await acceptUnknownUsageAsync(process.cwd(), opts.agent);
+          console.log(chalk.green(`Accepted: model requests recorded before ${accepted.acceptedBefore} with unknown usage no longer block agent ${opts.agent}.`));
+          console.log(`Signed into budgets.perAgent.${accepted.entry}.acceptUnknownUsageBefore in .amc/budgets.yaml. Limits are unchanged; a later request with unknown usage blocks again.`);
+        } catch (error) {
+          console.error(`Could not sign the acceptance: ${error instanceof Error ? error.message : String(error)}`);
+          process.exitCode = 1;
+        }
+      }
     });
 }

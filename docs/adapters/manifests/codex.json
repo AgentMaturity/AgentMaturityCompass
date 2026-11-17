@@ -16,6 +16,14 @@
       "onFailure": "proceeds",
       "source": "docs/adapters/codex.md",
       "cases": []
+    },
+    {
+      "name": "session hooks (SessionStart, SessionEnd, UserPromptSubmit, Stop, SubagentStart, SubagentStop, PreCompact, PostCompact, Interrupt)",
+      "role": "observe",
+      "tools": [],
+      "onFailure": "proceeds",
+      "source": "docs/adapters/codex.md",
+      "cases": []
     }
   ],
   "notCovered": [

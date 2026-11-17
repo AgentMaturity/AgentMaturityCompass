@@ -38,7 +38,7 @@ export function orgCommitmentsDir(workspace: string): string {
   return join(orgRootDir(workspace), "commitments");
 }
 
-export function defaultOrgConfig(enterpriseName = "AMC Enterprise"): OrgConfig {
+export function defaultOrgConfig(enterpriseName = "My organisation"): OrgConfig {
   return {
     version: 1,
     enterpriseId: `ent_${randomUUID()}`,
@@ -53,7 +53,7 @@ export function defaultOrgConfig(enterpriseName = "AMC Enterprise"): OrgConfig {
       {
         id: "ecosystem",
         type: "ECOSYSTEM",
-        name: "Partner Ecosystem",
+        name: "Partners",
         parentId: null
       }
     ],

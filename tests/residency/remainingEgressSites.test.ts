@@ -70,7 +70,7 @@ afterEach(async () => {
 describe("shell egress proxy", () => {
   const through = async (method: "GET" | "CONNECT") => {
     const rows: ShellEgressRow[] = [];
-    const proxy = await startShellEgressProxy({ allowHosts: ["127.0.0.1"], record: (row) => rows.push(row), workspace, agentId: "default" });
+    const proxy = await startShellEgressProxy({ allowHosts: [`127.0.0.1:${origin.port}`], record: (row) => rows.push(row), workspace, agentId: "default" });
     try {
       const status = await new Promise<number>((done, fail) => {
         const req = httpRequest({ host: "127.0.0.1", port: proxy.port, method, path: method === "CONNECT" ? `127.0.0.1:${origin.port}` : `${origin.url}/x`,

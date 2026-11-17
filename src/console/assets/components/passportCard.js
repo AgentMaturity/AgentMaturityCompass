@@ -1,3 +1,5 @@
+import { workspacePath } from "../pageKit.js";
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -20,9 +22,8 @@ export function renderPassportCard(row) {
         <strong>${esc(row?.passportId ?? "unknown")}</strong>
         <span class="${css}">${esc(status)}</span>
       </div>
-      <div class="muted">scope=${esc(row?.scopeType ?? "-")}</div>
-      <div class="muted">generated=${esc(iso(row?.generatedTs))}</div>
-      <div><code>${esc(row?.file ?? "-")}</code></div>
+      <div class="muted">For: ${esc(String(row?.scopeType ?? "-").toLowerCase())} · made ${esc(iso(row?.generatedTs))}</div>
+      <div><code>${esc(workspacePath(String(row?.file ?? "-")))}</code></div>
     </div>
   `;
 }

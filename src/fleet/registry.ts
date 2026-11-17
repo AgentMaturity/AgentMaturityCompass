@@ -60,6 +60,8 @@ export const agentConfigSchema = z.object({
   domain: z.string().min(1),
   primaryTasks: z.array(z.string()).min(1),
   stakeholders: z.array(z.string()).min(1),
+  /** The named person or team answerable for this agent. Optional: an agent without one counts as "without an owner". */
+  owner: z.string().min(1).max(200).optional(),
   riskTier: z.enum(["low", "med", "high", "critical"]),
   provider: z.object({
     templateId: z.string().min(1),

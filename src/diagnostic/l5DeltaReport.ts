@@ -16,7 +16,7 @@ import { questionBank } from "./questionBank.js";
 import { notEvaluatedLevel } from "./levelSemantics.js";
 import { classifyControls, type ControlEnforcementLevel } from "./controlClassification.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { agentRunFiles } from "./runReportResolution.js";
+import { latestRunFile } from "./runReportResolution.js";
 import type { DiagnosticReport, QuestionScore } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -146,7 +146,7 @@ function getL5Requirements(questionId: string): { missing: string[]; evidence: s
 // ---------------------------------------------------------------------------
 
 function loadLatestReport(workspace: string, agentId: string): DiagnosticReport | null {
-  const latest = agentRunFiles(workspace, agentId).at(-1);
+  const latest = latestRunFile(workspace, agentId);
   if (!latest) return null;
   try {
     return JSON.parse(readUtf8(latest)) as DiagnosticReport;

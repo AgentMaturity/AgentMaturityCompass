@@ -499,7 +499,7 @@ function detectCrossAgentContradictions(
 }
 
 // ---------------------------------------------------------------------------
-// Receipt chain verification (cross-agent)
+// Time-window overlap across a declared delegation (a heuristic: times only, no signatures checked)
 // ---------------------------------------------------------------------------
 
 export interface CrossAgentReceiptChain {
@@ -509,10 +509,14 @@ export interface CrossAgentReceiptChain {
   fromReceiptCount: number;
   toReceiptCount: number;
   matchedReceipts: number;
-  chainCoverage: number; // 0-1 ratio of matched/total
+  chainCoverage: number; // 0-1 share of calls with overlapping activity (time-window overlap, not a verified chain)
   gaps: string[];
 }
 
+/**
+ * Counts, per declared delegation, how many of the first agent's calls had any activity from the second agent within 60
+ * seconds. The names are kept for the SDK; the result is a time-window overlap, never a verified chain of receipts.
+ */
 export function verifyCrossAgentReceipts(
   workspace: string,
   edges: DelegationEdge[],
@@ -547,7 +551,7 @@ export function verifyCrossAgentReceipts(
       if (hasCorrespondingTo) {
         matched++;
       } else {
-        gaps.push(`No matching receipt from ${edge.toAgentId} for event ${fe.id} at ${new Date(fe.ts).toISOString()}`);
+        gaps.push(`No activity from ${edge.toAgentId} within 60 seconds of event ${fe.id} at ${new Date(fe.ts).toISOString()}`);
       }
     }
 

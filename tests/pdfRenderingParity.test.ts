@@ -1,3 +1,4 @@
+import { passportEvidenceMixWords, passportStatusWords } from "../src/passport/passportSchema.js";
 import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -181,7 +182,8 @@ describe("actual public evidence and passport rendering", () => {
     const passport = passportBadgeCli({ workspace: ws, agentId: "default" }).passport;
     const lines = [
       "AMC Passport Share Certificate", `Generated: ${new Date().toISOString()}`, "Agent: default",
-      `Passport ID: ${passport.passportId}`, `Status: ${passport.status.label}`, `Maturity Overall: ${passport.maturity.overall ?? "UNKNOWN"}`,
+      `Passport ID: ${passport.passportId}`, `Status: ${passportStatusWords(passport.status.label)}`, `Evidence mix: ${passportEvidenceMixWords(passport)}`,
+      "Self-issued: the workspace signed this about its own agent. The signature shows who wrote it and that it is unchanged, not that it is true.", `Maturity Overall: ${passport.maturity.overall ?? "UNKNOWN"}`,
       `Strategic Ops: ${passport.maturity.byFiveLayers.strategicOps ?? "UNKNOWN"}`, `Leadership: ${passport.maturity.byFiveLayers.leadership ?? "UNKNOWN"}`,
       `Culture: ${passport.maturity.byFiveLayers.culture ?? "UNKNOWN"}`, `Resilience: ${passport.maturity.byFiveLayers.resilience ?? "UNKNOWN"}`,
       `Skills: ${passport.maturity.byFiveLayers.skills ?? "UNKNOWN"}`, `Public URL: ${shared.publicUrl}`, `Verify URL: ${shared.verificationUrl}`, `QR URL: ${shared.qrCodeUrl}`,

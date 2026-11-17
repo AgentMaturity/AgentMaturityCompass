@@ -41,6 +41,7 @@ import type { AuthorizationIntentResult } from "../actions/authorize.js";
 import type { ActionClass } from "../types.js";
 import type {
   ApprovalAsk,
+  ApprovalAskDisplay,
   ApprovalDecision,
   ApprovalRiskTier
 } from "../approvals/seam/approvalSeamTypes.js";
@@ -102,6 +103,7 @@ function refusalText(decision: ApprovalDecision, toolName: string): string {
 async function ask(approval: ToolApprovalSeam, options: ToolApprovalGateOptions, call: {
   readonly callId: string; readonly toolName: string; readonly where: string; readonly signal?: AbortSignal;
   readonly intent: AuthorizationIntentResult | null; readonly legacyPayload: Record<string, unknown>;
+  readonly display: ApprovalAskDisplay;
 }): Promise<ApprovalDecision> {
   const intent = call.intent?.ok === true ? call.intent : null;
   const reviewed = options.reviewedActionClasses;
@@ -116,6 +118,8 @@ async function ask(approval: ToolApprovalSeam, options: ToolApprovalGateOptions,
     // Hashed into the engine request's `intentHash`, so the grant is bound to THESE facts and a later call with
     // different ones cannot spend it.
     intentPayload: intent?.payload ?? call.legacyPayload,
+    // Not hashed, not stored: what a person at a prompt is shown.
+    display: call.display,
     // The turn's signal, so a cancelled turn withdraws the question instead of leaving a live grant behind.
     ...(call.signal === undefined ? {} : { signal: call.signal })
   });
@@ -144,7 +148,7 @@ export function gateToolCallsOnApproval(
     ask: async (execution, intent) => {
       const decision = await ask(approval, options, { callId: execution.callId, toolName: execution.name, intent,
         where: `from inside the program of call ${execution.rootCallId}`, signal: execution.signal,
-        legacyPayload: { toolName: execution.name, arguments: execution.arguments } });
+        legacyPayload: { toolName: execution.name, arguments: execution.arguments }, display: { arguments: execution.arguments } });
       return decision.proceed ? { approvalRequestIds: decision.approvalRequestId === null ? [] : [decision.approvalRequestId] } : null;
     }
   });
@@ -167,7 +171,7 @@ export function gateToolCallsOnApproval(
       const decision = await ask(approval, options, { callId: request.callId, toolName: request.toolName, intent,
         where: `during turn ${request.turn}, step ${request.step}`, signal: request.signal,
         // Without an intent, the model's own arguments, verbatim.
-        legacyPayload: { toolName: request.toolName, rawArguments: request.rawArguments } });
+        legacyPayload: { toolName: request.toolName, rawArguments: request.rawArguments }, display: { rawArguments: request.rawArguments } });
 
       if (!decision.proceed) {
         return {

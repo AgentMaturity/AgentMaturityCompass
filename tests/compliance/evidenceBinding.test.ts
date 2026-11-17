@@ -7,7 +7,7 @@ import { openLedger } from "../../src/ledger/ledger.js";
 import { getAgentPaths } from "../../src/fleet/paths.js";
 import { canonicalize } from "../../src/utils/json.js";
 import { sha256Hex } from "../../src/utils/hash.js";
-import { evidenceProducer, PRODUCER_BY_SOURCE } from "../../src/claims/evidenceProvenance.js";
+import { AMC_RUNTIME_SOURCES, evidenceProducer, PRODUCER_BY_SOURCE } from "../../src/claims/evidenceProvenance.js";
 import { isBoundToControl, subjectRole, verifiedAssuranceByPack } from "../../src/compliance/evidenceBinding.js";
 import type { ComplianceEvidenceRequirement, ComplianceMapping } from "../../src/compliance/mappingSchema.js";
 import type { EvidenceEvent } from "../../src/types.js";
@@ -42,7 +42,12 @@ describe("evidenceProducer", () => {
       .map((source): [Record<string, unknown>, string] => [{ source }, "manual"]),
     [{ source: "webhook" }, "external-report"],
     [{ source: "stdin_pipe" }, "amc-runtime"],
-    [{ source: "constructor" }, "amc-runtime"],
+    // Fail closed: a source nobody classified is unknown, never AMC runtime (and never an inherited object key).
+    [{ source: "constructor" }, "unknown-source"],
+    [{ source: "some_new_importer" }, "unknown-source"],
+    // Words that label something other than a ledger row never count as AMC runtime.
+    ...["agent", "provider", "backoff", "user-env", "both"].map((source): [Record<string, unknown>, string] => [{ source }, "unknown-source"]),
+    [{ source: 7 }, "unknown-source"],
     [{}, "amc-runtime"]
   ];
   test.each(rows)("%j -> %s", (meta, producer) => {
@@ -60,18 +65,9 @@ describe("evidenceProducer", () => {
  * A new importer that writes `source: "x_import"` fails this test until someone classifies it.
  */
 const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
-  "", "active", "adapter-observation", "adapters", "agent", "agents", "amc", "amc-registered", "amc.audit", "api",
-  "approvals", "assurance", "audit-logs", "backoff", "backup", "both", "bridge", "budgets", "built-in-mcp-agent-provider",
-  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
-  "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
-  "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
-  "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
-  "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "model", "native", "none", "ops", "ops.blobs",
-  "override-near-miss-analytics", "plugin", "plugins", "policy", "project-env", "provider", "provider-drift-benchmark",
-  "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
-  "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
-  "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
-  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "user-env", "users", "validators",
+  // AMC's own runtime labels live in src (AMC_RUNTIME_SOURCES): the reader uses the same list, so a label missing
+  // there reads as an unknown source, which is SELF_REPORTED.
+  "", ...AMC_RUNTIME_SOURCES,
   // Never an evidence event's meta.source (reviewed 2026-10-11): claim-route labels that pick an HTTP result envelope
   // (P0-23, P1-11); catalog applicability exclusion kinds (P1-10); legal-hold registry row kinds, which write no ledger
   // rows (P2-01). The self-report-shaped literals (user, inferred, numeric_self_answer, default) are mapped to manual
@@ -84,6 +80,17 @@ const REVIEWED_RUNTIME_OR_NON_EVIDENCE = new Set([
   // A4 Activate record labels (P1-62, reviewed 2026-10-12 at the 442cd919 merge): a monitor record field no source could
   // fill (src/a4/a4Monitor.ts) and a value claim's recommended lane (src/a4/a4Value.ts). Neither is a ledger meta.source.
   "source_unavailable", "value_contract",
+  // Conditional labels found by the wider scan (vault lane, 2026-11-16), none a ledger meta.source: Aspire's answer
+  // source (src/a4/aspireUnderstand.ts), a session export's payload origin (src/observability/sessionExport.ts), a hook
+  // action identity's id origin (src/bridge/hookActionIdentity.ts), an external-evidence export's producer name
+  // (src/importers/externalEvidenceExport.ts) and a guardrail binding's origin (src/enforce/guardrailRuntimeBindings.ts).
+  "answers.stations", "blob", "derived-request-id", "provider-call-id", "neutral-artifact", "tool-pipeline",
+  // Labels that name something other than a ledger row (vault lane review, 2026-11-16), so the reader does not count them
+  // as AMC runtime: a memory item's author (src/score/memoryIntegrity.ts), where a retry delay came from
+  // (src/agent/requestRetry.ts delaySource), a credential's origin (src/credentials/credentialsSnapshot.ts) and a secret
+  // pattern's engine (src/shield/redaction/secretPatterns.ts). "none" stays runtime: the delegated child's hook-control
+  // row writes it as meta.source (src/agent/subagentRunner.ts).
+  "agent", "provider", "backoff", "user-env", "both",
   // A secret pattern's contributing engine (P2-02 hardening, src/shield/redaction/secretPatterns.ts SecretPatternSource),
   // reviewed 2026-10-18 at the codex-full merge. It labels where a redaction pattern came from, never a ledger meta.source.
   "dataflow",
@@ -115,7 +122,12 @@ describe("source-literal enumeration", () => {
   test("every source literal in src is classified", () => {
     const literals = new Set<string>();
     for (const file of sourceFiles("src")) {
-      for (const match of readFileSync(file, "utf8").matchAll(/source: "([a-z_.-]*)"/g)) literals.add(match[1] ?? "");
+      const text = readFileSync(file, "utf8");
+      for (const match of text.matchAll(/source: "([a-z_.-]*)"/g)) literals.add(match[1] ?? "");
+      // A conditional label too: `source: cond ? "none" : "parent-loop"` hid a runtime label (vault lane, 2026-11-16).
+      for (const match of text.matchAll(/source: [^,\n}"]*\?[^,\n}]*/g)) {
+        for (const literal of (match[0] ?? "").matchAll(/"([a-z_.-]*)"/g)) literals.add(literal[1] ?? "");
+      }
     }
     expect(literals.size).toBeGreaterThan(50);
     const unclassified = [...literals].filter((source) =>

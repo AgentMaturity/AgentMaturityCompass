@@ -8,12 +8,33 @@ import { canonicalize } from "../utils/json.js";
 
 /**
  * Who produced a ledger event. Only "amc-runtime" evidence (AMC observed it itself) may support a
- * positive regulated result; imported, manual, external and synthetic rows are recorded but never
+ * positive regulated result; imported, manual, external, synthetic and unknown-source rows are recorded but never
  * admitted as proof. P0-18 owns this table and derives trust tiers from it.
  */
-export type EvidenceProducer = "amc-runtime" | "import" | "manual" | "external-report" | "synthetic";
+export type EvidenceProducer = "amc-runtime" | "import" | "manual" | "external-report" | "synthetic" | "unknown-source";
 
-/** Every `meta.source` that is not AMC runtime evidence. Anything absent is amc-runtime. */
+/**
+ * Every `meta.source` AMC's own runtime writes on a ledger row. The labels fail closed: a row that names a source
+ * found neither here nor in PRODUCER_BY_SOURCE is "unknown-source" and reads SELF_REPORTED. A new runtime writer adds
+ * its label here (tests/compliance/evidenceBinding.test.ts fails until every `source: "…"` literal in src is classified).
+ */
+export const AMC_RUNTIME_SOURCES: ReadonlySet<string> = new Set([
+  "active", "adapter-observation", "adapters", "agents", "amc", "amc-registered", "amc.audit", "api",
+  "api.score.formal-spec", "api.score.result", "api.score.run",
+  "approvals", "assurance", "audit-logs", "backup", "bridge", "budgets", "built-in-mcp-agent-provider",
+  "builtin", "catalog-only", "cli", "compliance", "correlation", "decision", "defaults", "derived", "detector",
+  "diagnostic-eval-replay-corpus-boundary", "env", "eoc", "eval-replay-corpus", "eval.run.layer", "eval.run.question",
+  "events", "failed-evaluation", "file", "filesystem", "firewall", "fleet", "forecast", "gateway", "hook", "hook_control",
+  "host", "identity", "incident-regression", "inference-strategy-comparison", "judge-calibration", "ledger", "leases",
+  "linked-recorded-request-outcomes", "live-score-behavior-drift", "local", "model", "native", "none", "ops", "ops.blobs",
+  "override-near-miss-analytics", "parent-loop", "plugin", "plugins", "policy", "project-env", "provider-drift-benchmark",
+  "redteam", "registry", "release", "replay-benchmark-corpus", "reports", "request-failure", "retention.auto",
+  "risk-cost-latency-slo", "roles", "sdk", "settings", "shield.exploit_confirmation", "stdin_pipe", "studio",
+  "studio-audit", "support-observation", "toolhub", "tools", "trace", "transform", "transparency", "trust", "trust-list",
+  "trust-list-history", "turn-error", "turn-events", "undeclared-runner", "users", "validators"
+]);
+
+/** Every `meta.source` that is known not to be AMC runtime evidence. */
 export const PRODUCER_BY_SOURCE: Readonly<Record<string, Exclude<EvidenceProducer, "amc-runtime">>> = Object.freeze({
   "dogfood-maturity": "synthetic",
   // P2-27 seeded fixture captures remain synthetic even if a claim flag is absent or mislabelled.
@@ -69,8 +90,11 @@ export function evidenceProducer(event: Pick<EvidenceEvent, "meta_json">): Evide
 export function producerOfMeta(meta: Record<string, unknown>): EvidenceProducer {
   if (meta.provenance === "dogfood" || meta.claimKind === "synthetic_example") return "synthetic";
   const source = meta.source;
-  const producer = typeof source === "string" && Object.hasOwn(PRODUCER_BY_SOURCE, source) ? PRODUCER_BY_SOURCE[source] : undefined;
-  return producer ?? "amc-runtime";
+  // A row that names no source is one of AMC's own writers, which mostly label nothing.
+  if (source === undefined || source === null) return "amc-runtime";
+  if (typeof source !== "string") return "unknown-source";
+  if (Object.hasOwn(PRODUCER_BY_SOURCE, source)) return PRODUCER_BY_SOURCE[source]!;
+  return AMC_RUNTIME_SOURCES.has(source) ? "amc-runtime" : "unknown-source";
 }
 
 /**
@@ -190,9 +214,11 @@ function boundEntry(attestation: ThirdPartyAttestation, meta: Record<string, unk
 
 /**
  * The tier a reader may use. Synthetic rows are excluded (null). ATTESTED counts only while its attestation is bound
- * to this row and verifies against the trust list by a key that is not the workspace's own. Imported, manual and
- * external rows are otherwise SELF_REPORTED, and AMC runtime rows keep their declared tier, a missing or unknown one
- * reading SELF_REPORTED. Stored rows are never rewritten. `reader` may be a loader, which runs only for a row that
+ * to this row and verifies against the trust list by a key that is not the workspace's own. Imported, manual,
+ * external and unknown-source rows are otherwise SELF_REPORTED, and AMC runtime rows keep their declared tier, a
+ * missing or unknown one reading SELF_REPORTED. A runtime row whose content somebody else reported
+ * (`contentTier: "SELF_REPORTED"`, e.g. what a provider's hook says ran) reads SELF_REPORTED too: AMC saw the report
+ * arrive, it did not see what the report describes. Stored rows are never rewritten. `reader` may be a loader, which runs only for a row that
  * claims ATTESTED with an attestation bound to it.
  */
 export function effectiveTrustTier(event: ReadRow, reader: ReaderTrust | (() => ReaderTrust)): TrustTier | null {
@@ -206,7 +232,7 @@ export function effectiveTrustTier(event: ReadRow, reader: ReaderTrust | (() => 
     const { trustList, ownKeyIds } = typeof reader === "function" ? reader() : reader;
     return verifyThirdPartyAttestation(attestation, trustList, ownKeyIds).verified ? "ATTESTED" : "SELF_REPORTED";
   }
-  return producer === "amc-runtime" ? declared : "SELF_REPORTED";
+  return producer === "amc-runtime" && meta.contentTier !== "SELF_REPORTED" ? declared : "SELF_REPORTED";
 }
 
 /**

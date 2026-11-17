@@ -15,7 +15,7 @@ import { passportHarnessSchema, type PassportHarness } from "./passportHarness.j
 import { digestFile } from "./passportSigner.js";
 import { verifyProofsAgainstSignedRoot } from "../bench/benchProofs.js";
 import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspaceSelfTrust, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
-import { listPassportExportFiles, getPassportRevocation } from "./passportStore.js";
+import { listPassportExportFiles, passportRevocationStatus } from "./passportStore.js";
 import {
   verifyPassportPolicySignatureForApi as verifyPassportPolicySignature,
   verifyPassportCacheSignatureForApi as verifyPassportCacheSignature
@@ -112,12 +112,18 @@ export function verifyPassportArtifactFile(params: {
       });
     }
     if (params.workspace) {
-      const revocation = getPassportRevocation(params.workspace, passport.passportId);
-      if (revocation) {
-        errors.push({
-          code: "PASSPORT_REVOKED",
-          message: `passport revoked at ${new Date(revocation.revokedTs).toISOString()}`
-        });
+      // Fail closed: a signed revocation list that does not verify, or is older than one already seen, is not "not revoked".
+      try {
+        const revocation = passportRevocationStatus(params.workspace, passport.passportId);
+        if (revocation) {
+          errors.push({
+            code: "PASSPORT_REVOKED",
+            message: `passport revoked at ${new Date(revocation.revokedTs).toISOString()}`
+          });
+        }
+      } catch (error) {
+        errors.push({ code: "PASSPORT_REVOCATION_LIST_INVALID",
+          message: `the passport revocation list could not be checked, so the passport is not taken as current: ${error instanceof Error ? error.message : String(error)}` });
       }
     }
     const digest = sha256Hex(Buffer.from(canonicalize(passport), "utf8"));

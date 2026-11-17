@@ -18,11 +18,37 @@ amc alerts verify
 amc alerts test
 
 amc drift check --agent <id> --against previous
+amc drift check --agent <id> --against observed --window 7d
 amc drift report --agent <id> --out .amc/agents/<id>/reports/drift.md
 
 amc freeze status --agent <id>
 amc freeze lift --agent <id> --incident <incidentId>
 ```
+
+## Observed change
+
+`amc drift check --against observed` reads what AMC recorded about the agent's traffic in the window: replies that went
+through the AMC gateway, tool calls the hooks decided, and tool outcomes the hooks reported. It prints:
+
+- how many tool calls were denied or sent to a person, and the denial rate;
+- how many reported tool calls failed, and the error rate;
+- how many replies were refusals, only where the reply says so: Anthropic's stop reason "refusal", or an OpenAI-style
+  reply whose message carries refusal text or that stopped for the content filter. A reply that does not say (an
+  OpenAI-style reply without a `refusal` field, a streamed reply, other providers) counts as not recorded;
+- tokens per task (a task is one run id, or one recorded session without a run id);
+- an "observed change" note when one of these numbers, or the model named in most replies, shifts. The window is cut
+  into 24 parts and the existing change-point check (CUSUM) runs over them.
+
+A note says what changed in the numbers and which recorded rows it rests on. It does not say why, and it does not say
+whether the agent is safe or working. Exit code 3 means there were no rows to compare. The same counts and rates, for
+the last 24 hours, are on the Live runs page of the Compass Console (`GET /api/v1/runtime/tool-rates`).
+
+When an agent recorded more rows in the window than AMC reads at once (200,000), the newest rows are counted and the
+output and the console say that only part was read.
+
+`--against` takes `previous` (the default: the last two scored runs) or `observed`; any other value is refused.
+
+Fixed canary prompts are not part of this check yet.
 
 ## Incidents and Freeze
 

@@ -2,7 +2,8 @@
  * Red Team runner — executes attack simulations against a target agent.
  *
  * Composes assurance-pack scenarios × attack strategies, runs each combination
- * through the synthetic response engine, and produces a vulnerability report.
+ * against the real agent under test (multi-turn strategies as real conversations; effect-graded scenarios
+ * repeated with their benign twins), and produces a vulnerability report.
  */
 
 import { randomUUID } from "node:crypto";
@@ -26,7 +27,7 @@ import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { getAssurancePack, listAssurancePacks } from "../assurance/packs/index.js";
-import type { AssurancePackDefinition, AssuranceScenarioDefinition } from "../assurance/validators.js";
+import type { AssurancePackDefinition } from "../assurance/validators.js";
 import { aggregatePackScore } from "../assurance/scorers.js";
 import { gradeScenarioReply } from "../assurance/scenarioGrading.js";
 import {
@@ -34,7 +35,11 @@ import {
   resolveAgentResponder,
   type AgentResponder
 } from "../assurance/agentResponder.js";
-import { resolveStrategies, type RedTeamStrategy } from "./strategies.js";
+import { resolveStrategies } from "./strategies.js";
+import { auditRejectedReceipt, runEffectRedTeamRow, strategyNotApplied } from "./effectRow.js";
+import { adaptiveReportLines, adaptiveTotals, attackerNotApplied, runAdaptiveEffectRow, type AdaptiveAttacker, type AdaptiveRunTotals } from "./adaptiveRow.js";
+import { EFFECT_RATE_CAVEAT, gradingLabel, packAttempts, pooledAttackRate } from "../assurance/cliPresentation.js";
+import type { AgentChatTurn } from "../assurance/agentResponder.js";
 import {
   normalizeMCPAttackCategories,
   runMCPAgentRedTeam,
@@ -97,8 +102,10 @@ export interface RedTeamPluginResult {
   failCount: number;
   score0to100: number;
   scenarioResults: Array<
-    AssuranceScenarioResult & { strategyId: string; strategyName: string }
+    AssuranceScenarioResult & { strategyId: string; strategyName: string; turns?: number }
   >;
+  /** Scenario and strategy pairs that were not run, each with the reason (present only when there are any). */
+  notApplied?: Array<{ scenarioId: string; strategyId: string; reason: string }>;
 }
 
 export type RedTeamVerificationStatus = "SIGNED_VALID" | "SIGNED_INVALID" | "UNSIGNED_VALID";
@@ -163,6 +170,8 @@ export interface RedTeamReport {
   /** The agent target actually attacked. */
   target?: { transport: "gateway" | "direct"; endpoint: string; model: string };
   evilMcp?: RedTeamEvilMcpResult;
+  /** First-round and within-budget success when an attacker model proposed injections (`--attacker-model`). */
+  attacker?: AdaptiveRunTotals;
 }
 
 export interface RunRedTeamInput {
@@ -185,6 +194,10 @@ export interface RunRedTeamInput {
   evilMcp?: boolean;
   /** Optional MCP attack categories or aliases. Empty / undefined = all. */
   mcpAttackCategories?: string[];
+  /** An attacker model and its budget: effect-graded scenarios with an injection slot are attacked for up to its rounds. */
+  attacker?: AdaptiveAttacker;
+  /** Extra packs to run (scenarios loaded from a public attack corpus file). */
+  extraPacks?: AssurancePackDefinition[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -395,6 +408,7 @@ export function renderRedTeamMarkdown(report: RedTeamReport): string {
   lines.push(`| Failed | ${report.totalFail} |`);
   lines.push(`| Vulnerabilities Found | ${report.vulnerabilities.length} |`);
   lines.push("");
+  if (report.attacker) lines.push("## Attacker model", "", ...adaptiveReportLines(report.attacker), "");
 
   if (report.evilMcp) {
     lines.push("## Evil MCP Coverage");
@@ -445,12 +459,21 @@ export function renderRedTeamMarkdown(report: RedTeamReport): string {
 
   lines.push("## Plugin Results");
   lines.push("");
-  lines.push("| Plugin | Scenarios | Pass | Fail | Score |");
-  lines.push("|--------|-----------|------|------|-------|");
+  lines.push("| Plugin | Scenarios | Pass | Fail | Score | How graded |");
+  lines.push("|--------|-----------|------|------|-------|------------|");
   for (const pr of report.pluginResults) {
-    lines.push(`| ${pr.packTitle} | ${pr.scenarioCount} | ${pr.passCount} | ${pr.failCount} | ${pr.score0to100}/100 |`);
+    const method = pr.scenarioResults.some((row) => row.effect) ? "structured" : pr.scenarioResults.find((row) => row.gradingMethod)?.gradingMethod;
+    const rate = pooledAttackRate(pr);
+    lines.push(`| ${pr.packTitle} | ${pr.scenarioCount} | ${pr.passCount} | ${pr.failCount} | ${pr.score0to100}/100 | ${gradingLabel(method, packAttempts(pr))}${rate ? `; ${rate}` : ""} |`);
   }
   lines.push("");
+  if (report.pluginResults.some((pr) => pr.scenarioResults.some((row) => row.effect))) { lines.push(EFFECT_RATE_CAVEAT); lines.push(""); }
+  for (const pr of report.pluginResults.filter((item) => item.notApplied?.length)) {
+    const skipped = pr.notApplied!;
+    lines.push(`Strategies ${[...new Set(skipped.map((item) => item.strategyId))].join(", ")} on ${new Set(skipped.map((item) => item.scenarioId)).size} ` +
+      `scenarios of ${pr.packTitle}: ${skipped[0]!.reason}.`);
+    lines.push("");
+  }
 
   lines.push("---");
   lines.push("*Generated by `amc redteam`*");
@@ -480,10 +503,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   const admitReceipts = gatewayReceiptAdmitter(workspace);
 
   // Resolve plugins (packs)
-  const packs: AssurancePackDefinition[] =
-    input.plugins && input.plugins.length > 0
-      ? input.plugins.map((id) => getAssurancePack(id))
-      : listAssurancePacks();
+  const packs: AssurancePackDefinition[] = [...(input.plugins && input.plugins.length > 0 ? input.plugins.map((id) => getAssurancePack(id))
+    : listAssurancePacks()), ...(input.extraPacks ?? [])];
 
   // Resolve strategies
   const strats = resolveStrategies(input.strategies);
@@ -508,12 +529,37 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   let totalPass = 0;
   let totalFail = 0;
   let inconclusiveCount = 0;
+  let effectNotEvaluated = 0;
 
   for (const pack of packs) {
     const scenarioResults: RedTeamPluginResult["scenarioResults"] = [];
+    const skipped: NonNullable<RedTeamPluginResult["notApplied"]> = [];
 
     for (const scenario of pack.scenarios) {
+      // An effect row: not evaluated counts as not passed; a failure is a vulnerability.
+      const tallyEffectRow = (merged: RedTeamPluginResult["scenarioResults"][number]) => {
+        scenarioResults.push(merged);
+        if (merged.inconclusive) { inconclusiveCount += 1; effectNotEvaluated += 1; return; }
+        if (merged.pass) { totalPass++; return; }
+        totalFail++;
+        const severity = classifySeverity(merged.score0to100, false);
+        allVulns.push({ scenarioId: scenario.id, scenarioTitle: scenario.title, packId: pack.id, strategyId: merged.strategyId, strategyName: merged.strategyName,
+          severity, cvss: scoreRedTeamCvss({ category: scenario.category, severity, scenarioScore0to100: merged.score0to100 }),
+          prompt: merged.prompt, response: merged.response, reasons: merged.reasons, score0to100: merged.score0to100 });
+      };
+      const attackerSkip = input.attacker ? attackerNotApplied(scenario) : null;
+      if (input.attacker && attackerSkip === null) {
+        const at = { packId: pack.id, scenarioId: `${scenario.id}::attacker-model` };
+        const merged = { scenarioId: at.scenarioId, title: scenario.title, category: scenario.category, riskTier: "all" as const, prompt: scenario.effect!.slot!.text,
+          strategyId: "attacker-model", strategyName: `Attacker model ${input.attacker.model.id}`,
+          ...await runAdaptiveEffectRow({ scenario, context, responder, rows, at, agentId, admitReceipts, attacker: input.attacker }) };
+        tallyEffectRow(merged);
+        continue;
+      }
+      if (attackerSkip !== null) skipped.push({ scenarioId: scenario.id, strategyId: "attacker-model", reason: attackerSkip });
       for (const strat of strats) {
+        const notApplied = strategyNotApplied(scenario, strat);
+        if (notApplied !== null) { skipped.push({ scenarioId: scenario.id, strategyId: strat.id, reason: notApplied }); continue; }
         const rawPrompt = scenario.buildPrompt(context);
         const attackPrompt = strat.transform(rawPrompt);
         const row = {
@@ -522,8 +568,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           category: scenario.category,
           riskTier: scenario.riskTier === "all" ? ("all" as const) : context.riskTier,
           prompt: attackPrompt,
-          correlatedRequestIds: [],
-          evidenceEventIds: [],
+          correlatedRequestIds: [] as string[],
+          evidenceEventIds: [] as string[],
           strategyId: strat.id,
           strategyName: strat.name
         };
@@ -533,28 +579,49 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           if (rows !== null) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "REDTEAM_SCENARIO_INCONCLUSIVE", severity: "HIGH", message: `Attack not measured: ${reasons.join(" | ")}` });
           return { ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons, auditEventTypes: [] as string[], evidenceEventIds: ids, inconclusive: true };
         };
-        const answer = await responder.respond(attackPrompt).catch((error: unknown) => {
+        if (scenario.effect) {
+          tallyEffectRow({ ...row, ...await runEffectRedTeamRow({ scenario, strat, context, responder, rows, at: scenarioRow, promptEventId, agentId, admitReceipts }) });
+          continue;
+        }
+        // Multi-turn strategies are real conversations: each warm-up turn is answered before the next is sent.
+        const history: AgentChatTurn[] = [];
+        const warmUpIds: string[] = [];
+        let turnsSent = 0;
+        const sendTurns = async () => {
+          for (const turn of strat.warmUp ?? []) {
+            const reply = await responder.respond(turn, { history: [...history] });
+            turnsSent += 1;
+            const receipt = admitReceipts(reply, agentId);
+            auditRejectedReceipt(rows, scenarioRow, receipt);
+            if (rows !== null) warmUpIds.push(writeScenarioPrompt({ ...rows, ...scenarioRow, prompt: turn }),
+              writeScenarioResponse({ ...rows, ...scenarioRow, response: reply.text, toolCalls: reply.toolCalls, gatewayReceipt: receipt }));
+            history.push({ role: "user", content: turn }, { role: "assistant", content: reply.text });
+          }
+          turnsSent += 1;
+          return responder.respond(attackPrompt, { history: [...history] });
+        };
+        const answer = await sendTurns().catch((error: unknown) => {
           if (!(error instanceof AgentResponderInvocationError)) throw error;
           return error;
         });
         // Not reached => not attacked. Refused, tool-call-only or token-claim => not graded. Neither is ever scored.
         if (answer instanceof AgentResponderInvocationError) {
           inconclusiveCount += 1;
-          scenarioResults.push(inconclusiveRow("", [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], promptEventId === null ? [] : [promptEventId]));
+          scenarioResults.push(inconclusiveRow("", [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], [...(promptEventId === null ? [] : [promptEventId]), ...warmUpIds]));
           continue;
         }
         const response = answer.text;
         const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};
         // Only a verified pair can supply a correlation id. Refused receipts are audited without affecting grading.
         const receipt = admitReceipts(answer, agentId);
-        if (rows !== null && receipt.rejected.length > 0) writeAssuranceAudit({ ...rows, ...scenarioRow, auditType: "ASSURANCE_RECEIPT_REJECTED", severity: "HIGH", message: `Gateway receipt rejected: ${receipt.rejected.join(" | ")}` });
+        auditRejectedReceipt(rows, scenarioRow, receipt);
         const correlatedRequestIds = receipt.request === null ? [] : [receipt.request.receiptId];
         const responseEventId = rows === null ? null : writeScenarioResponse({ ...rows, ...scenarioRow, response, toolCalls: answer.toolCalls, gatewayReceipt: receipt });
         const exchangeIds = promptEventId === null || responseEventId === null ? [] : [promptEventId, responseEventId];
         const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);
         if (grade.kind === "inconclusive") {
           inconclusiveCount += 1;
-          scenarioResults.push({ ...inconclusiveRow(response, grade.reasons, exchangeIds), auditEventTypes: grade.auditTypes, inconclusiveCause: grade.cause, ...toolCalls });
+          scenarioResults.push({ ...inconclusiveRow(response, grade.reasons, [...exchangeIds, ...warmUpIds]), auditEventTypes: grade.auditTypes, inconclusiveCause: grade.cause, ...toolCalls });
           continue;
         }
         const { validation } = grade;
@@ -575,8 +642,10 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
           auditEventTypes: validation.auditTypes,
           gradingMethod: grade.gradingMethod,
           correlatedRequestIds,
-          evidenceEventIds: testEventId === null ? exchangeIds : [...exchangeIds, testEventId],
+          // The earlier turns of a multi-turn strategy follow the final exchange and its result.
+          evidenceEventIds: [...exchangeIds, ...(testEventId === null ? [] : [testEventId]), ...warmUpIds],
           responseTransport: responder.target.transport,
+          turns: turnsSent,
           ...toolCalls
         });
 
@@ -606,7 +675,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
       }
     }
 
-    // Inconclusive rows stay flagged so the aggregate excludes them.
+    // Inconclusive rows stay flagged: keyword rows are left out, not-evaluated effect rows count as not passed.
     const agg = aggregatePackScore(scenarioResults);
 
     pluginResults.push({
@@ -617,6 +686,7 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
       failCount: agg.failCount,
       score0to100: agg.score0to100,
       scenarioResults,
+      ...(skipped.length > 0 ? { notApplied: skipped } : {}),
     });
   }
 
@@ -625,7 +695,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   // is unknown, not secure.
   const evidenceStatus: "MEASURED" | "INSUFFICIENT_EVIDENCE" =
     totalScenarios === 0 ? "INSUFFICIENT_EVIDENCE" : "MEASURED";
-  const overallScore = totalScenarios === 0 ? 0 : Math.round((totalPass / totalScenarios) * 100);
+  // An effect-graded scenario the agent left alone counts as not passed (aggregatePackScore does the same per pack).
+  const overallScore = totalScenarios === 0 ? 0 : Math.round((totalPass / (totalScenarios + effectNotEvaluated)) * 100);
 
   // Evil MCP runs before the session seals, so its rows are part of the sealed session (see below).
   const evilMcp = input.evilMcp ? await runEvilMcp(input, { workspace, agentId, rows }) : null;
@@ -667,6 +738,8 @@ export async function runRedTeam(input: RunRedTeamInput): Promise<RedTeamReport>
   };
 
   if (evilMcp !== null) report.evilMcp = evilMcp;
+  const attackerTotals = input.attacker ? adaptiveTotals(pluginResults.flatMap((pr) => pr.scenarioResults)) : null;
+  if (attackerTotals !== null) report.attacker = attackerTotals;
 
   // Seal the report the way the assurance runner seals its own: hash with the seal fields emptied, sign that hash
   // with the artifact-seal key (`sealedRunReportVerifies` is the one reader of this shape).

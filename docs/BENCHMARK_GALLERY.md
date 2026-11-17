@@ -60,7 +60,7 @@ See: `.github/workflows/amc-score.yml`
 | Domain packs | 40 |
 | Framework adapters | 16 |
 | Scoring modules | 74+ |
-| CLI command paths | 1,304 |
+| CLI command paths | 1,302 |
 
 These numbers come from the actual repo, not marketing material.
 
@@ -105,7 +105,9 @@ AMC includes real release engineering, not just "we tagged a version":
 
 ## Evidence Trust Tiers
 
-| Tier | Weight | How |
+No trust weight is applied to a maturity level: a question's level is gated by evidence tier instead (only OBSERVED evidence can support L2 and above; self-reported and attested evidence support L1 at most). The weights below scale side scores only (confidence, citation quality, drift, community signals), from the one table in `src/score/trustWeights.ts`.
+
+| Tier | Side-score weight | How |
 |---|---|---|
 | `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios |
 | `OBSERVED` | 1.0× | Captured via gateway proxy |

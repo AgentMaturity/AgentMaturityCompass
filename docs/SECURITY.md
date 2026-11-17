@@ -15,12 +15,12 @@ AMC defends against all of these through layered tamper-proofing.
 
 ## Trust Tiers
 
-Evidence in AMC carries a trust tier that determines its weight in scoring:
+Evidence in AMC carries a trust tier. No trust weight is applied to a maturity level: a question's level is gated by evidence tier instead (only OBSERVED evidence can support L2 and above; self-reported and attested evidence support L1 at most). The weights below scale side scores only (confidence, citation quality, drift, community signals), from the one table in `src/score/trustWeights.ts`.
 
-| Tier | Weight | Source | Description |
+| Tier | Side-score weight | Source | Description |
 |------|--------|--------|-------------|
 | OBSERVED | 1.0× | Gateway/Monitor/Proxy | Captured in real time by trusted AMC infrastructure. Agent cannot forge. |
-| OBSERVED_HARDENED | 1.0× | Sandbox + Proxy | OBSERVED evidence from a sandboxed execution with network isolation. Strongest tier. |
+| OBSERVED_HARDENED | 1.1× | Sandbox + Proxy | OBSERVED evidence from a sandboxed execution with network isolation. Strongest tier. |
 | ATTESTED | 0.8× | Ingested + third-party-signed | Imported logs signed by a third party whose key is pinned for `independent-attestation`; the operator's own attestation leaves them SELF_REPORTED. Lower trust than OBSERVED. |
 | SELF_REPORTED | 0.4× | Agent self-report | Provided by the agent itself. Used only as claims, never as proof. |
 

@@ -20,18 +20,21 @@ function nearby(text: string, needle: string, radius = 200): string[] {
 }
 
 describe("the first console login is in the first-run path", () => {
-  test("the README's 60-seconds block creates the first login after amc up", () => {
-    const section = readme.slice(readme.indexOf("## 60 Seconds to Your First Score"));
+  test("the README's first-score block creates the first login after amc up", () => {
+    const section = readme.slice(readme.indexOf("## Your first score"));
     const block = section.slice(section.indexOf("```bash"), section.indexOf("```", section.indexOf("```bash") + 7));
     expect(block).toContain("amc user init --username <you>   # new workspace only: the first console login (asks for a password)");
     expect(block.indexOf("amc user init")).toBeGreaterThan(block.indexOf("amc up"));
   });
 
-  test("the website's Open Studio step names amc user init and amc user add", () => {
-    const step = website.slice(website.indexOf("<h4>Open Studio when ready</h4>"), website.indexOf("</div>", website.indexOf("<h4>Open Studio when ready</h4>")));
+  test("the website's open-the-console step names amc user init and amc user add", () => {
+    const start = website.indexOf('<h2 id="console">');
+    const step = website.slice(start, website.indexOf("<h2", start + 4));
     expect(step).toContain("amc user init --username &lt;you&gt;   # new workspace only: the first console login (asks for a password)");
-    expect(step).toContain("Then sign in to the Compass Console at the URL amc up printed.");
-    expect(step).toContain("If the workspace already has logins, an OWNER adds yours with <code>amc user add</code>.");
+    expect(step.indexOf("amc user init")).toBeGreaterThan(step.indexOf("amc up"));
+    expect(step).toContain("Then sign in to the Compass Console at the address <code>amc up</code> printed.");
+    expect(step).toContain("If the workspace already has logins, an owner adds yours with <code>amc user add</code>.");
+    expect(step).not.toContain("amc vault unlock");
   });
 });
 
@@ -73,11 +76,61 @@ describe("round-2 features are documented as the code behaves", () => {
 
   test("STUDIO.md says which commands use the remembered passphrase, that the environment overrides it, and that agents never get it", () => {
     // The CLI preAction unlocks from the remembered store, then asks y/N on governance paths (LIVE-VAULT-01).
-    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) \{ unlockWithRememberedPassphrase\(process\.cwd\(\)\); await confirmRememberedUnlock\(process\.cwd\(\), path\); \}/);
+    expect(read("src/cli.ts")).toMatch(/if \(!\/\^\(up\|mcp serve\|connect hooks forward\)\( \|\$\)\/\.test\(path\)\) \{ unlockWithRememberedPassphrase\(process\.cwd\(\)\); await confirmRememberedUnlock\(process\.cwd\(\), path\); \}/);
     const store = read("src/vault/passphraseStore.ts");
     expect(store).toContain('if ((env.AMC_VAULT_PASSPHRASE ?? "").length > 0');
     // Only an interactive operator gets the remembered passphrase: terminal, not agent mode, no agent marker.
     expect(store).toContain("return interactiveOperator({ workspace, env }).ok ? getRememberedVaultPassphrase(workspace, env) : null;");
     expect(read("docs/STUDIO.md")).toContain("After `amc up` remembers the vault passphrase, owner-mode commands in that workspace (`amc`, `amc verify`, `amc user init`, `amc user add`) use it only when an interactive operator runs them: stdin is a terminal, the workspace is not in agent mode and no agent marker is set; governance commands ask y/N first. `AMC_VAULT_PASSPHRASE` in the environment overrides it; agents started by AMC never receive it. See [VAULT.md](VAULT.md) for the full rule and its limits.");
+  });
+});
+
+// Lane docs (2026-11-17): the first pages a newcomer reads match the build as it is now.
+describe("the first pages tell the current first-run story", () => {
+  const firstFive = read("docs/FIRST_FIVE_MINUTES.md");
+  const startHere = read("docs/START_HERE.md");
+  const front = [["README.md", readme], ["docs/GETTING_STARTED.md", gettingStarted], ["docs/FIRST_FIVE_MINUTES.md", firstFive], ["docs/START_HERE.md", startHere]] as const;
+
+  test.each(front)("%s names the one-command source install and no release that does not exist", (_file, text) => {
+    expect(text).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
+    expect(text).not.toMatch(/next release is 2\.0\.0/);
+    expect(text).not.toContain("Node.js 22 or 24 for production");
+  });
+
+  test("README and GETTING_STARTED say when the address works, what install.sh installs, and that Windows is untested", () => {
+    for (const text of [readme, gettingStarted]) {
+      expect(text).toContain("serves the script only after the website is published");
+      expect(text).toContain("has not been tested on a real Windows machine yet");
+      expect(text).toContain("1.1.1");
+    }
+  });
+
+  test("the start menu shown is the real one and lists A4 Forge", () => {
+    expect(read("src/setup/frontDoor.ts")).toContain("Build an agent for my industry (A4 Forge preview)");
+    for (const text of [readme, gettingStarted, firstFive]) expect(text).toContain("Build an agent for my industry (A4 Forge preview)");
+  });
+
+  test("the glossary explains the twelve words a newcomer meets", () => {
+    const glossary = firstFive.slice(firstFive.indexOf("## Words you will meet"));
+    for (const word of ["Receipt", "Ledger", "Vault", "Passphrase", "Gate", "Approver", "Pack", "Station", "Level (L0 to L5)", "Evidence tier", "Bundle", "Passport"]) {
+      expect(glossary).toContain(`| ${word} |`);
+    }
+    expect(glossary).toContain("self-issued");
+    expect(readme).toContain("docs/FIRST_FIVE_MINUTES.md#words-you-will-meet");
+  });
+
+  test("first-run unlock steps never name the remembered passphrase file", () => {
+    for (const text of [firstFive, gettingStarted]) {
+      for (const window of nearby(text, "user init")) expect(window).not.toContain("local-vault-passphrase");
+    }
+    expect(firstFive).not.toContain("local-vault-passphrase");
+  });
+
+  test("Vault and Passport rows make no proof claim", () => {
+    for (const text of [readme, gettingStarted]) {
+      expect(text).not.toContain("Cryptographically prove what happened");
+      expect(text).not.toContain("portable, signed trust identity");
+      expect(text).toContain("self-issued, signed summary");
+    }
   });
 });

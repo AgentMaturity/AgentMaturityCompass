@@ -26,6 +26,7 @@ import {
 } from "./a4Schema.js";
 import { SOD_SENTENCE } from "./a4SoD.js";
 import { ASSEMBLE_REVIEW, REDO_PROPOSAL, STEP_NEXT } from "./a4StepLabels.js";
+import { addApprovers } from "./a4Words.js";
 
 export { A4_BOUND_ITEMS };
 /** P2-22's blocker vocabulary plus the A4-only kinds; P2-22's blocker inbox imports it from here (design §7 rule 3). */
@@ -89,7 +90,7 @@ export interface A4ReadinessState {
   readonly decisions: readonly A4DecisionRow[];
   /** Every chain-named ref, resolved at load: tier recomputed, lane re-derived (src/a4/a4Evidence.ts). */
   readonly refs: readonly (A4ResolvedRef & { readonly revisionNo: number })[];
-  readonly effects: readonly A4EffectRow[];
+  readonly effects: readonly A4EffectRow[]; readonly practice?: boolean; // a4Schema.practiceNow and still one person (a4Identity.onePersonSince); absent reads false
 }
 /** Live facts the caller gathered (a4Gates.collectFacts); null = could not be read. */
 export interface A4LiveFacts {
@@ -279,10 +280,10 @@ const ACTIVATE_PLAN_EFFECT = "a4.adapt.activate_plan";
 export function isRegulated(state: A4ReadinessState, floor: ApprovalA4Floor): boolean {
   if (floor.regulated === true) return true;
   const tier = riskTierOf(state);
-  if (tier !== "low" && tier !== "med" && tier !== "medium") return true;
+  if (tier !== "low" && tier !== "med" && tier !== "medium" && state.practice !== true) return true; // a practice project, still one person: a4Gates.stateOf
   const brief = latestRevision(state, "aspire");
   const prior = brief ? (parseJson(brief.spec_json) as { brief?: { priorRiskTier?: unknown } } | null)?.brief?.priorRiskTier : undefined;
-  if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > TIER_RANK[tier]!)) return true;
+  if (prior !== undefined && prior !== null && (typeof prior !== "string" || (TIER_RANK[prior] ?? 2) > (TIER_RANK[tier ?? ""] ?? 2))) return true;
   if (state.chain.some((link) => link.kind === "EFFECT_FINISHED" && link.body.effect === ACTIVATE_PLAN_EFFECT)) return true;
   return state.revisions.some((revision) => {
     const digests = parseJson(revision.resource_digests_json) as { plan?: { journalEntrySha256?: unknown } } | null;
@@ -385,7 +386,7 @@ export function proposeNextAction(state: A4ReadinessState, stage: A4Stage, label
  * role: generous) and the ACTIVE local workspace OWNERs (implicit owners). Null when unread, or with a host session live (a hosted
  * call has one): host roles are unread. ponytail: an OWNER of the host who is not signed in is not seen; read host memberships then.
  */
-function localDeciders(state: A4ReadinessState, live: A4LiveFacts): Set<string> | null {
+export function localDeciders(state: A4ReadinessState, live: A4LiveFacts): Set<string> | null {
   if (live.localOwners == null || live.hostPrincipals !== 0) return null;
   return new Set([...state.members.filter((member) => member.roles.includes("approver") || member.roles.includes("owner")).map((member) => member.principalKey),
     ...live.localOwners.map((userId) => `LOCAL_USER:${userId}`)]);
@@ -400,9 +401,6 @@ function soloSelfApproval(state: A4ReadinessState, query: A4ReadinessQuery): boo
   return only !== null && deriveSelfApprovalAllowed({ activeLocal, hostPrincipals, hostedRouter, regulated: false, workspaceFloor: query.floor.allowSelfApproval,
     ratcheted: selfApprovalFacts(state, query, only).ratcheted, decidingPrincipal: only });
 }
-/** `amc a4 members` as it runs: a writer names its `amc approvals login` token and the head it read (`amc a4 guide` prints it). */
-const addApprovers = (projectId: string, label: string): NonNullable<A4ReadinessItem["nextAction"]> => ({ label,
-  command: `amc a4 members ${projectId} --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>` });
 const QUORUM_UNREACHABLE = "QUORUM_UNREACHABLE"; // A-5's warning: progress never refuses on it (allowedFor)
 const unread = (id: string, reason: string, mandatory = true): A4ReadinessItem =>
   item(id, "NOT_EVALUATED", { kind: "source_unavailable", reasonCodes: [reason], mandatory });
@@ -458,7 +456,8 @@ function governanceItems(state: A4ReadinessState, query: A4ReadinessQuery, gates
     // A regulated project refuses WORKSPACE_ROUTER decisions until P2-33 (recordDecision, verifyAndConsumeEffect), so every
     // quorum it can count is LOCAL_USER keys, whoever the members are. Derive it from the counted quorum once that lifts.
     regulated && approvers.length > 0
-      ? item("sod.self_provisioned", "WAITING", { kind: "review_pending", reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT"] })
+      ? item("sod.self_provisioned", "WAITING", { kind: "review_pending", reasonCodes: ["SOD_DEGRADED_SELF_PROVISIONED", "REVIEW_NOT_INDEPENDENT", // alone: a4Words names the way out
+        ...(deciders !== null && deciders.size < 2 ? ["NO_SECOND_APPROVER"] : [])] })
       : item("sod.self_provisioned", "READY", { mandatory: regulated })
   ];
   for (const kind of ["direction", "completion"] as const) {
@@ -692,12 +691,12 @@ function allowedFor(state: A4ReadinessState, query: A4ReadinessQuery, items: rea
  */
 export const acknowledgedRecords = (reasonCodes: readonly string[]): string[] => reasonCodes.filter((code) => /^(RECEIPT|CHECK):/.test(code)).sort();
 
-/** The latest unexpired owner acknowledgement per item on the head revision, with the records it was recorded against. */
+/** The latest unexpired owner acknowledgement per item on the head revision (sod.self_provisioned, a workspace fact: any revision), with its records. */
 function acknowledgements(state: A4ReadinessState, now: number): Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }> {
   const out = new Map<string, { ack: NonNullable<A4ReadinessItem["acknowledged"]>; records: string }>();
   for (const link of state.chain) {
     const { itemId, reason, expiresTs, actorKey, ts, recordCodes } = link.body;
-    if (link.kind !== "ACKNOWLEDGED" || link.revisionNo !== state.project.revision_no || typeof itemId !== "string" || typeof reason !== "string"
+    if (link.kind !== "ACKNOWLEDGED" || (link.revisionNo !== state.project.revision_no && itemId !== "sod.self_provisioned") || typeof itemId !== "string" || typeof reason !== "string"
       || typeof expiresTs !== "number" || typeof actorKey !== "string" || typeof ts !== "number" || expiresTs <= now) continue;
     out.set(itemId, { ack: { by: actorKey, ts, expiresTs, reason }, records: JSON.stringify(Array.isArray(recordCodes) ? recordCodes : []) });
   }

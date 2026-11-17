@@ -281,48 +281,37 @@ function currentLevelFromScore(overall: number): number {
 
 /* ── CLI command mapping ───────────────────────────── */
 
+const FIRST_RUN_COLLECT = "amc evidence collect --first-run --runtime any -- <agent command>";
+
 function cliCommandsForGap(q: DiagnosticQuestion, currentLevel: number, targetLevel: number): string[] {
   const cmds: string[] = [];
 
-  // Evidence collection is always step 1 if below L2
+  // Evidence collection is always step 1 if below L2. The bare `amc evidence collect` wizard needs a terminal; this
+  // form also works for an agent or a script reading this guide.
   if (currentLevel < 2) {
-    cmds.push("amc evidence collect");
+    cmds.push(FIRST_RUN_COLLECT);
   }
 
-  // Assurance packs based on layer
-  const layerScopeMap: Record<string, string> = {
-    "Strategic Agent Operations": "strategic",
-    "Leadership & Autonomy": "autonomy",
-    "Culture & Alignment": "alignment",
-    "Resilience": "resilience",
-    "Skills": "skills",
-    "Evaluation & Growth": "evaluation",
-  };
-  const scope = layerScopeMap[q.layerName];
-  if (scope && targetLevel >= 3) {
-    cmds.push(`amc assurance run --scope ${scope}`);
+  // Every command below is one the CLI accepts: assurance has no per-layer scope, no --seal, one --pack per run.
+  if (targetLevel >= 3) {
+    cmds.push("amc assurance run --all");
   }
 
   // Over-compliance questions get specific pack
   if (q.id.startsWith("AMC-OC")) {
-    cmds.push("amc assurance run --pack overCompliance,falsePremise,misleadingContext");
+    cmds.push("amc assurance run --pack over-compliance", "amc assurance run --pack false-premise", "amc assurance run --pack misleading-context");
   }
 
   // Specific commands based on tuning knobs
   for (const knob of q.tuningKnobs) {
     if (knob.includes("guardrails")) cmds.push("amc doctor");
-    if (knob.includes("evalHarness")) cmds.push("amc score formal-spec");
-    if (knob.includes("evidence")) cmds.push("amc evidence collect --sign");
-  }
-
-  // L4+ needs sealed runs
-  if (targetLevel >= 4) {
-    cmds.push("amc assurance run --scope all --seal");
+    if (knob.includes("evalHarness")) cmds.push("amc assurance run --all");
+    if (knob.includes("evidence")) cmds.push(FIRST_RUN_COLLECT);
   }
 
   // L5 needs the loop
   if (targetLevel >= 5) {
-    cmds.push("amc loop start --auto-remediate");
+    cmds.push("amc loop run");
   }
 
   // Deduplicate
@@ -407,7 +396,6 @@ function generateAgentInstruction(q: DiagnosticQuestion, currentLevel: number, t
   parts.push("### Verify this question");
   parts.push(`\`\`\`bash`);
   parts.push(`amc explain ${q.id}`);
-  parts.push(`amc score formal-spec --question ${q.id}`);
   parts.push(`\`\`\``);
   parts.push("");
 
@@ -536,7 +524,7 @@ export function guideToHumanMarkdown(guide: Guide): string {
     lines.push("3. After fixing, run `amc quickscore` to see your new score");
     lines.push("4. Run `amc guide --diff` to see what improved");
     lines.push("");
-    lines.push("Start with `amc evidence collect`: AMC levels a question only on evidence it observes.");
+    lines.push(`Start with \`${FIRST_RUN_COLLECT}\`: AMC levels a question only on evidence it observes.`);
     lines.push("");
   }
 
@@ -667,7 +655,7 @@ export function guideToAgentMarkdown(guide: Guide, framework?: string): string {
   lines.push("");
   lines.push("```bash");
   lines.push("# Collect fresh evidence");
-  lines.push("amc evidence collect");
+  lines.push(FIRST_RUN_COLLECT);
   lines.push("");
   lines.push("# Re-score");
   lines.push("amc quickscore");

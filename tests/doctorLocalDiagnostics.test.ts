@@ -29,6 +29,8 @@ vi.mock("../src/gateway/config.js", () => ({ loadGatewayConfig: () => ({}), rout
 vi.mock("../src/leases/leaseCli.js", () => ({ issueLeaseForCli: seam.lease }));
 vi.mock("../src/workspaces/workspaceId.js", () => ({ workspaceIdFromDirectory: () => "fixture-workspace" }));
 vi.mock("../src/adapters/adapterCli.js", () => ({ adaptersDetectCli: () => [] }));
+// Hook installations are read by hookReleaseCheck (its own test: tests/hookReleaseQualification.test.ts); this seam has none.
+vi.mock("../src/watch/hookReleaseCheck.js", () => ({ hookReleaseDoctorChecks: () => [] }));
 vi.mock("../src/toolhub/toolhubValidators.js", () => ({ pathAllowedByPatterns: () => ({ ok: false }) }));
 vi.mock("../src/trust/trustConfig.js", () => ({ checkNotaryTrust: seam.notary, loadTrustConfig: () => ({ trust: { mode: "NOTARY" } }), verifyTrustConfigSignature: () => seam.signature }));
 vi.mock("../src/crypto/signing/signer.js", () => ({ signDigestWithPolicyAsync: seam.sign }));

@@ -51,6 +51,11 @@ export interface UnifiedRunResult {
   modules: ModuleResult[];
   overallGrade: LetterGrade;
   overallScore: number;
+  /**
+   * True when AMC holds no evidence of this agent doing anything (the diagnostic's evidence coverage is 0). The grades
+   * and numbers are then kept for machines but describe nothing, so text output shows no grade.
+   */
+  nothingToAssess?: boolean;
   surfaceCoverage: {
     evaluated: number;
     total: number;
@@ -515,6 +520,9 @@ export async function unifiedRun(input: UnifiedRunInput): Promise<UnifiedRunResu
     surfaceCoverage,
     topFixes,
   };
+  if (scoreOutput.report?.evidenceCoverage === 0) {
+    result.nothingToAssess = true;
+  }
   if (diagnosticRunId) {
     result.diagnosticRunId = diagnosticRunId;
   }

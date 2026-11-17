@@ -2,17 +2,9 @@
   publish = "website"
   command = ""
 
+# The docs app routes by the part after "#", so no server rewrite is needed for it.
+# There is deliberately no catch-all rule: an unknown path gets 404.html with a 404 status.
 [[redirects]]
   from = "/docs"
   to = "/docs/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/docs/*"
-  to = "/docs/index.html"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
   status = 200

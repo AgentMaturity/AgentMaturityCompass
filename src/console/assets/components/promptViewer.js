@@ -1,3 +1,5 @@
+import { recordRows } from "../pageKit.js";
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -14,10 +16,10 @@ export function renderPromptViewer(params) {
   const lines = [
     `<h4>Provider Prompt (${escapeHtml(params.provider || "generic")})</h4>`,
     `<pre style="max-height:240px;overflow:auto;white-space:pre-wrap">${escapeHtml(systemText)}</pre>`,
-    `<h4>Allowlists</h4>`,
-    `<pre>${escapeHtml(JSON.stringify(allowlists, null, 2))}</pre>`,
-    `<h4>Recurrence Checklist</h4>`,
-    `<pre>${escapeHtml(JSON.stringify(recurrence, null, 2))}</pre>`
+    `<h4>What the agent may use</h4>`,
+    recordRows(allowlists),
+    `<h4>When the pack is rebuilt</h4>`,
+    recordRows(recurrence)
   ];
   return lines.join("");
 }

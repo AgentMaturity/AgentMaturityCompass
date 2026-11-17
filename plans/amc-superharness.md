@@ -349,6 +349,13 @@ Foundational (■■■) domains: D1–D8, D15 — none can be skipped; D1→D3�
 
 ## 5b. Pi comparator digest — the second bar, and where it points
 
+> **Correction note (2026-11-17).** Two statements in this section are out of date; the text below is kept as written.
+> (1) It describes pi v0.84.4 with no MCP, and row A8 depends on that. A watch and fleet audit dated 2026-11-14 reports
+> that pi 1.0 ships native MCP; that was not re-checked against pi's own source for this note, so treat it as not
+> verified here. AMC's qualified pi releases are now 1.0.2, 1.0.4 and 1.5.2 (docs/adapters/pi.md). (2) Rows G2 and G3
+> say AMC has only a one-shot run and three model adapters. Today `amc agent-loop chat` exists, and `amc agent-loop
+> run` names 18 provider routes, `stub` included (its error message for an unknown provider lists them).
+
 ### What pi is
 
 Pi ("pi-monorepo", earendil-works/pi, MIT, lead Mario Zechner) is a minimal terminal coding harness: a TypeScript/ESM monorepo shipping a unified multi-provider LLM client (`pi-ai`), an agent runtime (`pi-agent-core`), a coding-agent CLI (`pi-coding-agent`, bin `pi`), a TUI library, a CBOR remote-session protocol stack (experimental), and vendor-neutral telemetry contracts — all at v0.84.4 (2026-08-28). Its philosophy is the inverse of both dsh and AMC: deliberately **no** MCP, sub-agents, permission popups, plan mode, or sandbox (VERIFIED — README Philosophy + SECURITY.md scope prompt injection out entirely; `agent-loop.ts prepareToolCall()` executes tool calls with no gate); safety is delegated to containers (Gondolin micro-VM / Docker / OpenShell docs) and everything else to hot-reloadable in-process TS extensions. Adoption is real: 99.6k stars, 12.4k forks, 5,826 commits, same-day pushes (READ-FROM-PAGE 2026-08-31). Digest source: fresh shallow clone at `/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/c5c61ae5-1f16-447b-bd19-a171b760d0cc/scratchpad/pi-mono`, HEAD `853a80d26c90a14c1886f0ebb8ffaae133ca2185`, 1,410 files.

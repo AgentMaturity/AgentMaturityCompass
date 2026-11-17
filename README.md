@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="website/og-card.png" width="900" alt="Agent Maturity Compass — Run one command. Get the full score. Fix the gaps. Evidence over claims." />
+  <img src="website/og-card.png" width="900" alt="Agent Maturity Compass. Build an AI agent for work that gets audited. Evidence over claims." />
 </p>
 
 <h1 align="center">Agent Maturity Compass</h1>
 
 <p align="center">
-  <strong>Run one command. Get the full score. Fix the gaps.</strong><br>
-  Is your AI agent safe to ship? Find out in one minute.<br>
+  <strong>Build an AI agent for work that gets audited</strong><br>
+  Build, run and check AI agents for regulated work.<br>
   <em>Evidence over claims.</em>
 </p>
 
@@ -14,43 +14,53 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C569-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C634-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
 <p align="center">
-  <a href="#start">Start</a> ·
-  <a href="docs/FIRST_FIVE_MINUTES.md">First Five Minutes</a> ·
-  <a href="#run-a-native-agent-task">Native Tasks</a> ·
-  <a href="#60-seconds-to-your-first-score">First Score</a> ·
+  <a href="#three-steps">Three steps</a> ·
+  <a href="#install">Install</a> ·
   <a href="#a4-forge-preview">A4 Forge</a> ·
+  <a href="docs/DOMAIN_PACKS.md">Industry Packs</a> ·
+  <a href="docs/FIRST_FIVE_MINUTES.md">First Five Minutes</a> ·
+  <a href="docs/FIRST_FIVE_MINUTES.md#words-you-will-meet">Glossary</a> ·
+  <a href="#run-a-native-agent-task">Native Tasks</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
-  <a href="#recipes--copy-paste-examples">Recipes</a> ·
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
   <a href="CONTRIBUTING.md">Contribute</a>
 </p>
 
 ---
 
-**AMC records what your AI agent actually does and turns that record into a score and a short list of gaps to fix.**
+**AMC helps you build an AI agent for work that gets audited, run it, and check what it really did.**
 
-It is for people who use or build AI agents, such as Claude Code, Codex or an agent of their own, and want to see what the agent did instead of taking its word for it. AMC runs on your own computer and collects no usage data.
+It is for people in regulated work, such as health, finance, education or the public sector, and for anyone who uses an AI agent (Claude Code, Codex or one of their own) and wants to see what it did instead of taking its word for it. AMC runs on your own computer and collects no usage data.
+
+## Three steps
+
+1. **Install AMC.** One command, [below](#install).
+2. **Build an agent for your industry.** In your project folder, type `amc` and choose "Build an agent for my industry (A4 Forge preview)". AMC starts on your computer and offers to open the A4 page of the Compass Console (AMC's web page on your computer). Sign in as the workspace owner (the first time, create your owner account with `amc user init --username <you>`), pick your industry and start an agent project. [A4 Forge](#a4-forge-preview) takes the agent through four stages, Aspire, Assemble, Adapt and Activate, and each step waits for a person's approval.
+3. **Watch or score an agent you already have.** In the same menu, choose "Watch Claude Code as it works" or "Watch Codex as it works" to record what your coding agent does, or "Just show my score" for a score worked out only from what AMC has recorded.
+
+Three things to know first:
+
+- A4 Forge is a preview. Its records are signed and self-reported: a signature shows who wrote a record and that it is unchanged, not that it is true. Nothing A4 Forge writes says an agent is safe, correct or lawful. Alone, you can get as far as building the agent in Assemble; the later approvals need two more people, and a project started from an Industry Pack always needs a second person.
+- [Industry Packs](docs/DOMAIN_PACKS.md) are experimental, self-reported questionnaires: drafted by AI, not reviewed by a qualified expert, and not legal advice. Their citations were checked by an AI agent on 2026-11-16, not by an expert; `amc domain pack describe --pack <packId>` prints the count for each pack.
+- A first score is low, and that is expected: 240 of the 244 questions cannot rise above L1 today, and AMC has not seen your agent work yet.
 
 ## Install
 
-The start menu below is in the current source build (1.2.0, unreleased; the next release is 2.0.0). Install it from source with Node.js 22 or 24:
+**Install the current source build.** You need git and Node.js (>=20, tested on 22 and 24) with Corepack. Node.js 20, 22 and 24 include Corepack; Node.js 25 and later do not, so install 22 or 24. On macOS or Linux, run:
 
 ```bash
-corepack enable
-git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass
-pnpm install --frozen-lockfile
-pnpm run build
-npm link            # puts the amc command on your PATH
+curl -fsSL https://agentmaturity.co/install-source.sh | sh
 ```
 
-The hosted installers and npm give the published 1.1.1 release, which has no start menu ([other install methods](#install-amc), [publication evidence](website/publication-status.json)).
+It fetches AMC from GitHub, builds it on your computer (a few minutes, no administrator password) and puts `amc` on your PATH. It prints the commit it built. Open a new terminal, go to your project folder and type `amc`. Run the same command again to update; if an update fails to build, the version you had keeps working. To remove it, delete the folder `~/.amc-source` and the line marked `# AMC source install` in your shell profile. To pin a tag or commit: `curl -fsSL https://agentmaturity.co/install-source.sh | sh -s -- --ref <tag or full commit id>`. On Windows, `irm https://agentmaturity.co/install-source.ps1 | iex` does the same, but it has not been tested on a real Windows machine yet. Details: [INSTALL.md](docs/INSTALL.md#option-b-from-github-development).
+
+Two things to know about that address. It serves the script only after the website is published from `main`; until then, build by hand as shown in [From source](#from-source). And the older `https://agentmaturity.co/install.sh` installs the published 1.1.1 release, which has no start menu and no A4 Forge ([other install methods](#install-amc), [publication evidence](website/publication-status.json)). The current build reports version 1.2.0 (`amc --version`) and is not published yet.
 
 ## Start
 
@@ -60,28 +70,36 @@ Go to the folder of the project you want AMC to look at, and type:
 amc
 ```
 
-The first time, AMC sets up the folder (it adds a hidden `.amc/` folder) and shows one menu. This is a real run on a computer where Claude Code and Codex are installed and signed in:
+The first time, AMC sets up the folder (it adds a hidden `.amc/` folder) and shows one menu. This is a real run on a computer where Codex is installed but signed out and Claude Code is not installed:
 
 ```text
 AMC set up this folder (.amc/).
 ? What do you want to do?
-❯ Watch Claude Code as it works (signed in)
-  Watch Codex as it works (signed in)
-  Try a demo chat (no account or key needed)
+  Sign in to Codex first
+❯ Try a demo chat (no account or key needed)
   Build an agent for my industry (A4 Forge preview)
   Open the console in my browser
   Just show my score (empty for now)
 ```
 
-Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is not installed is left out, one that is signed out shows "Sign in to … first", and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead, as it always did; `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
+Move with the arrow keys and press Enter. The menu only lists what can work right now: a coding agent that is signed in shows "Watch Claude Code as it works" or "Watch Codex as it works", one that is signed out shows "Sign in to … first", one that is not installed is left out, and "Chat with a model" appears when an API key such as `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` is set in your shell. In a pipe, in CI or inside an agent's shell, `amc` prints the score instead (in a folder AMC has not set up yet, run `amc --yes` so it may create `.amc/` without a terminal to ask); `amc --no-menu` or `AMC_NO_MENU=1` does the same in a terminal. `amc --help` lists the few commands you need first; `amc --help --all` lists every command.
 
-Three short paths:
+Four short paths:
 
+- **Build an agent for my industry.** Choose "Build an agent for my industry (A4 Forge preview)". In the run above, AMC printed:
+
+  ```text
+  Starting AMC on this Mac...
+  ✓ AMC is running. (agent: default)
+    Open your report card:  http://127.0.0.1:3660/console
+  ```
+
+  followed by the console sign-in hint and `? Open http://127.0.0.1:3660/console/a4?new=1 in your browser now? (Y/n)` (3660 because this run set `AMC_STUDIO_PORT`; yours may differ). Create your owner account once with `amc user init --username <you>`, sign in, pick your industry and start an agent project. [A4 Forge](#a4-forge-preview) has the stages and who approves them.
 - **Watch my coding agent.** Choose "Watch Claude Code as it works" or "Watch Codex as it works". AMC starts on this computer, asks before it adds a watch hook to this project's settings, and offers to start the agent here. AMC uses the agent's own sign-in; it never sees a password or a plan. Codex records nothing until you trust the folder and the AMC hook inside Codex ([sign-in and trust steps](docs/SIGN_IN_WITH_CLAUDE_OR_CHATGPT.md)).
-- **Chat or run a task.** "Try a demo chat" needs no account or key: a built-in demo model gives canned replies, and every turn is recorded. With an API key in your shell, "Chat with a model" talks to that provider. In the console, "Run a task" (called "Try a demo task" in the demo workspace) runs a task from the browser.
+- **Chat or run a task.** "Try a demo chat" needs no account or key: the stand-in model gives canned replies, and every turn is recorded. A result on the stand-in model says nothing about a real agent. With an API key in your shell, "Chat with a model" talks to that provider. In the console, "Run a task" (called "Try a demo task" in the demo workspace) runs a task from the browser.
 - **Score what I have.** "Just show my score" prints the score for the evidence AMC holds. A first score is low, because AMC has not seen your agent work yet. The report is signed, which shows it was not changed afterwards; it does not show that your agent is good.
 
-New to this? [Your first five minutes](docs/FIRST_FIVE_MINUTES.md) walks through each screen and explains the words (workspace, vault, evidence, score, observe and control). If something goes wrong, see [Troubleshooting](docs/TROUBLESHOOTING.md).
+New to this? [Your first five minutes](docs/FIRST_FIVE_MINUTES.md) walks through each screen and explains the words (workspace, vault, evidence, score, observe and control), and ends with [a short glossary](docs/FIRST_FIVE_MINUTES.md#words-you-will-meet): receipt, ledger, vault, passphrase, gate, approver, pack, station, level, evidence tier, bundle and passport. If something goes wrong, see [Troubleshooting](docs/TROUBLESHOOTING.md).
 
 ---
 
@@ -93,7 +111,7 @@ Its native runtime owns the model loop, workspace tools, approvals, streaming ch
 
 ## Run a native agent task
 
-The native workflow requires the current source build, which is unreleased (the next release is 2.0.0); follow [From source](#from-source) first. The published npm package and GitHub release are 1.1.1 and do not contain this workflow. Then inspect your setup:
+The native workflow requires the current source build, which reports version 1.2.0 and is not published yet; [install it](#install) first. The published npm package and GitHub release are 1.1.1 and do not contain this workflow. Then inspect your setup:
 
 ```bash
 amc agent-loop guide
@@ -108,8 +126,7 @@ In Studio, open **Native Tasks** to run the same native AMC runtime from the bro
 AMC also assesses an agent from L0 to L5 using attributable evidence. An imported claim, an execution outcome and an independently verified record carry different authority. A score is an assessment of the available evidence; signing the report does not make every underlying claim true.
 
 ```bash
-curl -fsSL https://agentmaturity.co/install.sh | sh
-amc up
+amc up        # current source build; install it first (see Install above)
 ```
 
 In the current source build `amc start` is another name for `amc up`. In the run recorded for this README (a new workspace and home directory, current source build, 2026-10-11; [record](qualification/2026-10-11-P0-28/README.md)), it:
@@ -126,25 +143,25 @@ To sign in to the Compass Console, create the first login with `amc user init --
 
 1. **An evidence-backed assessment.** L0 to L5 with traceable sources. Signatures expose changes to the signed report; the assessment still depends on the underlying evidence.
 2. **A fix list.** Exactly what's weak, and generated fixes: guardrails, config patches, CI gates.
-3. **Signed records you can hand to others.** A reviewer who pinned your keys can check that a record is unchanged and which key signed it. A signature proves integrity, not that the recorded statements are true.
+3. **Signed records you can hand to others.** A reviewer who pinned your keys can check that a record is unchanged and which key signed it. A signature shows the record is unchanged, not that the recorded statements are true.
 
 **The 8 areas AMC covers:**
 
 | Area | Plain meaning |
 |---|---|
 | **Score** | How mature is this agent, really? |
-| **Shield** | Does it survive attacks? (<!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs) |
+| **Shield** | Does it survive attacks? (<!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> registered assurance packs) |
 | **Enforce** | Can it be stopped from doing dangerous things? |
 | **Vault** | Are its secrets and keys protected? |
 | **Watch** | Do you see what it does in real time? |
 | **Comply** | Which controls have evidence? (EU AI Act, NIST AI RMF, ISO 42001, SOC 2 mappings; evidence of conformity, not a compliance verdict) |
 | **Fleet** | Do many agents work together safely? |
-| **Passport** | Can it prove its record anywhere it goes? |
+| **Passport** | Can someone else check its signed record? |
 
 Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, Gemini, OpenClaw, Hermes**, and more — with zero or near-zero integration friction.
 
 > Your first score will probably be low. That's honest: a fresh agent with no evidence starts at L0.
-> The signature proves the report is real — not that your agent is good. Capture a real agent run,
+> The signature shows the report was not changed after it was signed, not that your agent is good. Capture a real agent run,
 > score again, and watch the evidence build. Use scores externally only when readiness says `READY`.
 
 <details>
@@ -153,15 +170,15 @@ Works with **LangChain, CrewAI, AutoGen, OpenAI Agents SDK, Claude Code, Gemini,
 Today, most agents are "checked" by reading their docs.
 That's like grading a student by asking them how smart they are.
 
-AMC watches the agent work. It collects evidence. It only scores what it can prove.
-When it can't prove something, it says so — clearly.
+AMC watches the agent work. It collects evidence. It only scores what it has evidence for.
+When it has none, it says so, clearly.
 
 | How agents are evaluated today | How AMC evaluates |
 |---|---|
 | Agent claims "I'm safe" → Claimed score: 100 | AMC tests the agent and inspects evidence → Evidence-backed score may be 16 |
 | Self-reported documentation | Execution-verified evidence |
 | Keyword matching | Weighted trust evidence |
-| "Trust me, bro" | Cryptographic proof chains |
+| "Trust me, bro" | Signed records you can check |
 
 That is the entire thesis: **trust, but verify — with receipts**.
 
@@ -169,27 +186,27 @@ That is the entire thesis: **trust, but verify — with receipts**.
 
 ---
 
-## 60 Seconds to Your First Score
+## Your first score
 
 ```bash
-# macOS or Linux: download the pinned GitHub release and verify SHA-256
-curl -fsSL https://agentmaturity.co/install.sh | sh
+# macOS or Linux: build the current source (the address works once the website is published from main)
+curl -fsSL https://agentmaturity.co/install-source.sh | sh
 
-# Start Studio and the gateway (prints the console URL); the current source build also runs a first 8-surface baseline
+# Start Studio and the gateway (prints the console URL) and run a first 8-surface baseline
 cd your-agent-project
 amc up
 amc user init --username <you>   # new workspace only: the first console login (asks for a password)
 
-# Or open the start menu (current source build; 1.1.1 prints the full score)
+# Or open the start menu
 amc
 ```
 
 To verify the CLI before initialization, run `amc doctor`. It reports install readiness in a new directory; CI and deployments use `amc doctor --strict` after the workspace is initialized.
 
-On Windows PowerShell:
+On Windows PowerShell (the source installer has not been tested on a real Windows machine yet):
 
 ```powershell
-irm https://agentmaturity.co/install.ps1 | iex
+irm https://agentmaturity.co/install-source.ps1 | iex
 amc up
 ```
 
@@ -203,7 +220,7 @@ amc quickscore --answers answers.json --json  # non-interactive answer-based sco
 <details>
 <summary><strong>More install methods</strong></summary>
 
-**Verified release installer (Node.js 22 or 24 recommended)**
+**Verified release installer for the published 1.1.1 release (older: no start menu, no A4 Forge; Node.js >=20, tested on 22 and 24)**
 ```bash
 curl -fsSL https://agentmaturity.co/install.sh | sh
 ```
@@ -212,7 +229,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current native workflow, free Industry Packs and A4 Forge (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
+Each installer pins the published AMC release, downloads the platform archive and `SHA256SUMS` from GitHub Releases, verifies the archive, then installs the included package. The published npm package and GitHub release are 1.1.1; use the source build for the current native workflow, free Industry Packs and A4 Forge (it reports version 1.2.0 and is not published yet). The Homebrew tap is not publicly available. See [publication evidence](website/publication-status.json).
 
 **Docker**
 ```bash
@@ -223,8 +240,9 @@ docker run --rm amc-quickstart --version
 
 Use the local build command unless a GHCR package has been verified public. The quickstart image installs the published 1.1.1 release tarball after a SHA-256 check, not the source tree ([container guide](docker/README.md#quickstart-image)).
 
-**From source**
+**From source, by hand**
 ```bash
+corepack enable
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass && pnpm install --frozen-lockfile && pnpm run build && npm link
 ```
@@ -280,12 +298,12 @@ Repair never deletes evidence. A failed signature looks the same whether a vault
 
 |  | **AMC** | Observability platforms | Eval frameworks | Manual checklists |
 |---|---|---|---|---|
-| **Evidence model** | Execution-verified, cryptographic proofs | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
-| **Adversarial testing** | <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs built in | Not a focus | Partial (prompt-level only) | None |
+| **Evidence model** | Signed records of what AMC observed, each labelled with how much it can be trusted | Logs and metrics, no trust scoring | Test pass/fail, no maturity model | Self-reported |
+| **Adversarial testing** | <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> assurance packs built in | Not a focus | Partial (prompt-level only) | None |
 | **Compliance mapping** | EU AI Act, ISO 42001, NIST, SOC 2, OWASP | Not included | Not included | Manual, labor-intensive |
 | **Framework support** | <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, zero code changes | Framework-specific agents | Framework-specific | N/A |
 | **Cost** | Free, open source (MIT) | Per-seat/month pricing | Free to paid | Free but manual |
-| **Time to first result** | 60 seconds | Hours to days | Minutes to hours | Days to weeks |
+| **Time to first result** | Minutes after install (a first score is empty until AMC sees the agent work) | Hours to days | Minutes to hours | Days to weeks |
 
 AMC is not an observability tool and not an eval harness. It is a **trust scorecard** that shows what the evidence supports, what remains unproven, and which controls or compliance mappings need work. AMC does not certify legal compliance.
 
@@ -303,7 +321,7 @@ AMC is not an observability tool and not an eval harness. It is a **trust scorec
 | Resilience | 55 | Graceful degradation, circuit breakers, memory safety, threat resistance, fact/simulation boundaries |
 | Skills | 52 | Tool mastery, injection defense, DLP, scenario traceability, replay safety |
 
-### <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> Registered Assurance Packs
+### <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> Registered Assurance Packs
 
 In these counts, registered = packs returned by `listAssurancePacks()`; files on disk may differ (the generated [API reference](docs/API_REFERENCE.md#assurance-packs) lists the files).
 
@@ -333,7 +351,7 @@ Industry Packs are free in the current source build: every pack's questions and 
 ```bash
 amc domain pack list                       # all 41 packs and their question counts
 amc domain pack describe --pack <packId>   # a pack's regulatory basis and every question
-amc domain pack run --pack <packId>        # in a terminal: choose L1, L3 or L5 for each question
+amc domain pack run --pack <packId>        # in a terminal: choose L1 to L5 for each question, or skip it
 amc domain pack run --pack <packId> --baseline --json   # no answers: every question not evaluated, no score
 ```
 
@@ -399,7 +417,7 @@ AMC Gateway ──── transparent proxy, agent doesn't know it's being watche
 Evidence Ledger ──── Ed25519 signatures + Merkle tree proof chains
     │
     ▼
-Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs
+Scoring Engine ──── evidence-weighted diagnostics, research-backed scoring, <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> assurance packs
     │
     ▼
 AMC Studio ──── dashboard + API + CLI + reports
@@ -409,23 +427,27 @@ Studio's protected module API uses signed sessions and route-level least-privile
 
 ### Evidence Trust Tiers
 
-| Tier | Weight | How |
+The tier decides how high a question can go; a maturity level applies no trust weight.
+
+| Tier | Highest level it can support | How |
 |------|--------|-----|
-| `OBSERVED_HARDENED` | 1.1× | AMC-controlled adversarial scenarios |
-| `OBSERVED` | 1.0× | Captured via gateway proxy |
-| `ATTESTED` | 0.8× | Cryptographic attestation |
-| `SELF_REPORTED` | 0.4× | Agent's own claims (capped) |
+| `OBSERVED_HARDENED` | L3 (treated as OBSERVED) | AMC-controlled adversarial scenarios |
+| `OBSERVED` | L3 | Captured via gateway proxy |
+| `ATTESTED` | L1 | Cryptographic attestation |
+| `SELF_REPORTED` | L1 | Agent's own claims |
 
 ### Maturity Scale
 
-| Level | Name | Meaning |
-|-------|------|---------|
-| **L0** | Absent | No safety controls |
-| **L1** | Initial | Some intent, nothing operational |
-| **L2** | Developing | Works on happy path, breaks at edges |
-| **L3** | Defined | Repeatable, measurable, auditable |
-| **L4** | Managed | Proactive, risk-calibrated, cryptographic proofs |
-| **L5** | Optimizing | Self-correcting, continuously verified |
+| Level | Name | What a question needs | Questions that can reach it today |
+|-------|------|---------|---------|
+| **L0** | Absent | Not evidenced | 244 of 244 |
+| **L1** | Initial | Self-declared: rows tagged to the question from a registered source | 244 of 244 |
+| **L2** | Developing | Configuration evidence AMC observed | 4 of 244 |
+| **L3** | Defined | Runtime evidence AMC observed | 0 of 244 |
+| **L4** | Managed | Continuity, anchoring and sampling (not evaluated yet) | 0 of 244 |
+| **L5** | Optimizing | Independently attested (not evaluated yet) | 0 of 244 |
+
+So 240 of the 244 default questions cannot rise above L1 today, and a self-reported answer never counts above L1. `amc methodology` prints this table from the code.
 
 No AMC maturity level is a legal compliance threshold. Compliance depends on the system, role, use case, jurisdiction, obligations, and current evidence.
 
@@ -440,11 +462,18 @@ AMC is one trust stack with eight named product surfaces:
 | **Score** | Score trust before you ship | Evidence-weighted scoring across live execution behavior instead of brochure claims. |
 | **Shield** | Attack your agent before attackers do | Runs adversarial packs against prompt injection, leakage, memory poisoning, and sycophancy. |
 | **Enforce** | Wrap agent actions in policy | Approval gates, scoped permissions, and runtime controls for sensitive operations. |
-| **Vault** | Cryptographically prove what happened | Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody. |
+| **Vault** | Keep a signed record of what happened | Signs evidence, verifies ledgers, and gives auditors a tamper-evident chain of custody. A signature shows who wrote a record and that it is unchanged, not that it is true. |
 | **Watch** | See trust drift before it hurts you | Monitors posture over time and surfaces anomalies, regressions, and risky changes. |
 | **Comply** | Map trust evidence to real frameworks | Turns technical evidence into regulator-readable artifacts for audits and risk reviews. |
 | **Fleet** | Govern many agents like an actual platform | Benchmarks multiple agents, compares risk posture, and enforces org-wide trust baselines. |
-| **Passport** | Make trust portable between environments | Issues a portable, signed trust identity that can move between tools, teams, and environments. |
+| **Passport** | Make trust portable between environments | Issues a self-issued, signed summary of an agent's results that others can check with AMC or amc-verify against a key they pin. |
+
+What these surfaces do not do, today:
+
+- **Enforce.** The untrusted-input guard (`amc guardrails profile untrusted-input-guard --mode enforce`) asks for approval before, or blocks, consequential calls made after untrusted input in Claude Code and Gemini CLI sessions that AMC's hooks govern. It does not stop prompt injection.
+- **Native shell sandbox.** What the sandbox confines, on which system, is exactly what [docs/SANDBOX.md](docs/SANDBOX.md) says, and no more. The Linux path was tested only in unit tests here, never run on Linux.
+- **Fleet.** A freeze stops only calls routed through AMC; an agent that does not go through AMC is not stopped.
+- **Score.** 240 of the 244 default questions cannot rise above L1 today.
 
 ---
 
@@ -457,24 +486,24 @@ A4 Forge takes one agent from a brief to a recorded, customer-controlled deploym
 - **Adapt** (contextualization): compiles and signs the control plan for the agent's markets, sector and data, writes its context plugin and memory policy, and records a conformance statement as counts, never a percentage.
 - **Activate** (commercialization): builds a signed release package and its leases, prepares Compose or Helm files for an operator to run, and records the operator's deployment receipts, AMC's own reachability check, rollback and value claims.
 
-**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to stub-model runs are labelled `synthetic_example`); runtime observations enter only by reference to rows the runtime wrote. A signature proves who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. Separation of duties keeps a gate's author, requester and builders from approving it, and under the default approval policy the Assemble completion, Adapt and Activate gates need two approvals each, so a full walk needs the owner plus two more approvers with the roles each gate allows, one of them an AUDITOR for Adapt's completion ([who approves which gate](docs/A4_FORGE.md#approvals-and-separation-of-duties)). Two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, with citations not yet fetched, hashed or legally reviewed, and approved by no named expert. AMC never deploys: it prepares the plan and records what the operator says happened.
+**What the records are, and are not.** Every record A4 writes is signed and `self_reported` (references to runs on the stand-in model are labelled `synthetic_example`, and say nothing about a real agent); runtime observations enter only by reference to rows the runtime wrote. A signature shows who wrote a record and that it is unchanged, never that its statement is true, and no A4 output says the agent is safe, correct or lawful. Separation of duties keeps a gate's author, requester and builders from approving it, and under the default approval policy the Assemble completion, Adapt and Activate gates need two approvals each, so a full walk needs the owner plus two more approvers with the roles each gate allows, one of them an AUDITOR for Adapt's completion ([who approves which gate](docs/A4_FORGE.md#approvals-and-separation-of-duties)). Two members of one workspace are not two independent reviews. The regulatory records Adapt uses are `experimental`: drafted by an agent, not legally reviewed, not legal advice, and approved by no named expert. The Industry Pack citations were checked by an AI agent on 2026-11-16, not by an expert. Alone, on a practice project, you can get as far as building the agent in Assemble; Assemble's final approval, Adapt and Activate need two approvers who did not write, build or ask for the step, so three people in all. A project started from an Industry Pack always needs a second person. AMC never deploys: it prepares the plan and records what the operator says happened.
 
-**Try it.** A4 Forge is in the current source build only (see [From source](#from-source)); the published 1.1.1 release does not contain it. Set `AMC_A4_PREVIEW=1` in the environment Studio starts in and for each `amc a4` command; a Studio that is already running keeps its environment, so run `amc down` first. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`, P2-40), so the walk ends after Adapt.
+**Try it.** A4 Forge is in the current source build only (see [Install](#install)); the published 1.1.1 release does not contain it. It is a preview, on by default: `AMC_A4_PREVIEW=0` in the environment Studio starts in (or of an `amc a4` command) turns it off, and a Studio that is already running keeps its environment. Creating a project needs a signed-in local account with the OWNER or OPERATOR role ([RBAC](docs/RBAC.md)). Workspace OWNERs decide gates as implicit project owners; an APPROVER or AUDITOR decides only once added as a project member with the approver role, so add them before requesting a gate, because adding a member supersedes open gates. On a Studio that does not run under Compose or Helm, Activate's release approval is refused (`deployment.same_host`), so on a laptop the walk ends after Adapt.
 
 ```bash
-AMC_A4_PREVIEW=1 amc up                     # starts Studio with the A4 page
+amc up                                      # starts Studio with the A4 page
 amc user init --username <you>              # first console login (OWNER); with existing logins use amc user add
                                             # then sign in to the Compass Console and start a project on its A4 page
-AMC_A4_PREVIEW=1 amc a4 list                # the projects this identity may read
-AMC_A4_PREVIEW=1 amc a4 guide <projectId>   # the next action, the head seq, and the pins each open gate's decision needs
-AMC_A4_PREVIEW=1 amc a4 readiness <projectId>
+amc a4 list                                 # the projects this identity may read
+amc a4 guide <projectId>                    # the next action, the head seq, and the pins each open gate's decision needs
+amc a4 readiness <projectId>
 amc approvals login --username <you> --token-file <file>   # the session file every amc a4 write names
 # before a gate, add each approver who is not a workspace OWNER (<n>: the head seq amc a4 guide printed)
-AMC_A4_PREVIEW=1 amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
-AMC_A4_PREVIEW=1 amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
+amc a4 members <projectId> --member LOCAL_USER:<userId> --project-role approver --session-token-file <file> --expect-head-seq <n>
+amc a4 verify <projectId> --trust-list <file> --allow-unanchored   # the chain's integrity (exit 2): a project's ledger is unanchored, so it never reads trusted
 ```
 
-**Status: preview.** Without the variable, the `/api/v1/a4` routes answer 404 `A4_PREVIEW_DISABLED`, Studio shows no A4 entry, and every `amc a4` command refuses with exit code 1. `amc mcp serve` started with the variable adds five A4 tools (four reads and a self-reported comment), and the Node SDK's `createA4Client` calls the routes of a Studio that has it. Not available yet: independently reviewed claims (P2-24, P3-21); a real deployment target (P2-40: v1 records a same-host restart of the Studio that built the agent, and AMC's own destination check cannot report `passed`); CI qualification of the Compose and Helm overlays. Details: [docs/A4_FORGE.md](docs/A4_FORGE.md).
+**Status: preview.** With `AMC_A4_PREVIEW=0`, the `/api/v1/a4` routes answer 404 `A4_PREVIEW_DISABLED`, Studio shows no A4 entry, and every `amc a4` command refuses with exit code 1. Otherwise `amc mcp serve` adds five A4 tools (four reads and a self-reported comment), and the Node SDK's `createA4Client` calls the routes of a Studio that has it. Not available yet: independently reviewed claims; a real deployment target (v1 records a same-host restart of the Studio that built the agent, and AMC's own destination check cannot report `passed`); CI qualification of the Compose and Helm overlays. Details: [docs/A4_FORGE.md](docs/A4_FORGE.md).
 
 ---
 
@@ -631,7 +660,7 @@ amc up
 amc connect hooks install --provider claude-code --mode control --agent my-agent
 ```
 
-The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; run `amc vault unlock` or set `AMC_VAULT_PASSPHRASE` for non-interactive use. The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
+The default `observe` mode preserves unrelated provider settings, adds a managed `.gitignore` rule for `.amc/hooks/`, stores a dedicated `hook:observe` lease outside provider config with mode `0600`, signs its ownership manifest, and removes only the AMC-owned handlers and ignore block. It records requested actions and their completed or failed terminal state under one stable action ID. `hooks health` distinguishes an intact installation awaiting its first event from the latest receipt-verified event and from fail-closed drift, expiry, malformed metadata, or evidence tamper. Last-observed time is historical evidence, not a claim that the provider is live now. A locked Vault cannot authenticate encrypted event bodies, so health exits 2 with `HOOK_EVIDENCE_UNAVAILABLE`; export `AMC_VAULT_PASSPHRASE` in the shell that runs the check (`amc vault unlock` lasts only for its own command). The lifecycle command verifies each receipt and fails closed on missing, ambiguous, conflicting, cross-agent, out-of-order, or tampered evidence. Tool arguments, outputs, error messages, cwd, transcript paths, and raw session IDs are not retained.
 
 `--mode control` is an explicit loopback-only Enforce path. It adds `hook:control`, evaluates raw provider input in memory without retaining it, reuses signed ToolHub, Action Policy, Approval Policy, budget, freeze, maturity, and assurance gates, and binds the exact native response to a signed receipt. For Claude Code AMC only restricts: it denies, or lets a call through with an empty answer so Claude Code's own permissions still decide, and only for AMC's signed decision bound to that exact payload. A provider-local ask is not AMC approval and AMC has no approval path for hook calls, so a call that needs approval is denied. Control mode also installs SessionStart (session registration), UserPromptSubmit (admission) and Stop hooks; [docs/adapters/claude-code-hooks.md](docs/adapters/claude-code-hooks.md) states the claim per hook, the managed-settings delivery and the limits. Gemini CLI has no native `ask` result, so AMC converts that outcome to an explicit deny. Multi-user or distinct-user AMC quorum is never weakened to one provider prompt. Codex is supported in observe mode only (`--provider codex --mode observe`; [codex.md](docs/adapters/codex.md)). Cursor, OpenCode, and other providers remain unsupported until their native per-tool hook contracts are pinned and fixture-tested.
 
@@ -660,11 +689,13 @@ AMC observes four pinned AEP `0.1` action types, stores only an encrypted redact
 ### Red-team your agent
 
 ```bash
-amc assurance run --scope full                           # full assurance library
-amc assurance run --pack prompt-injection                # specific attack
-amc assurance run --pack adversarial-robustness          # TAP/PAIR/Crescendo
-amc assurance run --format sarif                         # export for security tools
+amc assurance run --all                                  # every registered assurance pack
+amc assurance run --pack injection                       # one pack
+amc assurance run --pack adversarial-robustness          # TAP, PAIR, Best-of-N
+amc assurance run --pack injection --format sarif        # export for security tools
 ```
+
+Not run here: each needs an agent to test (without one, AMC stops with "no agent under test was reachable" and names the setting to add). Nine attack packs are graded by what the agent did over repeated tries on made-up tools and a made-up secret, each attack paired with its ordinary task; the result is an attack success rate with the number of tries and a 95% interval. A low rate is not proof that the agent is safe, and these packs never count as regulated evidence. The other packs are still graded by keywords in the reply ([Shield and Enforce reference](docs/SHIELD_ENFORCE_REFERENCE.md)).
 
 ### Inspect traces and operational drift
 
@@ -825,7 +856,7 @@ For supported shell input, the same hook performs a compound-command blast-radiu
 | **ISO 42001** | Clauses 4-10 mapped to AMC dimensions |
 | **NIST AI RMF** | Risk management framework alignment |
 | **SOC 2** | Trust service criteria mapping |
-| **OWASP LLM Top 10** | Full coverage (10/10) |
+| **OWASP LLM Top 10** | All 10 entries of the 2025 list mapped to questions (a mapping, not a test result) |
 
 ---
 
@@ -841,7 +872,7 @@ curl -fsSL https://agentmaturity.co/install.sh | sh
 irm https://agentmaturity.co/install.ps1 | iex
 ```
 
-Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current source features, such as the native workflow, free Industry Packs and A4 Forge (unreleased; the next release is 2.0.0). The Homebrew tap is not publicly available. Use Node.js 22 or 24 for the current production qualification targets; the installer retains a Node 20 compatibility floor. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
+Both scripts install the published 1.1.1 GitHub release after SHA-256 verification. npm also publishes 1.1.1; neither channel contains the current source features, such as the native workflow, free Industry Packs and A4 Forge (the current build reports version 1.2.0 and is not published yet; [install it from source](#install)). The Homebrew tap is not publicly available. Node.js: >=20, tested on 22 and 24. See [platform qualification](docs/PLATFORM_QUALIFICATION.md) and [publication evidence](website/publication-status.json).
 
 ### Docker
 ```bash
@@ -854,7 +885,7 @@ Use the local build command unless a GHCR package has been verified public. The 
 
 ### From source
 
-Use this path to continue development on another device or run the current native workflow. Install Node.js 22 or 24 and enable Corepack before the frozen install; `package.json` pins pnpm 10.33.0.
+Use this path to continue development on another device or run the current native workflow. Install git and Node.js (>=20, tested on 22 and 24) and enable Corepack before the frozen install; `package.json` pins pnpm 10.33.0. The one-command [source install](#install) runs these same steps for you.
 
 ```bash
 corepack enable
@@ -888,7 +919,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 
 | Tier | What you get |
 |---|---|
-| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,304 registered CLI command paths, browser playground, CI gates |
+| **Free / Open Source** | Everything — Score, Shield, Enforce, Vault, Watch, Comply, Fleet, Passport, all 41 Industry Packs, all <!-- amc:count:adapters -->16<!-- /amc:count --> adapters, 1,302 registered CLI command paths, browser playground, CI gates |
 | **Enterprise (contact-first; not self-serve)** | Planned priority support, custom pack development, and deployment assistance; not needed for any feature or pack |
 
 > Industry Packs are 41 sector-specific questionnaires (healthcare, finance, education, logistics, government, etc.) that need ongoing regulatory research and expert review; their content stays experimental until a named expert signs it. See [`website/publication-status.json`](website/publication-status.json) for what each distribution channel publishes before making any availability claim.
@@ -901,7 +932,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 |------|----------|------------|
 | **Browser** | First-touch evaluation, demos, understanding scoring | [Web Playground](https://agentmaturity.co/playground.html) |
 | **CLI** | Real agent scoring, evidence capture, shareable outputs | [Install AMC](docs/INSTALL.md), then run `amc` |
-| **Desktop Studio** | macOS and Windows users who want a local launcher app | [Desktop Packages](docs/DESKTOP_PACKAGES.md) |
+| **Desktop Studio** | People who want a local launcher app (the macOS app window was not opened in testing; the Windows and Linux launchers were never run on those systems) | [Desktop Packages](docs/DESKTOP_PACKAGES.md) |
 | **CI/CD** | Release gates, score thresholds, PR comments | [CI Templates](docs/CI_TEMPLATES.md) |
 | **Enterprise** | Self-hosted, managed deployment | [Deployment Options](docs/DEPLOYMENT_OPTIONS.md) |
 | **Cloud self-hosting** | AWS, GCP, Azure reference architectures | [Cloud Reference Architectures](docs/CLOUD_REFERENCE_ARCHITECTURES.md) |
@@ -923,7 +954,7 @@ AMC is **free and MIT licensed**, and in the current source build all 41 Industr
 | [Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md) | [Why AMC One-Pager](docs/WHY_AMC_ONE_PAGER.md) |
 | [Solo Dev Quickstart](docs/SOLO_DEV_QUICKSTART.md) | [Platform Engineer Quickstart](docs/PLATFORM_ENGINEER_QUICKSTART.md) |
 | [Security & Compliance Quickstart](docs/SECURITY_COMPLIANCE_QUICKSTART.md) | [Troubleshooting](docs/TROUBLESHOOTING.md) |
-| [CLI Reference (1,304 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
+| [CLI Reference (1,302 command paths)](docs/CLI_COMMAND_INVENTORY.md) | [Architecture](docs/ARCHITECTURE_MAP.md) |
 | [Compatibility Matrix](docs/COMPATIBILITY_MATRIX.md) | [Starter Blueprints](docs/STARTER_BLUEPRINTS.md) |
 | [Install Packages](docs/INSTALL_PACKAGES.md) | [Support Policy](docs/SUPPORT_POLICY.md) |
 | [Release Cadence](docs/RELEASE_CADENCE.md) | [CI Templates](docs/CI_TEMPLATES.md) |
@@ -1038,7 +1069,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,569<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,634<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.
@@ -1059,6 +1090,6 @@ cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- a
 ---
 
 <p align="center">
-  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,304 CLI command paths</strong><br>
+  <strong><!-- amc:count:diagnosticQuestions -->244<!-- /amc:count --> default diagnostic questions + 20 lifecycle expansion questions · <!-- amc:count:assurancePacksRegistered -->148<!-- /amc:count --> assurance packs · 41 domain packs · <!-- amc:count:adapters -->16<!-- /amc:count --> adapters · 1,302 CLI command paths</strong><br>
   <em>Stop trusting. Start verifying.</em>
 </p>

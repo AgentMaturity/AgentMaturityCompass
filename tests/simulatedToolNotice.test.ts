@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -59,5 +59,20 @@ describe("a call the Action Policy only simulates", () => {
     const results = readNativeSessionEvents(workspace, summary.sessionId).filter((row) => row.event_type === "tool/result")
       .map((row) => { const payload = readEventPayload(workspace, row); return payload.status === "ok" ? payload.bytes.toString("utf8") : ""; });
     expect(results.join("\n")).toMatch(/SIMULATE fs\.write[\s\S]*simulated, not executed: the signed Action Policy runs WRITE_LOW as SIMULATE \(.+\); see `amc governor check --agent default --action WRITE_LOW --risk med --mode execute`/);
+  });
+
+  // M-01: a read under the same policy returns its real content, so it is never counted or shown as simulated.
+  it("does not call a read that returned content simulated, and the text output shows the call and its result", async () => {
+    const out: string[] = [], errors: string[] = [];
+    const io: AgentLoopCliIo = { log: (line) => out.push(line), error: (line) => errors.push(line), fail: () => { throw new Error(errors.join("\n")); } };
+    const program = new Command().exitOverride();
+    registerAgentCommands(program, io);
+    mkdirSync(join(workspace, "workspace"), { recursive: true });
+    writeFileSync(join(workspace, "workspace", "notes.txt"), "hello notes\nline two\n");
+    const prompt = JSON.stringify({ tool: "fs.read", arguments: { path: "workspace/notes.txt" } });
+    await program.parseAsync(["agent-loop", "run", prompt, "--provider", "stub", "--credentials-home", home, "--tools", "workspace"], { from: "user" });
+    const text = out.join("\n");
+    expect(text).not.toContain("ran as SIMULATE");
+    expect(text).toMatch(/✓ fs\.read workspace\/notes\.txt · hello notes/);
   });
 });

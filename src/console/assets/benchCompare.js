@@ -1,3 +1,4 @@
+import { showResult } from "./pageKit.js";
 import { apiGet, apiPost, onClaims, showSignIn, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { renderBenchPercentileTable } from "./components/benchPercentileTable.js";
@@ -57,7 +58,7 @@ function wireActions() {
       const id = document.getElementById("benchScopeId")?.value || "workspace";
       const against = document.getElementById("benchAgainst")?.value || "imported";
       const result = await apiPost("/bench/compare", { scope, id, against });
-      out.textContent = JSON.stringify(result, null, 2);
+      showResult(out, result);
       const latest = await loadLatest();
       render(document.getElementById("app"), latest);
       wireActions();

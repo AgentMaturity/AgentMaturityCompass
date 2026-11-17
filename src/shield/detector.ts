@@ -42,7 +42,8 @@ export function detectInjection(prompt: string): DetectorResult {
     position: match.position,
   }));
 
-  const riskScore = attacks.length === 0 ? 0 : Math.min(1, attacks.reduce((s, a) => s + a.confidence, 0) / attacks.length);
+  // Rounded to two places: the mean of float confidences printed as 0.8999999999999999 (CLI-27).
+  const riskScore = attacks.length === 0 ? 0 : Math.round(Math.min(1, attacks.reduce((s, a) => s + a.confidence, 0) / attacks.length) * 100) / 100;
 
   const result = { detected: attacks.length > 0, attacks, riskScore, confidence: riskScore };
   emitGuardEvent({

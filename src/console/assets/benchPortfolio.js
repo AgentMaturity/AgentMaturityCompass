@@ -1,3 +1,4 @@
+import { recordDetails } from "./pageKit.js";
 import { apiGet, onClaims, showSignIn, whoami } from "./api.js";
 import { loadBenchPortfolio } from "./hostPortfolio.js";
 import { installClaimStrip } from "./components/claimBadge.js";
@@ -59,7 +60,7 @@ async function main() {
       </table>
       `
     )}
-    ${card("Raw", `<pre class="scroll">${esc(JSON.stringify(portfolio, null, 2))}</pre>`)}
+    ${card("The full record", recordDetails(portfolio))}
   `;
 }
 

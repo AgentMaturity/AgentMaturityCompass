@@ -53,7 +53,7 @@ describe("Login while signed in", () => {
 describe("one run state across Agent, Drift and Work Orders", () => {
   const context = vm.createContext({ htmlEscape: escape });
   vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"),
-    bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)")].join("\n"), context);
+    bodyOf(app, "const UNTRUSTED_SEAL_LABEL"), bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)")].join("\n"), context);
   const summary = context.runStateSummary as (agentId: string, run: unknown) => string;
   const warning = context.runStateWarning as (run: unknown) => string;
 
@@ -66,6 +66,24 @@ describe("one run state across Agent, Drift and Work Orders", () => {
     expect(warning(invalid)).toContain("UNRELIABLE — DO NOT USE FOR CLAIMS");
     expect(warning(invalid)).toContain('class="status-bad"');
     expect(warning({ ...invalid, status: "VALID", trustLabel: "HIGH TRUST" })).toBe("");
+  });
+
+  test("Agent shows neither the file's own status nor its seal sentence when Studio's seal check fails", async () => {
+    const root = { innerHTML: "" };
+    let bars = 0;
+    const report = { status: "VALID", integrityIndex: 0.99, trustLabel: "HIGH TRUST", evidenceCoverage: 0.9,
+      layerScores: [{ avgFinalLevel: 3.25 }, { avgFinalLevel: 2.75 }],
+      evidenceReadiness: { status: "READY", claimEligible: true, claimBoundary: "The artifact seal is valid, but no accepted evidence supports the score." } };
+    const latestRun = { runId: "run-1", ts: 0, status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
+    const agent = vm.createContext({ htmlEscape: escape, root, currentAgent: () => "default", card: (t: string, b: string) => `<h3>${t}</h3>${b}`,
+      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => { bars += 1; }, document: { getElementById: () => null } });
+    vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"), bodyOf(app, "const UNTRUSTED_SEAL_LABEL"),
+      bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)"), bodyOf(app, "async function renderAgent()")].join("\n"), agent);
+    await (agent.renderAgent as () => Promise<void>)();
+    expect(root.innerHTML).toContain("Artifact Status: <strong>INVALID</strong>");
+    expect(root.innerHTML).not.toMatch(/seal is valid|HIGH TRUST|0\.990|ELIGIBLE|READY|90\.0%|3\.000|layerBars/);
+    expect(root.innerHTML).toContain("Evidence Readiness: <strong>UNVERIFIED</strong>");
+    expect(bars).toBe(0);
   });
 
   test("all three pages use the shared sentence, and none dumps raw JSON as its body", () => {
@@ -140,9 +158,11 @@ describe("requests a VIEWER or the demo session is always refused", () => {
     expect(approvals.indexOf('"local-demo") return [];')).toBeLessThan(approvals.indexOf("apiNativeRequest(API)"));
   });
 
-  test("Org pages ask for a recompute only with OWNER or OPERATOR", () => {
-    const load = bodyOf(app, "async function loadLatestOrgScorecard()");
-    expect(load.indexOf('role === "OWNER" || role === "OPERATOR"')).toBeLessThan(load.indexOf("/org/scorecards/recompute"));
+  test("Org pages never recompute on open; the button that does is for OWNER or OPERATOR (C-01)", () => {
+    expect(bodyOf(app, "async function loadLatestOrgScorecard()")).not.toContain("/org/scorecards/recompute");
+    const empty = bodyOf(app, "function noScorecardCard(title, again)");
+    expect(empty).toContain('<button id="orgScoreBuild" data-roles="OWNER,OPERATOR">');
+    expect(empty).toContain('apiPost("/org/scorecards/recompute"');
     expect(app).toContain('<button id="orgRunStartBtn" data-roles="OWNER,OPERATOR">Run</button>');
   });
 });
@@ -198,11 +218,33 @@ describe("load failures and untrusted text (2026-11-14 source audit)", () => {
     expect(app).toContain('merkleVerify ? (merkleVerify.ok ? "OK" : "FAILED") : "could not load');
   });
 
-  test("the agent id from the URL and Ops server text are escaped; Run Retention asks first", () => {
+  test("the agent id from the URL and Ops server text are escaped; removing old records asks first", () => {
     expect(app).toContain("Issue Lease For ${htmlEscape(currentAgent())}");
     const ops = readFileSync("src/console/assets/ops.js", "utf8");
     expect(ops).not.toMatch(/\+ String\(error\) \+/);
     expect(ops).not.toMatch(/"<pre>" \+ JSON\.stringify/);
-    expect(ops).toMatch(/"retention-run"\)\.addEventListener\("click", async \(\) => \{\n  if \(!window\.confirm\(/);
+    // Changed on purpose (C-16, C-07): the browser confirm box became a second press on the button.
+    expect(ops).toMatch(/action\("retention-run", "\/ops\/retention\/run", \{ dryRun: false \}, [^)]*\n\s*"remove old records \(this cannot be undone\)"\);/);
+    expect(ops).toContain("if (confirmWhat && !confirmPress(event.currentTarget, confirmWhat)) return;");
+  });
+});
+
+describe("Records wording", () => {
+  test("cards, columns and buttons say record, not proof, and buttons start with a capital", () => {
+    const assurance = readFileSync("src/console/assets/assurance.js", "utf8");
+    expect(app).not.toMatch(/Enforce Resource Proof|Finding Proofs|<th>Proof<\/th>|>activate changes<|>rollback previous</);
+    expect(assurance).not.toContain("<th>Proof</th>");
+    expect(app).toContain('card("Enforce resource records"');
+    expect(app).toContain(">Roll back to previous</button>");
+  });
+});
+
+describe("Tools page on a phone", () => {
+  test("the Allowed Tools table stacks each row as labelled lines below 480 px", () => {
+    const css = readFileSync("src/console/assets/styles.css", "utf8");
+    expect(app).toContain('<table class="stack-table">');
+    for (const label of ["Tool", "Action class", "Exec ticket", "Identity"]) expect(app).toContain(`<td data-label="${label}">`);
+    expect(css).toMatch(/@media \(max-width: 480px\) \{\s*\.stack-table thead \{ display: none; \}/);
+    expect(css).toContain(".stack-table td::before { content: attr(data-label);");
   });
 });

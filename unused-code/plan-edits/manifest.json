@@ -80,6 +80,13 @@
       "sha256": "b14d55d260d9c5b5c84b97fce4fd4db27bec942d24feccb15477fb15c37c9d69"
     },
     {
+      "path": "dist/watch/traceFailureIndex.d.ts",
+      "issue": "L-IMPORTERS-1115",
+      "baseCommit": "1041d302ca474274a3fbf86c2d3da3a4415ac810",
+      "archivePath": "unused-code/plan-edits/L-IMPORTERS-1115/dist/watch/traceFailureIndex.d.ts.landed",
+      "sha256": "56860b82b9f2b268d19e77d54efa32e2930120d7c26515334402a427835744d2"
+    },
+    {
       "path": "knip.json",
       "issue": "P1-58",
       "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
@@ -486,6 +493,13 @@
       "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
     },
     {
+      "path": "src/fleet/paths.ts",
+      "issue": "L-CLI2-1115",
+      "baseCommit": "31eb08d9def2973367631a352e136368a3a80438",
+      "archivePath": "unused-code/plan-edits/L-CLI2-1115/src/fleet/paths.ts.landed",
+      "sha256": "3afaf4c383ddf5c5d6faeb383bc4e6db3f2f250457a23e142a7ed28b4506a1e9"
+    },
+    {
       "path": "src/fleet/typedGraph.ts",
       "issue": "GAP-WP32",
       "baseCommit": "20b87b5e647bf67a58a909781fb252dedd0ebb51",
@@ -582,6 +596,13 @@
       "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
       "archivePath": "unused-code/plan-edits/P0-18/src/ledger/ledger.ts.landed",
       "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d"
+    },
+    {
+      "path": "src/lifecycle/lifecycleRunArtifact.ts",
+      "issue": "L-CONSOLE-PAGES-1115",
+      "baseCommit": "f093c7918962c67511f5f908aac280730ab8cb08",
+      "archivePath": "unused-code/plan-edits/L-CONSOLE-PAGES-1115/src/lifecycle/lifecycleRunArtifact.ts.landed",
+      "sha256": "9d18ddef8603dcb1052e62ae40ca5c553e2d5620fb6fa19b02f95effa19d1d03"
     },
     {
       "path": "src/lifecycle/signedControlJournal.ts",
@@ -1058,6 +1079,13 @@
       "baseCommit": "c71c28e2c10cad64c72600e042a2121b07b9b38e",
       "archivePath": "unused-code/plan-edits/AXE-23/src/watch/railScoreLiveDrift.ts.landed",
       "sha256": "479aa2bf8299a4e3951c85d95c4490d39be3616f6cd68a80ba5f818b82911282"
+    },
+    {
+      "path": "src/watch/traceFailureIndex.ts",
+      "issue": "L-IMPORTERS-1115",
+      "baseCommit": "1041d302ca474274a3fbf86c2d3da3a4415ac810",
+      "archivePath": "unused-code/plan-edits/L-IMPORTERS-1115/src/watch/traceFailureIndex.ts.landed",
+      "sha256": "18cbb11b79a7505e814c2e682d16190a3edc7ada318377bfb6d71f5df76ba51c"
     },
     {
       "path": "src/wire/wireListener.ts",

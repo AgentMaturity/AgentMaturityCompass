@@ -25,7 +25,7 @@ export const GUIDE_STEPS = [
   {
     title: "What AMC is",
     body: `<p>AMC (Agent Maturity Compass) checks how far you can trust an AI agent.</p>
-      <p>It does not take the agent's word for it. It looks at recorded proof of what the agent actually did, and gives
+      <p>It does not take the agent's word for it. It looks at signed records of what the agent actually did, and gives
       you a score and a list of gaps to fix.</p>`
   },
   {
@@ -94,7 +94,7 @@ export const ACTIVATION_HELP = {
   connected_agent: ["AMC knows your agent and can see what it does.",
     (agent) => `Use "Connect my agent" above, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
   observed_action: ["AMC has recorded at least one real action by your agent.",
-    (agent) => `Run one task: open <a href="./native-tasks?agent=${encodeURIComponent(agent)}">Native Tasks</a>, or use your connected agent once.`],
+    (agent) => `Run one task with a real model: open <a href="./native-tasks?agent=${encodeURIComponent(agent)}">Native Tasks</a>, or use your connected agent once. Only actions AMC records with a signed receipt count, so a task on the stand-in model does not.`],
   control_decision: ["An AMC guardrail has checked one of your agent's actions and allowed or stopped it.",
     (agent) => `Turn on control mode: run <code>amc connect hooks install --provider claude-code --agent ${esc(agent)} --mode control</code> in your terminal (use <code>gemini-cli</code> or <code>pi</code> as the provider if that is your agent), then run one action.`],
   signed_proof: ["AMC has sealed that decision in a signed record you can show to others.",
@@ -121,8 +121,8 @@ export function activationHelpHtml(row, agentId) {
 }
 
 const NEXT_STEP = {
-  connected_agent: "run one task",
-  observed_action: "run one task",
+  connected_agent: "run one task with a real model or your connected agent (the stand-in model does not count)",
+  observed_action: "run one task with a real model or your connected agent (the stand-in model does not count)",
   control_decision: "turn on control mode",
   signed_proof: "look at the signed record on the Evidence page"
 };
@@ -134,8 +134,10 @@ export function progressLineText(activation) {
   const done = Math.min(Number(activation?.progress?.completed) || 0, total);
   const next = rows.find((row) => row?.status !== "COMPLETE");
   const tail = next?.status === "BLOCKED" ? "Needs attention: AMC cannot trust its records right now."
-    : done >= total ? "All steps done." : `Next: ${NEXT_STEP[next?.id] ?? "run one task"}.`;
-  return `Your progress: ${done} of ${total}. ${tail}`;
+    : done >= total ? "All steps done." : `Next: ${NEXT_STEP[next?.id] ?? NEXT_STEP.observed_action}.`;
+  // Progress is counted per agent, from signed records of real actions only.
+  const who = activation?.agentId ? ` for agent ${activation.agentId}` : "";
+  return `Your progress${who}: ${done} of ${total}. ${tail}`;
 }
 
 function storage(win) {

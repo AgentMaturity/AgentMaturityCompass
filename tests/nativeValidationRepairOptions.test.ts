@@ -150,7 +150,7 @@ describe("explicit native validation repair options", () => {
     await runNativeInteractiveSession({ workspace: f.root, provider: "stub", validationConfig: f.file,
       validationConfigSha256: f.sha256, validate: ["public"], validationRepair }, { log: line => logs.push(line), error: line => logs.push(line), fail });
     expect(seam.commands).toHaveLength(1);
-    const resume = JSON.parse(logs.find(line => line.startsWith("Resume in this workspace:"))!.split("\n  ")[1]!) as string[];
+    const resume = JSON.parse(logs.find(line => line.startsWith("Resume in this workspace: "))!.slice("Resume in this workspace: ".length)) as string[];
     for (const argv of [seam.commands[0]!, resume]) {
       expect(option(argv, "--validation-repair")).toBe(frozen);
       expect(option(argv, "--validation-config")).toBe(f.file);

@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { writeExportAttestation, type ExportAttestation } from "../attest/exportAttestation.js";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -615,7 +616,7 @@ export function exportEvidenceBundle(params: {
   outFile: string;
   agentId?: string;
   attest?: boolean; // P1-27: add the AIBOM and a DSSE-signed in-toto statement, both listed in the manifest
-}): { outFile: string; manifest: BundleManifest; fileCount: number; eventCount: number; sessionCount: number; openSessions: string[] } {
+}): { outFile: string; sha256: string; attestation: ExportAttestation; manifest: BundleManifest; fileCount: number; eventCount: number; sessionCount: number; openSessions: string[] } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const agentPaths = getAgentPaths(params.workspace, agentId);
   const report = loadRunReport(params.workspace, params.runId, agentId);
@@ -769,19 +770,13 @@ export function exportEvidenceBundle(params: {
     const outFile = resolve(params.workspace, params.outFile);
     ensureDir(dirname(outFile));
     runTarCreate(root, outFile);
-    appendTransparencyEntry({
-      workspace: params.workspace,
-      type: "BUNDLE_EXPORTED",
-      agentId,
-      artifact: {
-        kind: "amcbundle",
-        sha256: sha256Hex(readFileSync(outFile)),
-        id: report.runId
-      }
-    });
+    const sha256 = sha256Hex(readFileSync(outFile));
+    appendTransparencyEntry({ workspace: params.workspace, type: "BUNDLE_EXPORTED", agentId, artifact: { kind: "amcbundle", sha256, id: report.runId } });
 
     return {
       outFile,
+      sha256,
+      attestation: writeExportAttestation(params.workspace, outFile, "amcbundle", sha256), // signs this digest only
       manifest,
       fileCount: manifest.files.length,
       eventCount: copied.eventCount,

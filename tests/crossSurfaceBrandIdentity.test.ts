@@ -54,7 +54,9 @@ describe("cross-surface AMC brand identity", () => {
     const header = readme.slice(0, 2200);
 
     expect(header).toContain('src="website/og-card.png"');
-    expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(header).toContain("Build an AI agent for work that gets audited");
+    expect(header).toContain("Build, run and check AI agents for regulated work.");
+    expect(header).not.toContain("Run one command");
     expect(header).toContain("Evidence over claims.");
     expect(header).not.toContain("img.shields.io/badge/🧭_AMC");
     const whitepaper = read("whitepaper/AMC_WHITEPAPER_v1.md");
@@ -67,7 +69,9 @@ describe("cross-surface AMC brand identity", () => {
     const header = docsIndex.slice(0, 1200);
 
     expect(header).toContain('src="https://agentmaturity.co/og-card.png"');
-    expect(header).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(header).toContain("Build an AI agent for work that gets audited");
+    expect(header).toContain("Build, run and check AI agents for regulated work.");
+    expect(header).not.toContain("Run one command");
     expect(header).toContain("Evidence over claims.");
   });
 
@@ -75,9 +79,13 @@ describe("cross-surface AMC brand identity", () => {
     const docs = read("website/docs/docs.js");
     const styles = read("website/docs/docs.css");
 
-    expect(docs).toContain("Run one command");
-    expect(docs).toContain("Get the full score. Fix the gaps.");
+    expect(docs).toContain("Build an AI agent for work that gets audited");
+    expect(docs).toContain("Build, run and check AI agents for regulated work.");
+    expect(docs).not.toContain("Run one command");
     expect(docs).toContain("Evidence over claims.");
+    // The source install is the current way in; the release installers are shown as the older 1.1.1 release.
+    expect(docs).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
+    expect(docs).toContain("install the published 1.1.1 release");
     expect(docs).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
     expect(docs).toContain("irm https://agentmaturity.co/install.ps1 | iex");
     expect(styles).toContain(".welcome-hero");
@@ -89,7 +97,7 @@ describe("cross-surface AMC brand identity", () => {
     const styles = read("website/docs/docs.css");
 
     expect(docs).toContain('class="doc-brandline"');
-    expect(docs).toContain("artifact valid ≠ evidence ready");
+    expect(docs).not.toContain("artifact valid ≠ evidence ready");
     expect(docs).toContain("Evidence over claims.");
     expect(styles).toContain(".doc-brandline");
     expect(styles).toContain(".doc-brandline-status");
@@ -98,21 +106,21 @@ describe("cross-surface AMC brand identity", () => {
   test("standalone Docs pages use the AMC wordmark and dark surfaces", () => {
     for (const path of standaloneDocs) {
       const html = read(path);
-      expect(html).toContain('amc<span class="brand-cursor">_</span> docs');
+      expect(html).toContain('amc<span class="accent">_</span>');
       expect(html).not.toContain('<span class="logo-icon">A</span>');
       expect(html).not.toMatch(/background:\s*#fff\b/i);
       expect(html).not.toContain("%230D6E6E");
-      expect(html).toContain('shared.css?v=20260710c');
+      expect(html).toContain('href="../home.css?v=6"');
+      expect(html).toContain('href="../docs-pages.css?v=1"');
     }
 
-    const shared = read("website/docs/shared.css");
-    expect(shared).toContain(".brand-cursor");
-    expect(shared).toContain("--teal: var(--green)");
-    expect(shared).toMatch(/\.main\s*\{[^}]*min-width:\s*0;/s);
-    expect(shared).toMatch(/\.step-content\s*\{[^}]*min-width:\s*0;/s);
-    expect(shared).toMatch(/\.card\s*\{[^}]*min-width:\s*0;/s);
-    expect(shared).toContain("grid-template-columns: minmax(0, 1fr)");
-    expect(shared).toMatch(/@media \(max-width: 860px\)[\s\S]*table\s*\{[^}]*overflow-x:\s*auto;/);
+    // Reading pages never scroll sideways on a phone: every box that holds text can shrink, and wide tables scroll.
+    const reading = read("website/docs-pages.css");
+    expect(reading).toMatch(/\.doc\s*\{[^}]*min-width:\s*0;/s);
+    expect(reading).toMatch(/\.step-content\s*\{[^}]*min-width:\s*0;/s);
+    expect(reading).toMatch(/\.card, \.adapter-card, \.domain-card\s*\{[^}]*min-width:\s*0;/s);
+    expect(reading).toContain("grid-template-columns: minmax(0, 1fr)");
+    expect(reading).toMatch(/\.doc table\s*\{[^}]*overflow-x:\s*auto;/);
     expect(read("website/docs/compliance.html")).toContain("grid-template-columns: minmax(0, 1fr)");
   });
 

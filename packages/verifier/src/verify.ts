@@ -6,6 +6,9 @@ import { evaluateAttestation } from "./kinds/attestation.js";
 import { refused } from "./kinds/common.js";
 import { evaluateDsseIntoto } from "./kinds/dsseIntoto.js";
 import { evaluateExternalEvidence } from "./kinds/externalEvidence.js";
+import { evaluateBundleManifest } from "./kinds/bundleManifest.js";
+import { evaluatePassport, type SuppliedList } from "./kinds/passport.js";
+import { isGzip, readTarGz, rootedAt } from "./archive.js";
 import { evaluateReceipt } from "./kinds/receipt.js";
 import { evaluateRevocationList, evaluateTrustList } from "./kinds/lists.js";
 import { evaluateKeyRotation, evaluateRootRotation } from "./kinds/rotation.js";
@@ -27,6 +30,8 @@ export interface VerifyOptions {
   knownSequences?: Readonly<Record<string, number>>;
   /** sha256 hex -> bytes of supplied evidence. */
   evidence?: ReadonlyMap<string, Uint8Array>;
+  /** Signed passport revocation lists the verifier's user supplies (parsed JSON plus the exact bytes). */
+  revocationLists?: readonly SuppliedList[];
   /** Shown in the report only. */
   path?: string;
 }
@@ -65,6 +70,21 @@ function evaluate(value: unknown, bytes: Uint8Array, env: Env): Evaluation {
   return refused("unknown", { code: "UNSUPPORTED_VERSION", detail: "not a record type this verifier supports (v1)" });
 }
 
+/** A .amcpass passport or a .amcbundle evidence bundle, told apart by what the archive holds. */
+function evaluateArchive(bytes: Uint8Array, revocationLists: readonly SuppliedList[], env: Env): Evaluation {
+  let archive: ReturnType<typeof readTarGz>;
+  try {
+    archive = readTarGz(bytes);
+  } catch (error) {
+    return refused("unknown", { code: "MALFORMED", detail: error instanceof Error ? error.message : String(error) });
+  }
+  const passport = rootedAt(archive, "amc-passport", "passport.json");
+  if (passport !== null) return evaluatePassport(passport, revocationLists, env);
+  const bundle = rootedAt(archive, "amc-bundle", "manifest.json");
+  if (bundle !== null) return evaluateBundleManifest(bundle, archive.appleDouble, env);
+  return refused("unknown", { code: "UNSUPPORTED_VERSION", detail: "an archive that is neither an AMC passport nor an AMC evidence bundle" });
+}
+
 /**
  * Verifies one artifact as of `options.asOf`, trusting only the supplied trust lists, pinned roots and evidence. Keys,
  * authorities and anchors the artifact names are looked up there, never believed.
@@ -78,11 +98,13 @@ export function verifyArtifact(bytes: Uint8Array, options: VerifyOptions): Verif
   const extraIntegrity: Finding<"integrity">[] = evidence.mismatched
     .map(digest => ({ code: "DIGEST_MISMATCH", detail: `evidence supplied as ${digest} does not hash to that digest` }));
   let value: unknown;
-  let evaluation: Evaluation | null = null;
-  try {
-    value = parseJson(bytes);
-  } catch (error) {
-    evaluation = refused("unknown", { code: "MALFORMED", detail: `the artifact is ${error instanceof Error ? error.message : String(error)}` });
+  let evaluation: Evaluation | null = isGzip(bytes) ? evaluateArchive(bytes, options.revocationLists ?? [], env) : null;
+  if (evaluation === null) {
+    try {
+      value = parseJson(bytes);
+    } catch (error) {
+      evaluation = refused("unknown", { code: "MALFORMED", detail: `the artifact is ${error instanceof Error ? error.message : String(error)}` });
+    }
   }
   evaluation ??= evaluate(value, bytes, env);
   if (options.rootThreshold === undefined && ctx.roots.size > 1) {

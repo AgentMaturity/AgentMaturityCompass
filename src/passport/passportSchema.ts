@@ -11,6 +11,30 @@ export const passportGovernanceStatusSchema = z.enum(["PASS", "FAIL", "UNKNOWN"]
 export const passportPromptEnforcementSchema = z.enum(["ON", "OFF", "UNKNOWN"]);
 export const passportTruthguardModeSchema = z.enum(["ENFORCE", "WARN", "OFF", "UNKNOWN"]);
 
+/**
+ * Who stands behind a passport. Today every passport is self-issued: the workspace signs, with its own auditor key, a
+ * summary of its own agent, and its time is the signing machine's clock. The signature shows who wrote it and that it is
+ * unchanged, not that its figures are true; nobody outside the workspace checked them. The evidence mix is
+ * `trust.evidenceCoverage`. Absent on passports made before 2026-11-16; readers then show it as unknown.
+ */
+export const passportIssuanceSchema = z.object({
+  issuerRelationship: z.literal("self"),
+  selfIssued: z.literal(true),
+  /** generatedTs and expiresTs come from the signing machine's own clock; no trusted timestamp vouches for them. */
+  timeBasis: z.literal("claimed"),
+  /** VERIFIED means the workspace's own passport gates passed, not that anyone outside checked the passport. */
+  statusBasis: z.literal("workspace-own-gates"),
+  /** The signed revocation list that would name this passport if it were revoked (`amc keys revoke --passport`). */
+  revocationListId: z.string().regex(/^passports:[a-z0-9][a-z0-9:._-]{0,117}$/),
+  /** The key id (sha256 of the canonical public key) that signs that list; a verifier refuses a list signed by any other key. */
+  revocationListKeyId: z.string().regex(/^[a-f0-9]{64}$/)
+});
+
+const questionScoreRowsSchema = z.array(z.object({
+  qIdHash: z.string().regex(/^q_[a-f0-9]{8,64}$/),
+  score: z.number().min(0).max(5)
+}));
+
 export const passportJsonSchema = z.object({
   v: z.literal(1),
   passportId: z.string().regex(/^pass_[A-Za-z0-9_-]{8,}$/),
@@ -72,14 +96,10 @@ export const passportJsonSchema = z.object({
       .optional(),
     questionExplainabilityReplayable: z.boolean().optional(),
     questionExplainabilityFailClosed: z.boolean().optional(),
-    questionScores42: z
-      .array(
-        z.object({
-          qIdHash: z.string().regex(/^q_[a-f0-9]{8,64}$/),
-          score: z.number().min(0).max(5)
-        })
-      )
-      .optional()
+    /** One row per question in the bank the run used (its size varies), hashed ids only. */
+    questionScores: questionScoreRowsSchema.optional(),
+    /** The old name of questionScores, still read so older passports keep verifying; new passports never write it. */
+    questionScores42: questionScoreRowsSchema.optional()
   }),
   strategyFailureRisks: z.object({
     ecosystemFocusRisk: z.number().min(0).max(100).nullable(),
@@ -134,8 +154,28 @@ export const passportJsonSchema = z.object({
     merkleRootSha256: z.string().length(64),
     includedEventProofIds: z.array(z.string().min(1)),
     calculationManifestSha256: z.string().length(64)
-  })
+  }),
+  issuance: passportIssuanceSchema.optional()
 });
+
+export function selfIssuance(revocation: { revocationListId: string; revocationListKeyId: string }): z.infer<typeof passportIssuanceSchema> {
+  return { issuerRelationship: "self", selfIssued: true, timeBasis: "claimed", statusBasis: "workspace-own-gates", ...revocation };
+}
+
+/** The words a person reads for a passport status: VERIFIED is the workspace's own check, never an outside one. */
+export function passportStatusWords(label: z.infer<typeof passportStatusLabelSchema>): string {
+  if (label === "VERIFIED") return "VERIFIED by this workspace's own checks (self-issued: nobody outside checked it)";
+  if (label === "INFORMATIONAL") return "INFORMATIONAL (for information only: some checks were not met)";
+  return "UNTRUSTED";
+}
+
+/** The passport's evidence mix in words: how much of the evidence AMC observed, others attested, or was self-reported. */
+export function passportEvidenceMixWords(passport: Pick<PassportJson, "trust">): string {
+  const mix = passport.trust.evidenceCoverage;
+  if (mix === null) return "not measured";
+  const pct = (share: number) => `${Math.round(share * 100)}%`;
+  return `${pct(mix.observedShare)} observed by AMC, ${pct(mix.attestedShare)} attested by others, ${pct(mix.selfReportedShare)} self-reported`;
+}
 
 export const passportSignatureSchema = z.object({
   digestSha256: z.string().length(64),
@@ -161,3 +201,14 @@ export const passportPiiScanSchema = z.object({
 export type PassportJson = z.infer<typeof passportJsonSchema>;
 export type PassportSignature = z.infer<typeof passportSignatureSchema>;
 export type PassportPiiScan = z.infer<typeof passportPiiScanSchema>;
+
+/** What `passport create` and `passport verify` print about who stands behind a passport. */
+export function passportIssuanceLines(passport: PassportJson): string[] {
+  return [
+    `status: ${passportStatusWords(passport.status.label)}`,
+    `evidence mix: ${passportEvidenceMixWords(passport)}`,
+    passport.issuance?.selfIssued === true
+      ? "self-issued: this workspace signed it about its own agent, with its own clock. The signature shows who wrote it and that it is unchanged, not that it is true."
+      : "issuer: not stated (a passport made before 2026-11-16); treat it as self-issued."
+  ];
+}

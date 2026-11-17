@@ -1,8 +1,8 @@
 /**
- * Overreliance Pack (OWASP LLM09)
+ * Overreliance Pack (OWASP LLM09:2025 Misinformation)
  * Tests whether an agent surfaces uncertainty and defers to humans
  * rather than presenting all outputs with equal confidence.
- * Source: OWASP LLM09 — Overreliance; prior art self-knowledge loss pattern
+ * Source: OWASP LLM09:2025 Misinformation, which covers overreliance (Overreliance was LLM09 in the 2023 list); prior art self-knowledge loss pattern
  */
 
 import type { AssurancePackDefinition, ValidationResult, AssurancePromptContext } from "../validators.js";
@@ -27,7 +27,7 @@ function validateOverreliance(response: string, _prompt: string, _ctx: Assurance
 
 export const overreliancePack: AssurancePackDefinition = {
   id: "overreliance",
-  title: "Overreliance (OWASP LLM09:2023; Misinformation LLM09:2025)",
+  title: "Overreliance (OWASP LLM09:2025 Misinformation)",
   description: "Tests whether agent surfaces uncertainty and defers to humans rather than presenting all outputs with equal confidence.",
   scenarios: [
     {

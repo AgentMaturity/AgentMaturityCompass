@@ -2,7 +2,7 @@
 
 Hook provider: `pi` (installed with `amc connect hooks install --provider pi`; it is not an `amc adapters` id)  
 Package export: `agent-maturity-compass/pi` (`createAmcPiExtension`)  
-Qualified Pi: the `pi` CLI of `@earendil-works/pi-coding-agent` 1.0.2 and 1.0.4 (see [Qualification](#qualification))  
+Qualified Pi: the `pi` CLI of `@earendil-works/pi-coding-agent` 1.0.2, 1.0.4 and 1.5.2 (see [Qualification](#qualification))  
 Support status: supported at the qualified versions in the [harness support matrix](SUPPORT_MATRIX.md), which is generated from [manifests/pi.json](manifests/pi.json)
 
 AMC ships an optional Pi extension. In control mode it sends every Pi `tool_call` to AMC's loopback hook control route, applies AMC's decision, and AMC records each decision as a signed receipt bound to an authorization record. In observe mode it records requested and finished tool calls without arguments or output. This page states exactly where that enforcement starts and ends.
@@ -132,28 +132,28 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 
 ## Qualification
 
-`tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-10-18-P1-22/pi-conformance.json` (the run after the evidence-latch follow-up; the first run is `qualification/2026-10-12-P1-22/`), hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
+`tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-11-16-watch/pi-conformance.json` (1.5.2 run on 2026-11-16; the 1.0.2 and 1.0.4 entries are copied from `qualification/2026-10-18-P1-22/`, the run after the evidence-latch follow-up; the first run is `qualification/2026-10-12-P1-22/`), hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
-Run 2026-10-18T01:21:20.265Z on local macOS arm64 (not CI), AMC commit `86da8c341c9c`.
+Run 2026-11-16 on local macOS arm64 (not CI), AMC commit `22b9ce7a2e7e`.
 
-| Case | Pi 1.0.2 | Pi 1.0.4 |
-|---|---|---|
-| Allowed `read` runs; recorded Pi version | yes; 1.0.2 | yes; 1.0.4 |
-| Allowed `read` outcome recorded, bound to its decision | yes | yes |
-| Writer fault on an outcome: next call ran; ran after owner recovery | no; yes | no; yes |
-| Session registered before its first call; claim | yes; enforced_at_pi_tool_call | yes; enforced_at_pi_tool_call |
-| `write` needing approval: file created | no | no |
-| Denied `bash`: effect | no | no |
-| Unmapped extension tool: effect | no | no |
-| `codemode` tool: effect | no | no |
-| `@`-prefixed `read` runs; read through a symlink into `.amc` | yes; no | yes; no |
-| Extension tool under a built-in's name (`find`): effect | no | no |
-| Codemode nested call emits `tool_call` (parent id) | yes (call_codemode_probe/1) | yes (call_codemode_probe/1) |
-| Bridge stopped: tool ran | no | no |
-| Decision receipts verified cold | 124 verified, 0 failed | 124 verified, 0 failed |
-| Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 |
-| Decision latency p50 / p95 (ms, n) | 57.5 / 77.1 (100) | 59.1 / 101.2 (100) |
+| Case | Pi 1.0.2 | Pi 1.0.4 | Pi 1.5.2 |
+|---|---|---|---|
+| Allowed `read` runs; recorded Pi version | yes; 1.0.2 | yes; 1.0.4 | yes; 1.5.2 |
+| Allowed `read` outcome recorded, bound to its decision | yes | yes | yes |
+| Writer fault on an outcome: next call ran; ran after owner recovery | no; yes | no; yes | no; yes |
+| Session registered before its first call; claim | yes; enforced_at_pi_tool_call | yes; enforced_at_pi_tool_call | yes; enforced_at_pi_tool_call |
+| `write` needing approval: file created | no | no | no |
+| Denied `bash`: effect | no | no | no |
+| Unmapped extension tool: effect | no | no | no |
+| `codemode` tool: effect | no | no | no |
+| `@`-prefixed `read` runs; read through a symlink into `.amc` | yes; no | yes; no | yes; no |
+| Extension tool under a built-in's name (`find`): effect | no | no | no |
+| Codemode nested call emits `tool_call` (parent id) | yes (call_codemode_probe/1) | yes (call_codemode_probe/1) | yes (call_codemode_probe/1) |
+| Bridge stopped: tool ran | no | no | no |
+| Decision receipts verified cold | 124 verified, 0 failed | 124 verified, 0 failed | 124 verified, 0 failed |
+| Limit, untrusted project: write ran; AMC decisions; registrations | yes; 0; 0 | yes; 0; 0 | yes; 0; 0 |
+| Decision latency p50 / p95 (ms, n) | 57.5 / 77.1 (100) | 59.1 / 101.2 (100) | 133.9 / 192.2 (100) |
 <!-- pi-conformance-matrix:end -->
 
 A new Pi release is blocked (`AMC has not qualified Pi <version>`) until it passes this run and is added to `QUALIFIED_PI_VERSIONS` (`src/adapters/pi/piVersions.ts`).

@@ -169,6 +169,7 @@ describe("AMC-1482 fail-closed MCP server and tool context", () => {
     expect(JSON.stringify(projection)).not.toContain("hostAllowlist");
     expect(JSON.stringify(projection)).not.toContain("binariesAllowlist");
     expect(projection.claimBoundary).toContain("declared context");
+    expect(projection.claimBoundary).not.toMatch(/\bprov(e|es)\b/i);
   });
 
   test("groups MCP tools by exact server identity with deterministic shared IDs", () => {

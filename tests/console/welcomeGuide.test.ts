@@ -60,6 +60,7 @@ describe("plain-language help", () => {
     expect(activationHelpHtml({ id: "signed_proof", status: "BLOCKED" }, "a")).toContain("amc doctor --strict --json");
     expect(activationHelpHtml({ id: "unknown", status: "WAITING" }, "a")).toBe("");
     expect(activationHelpHtml({ id: "observed_action", status: "WAITING" }, "a b")).toContain("./native-tasks?agent=a%20b");
+    expect(activationHelpHtml({ id: "observed_action", status: "WAITING" }, "a")).toContain("a task on the stand-in model does not");
   });
 
   test("every banner label has a tooltip and the help list names them", () => {

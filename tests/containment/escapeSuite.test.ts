@@ -7,7 +7,7 @@ import { bwrapBackend, unconsumedFds } from "../../src/sandbox/bwrapBackend.js";
 import { prepareNativePtyLaunch } from "../../src/terminal/nativePtySandbox.js";
 import { seatbeltNativeShell } from "../../src/sandbox/seatbeltNativeShell.js";
 import { denySessionSecretPaths } from "../../src/sandbox/shellSecretPaths.js";
-import { nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
+import { freePort, nativeContainmentFixture, sandboxNode, type NativeCall } from "../helpers/nativeContainment.js";
 
 // Binary prerequisites are not confinement evidence. Every actual call must produce a real applied receipt.
 const backend = process.platform === "darwin" ? seatbeltNativeShell() : bwrapBackend();
@@ -16,8 +16,8 @@ const prerequisite = backend.available();
 const required = process.env.AMC_REQUIRE_REAL_SANDBOX === "1";
 const node = sandboxNode();
 const realTest = supported && prerequisite.ok && node !== null || required ? test : test.skip;
-// Linux refuses a signed egress allowlist (ADR-008), so the proxy cases run where it is supported.
-const proxyTest = process.platform === "darwin" ? realTest : test.skip;
+// Both platforms route a signed egress allowlist through AMC's proxy (Linux: the relay of ADR-008).
+const proxyTest = realTest;
 // A Linux host whose kernel refuses Bubblewrap's namespaces must say so and run nothing.
 const refusalTest = process.platform === "linux" && !prerequisite.ok && !required ? test : test.skip;
 if (process.platform === "linux" && !prerequisite.ok) console.warn(`escape suite: Bubblewrap cannot confine here (${prerequisite.reason}); asserting the honest refusal instead.`);
@@ -72,16 +72,6 @@ describe("real native shell escape attempts with owned canaries", () => {
       const call = await f.run(`require("node:fs").writeFileSync(${JSON.stringify(target)},"ran");`);
       refusedBeforeLaunch(call, prerequisite.ok ? "" : prerequisite.reason);
       expect(existsSync(target)).toBe(false); passed = true;
-    } finally { await f.finish(passed); }
-  });
-
-  (process.platform === "linux" ? test : test.skip)("a signed egress allowlist is refused on Linux before anything launches", async () => {
-    const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
-    try {
-      const origin = await f.origin(), requests = origin.requests.length, connections = origin.connectionCount();
-      const call = await f.run(proxyProgram(`${origin.url}/allowed`));
-      refusedBeforeLaunch(call, prerequisite.ok ? "A signed shell egress allowlist is not available on Linux yet" : prerequisite.reason);
-      expect(origin.requests).toHaveLength(requests); expect(origin.connectionCount()).toBe(connections); expect(f.egress).toEqual([]); passed = true;
     } finally { await f.finish(passed); }
   });
 
@@ -251,9 +241,10 @@ describe("real native shell escape attempts with owned canaries", () => {
   });
 
   proxyTest("the real proxy denies an unlisted host with 403 and a matching decision callback", async () => {
-    const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
+    const port = await freePort();
+    const f = nativeContainmentFixture({ allowHosts: [`127.0.0.1:${port}`] }); let passed = false;
     try {
-      const origin = await f.origin(), before = origin.requests.length;
+      const origin = await f.origin(port), before = origin.requests.length;
       const call = await f.run(proxyProgram(`http://blocked.invalid:${origin.port}/blocked`));
       f.facts.push({ requestsBefore: before, requestsAfter: origin.requests.length });
       applied(call, "proxy-allowlist"); expect(call.data.status).toBe(403);
@@ -261,14 +252,17 @@ describe("real native shell escape attempts with owned canaries", () => {
         callId: call.execution.callId, host: "blocked.invalid", port: origin.port, decision: "deny",
         reason: "blocked.invalid is not in the egress allowlist"
       }]);
+      // The person sees the host and the exact file and command that allow it, never "switch the sandbox off".
+      expect(call.receipt.stderr).toContain(`amc: blocked a network connection to blocked.invalid port ${origin.port}: blocked.invalid is not in the egress allowlist. To allow it, add "blocked.invalid:${origin.port}" under bash, nativeSandbox, egress, allowHosts in .amc/tools.yaml, then sign the file again: amc tools sign.`);
       expect(origin.requests).toHaveLength(before); expect(origin.errors).toEqual([]); passed = true;
     } finally { await f.finish(passed); }
   });
 
   proxyTest("an explicitly listed loopback IP reaches the real owned origin through the authenticated proxy", async () => {
-    const f = nativeContainmentFixture({ allowHosts: ["127.0.0.1"] }); let passed = false;
+    const port = await freePort();
+    const f = nativeContainmentFixture({ allowHosts: [`127.0.0.1:${port}`] }); let passed = false;
     try {
-      const origin = await f.origin(), before = origin.requests.length;
+      const origin = await f.origin(port), before = origin.requests.length;
       const call = await f.run(proxyProgram(`${origin.url}/allowed`));
       f.facts.push({ requestsBefore: before, actualRequests: [...origin.requests] });
       applied(call, "proxy-allowlist"); expect(call.data).toMatchObject({ status: 200, body: "owned-p105-origin" });
@@ -279,12 +273,13 @@ describe("real native shell escape attempts with owned canaries", () => {
   });
 
   proxyTest("a listed localhost name without an IP exemption is refused after actual local resolution", async () => {
-    const f = nativeContainmentFixture({ allowHosts: ["localhost"] }); let passed = false;
+    const port = await freePort();
+    const f = nativeContainmentFixture({ allowHosts: [`localhost:${port}`] }); let passed = false;
     try {
       const addresses = (await lookup("localhost", { all: true, verbatim: true })).map(row => row.address);
       expect(addresses.length).toBeGreaterThan(0);
       expect(addresses.every(address => address === "127.0.0.1" || address === "::1")).toBe(true);
-      const origin = await f.origin(), before = origin.requests.length;
+      const origin = await f.origin(port), before = origin.requests.length;
       const call = await f.run(proxyProgram(`http://localhost:${origin.port}/private-name`));
       f.facts.push({ resolvedBefore: addresses, requestsBefore: before, requestsAfter: origin.requests.length });
       applied(call, "proxy-allowlist"); expect(call.data.status).toBe(403);

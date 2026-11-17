@@ -242,7 +242,7 @@ export const BUILT_IN_POLICY_PACKS: PolicyPack[] = [
       "AMC-1.8": 5,
       "AMC-3.2.3": 5,
       "AMC-5.8": 5,
-      "AMC-5.14": 5
+      "AMC-5.15": 5
     }
   }),
   packTemplate({

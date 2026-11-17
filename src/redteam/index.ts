@@ -124,3 +124,4 @@ export type {
   RedTeamExploitRetestStatus,
   RedTeamExploitSeverity,
 } from "./exploitLedger.js";
+export { redTeamExtras, withRedTeamExtras, type RedTeamExtraOptions } from "./attackerCli.js";

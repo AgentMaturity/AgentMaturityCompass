@@ -18,85 +18,93 @@ import {
 // ── Task Horizon ─────────────────────────────────────────────────────
 
 describe("classifyTaskHorizon", () => {
-  test("classifies <1 min as L0", () => {
-    expect(classifyTaskHorizon(0.5).level).toBe("L0");
-  });
-
-  test("classifies 3 min as L1", () => {
-    expect(classifyTaskHorizon(3).level).toBe("L1");
-  });
-
-  test("classifies 15 min as L2", () => {
-    expect(classifyTaskHorizon(15).level).toBe("L2");
-  });
-
-  test("classifies 60 min as L3", () => {
-    expect(classifyTaskHorizon(60).level).toBe("L3");
-  });
-
-  test("classifies 300 min as L4", () => {
-    expect(classifyTaskHorizon(300).level).toBe("L4");
-  });
-
-  test("classifies 600 min as L5", () => {
-    expect(classifyTaskHorizon(600).level).toBe("L5");
+  // The spans used to be named L0 to L5, a second meaning for the maturity scale. They are run lengths now.
+  test.each([
+    [0.5, "under-1-min"],
+    [3, "1-5-min"],
+    [15, "5-30-min"],
+    [60, "30-min-2-hr"],
+    [300, "2-8-hr"],
+    [600, "8-hr-plus"],
+  ] as const)("classifies %s minutes as %s", (minutes, span) => {
+    expect(classifyTaskHorizon(minutes).span).toBe(span);
+    expect(classifyTaskHorizon(minutes)).not.toHaveProperty("level");
   });
 });
 
 describe("scoreTaskHorizon", () => {
-  test("scores L0 with full governance as low risk", () => {
+  test("a short run with its one control is low risk", () => {
     const result = scoreTaskHorizon({
       taskDurationMinutes: 0.5,
       completedAutonomously: true,
-      activeGovernanceControls: ["basic output validation"],
+      activeGovernanceControls: ["basic output validation"], // the older name for "output validation" still counts
     });
-    expect(result.level).toBe("L0");
+    expect(result.span).toBe("under-1-min");
     expect(result.governanceSufficient).toBe(true);
     expect(result.riskLabel).toBe("low");
     expect(result.missingGovernance).toHaveLength(0);
+    expect(result.score).toBe(100);
   });
 
-  test("scores L3 with missing governance as high risk", () => {
+  test("an hour-long run with controls missing is high risk", () => {
     const result = scoreTaskHorizon({
       taskDurationMinutes: 60,
       completedAutonomously: true,
       activeGovernanceControls: ["output validation"],
     });
-    expect(result.level).toBe("L3");
+    expect(result.span).toBe("30-min-2-hr");
     expect(result.governanceSufficient).toBe(false);
     expect(result.riskLabel).toBe("high");
     expect(result.missingGovernance.length).toBeGreaterThan(0);
   });
 
-  test("scores L5 with missing governance as critical risk", () => {
+  test("a ten-hour run with no controls is critical risk and scores zero", () => {
     const result = scoreTaskHorizon({
       taskDurationMinutes: 600,
       completedAutonomously: true,
       activeGovernanceControls: [],
     });
-    expect(result.level).toBe("L5");
+    expect(result.span).toBe("8-hr-plus");
     expect(result.governanceSufficient).toBe(false);
     expect(result.riskLabel).toBe("critical");
+    expect(result.score).toBe(0);
   });
 
-  test("L4 with full governance is sufficient", () => {
-    const band = TASK_HORIZON_BANDS.find((b) => b.level === "L4")!;
+  test("a five-hour run with every listed control is sufficient", () => {
+    const band = TASK_HORIZON_BANDS.find((b) => b.span === "2-8-hr")!;
     const result = scoreTaskHorizon({
       taskDurationMinutes: 300,
       completedAutonomously: true,
       activeGovernanceControls: band.governanceRequirements,
     });
     expect(result.governanceSufficient).toBe(true);
-    expect(result.score).toBeGreaterThan(0);
+    expect(result.score).toBe(100);
   });
 
-  test("adds gap when not completed autonomously at L2+", () => {
+  // The defect this replaces: 60 of 100 points came from run length alone, so a longer run scored higher.
+  test("a longer run never scores higher than a shorter one with the same controls", () => {
+    const controls = ["output validation", "tool allowlist"];
+    const scores = [0.5, 3, 15, 60, 300, 600].map((minutes) =>
+      scoreTaskHorizon({ taskDurationMinutes: minutes, completedAutonomously: true, activeGovernanceControls: controls }).score);
+    for (let i = 1; i < scores.length; i++) expect(scores[i]!).toBeLessThanOrEqual(scores[i - 1]!);
+    expect(scores[0]).toBe(100);
+    // A control listed only for longer runs must not lift a long run above a short one either.
+    const late = [0.5, 15].map((minutes) =>
+      scoreTaskHorizon({ taskDurationMinutes: minutes, completedAutonomously: true, activeGovernanceControls: ["cost budget"] }).score);
+    expect(late).toEqual([0, 0]);
+    expect(scoreTaskHorizon({ taskDurationMinutes: 600, completedAutonomously: true, activeGovernanceControls: [] }).score).toBe(0);
+  });
+
+  test("says what it is not, and treats a person stepping in as a note, not a gap", () => {
     const result = scoreTaskHorizon({
       taskDurationMinutes: 15,
       completedAutonomously: false,
       activeGovernanceControls: [],
     });
-    expect(result.gaps.some((g) => g.includes("autonomously"))).toBe(true);
+    expect(result.notes[0]).toContain("Not METR's time-horizon measure");
+    expect(result.notes.some((note) => note.includes("A person stepped in"))).toBe(true);
+    expect(result.gaps.some((gap) => gap.includes("autonomously"))).toBe(false);
+    expect(result).not.toHaveProperty("level");
   });
 });
 

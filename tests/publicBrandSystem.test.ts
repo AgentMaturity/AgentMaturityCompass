@@ -88,10 +88,11 @@ describe("AMC public brand system", () => {
     expect(index).toContain("(API_REFERENCE.md)");
   });
 
-  test("uses one Docs topbar contract without decorative emoji chrome", () => {
+  test("uses the home page's nav on every Docs page without decorative emoji chrome", () => {
     const dynamic = read("website/docs/index.html");
     const docsScript = read("website/docs/docs.js");
-    expect(dynamic).toContain('class="topbar-tagline">Evidence over claims.</span>');
+    expect(dynamic).toContain('<nav class="nav" aria-label="Main">');
+    expect(dynamic).toContain('<a href="../docs/index.html" aria-current="page">Docs</a>');
     expect(dynamic).toContain('href="getting-started.html"');
     expect(dynamic).toContain('href="cli.html"');
     expect(dynamic).toContain('href="adapters.html"');
@@ -101,8 +102,10 @@ describe("AMC public brand system", () => {
 
     for (const path of standaloneDocs) {
       const html = read(path);
-      expect(html, path).toContain('class="topbar-tagline">Evidence over claims.</span>');
-      expect(html, path).toContain('href="./" class="topbar-logo"');
+      expect(html, path).toContain('<nav class="nav" aria-label="Main">');
+      expect(html, path).toContain('<a href="../" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>');
+      expect(html, path).toContain('<a href="../docs/index.html" aria-current="page">Docs</a>');
+      expect(html, path).toContain('href="../docs-pages.css?v=1"');
       expect(html, path).not.toMatch(/<(?:h[1-6]|strong|button)[^>]*>[^<]*\p{Extended_Pictographic}/u);
     }
   });
@@ -112,8 +115,9 @@ describe("AMC public brand system", () => {
     expect(existsSync(resolve(process.cwd(), "scripts/render-brand-assets.mjs"))).toBe(true);
     const source = read("scripts/brand/og-card.html");
     expect(source).toContain("Agent Maturity Compass");
-    expect(source).toContain("Run one command.");
-    expect(source).toContain("Get the full score. Fix the gaps.");
+    expect(source).toContain("Build an AI agent for work that gets audited");
+    expect(source).toContain("Build, run and check AI agents for regulated work.");
+    expect(source).not.toContain("Run one command");
     expect(source).toContain("Evidence over claims.");
     expect(source).toContain("#4AEF79");
     expect(source).not.toMatch(/235|5,031|🧭/u);

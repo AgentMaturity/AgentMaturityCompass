@@ -153,23 +153,24 @@ const GDPR_CONTROLS: FrameworkControl[] = [
   { id: 'GDPR-35', name: 'Data Protection Impact Assessment', description: 'DPIA for high-risk processing operations', amcQIDs: ['AMC-2.6', 'AMC-2.12'], amcModules: ['assurance', 'docs'], automatable: false },
 ];
 
-// MITRE ATLAS control mapping (technique-level granularity)
+// MITRE ATLAS control mapping (technique-level granularity). Ids and names: ATLAS data release v2026.10
+// (src/compliance/citations/reference/atlas.json).
 const MITRE_ATLAS_CONTROLS: FrameworkControl[] = [
-  { id: 'AML.T0000', name: 'Reconnaissance', description: 'Adversary gathers information about ML system architecture and capabilities', amcQIDs: ['AMC-1.5', 'AMC-2.4'], amcModules: ['shield', 'enforce'], automatable: true },
-  { id: 'AML.T0010', name: 'ML Supply Chain Compromise', description: 'Adversary compromises ML supply chain (models, libraries, datasets)', amcQIDs: ['AMC-2.5', 'AMC-4.5'], amcModules: ['enforce', 'gateway'], automatable: true },
-  { id: 'AML.T0015', name: 'Evade ML Model', description: 'Adversary crafts inputs to cause misclassification or bypass detection', amcQIDs: ['AMC-2.1', 'AMC-4.5'], amcModules: ['assurance', 'shield'], automatable: true },
-  { id: 'AML.T0018', name: 'Backdoor ML Model', description: 'Adversary inserts hidden trigger patterns into ML model', amcQIDs: ['AMC-2.5'], amcModules: ['assurance', 'score'], automatable: false },
-  { id: 'AML.T0019', name: 'Publish Poisoned Datasets', description: 'Adversary publishes poisoned datasets to compromise downstream models', amcQIDs: ['AMC-1.5'], amcModules: ['vault', 'enforce'], automatable: true },
-  { id: 'AML.T0020', name: 'Poison Training Data', description: 'Adversary modifies training data to influence model behavior', amcQIDs: ['AMC-1.5', 'AMC-2.5'], amcModules: ['vault', 'assurance'], automatable: true },
-  { id: 'AML.T0025', name: 'Exfiltration via ML Inference API', description: 'Adversary extracts training data or model parameters via inference', amcQIDs: ['AMC-3.1.2', 'AMC-1.5'], amcModules: ['enforce', 'dlp', 'shield'], automatable: true },
+  { id: 'AML.T0000', name: 'Search Open Technical Databases', description: 'Adversary searches public research and documentation to learn how and where AI is used', amcQIDs: ['AMC-1.5', 'AMC-2.4'], amcModules: ['shield', 'enforce'], automatable: true },
+  { id: 'AML.T0010', name: 'Supply Chain Compromise', description: 'Adversary compromises ML supply chain (models, libraries, datasets)', amcQIDs: ['AMC-2.5', 'AMC-4.5'], amcModules: ['enforce', 'gateway'], automatable: true },
+  { id: 'AML.T0015', name: 'Evade AI Model', description: 'Adversary crafts inputs to cause misclassification or bypass detection', amcQIDs: ['AMC-2.1', 'AMC-4.5'], amcModules: ['assurance', 'shield'], automatable: true },
+  { id: 'AML.T0018', name: 'Manipulate AI Model', description: 'Adversary manipulates a model artifact, for example to insert a hidden trigger', amcQIDs: ['AMC-2.5'], amcModules: ['assurance', 'score'], automatable: false },
+  { id: 'AML.T0115.000', name: 'Datasets', description: 'Adversary publishes poisoned datasets to compromise downstream models', amcQIDs: ['AMC-1.5'], amcModules: ['vault', 'enforce'], automatable: true },
+  { id: 'AML.T0020', name: 'Training Data Poisoning', description: 'Adversary modifies training data to influence model behavior', amcQIDs: ['AMC-1.5', 'AMC-2.5'], amcModules: ['vault', 'assurance'], automatable: true },
+  { id: 'AML.T0024', name: 'Exfiltration via AI Inference API', description: 'Adversary extracts training data or model parameters via inference', amcQIDs: ['AMC-3.1.2', 'AMC-1.5'], amcModules: ['enforce', 'dlp', 'shield'], automatable: true },
   { id: 'AML.T0034', name: 'Cost Harvesting', description: 'Adversary exploits ML APIs to consume compute resources', amcQIDs: ['AMC-4.2'], amcModules: ['enforce', 'costPredictability'], automatable: true },
-  { id: 'AML.T0040', name: 'ML Model Inference API Access', description: 'Adversary gains access to ML model inference endpoint', amcQIDs: ['AMC-1.5', 'AMC-1.8'], amcModules: ['enforce', 'rbac'], automatable: true },
+  { id: 'AML.T0040', name: 'AI Model Inference API Access', description: 'Adversary gains access to ML model inference endpoint', amcQIDs: ['AMC-1.5', 'AMC-1.8'], amcModules: ['enforce', 'rbac'], automatable: true },
   { id: 'AML.T0043', name: 'Craft Adversarial Data', description: 'Adversary creates adversarial examples to exploit model weaknesses', amcQIDs: ['AMC-2.1', 'AMC-4.5'], amcModules: ['shield', 'assurance'], automatable: true },
-  { id: 'AML.T0047', name: 'ML-Enabled Product Abuse', description: 'Adversary misuses ML product for unintended harmful purposes', amcQIDs: ['AMC-1.3', 'AMC-2.4'], amcModules: ['governor', 'enforce'], automatable: true },
-  { id: 'AML.T0051', name: 'Prompt Injection', description: 'Adversary injects malicious prompts to manipulate LLM behavior', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4'], amcModules: ['shield', 'enforce'], automatable: true },
-  { id: 'AML.T0052', name: 'Phishing via LLM', description: 'Adversary uses LLM to generate convincing phishing content', amcQIDs: ['AMC-1.3', 'AMC-2.4'], amcModules: ['enforce', 'governor'], automatable: true },
+  { id: 'AML.T0047', name: 'AI-Enabled Product or Service', description: 'Adversary misuses ML product for unintended harmful purposes', amcQIDs: ['AMC-1.3', 'AMC-2.4'], amcModules: ['governor', 'enforce'], automatable: true },
+  { id: 'AML.T0051', name: 'LLM Prompt Injection', description: 'Adversary injects malicious prompts to manipulate LLM behavior', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4'], amcModules: ['shield', 'enforce'], automatable: true },
+  { id: 'AML.T0052', name: 'Phishing', description: 'Adversary uses LLM to generate convincing phishing content', amcQIDs: ['AMC-1.3', 'AMC-2.4'], amcModules: ['enforce', 'governor'], automatable: true },
   { id: 'AML.T0054', name: 'LLM Jailbreak', description: 'Adversary bypasses LLM safety guardrails through crafted prompts', amcQIDs: ['AMC-3.3.1', 'AMC-3.3.4', 'AMC-4.5'], amcModules: ['shield', 'assurance'], automatable: true },
-  { id: 'AML.T0057', name: 'LLM Data Leakage', description: 'LLM inadvertently reveals training data or sensitive information', amcQIDs: ['AMC-3.1.2', 'AMC-1.5'], amcModules: ['shield', 'dlp', 'enforce'], automatable: true },
+  { id: 'AML.T0136', name: 'Exfiltration via AI User Interface', description: 'Sensitive information leaves through the AI system\'s replies, generated documents or previews', amcQIDs: ['AMC-3.1.2', 'AMC-1.5'], amcModules: ['shield', 'dlp', 'enforce'], automatable: true },
 ];
 
 // OWASP API Security Top 10 (2023) control mapping

@@ -1,3 +1,4 @@
+import { recordRows } from "./pageKit.js";
 import { renderWaiverBanner } from "./components/waiverBanner.js";
 
 function escapeHtml(value) {
@@ -40,14 +41,14 @@ export async function renderAssuranceCertPage(params) {
       </div>
       <div class="muted">file: <code>${escapeHtml(file || "-")}</code></div>
       <div class="muted">verify: ${verify?.ok ? "PASS" : "FAIL"}</div>
-      <pre class="scroll">${escapeHtml(JSON.stringify({
+      ${recordRows({
         riskAssuranceScore: cert.riskAssuranceScore,
         findingCounts: cert.findingCounts,
         gates: cert.gates,
         bindings: cert.bindings,
         proofBindings: cert.proofBindings,
         verifyErrors: verify?.errors || []
-      }, null, 2))}</pre>
+      })}
       `
     )
   ].join("");

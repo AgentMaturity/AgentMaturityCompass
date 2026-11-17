@@ -67,7 +67,7 @@ A superseded or withdrawn instrument gets status `repealed` and `supersededBy`. 
 `src/compliance/citations/reference/` holds the tables CIT002 checks ids against. Each records the file it came from:
 
 - `nistAiRmf.json`: the 72 subcategory ids and titles of NIST AI 100-1 (AI RMF 1.0), extracted from the official PDF, with its URL, retrieval date and sha256.
-- `atlas.json`: technique and sub-technique ids and names from the MITRE ATLAS data release v2026.09, with its URL, retrieval date and sha256.
+- `atlas.json`: technique and sub-technique ids and names from the MITRE ATLAS data release v2026.10 (released 2026-10-28, read 2026-11-16), with its URL, retrieval date and sha256.
 - `iso42001AnnexA.json`: empty. ISO/IEC 42001 is paywalled; a named expert fills it from a licensed copy. Until then ISO ids are checked for format and the pair rule only.
 
 Do not fill a table from secondary sources.

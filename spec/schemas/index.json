@@ -48,7 +48,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
       "name": "a4-readiness.schema.json",
-      "sha256": "cbdaa841ba879bbf73af55fa481b9160d8c1b6a53c291c39732d090d52563890"
+      "sha256": "0fc10acaf7f51d7d74079c6a00f0c56acf03a8818227d93abb427dc51a86926d"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
@@ -98,7 +98,7 @@
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcpass.schema.json",
       "name": "amcpass.schema.json",
-      "sha256": "09b5b00aeb66af6f5d1d7c7c45eda22a12b4fc2e713e43e067948defe60a2eda"
+      "sha256": "b11b85943a2e577f16e3f57781af373be81bba695308d41210de238b0399cdbf"
     },
     {
       "$id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",

@@ -38,6 +38,8 @@ export interface RepairPlan {
   sessions?: InterruptedSession[];
   /** SR-I1: why every failure was a missing seal and still none is sealed (a signed ledger checkpoint forbids it). */
   sealRefused?: string[];
+  /** CLI-03: payloads whose key a locked vault (or an unreachable key provider) holds; while any exist, nothing is proposed. */
+  payloadsNotEvaluated?: number;
 }
 export interface RepairReceipt {
   v: 1; type: "amc.verify-repair"; id: string; createdAt: string; amcVersion: string;
@@ -96,12 +98,18 @@ function evidenceStoreFiles(workspace: string): StoreFile[] {
 
 /** Runs the read-only verifier and says what `--apply` would do. Changes nothing. */
 export function planVerifyRepair(workspace: string, options: { expectedMonitorFingerprint?: string } = {}): RepairPlan {
-  const result = verifyLedgerIntegrity(workspace, options);
+  // CLI-03: a payload the vault keeps closed is not evaluated, as plain `amc verify` reports it, never "authentication failed".
+  const result = verifyLedgerIntegrity(workspace, { ...options, blobKeyOptional: true });
   const governance = new Set(result.governance.errors);
   const errorCounts: RepairPlan["errorCounts"] = {};
   for (const message of result.errors) {
     const kind = governance.has(message) ? "governance" : classify(message);
     errorCounts[kind] = (errorCounts[kind] ?? 0) + 1;
+  }
+  // No repair moves or seals evidence that cannot be authenticated here: the person unlocks first and plans again.
+  const notEvaluated = result.payloadsNotEvaluated?.length ?? 0;
+  if (notEvaluated > 0) {
+    return { verified: result.ok, chainOk: result.chain.ok, errorCounts, errors: result.errors.slice(0, MAX_PLAN_ERRORS), action: "none", files: [], payloadsNotEvaluated: notEvaluated };
   }
   // Every failure an interrupted legacy session's missing seal: seal those sessions instead of archiving the store.
   const interrupted = !result.ok && result.governance.ok ? interruptedSessionsIn(workspace, result.chain.errors) : null;

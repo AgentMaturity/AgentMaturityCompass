@@ -237,6 +237,16 @@ export function usersCreatedSince(workspace: string, ts: number): number | null 
 }
 
 /**
+ * Whether the workspace still has exactly one person now: one ACTIVE local user, no live host session, and nobody added
+ * (local user or host session) since `ts`. Any unreadable source answers false. A practice project counts as practice
+ * only while this holds (a4Schema.practiceNow), so a second person ends it at once, before any A4 write records them.
+ */
+export function onePersonSince(workspace: string, ts: number): boolean {
+  const { activeLocal, hostPrincipals } = principalPopulation(workspace);
+  return activeLocal?.length === 1 && hostPrincipals === 0 && usersCreatedSince(workspace, ts) === 0 && hostSessionsSince(workspace, ts) === 0;
+}
+
+/**
  * WORKSPACE_ROUTER session records of any state issued at or after `ts`; null when unreadable. A host principal who
  * signed in after a project was created ratchets it as an added user does, even once that session expired or was
  * revoked with no A4 write between (design §5.3).

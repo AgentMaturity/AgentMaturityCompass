@@ -17,7 +17,7 @@
 import { randomUUID } from "node:crypto";
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
+import { isAbsolute, join, resolve } from "node:path";
 import { stdin } from "node:process";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -26,6 +26,7 @@ import { openLedger, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { OBSERVED_AEP_HOOK_PATH, OBSERVED_HOOK_CORRELATION_PATH, type ObservedAepActionEvent } from "../bridge/hookIngress.js";
 import { isSafeProviderActionId } from "../bridge/hookActionIdentity.js";
 import { redactBridgeText } from "../bridge/bridgeRedaction.js";
+import { SESSION_HOOK_PATH } from "../bridge/sessionObservations.js";
 import {
   renderProviderControlResponse, serializeProviderControlResponse, type HookControlDecision, type HookProvider, type ProviderControlResponse,
 } from "../bridge/hookProviders.js";
@@ -38,7 +39,7 @@ import {
 } from "./hookIntegration.js";
 import { assertControlBridgeLocal, normalizeBridgeBase, parseMode, validateAgentId } from "./hookProviders/installFiles.js";
 import { claudeEnvelope, claudeHookSchemasFor, strictClaudeJson, type ClaudeHookPayload } from "./hookProviders/claudeCodePayloads.js";
-import { claudeActionId, claudeSessionSha256 } from "./hookProviders/claudeCode.js";
+import { CLAUDE_OBSERVE_SESSION_HOOKS, claudeActionId, claudeSessionSha256 } from "./hookProviders/claudeCode.js";
 import { claudeAllow, claudeDeny } from "./hookProviders/claudeAllow.js";
 
 /** Synchronous preflight right before each hook POST; its typed refusal is thrown outside every retry loop. */
@@ -605,6 +606,16 @@ async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promi
 }
 
 /**
+ * The AMC workspace a hook delivery belongs to. Claude Code may run a hook from a folder below the project (where the
+ * session was started); it names the project root, whose .claude/settings.json holds this hook, in CLAUDE_PROJECT_DIR
+ * (https://code.claude.com/docs/en/hooks, read 2026-11-15). The relative --token-file is then read from that root.
+ */
+export function hookWorkspace(provider: string, env: NodeJS.ProcessEnv = process.env, cwd = process.cwd()): string {
+  const projectDir = provider === "claude-code" ? env.CLAUDE_PROJECT_DIR : undefined;
+  return projectDir !== undefined && isAbsolute(projectDir) ? projectDir : cwd;
+}
+
+/**
  * Runs one provider hook delivery under forwardDeadlineMs(). Claude Code control mode turns every failure into the
  * answer its event needs (claudeFailure), because Claude Code runs the action after any other failure; Gemini CLI and
  * observe mode keep their earlier outputs and exit codes.
@@ -612,10 +623,13 @@ async function answerClaudeHook(opts: HookForwardOptions, readInput: () => Promi
 export async function runHookForward(
   opts: HookForwardOptions,
   readInput: () => Promise<string | Buffer>,
-  workspace = process.cwd(),
+  workspace = hookWorkspace(opts.provider),
   deadlineMs = forwardDeadlineMs(),
 ): Promise<HookForwardOutcome> {
   if (opts.provider === "claude-code" && opts.mode === "control") return answerClaudeHook(opts, readInput, workspace, deadlineMs);
+  if (opts.provider === "claude-code" && opts.mode === "observe" && (CLAUDE_OBSERVE_SESSION_HOOKS as readonly string[]).includes(opts.event ?? "")) {
+    return observeClaudeSessionHook(opts, readInput, workspace, deadlineMs);
+  }
   const deny = (message: string): HookForwardOutcome => ({
     stdout: `${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`,
     stderr: `${message}\n`,
@@ -651,6 +665,31 @@ export async function runHookForward(
       return deny(stage === "control" ? "AMC hook control unavailable; action denied." : "AMC hook control input invalid; action denied.");
     }
     return { stdout: "", stderr: `${error instanceof Error ? error.message : String(error)}\n`, exitCode: 1 };
+  }
+}
+
+/**
+ * Claude Code observe mode, a session hook (SessionStart, UserPromptSubmit, Stop, SubagentStart, PreCompact, …): the
+ * payload goes to AMC's session route on loopback, which keeps digests only (bridge/sessionObservations.ts). This hook
+ * only watches, so it always answers `{}` with exit 0, recorded or not, within its deadline: it never blocks the agent.
+ */
+async function observeClaudeSessionHook(opts: HookForwardOptions, readInput: () => Promise<string | Buffer>, workspace: string,
+  deadlineMs: number): Promise<HookForwardOutcome> {
+  try {
+    await withHookDeadline(deadlineMs, async (signal) => {
+      const received = await readInput();
+      const authorization = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "observe", agentId: validateAgentId(opts.agent),
+        bridgeBase: normalizeBridgeBase(opts.bridgeUrl), tokenFile: opts.tokenFile });
+      admitHookEgress(workspace, `${authorization.bridgeBase}${SESSION_HOOK_PATH}`);
+      const response = await fetch(`${authorization.bridgeBase}${SESSION_HOOK_PATH}`, { method: "POST", redirect: "error", signal: boundedFetchSignal(3_000, signal),
+        headers: { authorization: `Bearer ${authorization.token}`, "content-type": "application/json", "x-amc-hook-provider": "claude-code" },
+        body: typeof received === "string" ? received : new Uint8Array(received) });
+      if (!response.ok) throw new Error(`AMC answered HTTP ${response.status}`);
+    });
+    return { stdout: "{}\n", stderr: "", exitCode: 0 };
+  } catch (error) {
+    const reason = error instanceof HookDeadlineError ? "timed out" : redactBridgeText(error instanceof Error ? error.message : String(error)).slice(0, 200);
+    return { stdout: "{}\n", stderr: `AMC did not record this session event (${reason}); the session goes on.\n`, exitCode: 0 };
   }
 }
 

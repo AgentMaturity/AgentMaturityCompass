@@ -62,7 +62,7 @@ The list projection uses `context.kind: mcp`, returns native and MCP-server grou
 
 The list projection returns zero tools and groups when the config or signature is missing, the signature is invalid, the schema is malformed, tool names or identities collide, or one server ID declares conflicting metadata. Responses expose bounded reason codes rather than paths, raw policy, allow/deny patterns, arguments, credentials, or signature material.
 
-Every projection states `derivedView: true`, `recorded: false`, and `proofEligible: false`. It proves only declared context in the current signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP server attestation, or prove an invocation.
+Every projection states `derivedView: true`, `recorded: false`, and `proofEligible: false`. It shows only declared context in the current signed ToolHub allowlist. It does not discover a live server, show that a server is available, verify an MCP server attestation, or show that a tool was called.
 
 ## Intent -> Execute Flow
 

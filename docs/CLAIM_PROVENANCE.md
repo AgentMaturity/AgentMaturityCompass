@@ -16,7 +16,9 @@ the prior art's Pathfinder system had the right idea — provenance labels like 
 
 Every evidence claim in AMC carries a provenance label that describes how the claim was established:
 
-| Label | Definition | Trust Weight | Can Promote? |
+No trust weight is applied to a maturity level: a question's level is gated by evidence tier instead (only OBSERVED evidence can support L2 and above; self-reported and attested evidence support L1 at most). The weights in this table scale side scores only (confidence, citation quality, drift, community signals), from the one table in `src/score/trustWeights.ts`.
+
+| Label | Definition | Side-score weight | Can Promote? |
 |-------|-----------|-------------|-------------|
 | `OBSERVED` | AMC gateway/monitor directly witnessed the behavior | 1.0× | Already at production tier |
 | `OBSERVED_HARDENED` | Observed with additional assurance context (notary, sandbox) | 1.1× | Already at highest tier |
@@ -209,11 +211,11 @@ LLM-based agents hallucinate. They produce confident-sounding claims with no fac
 
 **Defense 1: Source-of-Truth Separation**
 
-The agent (untrusted) never writes directly to the evidence ledger. Only the AMC gateway/monitor (trusted) writes `OBSERVED` evidence. The agent can only produce `SELF_REPORTED` claims, which are capped at 0.4× trust weight and cannot unlock maturity levels.
+The agent (untrusted) never writes directly to the evidence ledger. Only the AMC gateway/monitor (trusted) writes `OBSERVED` evidence. The agent can only produce `SELF_REPORTED` claims, which support a question's level up to L1 at most and cannot unlock L2 or above (in side scores such as confidence they weigh 0.4).
 
 ```
-Agent claims "I enforced the policy"  → SELF_REPORTED (0.4×, capped)
-Gateway observes policy enforcement   → OBSERVED (1.0×, counts)
+Agent claims "I enforced the policy"  → SELF_REPORTED (level capped at L1)
+Gateway observes policy enforcement   → OBSERVED (can support L2 and above)
 ```
 
 **Defense 2: Truthguard Output Validation**

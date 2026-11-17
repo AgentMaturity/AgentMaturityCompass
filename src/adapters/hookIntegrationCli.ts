@@ -29,6 +29,7 @@ import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookFor
 export { runHookForward } from "./hookForwarder.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
+import { claudeCodeOnPathIssue } from "../watch/hookReleaseCheck.js";
 
 function printControlVerification(control: ClaudeControlVerification): void {
   console.log((control.verified ? chalk.green : chalk.red)(control.summary));
@@ -81,6 +82,14 @@ export function registerHookIntegrationCommands(
   const hooks = connect
     .command("hooks")
     .description("Install, inspect, or remove provider-native AMC observation and control hooks");
+  // Commander would answer `uninstall` with "Did you mean install?", the opposite of what the person wants.
+  hooks.on("command:*", (operands: string[]) => {
+    const name = String(operands[0] ?? "");
+    console.error(chalk.red(`error: unknown command 'connect hooks ${name}'`));
+    if (/^(uninstall|delete|disable|rm)$/i.test(name)) console.error("To take AMC's hook out again: amc connect hooks remove --provider <claude-code|gemini-cli|pi|dsh|codex>");
+    console.error(`Commands here: ${hooks.commands.filter((command) => !(command as unknown as { _hidden?: boolean })._hidden).map((command) => command.name()).join(", ")}`);
+    process.exitCode = 1;
+  });
 
   hooks
     .command("install")
@@ -140,6 +149,7 @@ export function registerHookIntegrationCommands(
         : "Boundary: observation only; provider control decisions are unchanged.");
       if (result.provider === "pi" || result.provider === "codex" || result.mode === "control") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
       if (result.provider === "codex" && !opts.dryRun) printCodexNextSteps();
+      if (!opts.dryRun) console.log(chalk.gray(`To take it out again: amc connect hooks remove --provider ${result.provider}`));
     });
 
   hooks
@@ -150,7 +160,9 @@ export function registerHookIntegrationCommands(
     .action(async (opts: { provider: HookProvider; json: boolean }) => {
       const found = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
       const bridgeIssues = hookBridgeIssues(process.cwd(), { manifestPath: found.files.manifest, manifestValid: found.manifestValid, provider: found.provider, mode: found.mode });
-      const status = { ...found, issues: [...found.issues, ...bridgeIssues] };
+      // A Claude Code that updated itself after the install: control denies its calls; say so and name observe mode.
+      const onPath = found.provider === "claude-code" && found.mode === "control" ? claudeCodeOnPathIssue() : null;
+      const status = { ...found, issues: [...found.issues, ...bridgeIssues, ...(onPath && !found.issues.includes(onPath) ? [onPath] : [])] };
       const control = status.provider === "claude-code" && status.mode === "control"
         ? await verifyClaudeControl({ workspace: process.cwd() })
         : null;
@@ -176,12 +188,12 @@ export function registerHookIntegrationCommands(
   hooks
     .command("health")
     .description("Verify signed hook setup and show the latest verified provider event")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--recover-latch", "owner only: first clear this workspace's hook audit latch (vault passphrase); the recovery is recorded", false)
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: string; json: boolean; recoverLatch: boolean }) => {
-      if (!isHookProvider(opts.provider)) {
-        const message = "provider must be claude-code, gemini-cli, pi or dsh";
+      if (opts.provider !== "codex" && !isHookProvider(opts.provider)) {
+        const message = "provider must be claude-code, gemini-cli, pi, dsh or codex";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
         else console.error(chalk.red(message));
         process.exitCode = 2;
@@ -229,6 +241,7 @@ export function registerHookIntegrationCommands(
           console.log(`Action: ${health.evidence.lastEvent.actionId}`);
         }
         for (const reason of [...health.reasonCodes, ...bridgeIssues]) console.log(chalk.yellow(`Issue: ${reason}`));
+        if (installed.lostObservations) console.log(chalk.yellow(`Issue: ${installed.issues.at(-1)}`));
         if (control) printControlVerification(control);
         console.log(chalk.gray(`Boundary: ${health.claimBoundary}`));
       }

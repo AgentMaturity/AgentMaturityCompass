@@ -20,7 +20,7 @@
     "LICENSE"
   ],
   "bin": {
-    "amc": "dist/cli.js"
+    "amc": "dist/amc.js"
   },
   "engines": {
     "node": ">=20"
@@ -77,6 +77,9 @@
     "check:spec": "node scripts/check-spec-sync.mjs --check",
     "gen-industry-guides": "tsx scripts/gen-industry-guides.mts",
     "check:industry-guides": "tsx scripts/gen-industry-guides.mts --check",
+    "gen-website-packs": "tsx scripts/gen-website-packs.mts",
+    "check:website-packs": "tsx scripts/gen-website-packs.mts --check",
+    "capture:site-shots": "node scripts/brand/capture-site-shots.mjs",
     "gen:judge-calibration": "tsx scripts/gen-judge-calibration.mts",
     "check:judge-calibration": "tsx scripts/gen-judge-calibration.mts --check",
     "check:regulatory-calendar": "node scripts/gen-regulatory-calendar.mjs --check",
@@ -197,12 +200,12 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.31.0",
-    "better-sqlite3": "^12.8.0",
+    "better-sqlite3": "^12.11.1",
     "chalk": "^5.4.1",
     "commander": "^14.0.3",
     "inquirer": "^13.3.2",
-    "semver": "^7.7.4",
-    "yaml": "^2.8.3",
+    "semver": "^7.8.5",
+    "yaml": "^2.9.0",
     "zod": "^4.6.6"
   },
   "peerDependencies": {
@@ -238,7 +241,7 @@
     "@amc/cordis-plugin-loader": "workspace:*",
     "@amc/core": "workspace:*",
     "@amc/schemastery": "workspace:*",
-    "@axe-core/playwright": "^4.11.1",
+    "@axe-core/playwright": "^4.12.1",
     "@changesets/cli": "^2.30.0",
     "@earendil-works/pi-ai": "1.3.0",
     "@fontsource/inter": "5.2.8",
@@ -248,9 +251,9 @@
     "@types/node": "^25.5.0",
     "@types/semver": "^7.7.1",
     "@vitest/coverage-v8": "^4.1.10",
-    "ajv": "8.18.0",
+    "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.4.0",
     "esbuild": "0.28.2",
     "jscpd": "^5.4.0",
     "knip": "^6.39.0",
@@ -272,9 +275,9 @@
     "overrides": {
       "qs": ">=6.16.1",
       "fast-uri": "^3.1.9",
-      "@modelcontextprotocol/sdk>hono": "4.13.11",
+      "@modelcontextprotocol/sdk>hono": "4.13.18",
       "body-parser": ">=2.4.0",
-      "@hono/node-server": ">=2.1.3",
+      "@hono/node-server": ">=2.1.6",
       "ip-address": ">=10.7.4",
       "proxy-addr": "^2.0.8",
       "brace-expansion": "^5.0.12",

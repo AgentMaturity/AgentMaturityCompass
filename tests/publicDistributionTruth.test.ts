@@ -154,11 +154,13 @@ describe("truthful public distribution and brand contract", () => {
     const dynamicDocs = read("website/docs/docs.js");
 
     expect(readme.slice(0, 2600)).toContain('src="website/og-card.png"');
-    expect(readme.slice(0, 2600)).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(readme.slice(0, 2600)).toContain("Build an AI agent for work that gets audited");
+    expect(readme).not.toContain("Run one command. Get the full score. Fix the gaps.");
     expect(readme.slice(0, 2600)).toContain("Evidence over claims.");
     expect(readme).toContain("img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass");
     expect(readme).not.toContain("img.shields.io/npm/");
-    expect(docsIndex.slice(0, 1600)).toContain("Run one command. Get the full score. Fix the gaps.");
+    expect(docsIndex.slice(0, 1600)).toContain("Build an AI agent for work that gets audited");
+    expect(docsIndex).not.toContain("Run one command. Get the full score. Fix the gaps.");
     expect(dynamicDocs).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
     expect(dynamicDocs).toContain("irm https://agentmaturity.co/install.ps1 | iex");
   });

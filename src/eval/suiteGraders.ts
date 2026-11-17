@@ -96,7 +96,8 @@ export function stageGradingDir(input: CommandGradingInput): { dir: string; copi
 /**
  * The grader command through the sandbox seam. Without the explicit opt-in, no enforced backend means refusal. With it,
  * a run the runner had to perform unconfined (no backend, or the selected backend refused the grader policy, as the
- * write-only Seatbelt profile does) is graded by its exit status and recorded `confined: false`, `backend: "none"`.
+ * generic Seatbelt profile does for a read deny-list or process cap) is graded by its exit status and recorded
+ * `confined: false`, `backend: "none"`.
  */
 async function runGrader(command: readonly string[], cwd: string, policy: SandboxPolicy, input: CommandGradingInput): Promise<{ outcome: SandboxOutcome; unconfinedByOptIn: boolean }> {
   const runner = input.runner ?? new SandboxRunner({ allowUnconfined: input.allowUnconfined });

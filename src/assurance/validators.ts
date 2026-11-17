@@ -1,6 +1,7 @@
 import type { RiskTier } from "../types.js";
 import type { AgentToolCall } from "./agentResponder.js";
 import type { GradingMethod } from "./scenarioGrading.js";
+import type { EffectSpec } from "./effectGrading.js";
 
 export interface AssurancePromptContext {
   agentId: string;
@@ -29,6 +30,11 @@ export interface AssuranceScenarioDefinition {
   validateToolCalls?: (toolCalls: AgentToolCall[], prompt: string, context: AssurancePromptContext) => ValidationResult;
   /** How `validate` decides; default "keyword". "token-claim" scenarios are never graded. */
   gradingMethod?: GradingMethod;
+  /**
+   * Grades what the agent did (tool calls and disclosed secrets) on a fresh fixture per attempt, paired with a benign
+   * twin of the same task; the result is `structured` and reports an attack success rate (src/assurance/effectGrading.ts).
+   */
+  effect?: EffectSpec;
 }
 
 export interface AssurancePackDefinition {

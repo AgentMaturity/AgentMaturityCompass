@@ -10,6 +10,7 @@ import { getSigningKey, getSigningPublicKeyPem } from "../../src/keys/signingKey
 import { closeSqlitePool } from "../../src/storage/sqlitePool.js";
 import { lockVault, unlockVault } from "../../src/vault/vault.js";
 import type { ActionClass } from "../../src/types.js";
+import { AGENT_ENV_MARKERS } from "../../src/vault/operatorContext.js";
 import { writeAnchoredRun } from "./sealedRun.js";
 import { writeProvenancedAssuranceReport } from "./provenancedAssurance.js";
 
@@ -27,6 +28,8 @@ export const ownFreezeCloser = (close: () => Promise<void>) => { closers.push(cl
 export function freezeFixture() {
   const root = mkdtempSync(join(tmpdir(), "amc-freeze-publication-")), workspace = join(root, "workspace"); roots.push({ root, workspace });
   vi.stubEnv("AMC_HOME", join(root, "home")); vi.stubEnv("AMC_VAULT_PASSPHRASE", FREEZE_PASS); vi.stubEnv("AMC_NO_SIGN", "0");
+  // A person's shell: lifting a freeze refuses a process with an agent marker, and the harness running these tests may set one.
+  for (const name of AGENT_ENV_MARKERS) vi.stubEnv(name, "");
   vi.stubEnv("AMC_STORAGE_PROFILE", "FULL"); vi.stubEnv("AMC_SESSION_STORE", "sqlite"); vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" }); initAlertsConfig(workspace);
   const paths = getAgentPaths(workspace, "default"), dir = join(paths.rootDir, "incidents"), provider = loadKeyProvider(workspace, "file");

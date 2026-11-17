@@ -28,7 +28,8 @@ let restoreEnv: () => void;
 const roots: string[] = [];
 
 beforeAll(async () => {
-  fakeAgent = await startFakeAgentServer();
+  // An agent that does the ordinary task (files the ticket) and nothing else: the effect-graded injection rows are graded.
+  fakeAgent = await startFakeAgentServer({ toolCalls: () => [{ name: "create_ticket", arguments: { title: "Wrong VAT number", summary: "Customer reports a wrong VAT number." } }] });
   restoreEnv = useFakeAgentEnv(fakeAgent.baseUrl);
 });
 afterAll(async () => { restoreEnv(); await fakeAgent.close(); });
@@ -71,11 +72,13 @@ describe("signed red-team runs are ledgered and sealed", () => {
       expect(session?.binary_path).toBe("amc-redteam-runner");
       expect(session?.session_seal_sig).toBeTruthy();
       const rows = ledger.getAllEvents().filter((event) => event.session_id === report.sessionId);
-      expect(rows.filter((event) => event.event_type === "stdin").length).toBe(report.pluginResults[0]!.scenarioResults.length);
+      // injection is effect-graded: per scenario one description row, then one attack and one benign exchange (1 try).
+      expect(rows.filter((event) => event.event_type === "stdin").length).toBe(report.pluginResults[0]!.scenarioResults.length * 3);
       expect(rows.every((event) => eventMeta(event).source === "redteam" || eventMeta(event).auditType === "ASSURANCE_RUN_STARTED")).toBe(true);
       // Every graded row names its own stdin, stdout and test rows in that session.
       for (const row of report.pluginResults[0]!.scenarioResults.filter((row) => row.inconclusive !== true)) {
-        expect(row.evidenceEventIds).toHaveLength(3);
+        expect(row.evidenceEventIds).toHaveLength(6);
+        expect(row.evidenceEventIds.slice(0, 3).map((id) => rows.find((event) => event.id === id)?.event_type)).toEqual(["stdin", "stdout", "test"]);
         expect(row.evidenceEventIds.every((id) => rows.some((event) => event.id === id))).toBe(true);
       }
     } finally { ledger.close(); }
@@ -128,7 +131,7 @@ describe("signed red-team runs are ledgered and sealed", () => {
     const original = readFileSync(file, "utf8");
     // One byte of the score changes: the seal no longer verifies.
     const tampered = JSON.parse(original) as Record<string, unknown>;
-    tampered.overallScore0to100 = 100;
+    tampered.overallScore0to100 = report.overallScore0to100 === 100 ? 99 : 100;
     writeFileSync(file, JSON.stringify(tampered));
     expect(verifyRedTeamReportFile(ws, file)).toMatchObject({ ok: false, reason: "REDTEAM_SEAL_INVALID" });
     // Re-sealed with a flipped verdict: the seal verifies but the test row disagrees with the graded result.

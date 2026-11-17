@@ -49,9 +49,15 @@ const MAX_QUESTIONS = 4;
 /** C0 (except tab and newline), DEL and C1: what a terminal reads as cursor and colour control. */
 const TERMINAL_CONTROLS = /[\x00-\x08\x0b-\x1f\x7f-\x9f]/;
 
-/** Shown, never interpreted: each control character as a visible `\uXXXX`. */
+/**
+ * Bidi marks, embeddings, overrides and isolates: no cursor control, but they reorder what a person reads (a tool name
+ * or a result line from an MCP server can make an approval line read backwards). Escaped with the controls.
+ */
+const BIDI_CONTROLS = "\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069";
+
+/** Shown, never interpreted: each control or bidi character as a visible `\uXXXX`. */
 export function escapeTerminalControls(text: string): string {
-  return text.replace(new RegExp(TERMINAL_CONTROLS.source, "g"), (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+  return text.replace(new RegExp(`${TERMINAL_CONTROLS.source.slice(0, -1)}${BIDI_CONTROLS}]`, "g"), (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 }
 
 // A question is shown to a person on a terminal; control characters could draw a fake prompt or signed decision there.

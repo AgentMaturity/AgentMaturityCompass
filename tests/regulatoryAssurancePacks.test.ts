@@ -138,35 +138,38 @@ describe("ISO 42005 evidence gates", () => {
   });
 });
 
-describe("OWASP GenAI G01-G10 evidence gates", () => {
-  test("OWASP pack has 10 distinct G01-G10 scenarios", () => {
+describe("OWASP Top 10 for LLM Applications 2025 evidence gates", () => {
+  test("OWASP pack has the ten LLM01:2025 to LLM10:2025 scenarios and no 2023 entries", () => {
     const pack = getAssurancePack("owaspGenAI");
+    expect(pack.title).toContain("2025");
     expect(pack.scenarios.length).toBe(10);
     const ids = pack.scenarios.map((scenario) => scenario.id);
-    expect(ids).toContain("owasp-g01-prompt-injection");
-    expect(ids).toContain("owasp-g10-model-theft");
+    expect(ids).toContain("owasp-llm01-prompt-injection");
+    expect(ids).toContain("owasp-llm07-system-prompt-leakage");
+    expect(ids).toContain("owasp-llm10-unbounded-consumption");
+    expect(pack.scenarios.map((s) => s.title).join(" ")).not.toMatch(/Insecure Plugin|Model Theft|Model Denial|Overreliance/);
   });
 
-  test("G01: a bare token for prompt_injection_test_report artifact is a claim, never graded", () => {
-    expectTokenClaimNotGraded("owaspGenAI", "owasp-g01-prompt-injection", "[artifact:prompt_injection_test_report]");
+  test("LLM01: a bare token for prompt_injection_test_report artifact is a claim, never graded", () => {
+    expectTokenClaimNotGraded("owaspGenAI", "owasp-llm01-prompt-injection", "[artifact:prompt_injection_test_report]");
   });
 
-  test("G01 fails without prompt_injection_test_report artifact", () => {
-    const scenario = getScenario("owaspGenAI", "owasp-g01-prompt-injection");
+  test("LLM01 fails without prompt_injection_test_report artifact", () => {
+    const scenario = getScenario("owaspGenAI", "owasp-llm01-prompt-injection");
     const result = scenario.validate("[artifact:output_handling_safeguard_report]", scenario.buildPrompt(context), context);
     expect(result.pass).toBe(false);
-    expect(result.auditTypes).toContain("OWASP_GENAI_G01_ARTIFACT_MISSING");
+    expect(result.auditTypes).toContain("OWASP_LLM_LLM01_2025_ARTIFACT_MISSING");
   });
 
-  test("G06 fails without sensitive_information_disclosure_assessment artifact", () => {
-    const scenario = getScenario("owaspGenAI", "owasp-g06-sensitive-information-disclosure");
+  test("LLM02 fails without sensitive_information_disclosure_assessment artifact", () => {
+    const scenario = getScenario("owaspGenAI", "owasp-llm02-sensitive-information-disclosure");
     const result = scenario.validate("artifact=plugin_tool_permission_audit", scenario.buildPrompt(context), context);
     expect(result.pass).toBe(false);
-    expect(result.auditTypes).toContain("OWASP_GENAI_G06_ARTIFACT_MISSING");
+    expect(result.auditTypes).toContain("OWASP_LLM_LLM02_2025_ARTIFACT_MISSING");
   });
 
-  test("G10: a bare token for model_theft_protection_assessment artifact is a claim, never graded", () => {
-    expectTokenClaimNotGraded("owaspGenAI", "owasp-g10-model-theft", "artifact=model_theft_protection_assessment");
+  test("LLM10: a bare token for model_dos_resilience_report artifact is a claim, never graded", () => {
+    expectTokenClaimNotGraded("owaspGenAI", "owasp-llm10-unbounded-consumption", "artifact=model_dos_resilience_report");
   });
 });
 

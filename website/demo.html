@@ -1,148 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMC Terminal Demo — Agent Maturity Compass</title>
-<meta name="description" content="A recorded first run of Agent Maturity Compass: type amc, try the demo chat, check sign-in, and see a first score that stays empty until AMC has seen your agent work.">
-<link rel="stylesheet" href="brand.css">
-<style>
-  :root {
-    --bg: #0a0a0a;
-    --green: #00ff41;
-    --green-dim: #009926;
-    --text: #b0b0b0;
-    --text2: #8cc88c;
-    --border: rgba(0,255,65,0.12);
-    --mono: var(--amc-font-mono);
-  }
-  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  *:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
-  body {
-    background: #050505;
-    color: var(--text);
-    font-family: var(--mono), monospace;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
-  .back-link {
-    position: fixed;
-    top: 1rem;
-    left: 1.5rem;
-    color: var(--green);
-    text-decoration: none;
-    font-size: 0.8rem;
-    z-index: 10;
-  }
-  .back-link:hover { text-shadow: 0 0 10px rgba(0,255,65,0.4); }
-  .terminal {
-    width: 100%;
-    max-width: 780px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 60px rgba(0,255,65,0.05), 0 20px 40px rgba(0,0,0,0.5);
-  }
-  .terminal-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: #111;
-    border-bottom: 1px solid var(--border);
-  }
-  .dot { width: 12px; height: 12px; border-radius: 50%; }
-  .dot-r { background: #ff5f57; }
-  .dot-y { background: #febc2e; }
-  .dot-g { background: #28c840; }
-  .terminal-title {
-    flex: 1;
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--amc-dim);
-    margin-right: 44px;
-  }
-  .terminal-body {
-    padding: 20px;
-    min-height: 380px;
-    font-size: 0.82rem;
-    line-height: 1.65;
-    overflow: hidden;
-  }
-  .line { white-space: pre-wrap; word-break: break-all; }
-  .line .prompt { color: var(--green); font-weight: 700; }
-  .line .cmd { color: #e0e0e0; }
-  .line .output { color: var(--text2); }
-  .line .highlight { color: var(--green); font-weight: 700; }
-  .line .dim { color: var(--amc-dim); }
-  .line .warn { color: #febc2e; }
-  .cursor {
-    display: inline-block;
-    width: 8px;
-    height: 16px;
-    background: var(--green);
-    animation: blink 1s step-end infinite;
-    vertical-align: middle;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-
-  .cta {
-    margin-top: 2rem;
-    text-align: center;
-  }
-  .cta a {
-    display: inline-block;
-    padding: 14px 32px;
-    background: var(--green);
-    color: #000;
-    text-decoration: none;
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    font-weight: 700;
-    border-radius: 4px;
-    transition: all 0.3s;
-    box-shadow: 0 0 30px rgba(0,255,65,0.2);
-  }
-  .cta a:hover {
-    box-shadow: 0 0 50px rgba(0,255,65,0.35);
-    transform: translateY(-2px);
-  }
-  .cta p {
-    margin-top: 0.75rem;
-    font-size: 0.7rem;
-    color: var(--amc-dim);
-  }
-
-  @media (max-width: 600px) {
-    .terminal-body { font-size: 0.7rem; padding: 12px; min-height: 300px; }
-  }
-</style>
-<style id="skip-link-style">
-.skip-link{position:fixed;left:-9999px;top:12px;z-index:10000;padding:8px 14px;background:#4AEF79;color:#0a0a0a;font:700 14px system-ui,sans-serif;text-decoration:none}
-.skip-link:focus,.skip-link:focus-visible{left:12px}
-:where(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid #4AEF79;outline-offset:3px}
-</style>
+  <meta charset="UTF-8">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A first run of AMC, recorded | Agent Maturity Compass</title>
+  <meta name="description" content="A recorded first run of Agent Maturity Compass: type amc, see the menu, try the demo chat, check sign-in, and see a first score that stays empty until AMC has seen your agent work.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://agentmaturity.co/demo.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="A first run of AMC, recorded | Agent Maturity Compass">
+  <meta property="og:description" content="A recorded first run of Agent Maturity Compass: type amc, see the menu, try the demo chat, check sign-in, and see a first score that stays empty until AMC has seen your agent work.">
+  <meta property="og:url" content="https://agentmaturity.co/demo.html">
+  <meta property="og:image" content="https://agentmaturity.co/og-card.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="home.css?v=6">
+  <link rel="stylesheet" href="pages.css?v=1">
+  <style>
+    .demo { padding-bottom: var(--band); }
+    .demo .terminal { max-width: 820px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5); }
+    .demo .terminal-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--card); }
+    .demo .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line-strong); }
+    .demo .terminal-title { flex: 1; text-align: center; margin-right: 44px; font-family: var(--mono); font-size: 0.75rem; color: var(--amc-dim); }
+    .demo .terminal-body { padding: 20px; min-height: 420px; font-family: var(--mono); font-size: 0.82rem; line-height: 1.65; color: var(--body); overflow: hidden; }
+    .demo .line { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .demo .line .prompt, .demo .line .highlight { color: var(--accent); font-weight: 700; }
+    .demo .line .typed { color: var(--text); }
+    .demo .line .dim { color: var(--muted); }
+    .demo .caret { display: inline-block; width: 8px; height: 16px; margin: 0; background: var(--accent); vertical-align: middle; animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    .demo .fine { margin-top: 20px; max-width: 46em; }
+    @media (max-width: 640px) { .demo .terminal-body { font-size: 0.72rem; padding: 14px; min-height: 340px; } }
+  </style>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to content</a>
-<div id="main-content" tabindex="-1"></div>
-  <a href="index.html" class="back-link">← Back to AMC</a>
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
-  <div class="terminal" role="img" aria-label="Animated terminal replay of a recorded AMC first run: the amc menu, the demo chat, amc login status, and an empty first score">
-    <div class="terminal-bar">
-      <div class="dot dot-r"></div>
-      <div class="dot dot-y"></div>
-      <div class="dot dot-g"></div>
-      <div class="terminal-title">~/my-agent — zsh</div>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-inner">
+      <a href="./" class="nav-brand" aria-label="AMC home">amc<span class="accent">_</span></a>
+      <ul class="nav-links">
+        <li><a href="./#a4-forge">Build an agent</a></li>
+        <li><a href="./#capabilities">Run it</a></li>
+        <li><a href="./#domains">Industries</a></li>
+        <li><a href="a4.html">A4 Forge</a></li>
+        <li><a href="docs/index.html">Docs</a></li>
+      </ul>
+      <div class="nav-right">
+        <a href="https://github.com/AgentMaturity/AgentMaturityCompass" class="nav-quiet">GitHub</a>
+        <a href="./#install" class="btn btn-primary btn-small">Get AMC</a>
+        <button class="nav-hamburger" aria-label="Menu" aria-controls="navMobile" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
     </div>
-    <div class="terminal-body" id="term"><noscript><pre style="white-space:pre-wrap;margin:0">$ amc
+  </nav>
+  <div class="nav-mobile" id="navMobile">
+    <a href="./#a4-forge">Build an agent</a>
+    <a href="./#capabilities">Run it</a>
+    <a href="./#domains">Industries</a>
+    <a href="./#paths">Already have an agent?</a>
+    <a href="./#install">Get AMC</a>
+    <a href="./#desktop">macOS app</a>
+    <a href="./#pricing">Price</a>
+    <a href="a4.html">A4 Forge (preview)</a>
+    <a href="docs/index.html">Docs</a>
+    <a href="executive.html">For executives</a>
+    <a href="https://github.com/AgentMaturity/AgentMaturityCompass">GitHub</a>
+  </div>
+
+  <span id="main-content" tabindex="-1"></span>
+  <main id="main">
+    <section class="page-hero">
+      <div class="wrap">
+        <p class="product-name">Demo</p>
+        <h1>A first run of AMC, recorded</h1>
+        <p class="lede">Type <code>amc</code> in a new folder and pick from a short menu. This replay shows the menu, the demo chat, the sign-in check and a first score, which stays empty until AMC has seen your agent work.</p>
+      </div>
+    </section>
+    <section class="demo" aria-labelledby="runTitle">
+      <div class="wrap">
+        <h2 id="runTitle" class="band-sub">The recorded run</h2>
+        <div class="terminal" role="img" aria-label="Replay of a recorded AMC first run: the amc menu with its five choices, the demo chat, amc login status, and an empty first score">
+          <div class="terminal-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="terminal-title">~/my-agent</span></div>
+          <div class="terminal-body" id="term"><noscript><pre style="white-space:pre-wrap;margin:0">$ amc
 ? What do you want to do?
 &gt; Try a demo chat (no account or key needed)
+  Build an agent for my industry (A4 Forge preview)
 you&gt; hello
 Recorded reply: stub provider: 3 message(s) in view; you last said "hello".
 $ amc login status
@@ -150,12 +95,29 @@ Codex        signed-out     next: amc login codex
 $ amc        # choose: Just show my score
 Overall: L0.00 (0/100) UNRELIABLE — DO NOT USE FOR CLAIMS
 AMC has not seen your agent do anything yet, so this score is empty.</pre></noscript></div>
-  </div>
+        </div>
+        <p class="fine">Recorded from the current source build on 2026-11-14 in a new folder; the menu line for A4 Forge was checked again on 2026-11-15. The demo chat's replies come from the built-in stand-in model, so they say nothing about a real agent. The one-line installers give the older 1.1.1 release, which has no menu.</p>
+        <div class="cta-row"><a href="./#install" class="btn btn-primary">Get AMC</a><a href="a4.html" class="btn btn-ghost">Build an agent with A4 Forge</a></div>
+      </div>
+    </section>
+  </main>
 
-  <div class="cta">
-    <a href="index.html#install">Try it yourself →</a>
-    <p>Recorded from the current source build on 2026-11-14 in a new folder. The one-line installers give the older 1.1.1 release, which has no menu.</p>
-  </div>
+  <footer class="footer">
+    <div class="footer-inner wrap">
+      <div class="footer-top">
+        <div><div class="footer-brand">amc<span class="accent">_</span></div><p class="footer-tagline">Build, run and check AI agents for regulated work.<br>Evidence over claims.</p></div>
+        <div class="footer-col"><h2>Product</h2><a href="./#a4-forge">Build an agent</a><a href="./#capabilities">Run it</a><a href="./#paths">Already have an agent?</a><a href="./#install">Get AMC</a><a href="./#desktop">macOS app</a><a href="./#products">Eight tools</a><a href="executive.html">Executives</a><a href="playground.html">Playground</a><a href="docs/index.html">Documentation</a></div>
+        <div class="footer-col"><h2>Depth</h2><a href="a4.html">A4 Forge</a><a href="methodology.html">Approach and research</a><a href="compliance.html">Frameworks</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/whitepaper/AMC_WHITEPAPER_v1.md" target="_blank" rel="noopener">Whitepaper</a><a href="./#pricing">Price</a><a href="./#faq">FAQ</a></div>
+        <div class="footer-col"><h2>Industry Packs</h2><a href="./#domains">All packs</a><a href="station-environment.html">Environment</a><a href="station-health.html">Health</a><a href="station-wealth.html">Wealth</a><a href="station-education.html">Education</a><a href="station-mobility.html">Mobility</a><a href="station-technology.html">Technology</a><a href="station-governance.html">Governance</a></div>
+        <div class="footer-col"><h2>Code</h2><a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases" target="_blank" rel="noopener">GitHub Releases</a><a href="https://github.com/AgentMaturity/AgentMaturityCompass" target="_blank" rel="noopener">Source</a><a href="accessibility.html">Accessibility</a></div>
+      </div>
+      <div class="footer-bottom"><span class="footer-copy">© 2026 Agent Maturity Compass. MIT License.</span><span class="footer-copy">Evidence over claims.</span></div>
+    </div>
+  </footer>
+
+  <script src="script.js?v=14"></script>
+  <script src="home.js?v=3"></script>
+  <script src="pages.js?v=2"></script>
 
 <script>
 (function() {
@@ -173,6 +135,7 @@ AMC has not seen your agent do anything yet, so this score is empty.</pre></nosc
         { text: '? What do you want to do?', cls: 'highlight' },
         { text: '  Sign in to Codex first', cls: 'output' },
         { text: '> Try a demo chat (no account or key needed)', cls: 'highlight' },
+        { text: '  Build an agent for my industry (A4 Forge preview)', cls: 'output' },
         { text: '  Open the console in my browser', cls: 'output' },
         { text: '  Just show my score (empty for now)', cls: 'output' },
         { text: '', cls: '' },
@@ -200,10 +163,22 @@ AMC has not seen your agent do anything yet, so this score is empty.</pre></nosc
         { text: 'Artifact seal: VALID | Evidence: INSUFFICIENT_EVIDENCE | Claims: BLOCKED', cls: 'output' },
         { text: 'Overall: L0.00 (0/100) UNRELIABLE — DO NOT USE FOR CLAIMS', cls: 'highlight' },
         { text: 'AMC has not seen your agent do anything yet, so this score is empty.', cls: 'output' },
-        { text: 'Signing proves integrity, not evidence sufficiency.', cls: 'dim' },
+        { text: 'A signature shows the record is unchanged, not that there is enough evidence.', cls: 'dim' },
       ]
     }
   ];
+
+  // Under reduced motion the recorded run is shown whole, without typing.
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    term.innerHTML = '';
+    scenes.forEach(function (scene) {
+      addLine('<span class="prompt">$ </span><span class="typed"></span>').querySelector('.typed').textContent = scene.cmd;
+      scene.output.forEach(function (out) {
+        if (out.text === '') addLine('&nbsp;'); else addLine('<span class="' + out.cls + '"></span>').querySelector('span').textContent = out.text;
+      });
+    });
+    return;
+  }
 
   let playing = true;
 
@@ -234,9 +209,9 @@ AMC has not seen your agent do anything yet, so this score is empty.</pre></nosc
 
   async function playScene(scene) {
     // Show prompt with typing
-    const line = addLine('<span class="prompt">$ </span><span class="cmd"></span><span class="cursor"></span>');
-    const cmdSpan = line.querySelector('.cmd');
-    const cursorSpan = line.querySelector('.cursor');
+    const line = addLine('<span class="prompt">$ </span><span class="typed"></span><span class="caret"></span>');
+    const cmdSpan = line.querySelector('.typed');
+    const cursorSpan = line.querySelector('.caret');
 
     await typeText(cmdSpan, scene.cmd, TYPE_SPEED);
 
@@ -266,7 +241,7 @@ AMC has not seen your agent do anything yet, so this score is empty.</pre></nosc
         await playScene(scene);
       }
       // Show final cursor
-      addLine('<span class="prompt">$ </span><span class="cursor"></span>');
+      addLine('<span class="prompt">$ </span><span class="caret"></span>');
       await sleep(4000);
     }
   }

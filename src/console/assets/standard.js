@@ -1,3 +1,4 @@
+import { showResult } from "./pageKit.js";
 import { renderSchemaViewer } from "./components/schemaViewer.js";
 import { renderVerifyPanel } from "./components/verifyPanel.js";
 
@@ -32,11 +33,13 @@ export async function renderStandardPage(params) {
   if (status?.passport?.policySignatureValid === false) {
     warnings.push("<div class='card status-bad'><strong>PASSPORT POLICY UNTRUSTED</strong></div>");
   }
-  if (schemas?.verify?.ok === false) {
-    warnings.push(`<div class='card status-warn'><strong>SCHEMA BUNDLE NOT VERIFIED</strong>: ${esc((schemas.verify.errors || []).join(", "))}</div>`);
+  const rows = Array.isArray(schemas?.schemas) ? schemas.schemas : [];
+  // Before the first Generate there is no bundle (no meta, no schemas): that is the empty state, not a failed check.
+  const noBundle = schemas?.verify?.meta == null && rows.length === 0;
+  if (schemas?.verify?.ok === false && !noBundle) {
+    warnings.push(`<div class='card status-warn'><strong>The schema bundle does not check out</strong>: ${esc((schemas.verify.errors || []).join(", "))}</div>`);
   }
 
-  const rows = Array.isArray(schemas?.schemas) ? schemas.schemas : [];
   params.root.innerHTML = [
     ...warnings,
     params.card(
@@ -46,7 +49,8 @@ export async function renderStandardPage(params) {
         <button id="standardGenerateBtn" data-roles="OWNER">Generate Schemas</button>
         <button id="standardVerifyBtn" class="secondary">Verify Bundle</button>
       </div>
-      <div class="muted">bundle ok=${esc(String(Boolean(schemas?.verify?.ok)))} schemas=${esc(String(rows.length))}</div>
+      <div class="muted">${noBundle ? "No schemas yet: press Generate Schemas to write them."
+        : `${esc(String(rows.length))} schemas; the bundle ${schemas?.verify?.ok ? "checks out" : "does not check out"}.`}</div>
       <pre id="standardOut" class="scroll muted"></pre>
       `
     ),
@@ -66,8 +70,9 @@ export async function renderStandardPage(params) {
   const show = (out, bad = false) => {
     const node = document.getElementById("standardOut");
     if (!node) return;
+    if (typeof out !== "string") return showResult(node, out);
     node.className = `scroll ${bad ? "status-bad" : "muted"}`;
-    node.textContent = typeof out === "string" ? out : JSON.stringify(out, null, 2);
+    node.textContent = out;
   };
   const failure = (error) => `${error?.status === 403 ? "Not permitted: " : ""}${String(error?.message || error)}`;
 

@@ -43,6 +43,8 @@ vi.mock("../src/gateway/config.js", () => ({ loadGatewayConfig: () => ({}), rout
 vi.mock("../src/leases/leaseCli.js", () => ({ issueLeaseForCli: () => ({ token: "never-used" }) }));
 vi.mock("../src/workspaces/workspaceId.js", () => ({ workspaceIdFromDirectory: () => "fixture-workspace" }));
 vi.mock("../src/adapters/adapterCli.js", () => ({ adaptersDetectCli: () => [] }));
+// Hook installations are read by hookReleaseCheck (its own test: tests/hookReleaseQualification.test.ts); this seam has none.
+vi.mock("../src/watch/hookReleaseCheck.js", () => ({ hookReleaseDoctorChecks: () => [] }));
 vi.mock("../src/toolhub/toolhubValidators.js", () => ({ pathAllowedByPatterns: () => ({ ok: false }) }));
 vi.mock("../src/trust/trustConfig.js", () => ({ checkNotaryTrust: async () => ({ ok: true, reasons: [] }), loadTrustConfig: () => ({ trust: { mode: "LOCAL_VAULT" } }), verifyTrustConfigSignature: () => seam.signature }));
 vi.mock("../src/crypto/signing/signer.js", () => ({ signDigestWithPolicyAsync: async () => undefined }));
@@ -151,7 +153,9 @@ describe("amc doctor names each first-run precondition and its fix", () => {
     expect(vault?.message).toContain("Vault locked");
     expect(vault?.message).toContain("amc firewall enable");
     expect(vault?.fixHint).toContain("export AMC_VAULT_PASSPHRASE=");
-    expect(vault?.fixHint).toContain("amc vault unlock");
+    // CLI-02: `amc vault unlock` lasts only for its own command, so it is not offered as the fix.
+    expect(vault?.fixHint).toContain("amc vault unlock lasts only for its own command");
+    expect(vault?.fixHint).not.toContain("interactive alternative: amc vault unlock");
     // B2: a newcomer whose passphrase `amc up` generated never saw it; the advice names where it is kept.
     expect(vault?.fixHint).toContain("remembered is kept in the macOS Keychain (service amc-vault) or /fixture/amc-home/vault-credentials.json");
   });

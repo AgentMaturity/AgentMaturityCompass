@@ -8,15 +8,17 @@
  * - Trust translation between different scoring systems
  */
 
-import { createHash, createHmac, randomBytes, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { canonicalize as canonicalJson } from "../utils/json.js";
 import { type MaturityLevel } from "../score/formalSpec.js";
 import { scoreToLevel, toDisplayScore, toInternalScore, getScoringConfig } from "../score/scoringScale.js";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
 /**
- * AMC Trust Token — portable, verifiable trust credential.
- * Designed to be exchangeable across platforms.
+ * AMC Trust Token: a set of claims under a shared-secret HMAC. Whoever holds the secret can make one, so it is not a
+ * credential anyone else can check. A token made with the public demo secret (`amc passport issue-token`) is a demo:
+ * it says so inside the token, and no verifier calls it verified.
  */
 export interface AMCTrustToken {
   version: "1.0";
@@ -34,8 +36,15 @@ export interface AMCTrustToken {
   claims: TrustClaim[];
   issuedAt: number;
   expiresAt: number;
+  /** Present on a token made with the public demo secret. */
+  demo?: true;
+  notice?: string;
   signature: string;              // HMAC-SHA256 of canonical token
 }
+
+/** The public secret the CLI demo signs with. Anyone can make a token with it, so it never verifies. */
+export const DEMO_TOKEN_SECRET = "cli-demo-secret";
+export const DEMO_TOKEN_NOTICE = "Demo token: signed with a public demo secret that anyone can use, so it shows nothing about the agent and is never verified.";
 
 export interface TrustClaim {
   dimension: string;              // "security" | "reliability" | "safety" | etc.
@@ -58,7 +67,7 @@ export interface TrustTranslation {
 export interface DimensionMapping {
   sourceDimension: string;
   targetDimension: string;
-  conversionFactor: number;       // Multiply source score by this
+  conversionFactor: number;       // Multiply source score by this (made-up example value)
   offset: number;                 // Add this after multiplication
   confidence: number;             // 0-1 confidence in the mapping
 }
@@ -109,8 +118,15 @@ export interface TrustNetworkEdge {
 
 // ── Trust Token Issuance ───────────────────────────────────────────────────
 
+/** Deep canonical form: the old top-level key list dropped every nested field, so claims were not under the HMAC. */
 function canonicalize(obj: unknown): string {
-  return JSON.stringify(obj, Object.keys(obj as object).sort());
+  return canonicalJson(obj);
+}
+
+function hmacMatches(payload: string, secret: string, signature: string): boolean {
+  const expected = Buffer.from(createHmac("sha256", secret).update(payload).digest("hex"), "utf8");
+  const given = Buffer.from(typeof signature === "string" ? signature : "", "utf8");
+  return given.length === expected.length && timingSafeEqual(given, expected);
 }
 
 /**
@@ -141,13 +157,23 @@ export function issueTrustToken(
   return { ...token, signature } as AMCTrustToken;
 }
 
+/** The CLI demo: a token under the public demo secret, labelled a demo inside the token itself. */
+export function issueDemoTrustToken(agentId: string, claims: TrustClaim[], opts?: { ttlHours?: number }): AMCTrustToken {
+  const now = Date.now();
+  const token: Omit<AMCTrustToken, "signature"> = {
+    version: "1.0", tokenId: randomUUID(), issuer: { workspaceId: "demo", platform: "amc", publicKeyHash: "none" },
+    subject: { agentId }, claims, issuedAt: now, expiresAt: now + (opts?.ttlHours ?? 24) * 3600000, demo: true, notice: DEMO_TOKEN_NOTICE
+  };
+  return { ...token, signature: createHmac("sha256", DEMO_TOKEN_SECRET).update(canonicalize(token)).digest("hex") };
+}
+
 /**
- * Verify an AMC Trust Token.
+ * Verify an AMC Trust Token. A demo token, or any token checked against the public demo secret, is never valid.
  */
 export function verifyTrustToken(
   token: AMCTrustToken,
   secret: string,
-): { valid: boolean; reasons: string[] } {
+): { valid: boolean; reasons: string[]; hmacMatches: boolean; demo: boolean } {
   const reasons: string[] = [];
 
   // Check expiry
@@ -159,10 +185,10 @@ export function verifyTrustToken(
   const tokenCopy = { ...token };
   delete (tokenCopy as Record<string, unknown>).signature;
   const payload = canonicalize(tokenCopy);
-  const expectedSig = createHmac("sha256", secret).update(payload).digest("hex");
-  if (token.signature !== expectedSig) {
-    reasons.push("Invalid signature");
-  }
+  const matches = hmacMatches(payload, secret, token.signature);
+  if (!matches) reasons.push("Invalid signature");
+  const demo = secret === DEMO_TOKEN_SECRET || token.demo === true;
+  if (demo) reasons.push(DEMO_TOKEN_NOTICE);
 
   // Check claims integrity
   for (const claim of token.claims) {
@@ -170,13 +196,17 @@ export function verifyTrustToken(
     if (claim.observedShare < 0 || claim.observedShare > 1) reasons.push(`Invalid observedShare for ${claim.dimension}`);
   }
 
-  return { valid: reasons.length === 0, reasons };
+  return { valid: reasons.length === 0, reasons, hmacMatches: matches, demo };
 }
 
 // ── Trust Translation ──────────────────────────────────────────────────────
 
+/** Shown with every translation: the factors below are AMC's own made-up examples, not from either framework. */
+export const TRANSLATION_NOTICE = "Example only: these conversion factors were made up by AMC. NIST AI RMF and ISO/IEC 42001 have no numeric score, so no real conversion exists.";
+
 /**
- * Built-in translation tables for common scoring systems.
+ * Example translation tables. The factors, offsets and confidences are made-up examples: neither NIST AI RMF nor
+ * ISO/IEC 42001 defines a numeric scale, so these numbers do not come from either framework.
  */
 export const TRUST_TRANSLATIONS: TrustTranslation[] = [
   {
@@ -263,8 +293,14 @@ export function processVerificationRequest(
   secret: string,
 ): FederatedVerificationResponse {
   const claimResults: Record<string, { verified: boolean; score: number; reason: string }> = {};
+  // A claim is checked only inside a token that verifies: a demo, expired or altered token verifies no claim.
+  const tokenCheck = verifyTrustToken(token, secret);
 
   for (const requiredClaim of request.requiredClaims) {
+    if (!tokenCheck.valid) {
+      claimResults[requiredClaim] = { verified: false, score: 0, reason: `token not verified: ${tokenCheck.reasons.join("; ")}` };
+      continue;
+    }
     const claim = token.claims.find(c => c.dimension === requiredClaim);
     if (!claim) {
       claimResults[requiredClaim] = { verified: false, score: 0, reason: "Claim not present in token" };

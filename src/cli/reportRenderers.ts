@@ -6,6 +6,9 @@ import { formatClaimLabel, renderClaimLabel, renderClaimLegend } from "../claims
 import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 import type { explainDiagnosticReportStatus } from "../diagnostic/runner.js";
 import type { DiagnosticReport } from "../types.js";
+import chalk from "chalk";
+import { scoreSummary, scoreSummaryLines } from "../diagnostic/scoreSummary.js";
+import { printClaimResult } from "./claimOutput.js";
 
 function escapeReportHtml(value: string): string {
   return value
@@ -24,15 +27,20 @@ export interface DiagnosticReportHtmlInput {
   claim: ClaimEnvelope;
 }
 
+/** The overall (mean of layer scores), its whole level and the risk label both report views show. */
+function overallRisk(report: DiagnosticReport) {
+  const avgLayerScore = report.layerScores.length > 0
+    ? report.layerScores.reduce((sum, layer) => sum + layer.avgFinalLevel, 0) / report.layerScores.length
+    : 0;
+  const levelNum = Math.min(5, Math.floor(avgLayerScore));
+  const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
+  return { avgLayerScore, levelNum, level: `L${levelNum}`, riskLabel };
+}
+
 /** `amc report --html` and `--share`: a styled, printable page. */
 export function renderDiagnosticReportHtml(input: DiagnosticReportHtmlInput): string {
   const { report, statusExplanation } = input;
-  const avgLayerScore = report.layerScores.length > 0
-    ? report.layerScores.reduce((s: number, l: any) => s + l.avgFinalLevel, 0) / report.layerScores.length
-    : 0;
-  const levelNum = Math.min(5, Math.floor(avgLayerScore));
-  const level = `L${levelNum}`;
-  const riskLabel = levelNum >= 4 ? "Low" : levelNum >= 3 ? "Moderate" : levelNum >= 2 ? "Elevated" : "High";
+  const { avgLayerScore, levelNum, level, riskLabel } = overallRisk(report);
   const riskColor = levelNum >= 4 ? "#4AEF79" : levelNum >= 3 ? "#f59e0b" : "#ff3355";
   const date = new Date(report.ts).toISOString().split("T")[0];
   const layerRows = report.layerScores.map((l: any) => {
@@ -43,6 +51,14 @@ export function renderDiagnosticReportHtml(input: DiagnosticReportHtmlInput): st
   const gapRows = ((report as any).gaps ?? []).slice(0, 10).map((g: any) =>
     `<tr><td>${escapeReportHtml(String(g.questionId ?? ""))}</td><td>${Number(g.currentLevel ?? 0)}→${Number(g.targetLevel ?? 0)}</td><td>${escapeReportHtml(String(g.narrative ?? ""))}</td></tr>`
   ).join("\n");
+  const summary = scoreSummary(report);
+  const summaryHtml = [
+    `<strong>Overall:</strong> L${summary.overall.toFixed(2)}, ${escapeReportHtml(summary.range)}`,
+    `<strong>Levels AMC can evaluate today:</strong> ${escapeReportHtml(summary.reach)}`,
+    `<strong>Questions that apply:</strong> ${escapeReportHtml(summary.applicability)}`
+  ].join("<br>\n  ") + (summary.notApplicable.length > 0
+    ? `\n  <ul>${summary.notApplicable.map((row) => `<li>${escapeReportHtml(row.title)} (<code>${escapeReportHtml(row.questionId)}</code>): ${escapeReportHtml(row.reason)}</li>`).join("")}</ul>`
+    : "");
   const aliasHtml = input.alias ? ` &nbsp;|&nbsp; <strong>Alias:</strong> <code>${escapeReportHtml(input.alias)}</code>` : "";
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AMC Report — ${escapeReportHtml(String(report.agentId ?? "Agent"))}</title>
@@ -83,6 +99,9 @@ export function renderDiagnosticReportHtml(input: DiagnosticReportHtmlInput): st
   <div class="label">Maturity Level (${avgLayerScore.toFixed(1)}/5 weighted)</div>
   <div style="margin-top:8px"><span class="risk">${riskLabel} Risk</span></div>
 </div>
+<div class="status-note">
+  ${summaryHtml}
+</div>
 <h2>Dimension Scores</h2>
 <table><thead><tr><th>Dimension</th><th>Level</th><th>Score</th><th>Coverage</th></tr></thead><tbody>
 ${layerRows}
@@ -112,4 +131,59 @@ ${renderClaimLegend("html")}
   Report generated: ${new Date().toISOString()} | Print this page (Ctrl+P) to save as PDF
 </div>
 </body></html>`;
+}
+
+/** `amc report --executive`: a short board-friendly summary in the terminal. */
+export function printExecutiveSummary(input: DiagnosticReportHtmlInput): void {
+  const { report, statusExplanation } = input;
+  const { avgLayerScore, levelNum, level, riskLabel } = overallRisk(report);
+  const riskColor = levelNum >= 4 ? chalk.green : levelNum >= 3 ? chalk.yellow : chalk.red;
+  console.log(chalk.bold("\n═══════════════════════════════════════════"));
+  console.log(chalk.bold("  AMC Executive Summary"));
+  console.log(chalk.bold("═══════════════════════════════════════════\n"));
+  printClaimResult(input.claim, {});
+  console.log(chalk.gray("  Agent:        "), report.agentId ?? "default");
+  if (input.alias) {
+    console.log(chalk.gray("  Alias:        "), input.alias);
+  }
+  console.log(chalk.gray("  Date:         "), new Date(report.ts).toISOString().split("T")[0]);
+  console.log(chalk.gray("  Maturity:     "), chalk.bold(level));
+  console.log(chalk.gray("  Overall Score:"), chalk.bold(`${avgLayerScore.toFixed(1)}/5`));
+  console.log(chalk.gray("  Risk Level:   "), riskColor(riskLabel));
+  console.log(chalk.gray("  Artifact:     "), `${report.status} — ${statusExplanation.artifactLabel}`);
+  console.log(chalk.gray("  Evidence:     "), `${statusExplanation.evidenceStatus} — ${statusExplanation.readinessLabel}`);
+  console.log(chalk.gray("  Claims:       "), statusExplanation.strongClaimsAllowed ? "ELIGIBLE" : "BLOCKED");
+  console.log(chalk.gray("  Claim Boundary:"), statusExplanation.claimBoundary);
+  console.log(chalk.gray("  Evidence Next:"), statusExplanation.nextStep);
+  console.log("");
+  // Every report says which questions were left out of this number, and why (P1), and how wide its range is (P8).
+  for (const line of scoreSummaryLines(report, "  ")) console.log(chalk.gray(line));
+  console.log("");
+  console.log(chalk.bold("  What This Means"));
+  console.log(chalk.gray("  ─────────────────"));
+  const meanings: Record<number, string> = {
+    0: "This agent has no governance controls. It should not be deployed in production.",
+    1: "This agent has basic intent toward safety but lacks operational controls.",
+    2: "This agent has repeatable processes but gaps remain in edge cases.",
+    3: "This agent has defined controls; production readiness still depends on scoped evidence and applicable requirements.",
+    4: "This agent has measured controls and strong proof coverage for the assessed scope.",
+    5: "This agent demonstrates continuously verified controls for the assessed scope.",
+  };
+  console.log(`  ${statusExplanation.strongClaimsAllowed ? meanings[levelNum] ?? meanings[0] : "This score is a local baseline only because evidence is not claim-ready."}`);
+  console.log("");
+  console.log(chalk.bold("  Recommendation"));
+  console.log(chalk.gray("  ─────────────────"));
+  if (!statusExplanation.strongClaimsAllowed) {
+    console.log("  Collect sufficient verified evidence before making deployment, compliance, or audit-readiness claims.");
+  } else if (levelNum >= 3) {
+    console.log("  Review the scoped evidence, applicable controls, and operating risk before production expansion.");
+  } else if (levelNum >= 2) {
+    console.log("  ⚠️  Address identified gaps before production deployment. Run: amc guide --go");
+  } else {
+    console.log("  ❌ Significant governance gaps. Not recommended for production. Run: amc guide --go");
+  }
+  console.log("");
+  console.log(chalk.gray("  Full report: amc report " + input.runId));
+  console.log(chalk.gray("  Improvement plan: amc guide --go"));
+  console.log(chalk.gray("  EU AI Act mapping: amc quickscore --eu-ai-act\n"));
 }

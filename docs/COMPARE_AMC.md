@@ -7,7 +7,7 @@ AMC is strongest when compared honestly.
 | | Self-reported evals | AMC |
 |---|---|---|
 | Evidence source | Agent/team claims | Observed execution behavior |
-| Trust weighting | None — all evidence equal | Tiered: observed 1.0×, self-reported 0.4× |
+| Trust weighting | None — all evidence equal | Tiered: only observed evidence can support L2 and above; self-reported supports L1 at most |
 | Gaming resistance | Low — easy to inflate | High — adversarial probes + evidence integrity |
 | Proof chains | None | Ed25519 signatures + Merkle trees |
 | CI integration | Limited | Score gates, artifact generation, regression prevention |

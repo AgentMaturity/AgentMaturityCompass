@@ -54,10 +54,10 @@ function initReveals(){
 }
 
 var PRODUCTS=[
-  {name:'amc score',title:'Score',headline:'Score your agent before you ship',summary:'Scores your agent from what it actually did, not from what its documentation says.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Gives you a starting score',text:'Shows where the agent is weak across governance, security, reliability, cost, proof, and state.'},{label:'why it matters',title:'Claims cannot inflate the score',text:'What AMC saw counts in full. What the agent says about itself is capped.'},{label:'output',title:'A report you can act on',text:'A scored report, a signed bundle of the records behind it, a proof status, and a list of what to fix.'}],lines:[
+  {name:'amc score',title:'Score',headline:'Score your agent before you ship',summary:'Scores your agent from what it actually did, not from what its documentation says.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Gives you a starting score',text:'Shows where the agent is weak across governance, security, reliability, cost, evidence, and state.'},{label:'why it matters',title:'Claims cannot inflate the score',text:'What AMC saw counts in full. What the agent says about itself is capped.'},{label:'output',title:'A report you can act on',text:'A scored report, a signed bundle of the records behind it, a record status, and a list of what to fix.'}],lines:[
     {type:'code',label:'$ amc'},
     {label:'full score',value:'244 default questions · VALID'},
-    {label:'lifecycle option',value:'264 questions · runtime/proof/fleet'},
+    {label:'lifecycle option',value:'264 questions · runtime/evidence/fleet'},
     {label:'overall maturity',value:'L3.2 · 64%'},
     {label:'security',value:'L4.0 · hardened execution'},
     {label:'governance',value:'L2.8 · approvals missing'},
@@ -66,17 +66,17 @@ var PRODUCTS=[
     {label:'fixes generated',value:'12 mapped remediations'},
     {label:'signed artifact',value:'.amc/reports/latest.md'}
   ]},
-  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs sets of attack tests, with a controlled way to confirm each finding, against prompt injection, data leaks, memory poisoning, and flattery.',badges:['registered assurance packs','authorized confirmation','safe proof'],info:[{label:'what it does',title:'Tests the agent you actually run',text:'Runs attack scenarios against your real prompts, tools, and memory.'},{label:'why it matters',title:'Finds weak defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe proof',text:'Lists the tests that failed, a redacted record confirming each one, and generated settings that reduce the risk.'}],lines:[
+  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs sets of attack tests, with a controlled way to confirm each finding, against prompt injection, data leaks, memory poisoning, and flattery.',badges:['registered assurance packs','authorized confirmation','safe record'],info:[{label:'what it does',title:'Tests the agent you actually run',text:'Runs attack scenarios against your real prompts, tools, and memory.'},{label:'why it matters',title:'Finds weak defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe record',text:'Lists the tests that failed, a redacted record confirming each one, and generated settings that reduce the risk.'}],lines:[
     {type:'code',label:'$ amc shield confirm run --scope sec-1 --task finding.json'},
     {label:'injection pack',value:'PASS · 12/12 probes blocked'},
     {label:'exfiltration pack',value:'WARN · 1 DLP bypass found'},
     {label:'memory poisoning',value:'PASS · persistence blocked'},
     {label:'sycophancy',value:'PASS · 8/8 resisted'},
-    {label:'safe proof',value:'confirmed · raw payload omitted'},
+    {label:'safe record',value:'confirmed · raw payload omitted'},
     {label:'generated fix',value:'.amc/guardrails/dlp-base64.yaml'},
     {label:'report',value:'.amc/shield/latest.md'}
   ]},
-  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing proof',summary:'Preview one immutable action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, transparency proof, and a ledger receipt.'}],lines:[
+  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing the record',summary:'Preview one fixed action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, a transparency log entry, and a ledger receipt.'}],lines:[
     {type:'code',label:'$ amc policy scope compile release-external --pack code-agent.high'},
     {label:'scope',value:'workspace · fleet-wide'},
     {label:'action classes',value:'DEPLOY · NETWORK_EXTERNAL'},
@@ -86,12 +86,12 @@ var PRODUCTS=[
     {label:'policy signatures',value:'verified'},
     {label:'evidence',value:'transparency + ledger receipt'}
   ]},
-  {name:'amc vault',title:'Vault',headline:'Show what happened, with signatures',summary:'Signs each record and links it to the one before, so an auditor can see if anything was changed or removed.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Makes records anyone can check',text:'Every record can be signed, linked to the one before, and checked by someone else.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need proof that survives handoffs, audits, and disputes.'},{label:'output',title:'A signed chain of records',text:'A ledger (an ordered log) with hashes, proofs, and what is needed to verify it.'}],lines:[
+  {name:'amc vault',title:'Vault',headline:'Show what happened, with signatures',summary:'Signs each record and links it to the one before, so an auditor can see if anything was changed or removed.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Makes records anyone can check',text:'Every record can be signed, linked to the one before, and checked by someone else.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need records that survive handoffs, audits, and disputes. A signature shows who wrote a record and that it is unchanged, not that it is true.'},{label:'output',title:'A signed chain of records',text:'A ledger (an ordered log) with hashes and what is needed to check it.'}],lines:[
     {type:'code',label:'$ amc vault verify --chain .amc/evidence/'},
     {label:'chain length',value:'23 artifacts'},
     {label:'root hash',value:'a7f3c2d1...e890b4'},
     {label:'signatures',value:'23/23 valid'},
-    {label:'merkle proof',value:'VERIFIED'},
+    {label:'hash chain',value:'checks out'},
     {label:'tamper check',value:'clean'},
     {label:'notary timestamp',value:'2026-03-12T18:30:00Z'},
     {label:'status',value:'auditor-ready'}
@@ -143,7 +143,7 @@ var PRODUCTS=[
   ]}
 ];
 
-var currentProduct=0,cycleTimer=null;
+var currentProduct=0;
 
 function renderProduct(idx){
   var p=PRODUCTS[idx];
@@ -155,7 +155,12 @@ function renderProduct(idx){
   var badges=document.getElementById('product-badges');
   if(!body||!p) return;
 
-  document.querySelectorAll('.product-tab').forEach(function(t,i){t.classList.toggle('active',i===idx)});
+  document.querySelectorAll('.product-tab').forEach(function(t,i){
+    t.classList.toggle('active',i===idx);
+    if(t.getAttribute('role')==='tab'){ t.setAttribute('aria-selected',i===idx?'true':'false'); t.tabIndex=i===idx?0:-1; }
+  });
+  var panel=document.getElementById('product-panel');
+  if(panel) panel.setAttribute('aria-labelledby','product-tab-'+idx);
   if(title) title.textContent=p.name;
   if(headline) headline.textContent=p.headline||p.title;
   if(summary) summary.textContent=p.summary||'';
@@ -170,31 +175,26 @@ function renderProduct(idx){
   }).join('');
 }
 
-function startCycle(){
-  if(cycleTimer) clearInterval(cycleTimer);
-  cycleTimer=setInterval(function(){
-    currentProduct=(currentProduct+1)%PRODUCTS.length;
-    renderProduct(currentProduct);
-  },10000);
-}
-
 function initProducts(){
   var tabs=document.getElementById('product-tabs');
   if(!tabs) return;
+  // The tabs change only when the reader asks: no timer moves them.
+  function select(idx,focus){
+    currentProduct=(idx+PRODUCTS.length)%PRODUCTS.length;
+    renderProduct(currentProduct);
+    if(focus){ var tab=tabs.querySelectorAll('.product-tab')[currentProduct]; if(tab) tab.focus(); }
+  }
   tabs.addEventListener('click',function(e){
     var btn=e.target.closest('.product-tab');
-    if(!btn) return;
-    currentProduct=parseInt(btn.dataset.idx,10);
-    renderProduct(currentProduct);
-    startCycle();
+    if(btn) select(parseInt(btn.dataset.idx,10),false);
+  });
+  tabs.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'){ e.preventDefault(); select(currentProduct+1,true); }
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); select(currentProduct-1,true); }
+    else if(e.key==='Home'){ e.preventDefault(); select(0,true); }
+    else if(e.key==='End'){ e.preventDefault(); select(PRODUCTS.length-1,true); }
   });
   renderProduct(0);
-  if('IntersectionObserver' in window){
-    var obs=new IntersectionObserver(function(entries){
-      if(entries[0] && entries[0].isIntersecting){startCycle();obs.disconnect();}
-    },{threshold:0.2});
-    obs.observe(tabs);
-  }
 }
 
 function initFAQ(){
@@ -220,7 +220,8 @@ function initAnchors(){
       var target=document.querySelector(id);
       if(!target) return;
       e.preventDefault();
-      target.scrollIntoView({behavior:'smooth',block:'start'});
+      var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({behavior:still?'auto':'smooth',block:'start'});
       if(a.classList.contains('skip-link')){
         if(!target.hasAttribute('tabindex')) target.setAttribute('tabindex','-1');
         target.focus({preventScroll:true});

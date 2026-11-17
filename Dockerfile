@@ -26,6 +26,7 @@ COPY fixtures/policy/ fixtures/policy/
 COPY docs/adapters/manifests/ docs/adapters/manifests/
 COPY qualification/2026-10-18-P1-22/pi-conformance.json qualification/2026-10-18-P1-22/receipt.json qualification/2026-10-18-P1-22/
 COPY qualification/2026-10-18-P1-23/claude-code-conformance.json qualification/2026-10-18-P1-23/receipt.json qualification/2026-10-18-P1-23/
+COPY qualification/2026-11-16-watch/claude-code-conformance.json qualification/2026-11-16-watch/pi-conformance.json qualification/2026-11-16-watch/receipt.json qualification/2026-11-16-watch/
 # Non-dist entries of package.json "files": npm pack silently omits any that are not in the context.
 COPY catalog/ catalog/
 COPY deploy/apparmor/ deploy/apparmor/

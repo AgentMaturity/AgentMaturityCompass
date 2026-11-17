@@ -11,9 +11,9 @@ test.describe("AMC comparison brand and evidence boundary", () => {
 
   test("renders the canonical decision guide and provenance ledger", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await expect(page.locator(".comparison-wordmark")).toHaveText(/amc_compare/);
-    await expect(page.locator(".comparison-tagline")).toHaveText("Evidence over claims.");
-    await expect(page.getByRole("heading", { name: "Choose the proof that matches the decision." })).toBeVisible();
+    await expect(page.locator(".nav-brand")).toHaveText("amc_");
+    await expect(page.locator(".footer-tagline")).toContainText("Evidence over claims.");
+    await expect(page.getByRole("heading", { name: "Pick the evidence that fits your decision." })).toBeVisible();
     await expect(page.locator(".decision-card")).toHaveCount(7);
     await expect(page.locator(".source-item")).toHaveCount(8);
     await expect(page.getByRole("table", { name: "Evidence fit by evaluation approach" })).toBeVisible();
@@ -33,27 +33,19 @@ test.describe("AMC comparison brand and evidence boundary", () => {
     await page.screenshot({ path: testInfo.outputPath("amc-comparison-desktop.png"), fullPage: true });
   });
 
-  test("persists an accessible canonical light theme", async ({ page }) => {
-    const toggle = page.locator("#themeToggle");
-    await expect(toggle).toHaveAttribute("aria-label", "Switch to light theme");
-    await expect(toggle).toHaveAttribute("aria-pressed", "false");
-
-    await toggle.click();
-    await expect(page.locator("body")).toHaveClass(/clean-theme/);
-    await expect(toggle).toHaveAttribute("aria-label", "Switch to dark theme");
-    await expect(toggle).toHaveAttribute("aria-pressed", "true");
-    await expect.poll(() => page.evaluate(() => localStorage.getItem("amc-theme"))).toBe("clean");
-
+  test("is dark only, like the rest of the site, and forgets a saved light theme", async ({ page }) => {
+    await page.evaluate(() => localStorage.setItem("amc-theme", "clean"));
     await page.reload();
-    await expect(page.locator("body")).toHaveClass(/clean-theme/);
-    await expect(page.locator("#themeToggle")).toHaveAttribute("aria-label", "Switch to dark theme");
+    await expect(page.locator("#themeToggle, .theme-toggle")).toHaveCount(0);
+    await expect(page.locator("body")).not.toHaveClass(/clean-theme/);
+    expect(await page.evaluate(() => localStorage.getItem("amc-theme"))).toBeNull();
   });
 
-  test("is accessible and bounded at 390px in both themes", async ({ page }, testInfo) => {
+  test("is accessible and bounded at 390px, and says its table scrolls", async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await expect(page.locator(".table-region")).toHaveAttribute("tabindex", "0");
-    for (const theme of ["dark", "light"] as const) {
-      if (theme === "light") await page.locator("#themeToggle").click();
+    await expect(page.locator(".scroll-hint")).toBeVisible();
+    {
 
       const layout = await page.evaluate(() => {
         const tableRegion = document.querySelector<HTMLElement>(".table-region");

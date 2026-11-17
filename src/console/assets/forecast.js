@@ -1,3 +1,4 @@
+import { recordRows } from "./pageKit.js";
 import { renderChartBand } from "./components/chartBand.js";
 import { renderIndicatorList } from "./components/indicatorList.js";
 import { renderAdvisoryCards } from "./components/advisoryCard.js";
@@ -51,10 +52,10 @@ export async function renderForecastScopePage(params) {
     ${card("Leading Indicators (Why)", `<div id="forecastIndicators"></div>`)}
     ${card("ETA to Target", `<div id="forecastEta"></div>`)}
     ${card("Advisories", `<div id="forecastAdvisories"></div>`)}
-    ${card("Evidence refs", `<pre class="scroll">${htmlEscape(JSON.stringify({
+    ${card("Evidence refs", `${recordRows({
       runIds: latest.leadingIndicators?.flatMap((i) => i.evidenceRefs?.runIds || []) || [],
       eventHashes: latest.leadingIndicators?.flatMap((i) => i.evidenceRefs?.eventHashes || []) || []
-    }, null, 2))}</pre>`)}
+    })}`)}
   `;
 
   renderChartBand(

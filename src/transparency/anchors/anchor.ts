@@ -109,7 +109,7 @@ export function verifyAnchorReceipt(receiptBytes: Buffer, note: Buffer, trust: P
     return token.code === "TST_UNTRUSTED_TSA" ? notAnchored(detail) : invalid(detail);
   }
   return anchored(`${log.origin} (trust-list log ${log.logId}) holds the checkpoint at index ${log.logIndex} of ${log.treeSize}; `
-    + `RFC 3161 genTime ${token.attested.genTime} from ${token.attested.tsa.anchorId}`, log.logIndex);
+    + `RFC 3161 genTime ${token.attested.genTime} from ${token.attested.tsa.anchorId} (the time authority's certificate revocation was not checked)`, log.logIndex);
 }
 
 /** The newest checkpoint note with a stored receipt, for a proof bundle; null when nothing was anchored yet. */

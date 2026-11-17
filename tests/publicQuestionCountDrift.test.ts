@@ -79,8 +79,7 @@ describe("public diagnostic question-count claims", () => {
     for (const station of STATIONS) {
       const { packCount, totalQuestions } = getStationSummary(station);
       const page = readProjectFile(`website/station-${station}.html`);
-      expect(page, station).toContain(`${packCount} diagnostic packs · ${totalQuestions} experimental, self-reported questions`);
-      expect(page, station).toContain(`Station: ${packCount} packs · ${totalQuestions} experimental, self-reported questions`);
+      expect(page, station).toContain(`<dd class="pack-count">${packCount} packs · ${totalQuestions} experimental, self-reported questions</dd>`);
     }
   });
 

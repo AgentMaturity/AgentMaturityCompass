@@ -3,7 +3,11 @@
  * Use in catch blocks instead of `catch (e: any) { e.message }`.
  */
 export function toErrorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message;
+  if (err instanceof Error) {
+    // CLI-28: a missing path reached people as "ENOENT: no such file or directory, open '/x'".
+    const missing = /^ENOENT: no such file or directory, \w+ '(.+)'$/.exec(err.message);
+    return missing ? `The file or folder ${missing[1]} does not exist. Check the path and try again.` : err.message;
+  }
   if (typeof err === "string") return err;
   return String(err);
 }

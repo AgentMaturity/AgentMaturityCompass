@@ -29,7 +29,7 @@ import { compactionFromFlags } from "./agent/compaction/promptPressure.js";
 import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
-import type { LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
+import { LIVE_FRAME, LIVE_FRAME_ENV, type LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
 import type { ComposedTurnHandle } from "./kernel/agentLoopRunner.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
 import { approvalModeExemptTools, approvalModeGatedClasses, parseApprovalMode, type ApprovalMode } from "./approvals/approvalModes.js";
@@ -705,16 +705,17 @@ export function renderNotification(notification: LoopNotification): string | nul
 /** `--stream`: the provisional live reply on stderr; the recorded settlement remains the outcome. */
 export function liveTextPreviewPrinter(): (event: LiveTextPreviewEvent) => void {
   let previewRequest: string | null = null;
+  const frame = process.env[LIVE_FRAME_ENV] === "1" ? LIVE_FRAME : "";
   return event => {
     if (event.kind === "text") {
       if (previewRequest !== event.headerEventId) {
-        process.stderr.write(`\nLive reply · session ${event.sessionId} · provisional until recorded settlement\n`);
+        process.stderr.write(`\n${frame}Live reply · session ${event.sessionId} · provisional until recorded settlement\n`);
         previewRequest = event.headerEventId;
       }
       process.stderr.write(event.text);
     } else if (previewRequest !== null) {
-      process.stderr.write(event.truncated ? "\n[Live preview truncated; read the recorded result for the outcome.]\n"
-        : "\n[Live preview ended; read the recorded result for the outcome.]\n");
+      process.stderr.write(event.truncated ? `\n${frame}[Live preview truncated; read the recorded result for the outcome.]\n`
+        : `\n${frame}[Live preview ended; read the recorded result for the outcome.]\n`);
       previewRequest = null;
     }
   };

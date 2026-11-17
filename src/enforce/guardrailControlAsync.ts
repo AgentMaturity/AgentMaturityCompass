@@ -5,14 +5,15 @@ import { captureSignedControlJournalAppend, ControlMutationAuthorityError, retry
 import { captureControlMirror } from "../lifecycle/controlJournalMirror.js";
 import {
   GUARDRAIL_CONTROL_SCHEMA_VERSION, GuardrailControlError, assertKnownBoundGuardrail, guardrailControlHeadsDir,
-  guardrailControlStatePath, isBoundGuardrailName, nextBaseState, readGuardrailControlStateUnlocked, readJournal,
+  guardrailControlStatePath, isBoundGuardrailName, keepInputGuard, nextBaseState, readGuardrailControlStateUnlocked, readJournal,
   validateState, withGuardrailControlLock, type GuardrailControlSource, type GuardrailControlState,
   type GuardrailControlSnapshot
 } from "./guardrailControlState.js";
 import { GUARDRAIL_PROFILES } from "./guardrailProfiles.js";
+import { INPUT_GUARD_PROFILE, assertInputGuardAuthority, auditInputGuardChange, inputGuardState, type InputGuardMode } from "./inputGuardProfile.js";
 
 type Requested = { workspace: string; name: string; enabled: boolean; source: GuardrailControlSource; actor: string };
-type Profile = { workspace: string; profileName: string; source: GuardrailControlSource; actor: string };
+type Profile = { workspace: string; profileName: string; source: GuardrailControlSource; actor: string; mode?: InputGuardMode };
 const actorCurrent = (check?: () => boolean) => { if (check?.() === false) throw new ControlMutationAuthorityError(); };
 
 async function mutate(workspace: string, command: string, build: (snapshot: GuardrailControlSnapshot) => GuardrailControlState,
@@ -65,7 +66,7 @@ async function requested(input: Requested, currentActor?: () => boolean) {
     const current = nextBaseState(snapshot), requested = new Set(current.requestedGuardrails);
     if (fixed.enabled) requested.add(fixed.name); else requested.delete(fixed.name);
     return { schemaVersion: GUARDRAIL_CONTROL_SCHEMA_VERSION, revision: current.revision + 1,
-      requestedGuardrails: [...requested].sort((a, b) => a.localeCompare(b)), activeProfile: null,
+      requestedGuardrails: [...requested].sort((a, b) => a.localeCompare(b)), activeProfile: null, ...keepInputGuard(current),
       updatedAt: new Date().toISOString(), updatedBy: { source: fixed.source, actor: fixed.actor.trim() || "local-user" } };
   }, currentActor);
 }
@@ -73,12 +74,23 @@ async function profile(input: Profile, currentActor?: () => boolean) {
   const fixed = { ...input, workspace: resolve(input.workspace) };
   const selected = GUARDRAIL_PROFILES.find(candidate => candidate.name === fixed.profileName);
   if (!selected) throw new GuardrailControlError("UNKNOWN_PROFILE", "Unknown guardrail profile: " + fixed.profileName);
+  if (selected.name === INPUT_GUARD_PROFILE) {
+    assertInputGuardAuthority(fixed.workspace, fixed.source);
+    let before: InputGuardMode = "off";
+    const state = await mutate(fixed.workspace, "guardrails profile", snapshot => {
+      const current = nextBaseState(snapshot);
+      before = current.untrustedInputGuard ?? "off";
+      return inputGuardState(current, fixed.mode ?? "enforce", fixed.source, fixed.actor);
+    }, currentActor);
+    auditInputGuardChange(fixed.workspace, before, state);
+    return { state, unsupported: [] as string[] };
+  }
   const name = selected.name, requested = selected.guardrails.filter(isBoundGuardrailName).sort((a, b) => a.localeCompare(b));
   const unsupported = selected.guardrails.filter(value => !isBoundGuardrailName(value)).sort((a, b) => a.localeCompare(b));
   const state = await mutate(fixed.workspace, "guardrails profile", snapshot => {
     const current = nextBaseState(snapshot);
     return { schemaVersion: GUARDRAIL_CONTROL_SCHEMA_VERSION, revision: current.revision + 1,
-      requestedGuardrails: [...requested], activeProfile: name, updatedAt: new Date().toISOString(),
+      requestedGuardrails: [...requested], activeProfile: name, ...keepInputGuard(current), updatedAt: new Date().toISOString(),
       updatedBy: { source: fixed.source, actor: fixed.actor.trim() || "local-user" } };
   }, currentActor);
   return { state, unsupported: [...unsupported] };

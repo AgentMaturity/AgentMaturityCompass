@@ -1,4 +1,5 @@
 import { renderQuestionCard } from "./components/questionCard.js";
+import { esc, recordRows } from "./pageKit.js";
 
 export async function renderDiagnosticViewPage(params) {
   const agentId = params.currentAgent();
@@ -44,15 +45,15 @@ export async function renderDiagnosticViewPage(params) {
         .sort((a, b) => a.question.qId.localeCompare(b.question.qId))
         .map((row) => renderQuestionCard(row))
         .join("");
-      return `<section><h2>${group.name}</h2>${cards}</section>`;
+      return `<section><h2>${esc(group.name)}</h2>${cards}</section>`;
     })
     .join("");
 
   params.root.innerHTML = `
     ${params.card("Diagnostic Overview", `
       <div class="grid">
-        <div><div class="muted">Agent</div><div class="tile-value">${agentId}</div></div>
-        <div><div class="muted">Run ID</div><div class="tile-value">${auto.runId ?? "n/a"}</div></div>
+        <div><div class="muted">Agent</div><div class="tile-value">${esc(agentId)}</div></div>
+        <div><div class="muted">Score used</div><div class="tile-value" title="${esc(auto.runId ?? "")}">${auto.runId ? `latest (${esc(String(auto.runId).slice(0, 8))})` : "none"}</div></div>
         <div><div class="muted">Integrity</div><div class="tile-value">${typeof auto.integrityIndex === "number" ? auto.integrityIndex.toFixed(3) : "n/a"}</div></div>
         <div><div class="muted">Unknown Questions</div><div class="tile-value">${(auto.unknownReasons ?? []).length}</div></div>
         <div><div class="muted">Low Confidence</div><div class="tile-value">${lowConfidenceCount}</div></div>
@@ -63,8 +64,8 @@ export async function renderDiagnosticViewPage(params) {
         <button class="secondary" data-confidence-filter="low">Low confidence</button>
         <button class="secondary" data-confidence-filter="risk">High risk</button>
       </div>
-      ${(auto.unknownReasons ?? []).length > 0 ? `<p class="status-bad"><strong>Honesty banner:</strong> insufficient evidence for one or more questions.</p>` : ""}
-      ${auto.confidenceSummary ? `<pre class="scroll">${JSON.stringify(auto.confidenceSummary, null, 2)}</pre>` : ""}
+      ${(auto.unknownReasons ?? []).length > 0 ? `<p class="status-bad"><strong>Not enough records</strong> to answer one or more questions.</p>` : ""}
+      ${auto.confidenceSummary ? recordRows(auto.confidenceSummary) : ""}
     `)}
     ${sections}
   `;

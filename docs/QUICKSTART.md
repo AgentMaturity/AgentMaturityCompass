@@ -1,6 +1,6 @@
 # Quickstart — choose your first task
 
-> **Install from source to follow this page.** The native task workflow (`amc agent-loop`), `amc init --coding` and the TypeScript SDK path need the current source build, which is unreleased (the next release is 2.0.0). The published npm package and GitHub release, which the hosted installers install, are 1.1.1 and do not contain them; 1.1.1 has most of the evidence-score steps ([2](QUICKSTART.md#2-run-amc-in-your-agent-project) to 5) in an older form; `amc connect hooks` (step 3) is new in the source build.
+> **Install from source to follow this page.** The native task workflow (`amc agent-loop`), `amc init --coding` and the TypeScript SDK path need the current source build, which is unreleased (the source reports version 1.2.0). The published npm package and GitHub release, which the hosted installers install, are 1.1.1 and do not contain them; 1.1.1 has most of the evidence-score steps ([2](QUICKSTART.md#2-run-amc-in-your-agent-project) to 5) in an older form; `amc connect hooks` (step 3) is new in the source build.
 
 Run a bounded native task, assess your existing evidence, or connect an agent you already use. Each path has a different result; a recording demonstration and an evidence baseline do not establish a completed real-model task.
 
@@ -168,11 +168,12 @@ node quickstart.mjs        # a copy of examples/sdk/quickstart.mjs
 ```
 
 The quickstart starts `AMCNativeClient` on the stub provider, makes one governed `fs.write` call (`hello.txt`), then
-`closeAndVerify()` and prints the session id, the verification result and the receipt digest. `amc init` signs the
-default Action Policy, which runs an agent's EXECUTE calls as SIMULATE until it has a trusted diagnostic run at integrity
-0.6 or above, so on a fresh workspace the call is recorded as SIMULATE and `hello.txt` is not written (see
-"Reaching EXECUTE" in `docs/GOVERNOR.md`). An owner can instead sign a lower `requireRunIntegrityAtLeast` for a class
-once a sealed run exists; every decision made under it names the waiver. Every line is labelled
+`closeAndVerify()` and prints the session id, the verification result and the receipt digest. `amc init --coding`
+signs an Action Policy that runs a file edit or a shell command only after a person approves that call. The quickstart
+asks nobody, so its call is recorded as SIMULATE and `hello.txt` is not written. In chat
+(`amc agent-loop chat --provider stub --tools workspace --approval-mode default`) you are asked before each edit and
+command, and the one you approve runs (see `executeOnApproval` in `docs/GOVERNOR.md`). The file tools never read or
+write `.amc`, `.git` or common secret files such as `.env`, private keys and `.ssh`. Every line is labelled
 `[synthetic]`: the stub runs no model, so this is a demonstration of the governed path, never a real-model result.
 For a regulated starting point, `amc init --regulated` adds a `block` firewall, a signed approval preset and a signed,
 not yet active Layer 0 control plan (experimental). See [TypeScript SDK](sdk/TYPESCRIPT_SDK.md) for the API contract,
@@ -187,7 +188,7 @@ mkdir my-agent && cd my-agent
 amc
 ```
 
-`amc` is the default path. It creates the `.amc/` workspace if needed. In a terminal it then shows the start menu: choose "Just show my score" for the full maturity score, or "Watch Claude Code as it works" (or Codex) to start recording evidence first ([Your first five minutes](FIRST_FIVE_MINUTES.md)). In a pipe or CI, and with `amc --no-menu`, it runs the full maturity score directly, detects what it can score, and prints the next action.
+`amc` is the default path. It creates the `.amc/` workspace if needed. In a terminal it then shows the start menu: choose "Just show my score" for the full maturity score, or "Watch Claude Code as it works" (or Codex) to start recording evidence first ([Your first five minutes](FIRST_FIVE_MINUTES.md)). In a pipe or CI, and with `amc --no-menu`, it runs the full maturity score directly, detects what it can score, and prints the next action. Without a terminal it does not create `.amc/` on its own: in a new folder it says what it would create and stops, and `amc --yes` lets it go ahead.
 
 On a clean project, the report can be signed and `VALID` while evidence readiness is `INSUFFICIENT_EVIDENCE`. This is the honest first baseline: the artifact is intact, but AMC has not yet observed enough execution evidence to support external claims.
 
@@ -244,7 +245,7 @@ Read the two status lines independently:
 | Artifact status: `VALID`, `INVALID`, or `UNSIGNED` | Is this report intact and verifiable? |
 | Evidence readiness: `READY`, `LIMITED`, `INSUFFICIENT_EVIDENCE`, or `UNVERIFIED` | Is the evidence strong enough for external claims? |
 
-Only `READY` is claim-eligible. Signing proves artifact integrity, not evidence sufficiency.
+Only `READY` is claim-eligible. A signature shows the record is unchanged, not that there is enough evidence.
 
 **Optional expanded assessment:**
 

@@ -1,10 +1,10 @@
 {
   "framework": "MITRE ATLAS",
   "source": {
-    "title": "MITRE ATLAS data release v2026.09 (ATLAS-2026.09.yaml)",
-    "url": "https://github.com/mitre-atlas/atlas-data/releases/download/v2026.09/ATLAS-2026.09.yaml",
-    "retrievedAt": "2026-10-07",
-    "sha256": "935efa93e28294432d3e2f537eb94991ef8d1f8c58341cd360ea3321ddb66688"
+    "title": "MITRE ATLAS data release v2026.10 (ATLAS-2026.10.yaml)",
+    "url": "https://github.com/mitre-atlas/atlas-data/releases/download/v2026.10/ATLAS-2026.10.yaml",
+    "retrievedAt": "2026-11-16",
+    "sha256": "ac41ee9f99a47084ba5fdfc77ae83a28687e12390240fffeb37df7914ffe142d"
   },
   "extraction": "Every key under `techniques` (techniques and sub-techniques) with its `name`, read from the release file with the yaml parser.",
   "entries": [
@@ -58,19 +58,19 @@
     },
     {
       "id": "AML.T0005",
-      "name": "Create Proxy AI Model"
+      "name": "Replicate AI Model Behavior"
     },
     {
       "id": "AML.T0005.000",
-      "name": "Train Proxy via Gathered AI Artifacts"
+      "name": "Replicate Behavior from Gathered AI Artifacts"
     },
     {
       "id": "AML.T0005.001",
-      "name": "Train Proxy via Replication"
+      "name": "Replicate Behavior from Model Outputs"
     },
     {
       "id": "AML.T0005.002",
-      "name": "Use Pre-Trained Model"
+      "name": "Adapt Existing Model to Replicate Behavior"
     },
     {
       "id": "AML.T0006",
@@ -126,7 +126,7 @@
     },
     {
       "id": "AML.T0010",
-      "name": "AI Supply Chain Compromise"
+      "name": "Supply Chain Compromise"
     },
     {
       "id": "AML.T0010.000",
@@ -134,15 +134,15 @@
     },
     {
       "id": "AML.T0010.001",
-      "name": "AI Software"
+      "name": "Software"
     },
     {
       "id": "AML.T0010.002",
-      "name": "Data"
+      "name": "Data Repository"
     },
     {
       "id": "AML.T0010.003",
-      "name": "Model"
+      "name": "Model Repository"
     },
     {
       "id": "AML.T0010.004",
@@ -229,6 +229,10 @@
       "name": "AI Agent Tools"
     },
     {
+      "id": "AML.T0017.003",
+      "name": "Malware"
+    },
+    {
       "id": "AML.T0018",
       "name": "Manipulate AI Model"
     },
@@ -259,18 +263,6 @@
     {
       "id": "AML.T0024",
       "name": "Exfiltration via AI Inference API"
-    },
-    {
-      "id": "AML.T0024.000",
-      "name": "Infer Training Data Membership"
-    },
-    {
-      "id": "AML.T0024.001",
-      "name": "Invert AI Model"
-    },
-    {
-      "id": "AML.T0024.002",
-      "name": "Extract AI Model"
     },
     {
       "id": "AML.T0025",
@@ -433,14 +425,6 @@
       "name": "Unsecured Credentials"
     },
     {
-      "id": "AML.T0056",
-      "name": "Extract LLM System Prompt"
-    },
-    {
-      "id": "AML.T0057",
-      "name": "LLM Data Leakage"
-    },
-    {
       "id": "AML.T0059",
       "name": "Erode Dataset Integrity"
     },
@@ -595,6 +579,14 @@
     {
       "id": "AML.T0085.001",
       "name": "AI Agent Tools"
+    },
+    {
+      "id": "AML.T0085.002",
+      "name": "Conversation Context and Memory"
+    },
+    {
+      "id": "AML.T0085.003",
+      "name": "System Instructions"
     },
     {
       "id": "AML.T0086",
@@ -839,6 +831,66 @@
     {
       "id": "AML.T0134",
       "name": "AI Targeted Cloaking"
+    },
+    {
+      "id": "AML.T0135",
+      "name": "Outputs from AI Models"
+    },
+    {
+      "id": "AML.T0136",
+      "name": "Exfiltration via AI User Interface"
+    },
+    {
+      "id": "AML.T0137",
+      "name": "Training Data Information from AI Models"
+    },
+    {
+      "id": "AML.T0137.000",
+      "name": "Infer Membership"
+    },
+    {
+      "id": "AML.T0137.001",
+      "name": "Infer Properties"
+    },
+    {
+      "id": "AML.T0137.002",
+      "name": "Invert AI Model"
+    },
+    {
+      "id": "AML.T0137.003",
+      "name": "Extract Memorized Data"
+    },
+    {
+      "id": "AML.T0138",
+      "name": "Indicator Removal"
+    },
+    {
+      "id": "AML.T0139",
+      "name": "Compromise Accounts"
+    },
+    {
+      "id": "AML.T0140",
+      "name": "Centralized AI Service Request Routing"
+    },
+    {
+      "id": "AML.T0141",
+      "name": "AI Service Request Metadata Sanitization"
+    },
+    {
+      "id": "AML.T0142",
+      "name": "Event Triggered Execution"
+    },
+    {
+      "id": "AML.T0143",
+      "name": "LLM Prompt Propagation"
+    },
+    {
+      "id": "AML.T0144",
+      "name": "Recover AI Model Internals"
+    },
+    {
+      "id": "AML.T0145",
+      "name": "Poison AI Agent Learning Environment"
     }
   ]
 }

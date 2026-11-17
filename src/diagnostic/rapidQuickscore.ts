@@ -1,6 +1,6 @@
 import type { DiagnosticQuestion } from "../types.js";
 import { questionBank } from "./questionBank.js";
-import { notEvaluatedLevel } from "./levelSemantics.js";
+import { reachableLevel } from "./levelSemantics.js";
 
 const RAPID_QUESTION_IDS = [
   "AMC-1.1",
@@ -98,7 +98,17 @@ export function getRapidQuestions(): DiagnosticQuestion[] {
   return RAPID_QUESTION_IDS.map((questionId) => findQuestionOrThrow(questionId));
 }
 
-export function scoreRapidAssessment(answers: Record<string, number>): RapidQuickscoreResult {
+/**
+ * `amc improve`'s headline: the self-answers as points and a percentage, never an L-level. A self-reported answer never
+ * counts above L1 (self-declared), so five answers of 5 must not read as L5.
+ */
+export function rapidSelfAssessmentLine(result: Pick<RapidQuickscoreResult, "totalScore" | "maxScore" | "percentage" | "questionCount">): string {
+  return `Self-assessed: ${result.totalScore}/${result.maxScore} points (${result.percentage}%) from ${result.questionCount} self-answers, 0-5 each. `
+    + "This is not a maturity level: a self-reported answer never counts above L1 (self-declared).";
+}
+
+/** `notApplicable`: question ids a person marked as not applying to this agent; they get no recommendation (P1). */
+export function scoreRapidAssessment(answers: Record<string, number>, notApplicable: readonly string[] = []): RapidQuickscoreResult {
   const questions = getRapidQuestions();
   const scored = questions.map<RapidQuestionScore>((question) => ({
     questionId: question.id,
@@ -112,23 +122,21 @@ export function scoreRapidAssessment(answers: Record<string, number>): RapidQuic
   const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
   const preliminaryLevel = preliminaryLevelFromPercent(percentage);
 
+  // P12: only steps that can move a level: the target is capped at the highest level AMC can evaluate for the question.
   const recommendations = scored
-    .filter((row) => row.level < 3)
-    .sort((a, b) => a.level - b.level || a.questionId.localeCompare(b.questionId))
+    .map((row) => ({ row, question: findQuestionOrThrow(row.questionId) }))
+    .map(({ row, question }) => ({ row, question, targetLevel: Math.min(3, reachableLevel(question)) }))
+    .filter(({ row, targetLevel }) => row.level < targetLevel && !notApplicable.includes(row.questionId))
+    .sort((a, b) => a.row.level - b.row.level || a.row.questionId.localeCompare(b.row.questionId))
     .slice(0, 3)
-    .map<RapidImprovementRecommendation>((row) => {
-      const question = findQuestionOrThrow(row.questionId);
-      const targetLevel = Math.max(3, row.level + 1);
-      return {
-        questionId: row.questionId,
-        title: row.title,
-        currentLevel: row.level,
-        targetLevel,
-        whyItMatters: LAYER_VALUE_MAP[row.layerName] ?? "It directly affects your trust posture and production reliability.",
-        // P1-07: a target AMC cannot evaluate gets its reason, not advice that would promise it.
-        howToImprove: notEvaluatedLevel(question, row.level, targetLevel)?.notice ?? firstSentence(question.upgradeHints)
-      };
-    });
+    .map<RapidImprovementRecommendation>(({ row, question, targetLevel }) => ({
+      questionId: row.questionId,
+      title: row.title,
+      currentLevel: row.level,
+      targetLevel,
+      whyItMatters: LAYER_VALUE_MAP[row.layerName] ?? "It directly affects your trust posture and production reliability.",
+      howToImprove: firstSentence(question.upgradeHints)
+    }));
 
   return {
     questionCount: scored.length,

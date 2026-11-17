@@ -1,5 +1,6 @@
 import { renderPassportCard } from "./components/passportCard.js";
 import { renderBadgeChip } from "./components/badgeChip.js";
+import { askInline, codeWords, recordDetails, workspacePath } from "./pageKit.js";
 
 function esc(value) {
   return String(value ?? "")
@@ -8,13 +9,6 @@ function esc(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-function parseStatusFromBadge(badge) {
-  const text = String(badge ?? "").toUpperCase();
-  if (text.includes("AMC VERIFIED")) return "VERIFIED";
-  if (text.includes("AMC INFO")) return "INFO";
-  return "UNTRUSTED";
 }
 
 function tile(label, value) {
@@ -29,23 +23,11 @@ async function loadPassportData(params) {
     params.apiGet("/agents").catch(() => ({ agents: [] }))
   ]);
   const agents = Array.isArray(agentsRes?.agents) ? agentsRes.agents : [];
-  const badges = [];
-  for (const agent of agents.slice(0, 20)) {
-    const id = String(agent?.id ?? "");
-    if (!id) continue;
-    try {
-      const row = await params.apiGet(`/passport/badge?agentId=${encodeURIComponent(id)}`);
-      badges.push({
-        agentId: id,
-        badge: String(row?.badge ?? "")
-      });
-    } catch {
-      badges.push({
-        agentId: id,
-        badge: "AMC UNTRUSTED • unavailable"
-      });
-    }
-  }
+  // Each agent's latest passport, read only (C-01): the badge route makes a passport when none exists, so it is not used here.
+  const badges = await Promise.all(agents.slice(0, 20).map((agent) => String(agent?.id ?? "")).filter(Boolean).map(async (agentId) => {
+    const row = await params.apiGet(`/passport/cache/latest?scope=agent&id=${encodeURIComponent(agentId)}`).catch(() => null);
+    return { agentId, label: row?.passport?.status?.label ?? null };
+  }));
   return {
     status,
     exports: Array.isArray(exportsRes?.exports) ? exportsRes.exports : [],
@@ -55,6 +37,7 @@ async function loadPassportData(params) {
 }
 
 export async function renderPassportPage(params) {
+  params.root.innerHTML = params.card("Agent Passport", "<p aria-busy=\"true\">Reading the passports…</p>");
   const data = await loadPassportData(params);
   const passport = data.cache;
   const warnings = [];
@@ -64,7 +47,8 @@ export async function renderPassportPage(params) {
   if (passport?.status?.label === "UNTRUSTED") {
     warnings.push("<div class='card status-bad'><strong>UNTRUSTED PASSPORT</strong></div>");
   } else if (passport?.status?.label === "INFORMATIONAL") {
-    warnings.push(`<div class='card status-warn'><strong>INFORMATIONAL ONLY</strong>: ${esc((passport.status.reasons || []).join(", ") || "gates unmet")}</div>`);
+    const reasons = (passport.status.reasons || []).map(codeWords).join(", ");
+    warnings.push(`<div class='card status-warn'><strong>For information only.</strong> This passport does not meet the bar for claims: ${reasons || "some checks were not met"}.</div>`);
   }
 
   const maturity = typeof passport?.maturity?.overall === "number" ? passport.maturity.overall.toFixed(1) : "UNKNOWN";
@@ -88,26 +72,32 @@ export async function renderPassportPage(params) {
     params.card(
       "Agent Passport",
       `
-      <div class="grid">
-        ${tile("Status", renderBadgeChip({ status: passport?.status?.label === "INFORMATIONAL" ? "INFO" : passport?.status?.label ?? "UNTRUSTED", badge: passport?.status?.label ?? "UNTRUSTED" }))}
+      <p class="muted">A passport is a signed summary of an agent's latest score that you can hand to someone else. The signature shows
+      who made it and that it has not changed since; it does not make the score true.</p>
+      <p class="muted">Every passport is self-issued: this workspace signs it about its own agent, using its own clock. "Verified"
+      means this workspace's own checks passed, not that anyone outside checked it.</p>
+      ${passport ? `<div class="grid">
+        ${tile("Status", renderBadgeChip({ status: passport.status?.label === "INFORMATIONAL" ? "INFO" : passport.status?.label ?? "UNTRUSTED", badge: passport.status?.label ?? "UNTRUSTED" }))}
         ${tile("Maturity", esc(`${maturity}/5`))}
         ${tile("Assurance", esc(assurance))}
         ${tile("Value", esc(value))}
         ${tile("Risk avg", esc(riskSummary))}
-      </div>
+      </div>` : `<p>No passport yet for <strong>${esc(params.currentAgent())}</strong>. Create one to see its status here.</p>`}
       <div class="row wrap">
-        <button id="passportCreateBtn">Create Current Agent Passport</button>
-        <button id="passportExportBtn" class="secondary">Export Current Agent Passport</button>
-        <button id="passportVerifyBtn" class="secondary">Verify Passport File</button>
+        <button id="passportCreateBtn" data-roles="OWNER,OPERATOR">Create a passport for this agent</button>
+        <button id="passportExportBtn" class="secondary" data-roles="OWNER,OPERATOR">Save it to a file</button>
+        <button id="passportVerifyBtn" class="secondary">Check a passport file</button>
       </div>
-      <pre id="passportOut" class="scroll muted"></pre>
+      <div id="passportOut" aria-live="polite"></div>
       `
     ),
     params.card(
-      "Agent Badges",
+      "Every agent's passport",
       data.badges.length > 0
         ? data.badges
-          .map((row) => `<div class="row wrap"><code>${esc(row.agentId)}</code>${renderBadgeChip({ status: parseStatusFromBadge(row.badge), badge: row.badge })}<span class="muted">${esc(row.badge)}</span></div>`)
+          .map((row) => `<div class="row wrap"><code>${esc(row.agentId)}</code>${row.label
+            ? renderBadgeChip({ status: row.label === "INFORMATIONAL" ? "INFO" : row.label, badge: row.label })
+            : '<span class="muted">No passport yet</span>'}</div>`)
           .join("")
         : "<div class='muted'>No agents found.</div>"
     ),
@@ -119,41 +109,28 @@ export async function renderPassportPage(params) {
     )
   ].join("");
 
+  const view = document.getElementById("passportOut");
+  const say = (html) => { if (view) view.innerHTML = html; };
   document.getElementById("passportCreateBtn")?.addEventListener("click", async () => {
-    const out = await params.apiPost("/passport/create", {
-      scopeType: "AGENT",
-      scopeId: params.currentAgent()
-    });
-    const view = document.getElementById("passportOut");
-    if (view) {
-      view.textContent = JSON.stringify(out, null, 2);
-    }
+    await params.apiPost("/passport/create", { scopeType: "AGENT", scopeId: params.currentAgent() });
     await renderPassportPage(params);
   });
 
-  document.getElementById("passportExportBtn")?.addEventListener("click", async () => {
-    const outFile = window.prompt("Output .amcpass path", `.amc/passport/exports/agent/${params.currentAgent()}/manual.amcpass`);
+  document.getElementById("passportExportBtn")?.addEventListener("click", async (event) => {
+    const outFile = await askInline(event.currentTarget, { label: "Save to (a path inside the workspace, ending in .amcpass)",
+      value: `.amc/passport/exports/agent/${params.currentAgent()}/manual.amcpass`, submit: "Save",
+      check: (text) => text.endsWith(".amcpass") ? null : "The file name must end in .amcpass." });
     if (!outFile) return;
-    const out = await params.apiPost("/passport/export", {
-      scopeType: "AGENT",
-      scopeId: params.currentAgent(),
-      outFile: outFile.trim()
-    });
-    const view = document.getElementById("passportOut");
-    if (view) {
-      view.textContent = JSON.stringify(out, null, 2);
-    }
-    await renderPassportPage(params);
+    const out = await params.apiPost("/passport/export", { scopeType: "AGENT", scopeId: params.currentAgent(), outFile });
+    say(`<p class="status-ok">Saved to <code>${esc(workspacePath(String(out?.outFile ?? out?.path ?? outFile)))}</code>.</p>${recordDetails(out)}`);
   });
 
-  document.getElementById("passportVerifyBtn")?.addEventListener("click", async () => {
-    const file = window.prompt("Passport file path", ".amc/passport/exports/agent/default/latest.amcpass");
+  document.getElementById("passportVerifyBtn")?.addEventListener("click", async (event) => {
+    const file = await askInline(event.currentTarget, { label: "Passport file to check (a path inside the workspace)",
+      value: `.amc/passport/exports/agent/${params.currentAgent()}/latest.amcpass`, submit: "Check" });
     if (!file) return;
-    const out = await params.apiPost("/passport/verify", { file: file.trim() });
-    const view = document.getElementById("passportOut");
-    if (view) {
-      view.textContent = JSON.stringify(out, null, 2);
-    }
+    const out = await params.apiPost("/passport/verify", { file });
+    say(`<p class="${out?.ok === false || out?.valid === false ? "status-bad" : "status-ok"}">${out?.ok === false || out?.valid === false
+      ? "This file did not pass the check: it was changed, or AMC cannot confirm who signed it." : "The signature checks out: the file is unchanged since it was signed."}</p>${recordDetails(out)}`);
   });
 }
-

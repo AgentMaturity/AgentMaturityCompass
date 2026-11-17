@@ -142,7 +142,7 @@ export const sourceToSustenanceDetail: PackQuestionDetail = {
     l4: "Indicators have baselines, thresholds and uncertainty with interventions tracked, but disclosures are not ready for independent checking",
     evidence: ["target4_indicator_register", "intervention_outcome_tracker", "disclosure_data_lineage"],
     remediation:
-      "Link every figure in a Target 4 disclosure to its indicator record, baseline and data source, and block publication of any figure without that lineage.",
+      "Link every figure in a Biodiversity Strategy disclosure to its indicator record, baseline and data source, and block publication of any figure without that lineage.",
     failureMode:
       "The agent reports species recovery from counts of interventions rather than measured outcomes, overstating progress in a stakeholder disclosure.",
     keyRisk: 2,

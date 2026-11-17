@@ -80,12 +80,15 @@ describe("docs truth reset (P0-28)", () => {
   });
 
   test("the quickstart image is run without a second amc and with no example passphrase", () => {
-    for (const surface of ["README.md", "website/docs/getting-started.html"]) {
-      const text = read(surface);
-      expect(text, surface).not.toMatch(/amc-quickstart\s+amc\b/);
-      expect(text, surface).not.toMatch(/AMC_VAULT_PASSPHRASE=\S/);
-      expect(text, surface).toContain("docker run --rm amc-quickstart --version");
-    }
+    const readme = read("README.md");
+    expect(readme).not.toMatch(/amc-quickstart\s+amc\b/);
+    expect(readme).not.toMatch(/AMC_VAULT_PASSPHRASE=\S/);
+    expect(readme).toContain("docker run --rm amc-quickstart --version");
+    // The website's getting-started page no longer shows the image (it installs the older 1.1.1 release); if it ever
+    // does again, the same rules hold.
+    const website = read("website/docs/getting-started.html");
+    expect(website).not.toMatch(/amc-quickstart\s+amc\b/);
+    expect(website).not.toMatch(/AMC_VAULT_PASSPHRASE=\S/);
   });
 
   test("no CLI description still says 126-question", () => {

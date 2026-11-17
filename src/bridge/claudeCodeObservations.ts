@@ -14,8 +14,8 @@
  * unmatched and refused: it never takes the call's place, so whoever posts first cannot own the record. A second
  * observation of the same call is kept beside the first and flagged as a conflict (`conflictOf`), never dropped; for Pi,
  * a repeat of exactly the recorded observation, bound to the same decision, is answered as recorded (an idempotent replay).
- * What the provider reports (the input that ran, completed or failed) is labelled `reported: { by: <provider> }`:
- * AMC records it, it does not vouch for it. A mismatch (`authorizationMismatch: true`) is observed, not prevented,
+ * What the provider reports (the input that ran, completed or failed) is labelled `reported: { by: <provider> }` and
+ * `contentTier: "SELF_REPORTED"`: AMC records it, it does not vouch for it, and readers never count it as observed. A mismatch (`authorizationMismatch: true`) is observed, not prevented,
  * because the tool already ran. Raw tool input reaches AMC over loopback only and is never stored.
  */
 import { codexActionId, codexSessionSha256 } from "../adapters/codex/codexIdentity.js";
@@ -46,13 +46,23 @@ type Ledger = ReturnType<typeof openLedger>;
 // ponytail: in-memory counters per Bridge process (bounded, hookIntake.ts); a restart resets them, summary rows already written stay.
 const observationCounters = new IntakeCounters(OBSERVATION_LIMITS);
 
+/**
+ * The label on a row whose substance is what the provider told AMC (a turn ended, a tool ran or failed with this input).
+ * AMC observed the report arriving, so the row is still written by AMC's runtime, but the content is the provider's own
+ * word: readers count it as SELF_REPORTED (effectiveTrustTier), never as something AMC observed.
+ */
+const PROVIDER_REPORTED = { contentTier: "SELF_REPORTED" } as const;
+
 /** The providers whose after-the-fact observations AMC records here, and how each names its sessions, calls and registrations. */
-export type ObservedProvider = "claude-code" | "pi" | "codex";
+export type ObservedProvider = "claude-code" | "pi" | "codex" | "otlp";
 /** Codex (P2-17) is observed only: no installation registers a Codex session, so its observations are never under registration. */
 const PROVIDERS = {
   "claude-code": { label: "Claude Code", prefix: "cc", sessionSha256: claudeSessionSha256, actionId: claudeActionId, registration: claudeCodeSessionRegistration },
   pi: { label: "Pi", prefix: "pi", sessionSha256: piSessionSha256, actionId: piActionId, registration: piSessionRegistration },
   codex: { label: "Codex", prefix: "cx", sessionSha256: codexSessionSha256, actionId: codexActionId, registration: () => ({ status: "missing" as const }) },
+  /** OTLP export requests (src/watch/otlpReceiver.ts): self-reported telemetry, never under a registration, capped like the rest. */
+  otlp: { label: "OTLP", prefix: "otlp", sessionSha256: (id: string) => sha256Hex(`otlp\0${id}`), actionId: (id: string, call: string) => sha256Hex(`otlp\0${id}\0${call}`),
+    registration: () => ({ status: "missing" as const }) },
 } as const;
 
 /** Whether `provider` session `sessionId` has a verified registration: only then can a fault of its writer latch. */
@@ -92,14 +102,17 @@ function summaryWriter(input: ScopeInput & { registered: boolean; now: number })
  * its session, its lease and its workspace (hookIntake.ts). Over a cap it is refused (429), never silently: it is listed
  * in a signed intake summary row, and decisions under the capped scope are denied until its window passes.
  */
-export function admitObservation(input: ScopeInput & { now: number; toolUseId?: string }): { registered: boolean } {
+export function admitObservation(input: ScopeInput & { now: number; toolUseId?: string; count?: number }): { registered: boolean } {
   const registered = sessionRegistered(input.workspace, input.agentId, input.sessionId, input.provider);
   const write = summaryWriter({ ...input, registered });
-  const refused = observationCounters.admit(intakeScope({ ...input, registered }), input.now, write,
-    input.toolUseId ? { toolUseId: input.toolUseId, actionId: PROVIDERS[input.provider].actionId(input.sessionId, input.toolUseId) } : undefined);
-  if (refused !== null) {
-    throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `${PROVIDERS[input.provider].label} observations are over AMC's ${refused} intake limit: AMC lists this one `
-      + "in a signed intake summary as not recorded and denies the calls under that limit until it recovers");
+  // One count per record (an OTLP request carries many); the first refusal stops the rest, and nothing of the request is stored.
+  for (let counted = 0; counted < (input.count ?? 1); counted += 1) {
+    const refused = observationCounters.admit(intakeScope({ ...input, registered }), input.now, write,
+      input.toolUseId ? { toolUseId: input.toolUseId, actionId: PROVIDERS[input.provider].actionId(input.sessionId, input.toolUseId) } : undefined);
+    if (refused !== null) {
+      throw new HookControlError("HOOK_CONTROL_RATE_LIMITED", 429, `${PROVIDERS[input.provider].label} observations are over AMC's ${refused} intake limit: AMC lists this one `
+        + "in a signed intake summary as not recorded and denies the calls under that limit until it recovers");
+    }
   }
   return { registered };
 }
@@ -225,7 +238,7 @@ export function recordClaudeCodeStop(input: { workspace: string; authenticatedAg
   const sessionSha256 = claudeSessionSha256(parsed.session_id);
   const record = { kind: "amc.claude-code-turn-end/v1", agentId: input.authenticatedAgentId, sessionSha256, reported: { by: "claude-code",
     promptId: parsed.prompt_id ?? null, stopHookActive: parsed.stop_hook_active } };
-  return recordHookAudit({ workspace: input.workspace, now, sessionSha256, body: record, meta: { turnEndSchemaVersion: 1, ...record },
+  return recordHookAudit({ workspace: input.workspace, now, sessionSha256, body: record, meta: { turnEndSchemaVersion: 1, ...PROVIDER_REPORTED, ...record },
     id: observationId("ccstop", [input.authenticatedAgentId, sessionSha256, parsed.prompt_id, parsed.stop_hook_active], now),
     receipt: { kind: "work_accepted", providerId: "hook-session:claude-code" }, underRegistration: registered });
 }
@@ -248,7 +261,7 @@ const decisionMetaSchema = z.object({
 });
 
 /** The verified decision row of `provider`'s action `actionId`, or null when there is none or it does not verify. */
-function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, provider: Exclude<ObservedProvider, "codex">):
+function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, provider: Exclude<ObservedProvider, "codex" | "otlp">):
   (z.infer<typeof decisionMetaSchema> & { eventId: string }) | null {
   const eventId = decisionEventId(agentId, provider, actionId);
   try {
@@ -264,7 +277,7 @@ function verifiedDecision(ledger: Ledger, agentId: string, actionId: string, pro
 /** One tool call's outcome as the provider's hook reports it, in AMC's terms. */
 export interface ReportedOutcome {
   /** A provider whose outcomes follow an AMC control decision; Codex has none. */
-  provider: Exclude<ObservedProvider, "codex">;
+  provider: Exclude<ObservedProvider, "codex" | "otlp">;
   /** The provider's event name (PostToolUse, PostToolUseFailure, tool_result). */
   event: string;
   sessionId: string;
@@ -328,7 +341,7 @@ export function recordPostExecution(input: { workspace: string; authenticatedAge
       decisionReceiptSha256: reported.decisionReceiptSha256, leaseId: input.lease?.leaseId ?? null },
     ingressRecorded: reported.ingressRecorded,
   };
-  const audit = { workspace: input.workspace, now, sessionSha256, meta: { postExecutionSchemaVersion: 1, ...record }, body: record, provider,
+  const audit = { workspace: input.workspace, now, sessionSha256, meta: { postExecutionSchemaVersion: 1, ...PROVIDER_REPORTED, ...record }, body: record, provider,
     receipt: { kind: "tool_result" as const, providerId: `hook-post-execution:${provider}` }, underRegistration: registered };
   const prefix = `${PROVIDERS[provider].prefix}post`;
   if (bindingRefusal !== null) {

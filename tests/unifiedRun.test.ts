@@ -135,4 +135,33 @@ describe("unified run", () => {
     expect(output).toContain("::warning title=AMC Watch::no alerting");
     expect(output).toContain("::notice title=AMC Overall Grade::D (63/100)");
   });
+
+  // 2026-11-15: in a fresh folder amc run printed "Overall Grade: F (15/100)" with Vault "A+" while bare amc said the score was empty.
+  test("shows no grade when AMC has seen nothing to assess", async () => {
+    const { renderUnifiedResult, renderCIAnnotations } = await import("../src/unified/unifiedRenderer.js");
+    const result = {
+      agentId: "default",
+      ts: Date.now(),
+      modules: [
+        { name: "Score", icon: "①", grade: "F" as LetterGrade, score: 0, summary: "235 questions scored, 235 below target", issues: ["Skills: 0.0/5.0"] },
+        { name: "Vault", icon: "④", grade: "A+" as LetterGrade, score: 100, summary: "vault ready", issues: [] },
+      ],
+      overallGrade: "F" as LetterGrade,
+      overallScore: 15,
+      nothingToAssess: true,
+      surfaceCoverage: { evaluated: 2, total: 8, pending: [], failed: [] },
+      topFixes: [{ action: "Improve weakest dimensions", impact: "Score → F (+22.5 overall)", command: "amc improve" }],
+    };
+    const text = renderUnifiedResult(result).replace(/\x1b\[[0-9;]*m/g, "");
+    expect(text).toContain("Overall Grade:  none yet");
+    expect(text).toContain("nothing to grade");
+    expect(text).not.toMatch(/15\/100|A\+|Grade:\s+F/);
+    expect(text.match(/not graded yet/g)).toHaveLength(2);
+    expect(text).toContain("amc improve");
+    expect(text).not.toMatch(/\+22\.5|grade impact/);
+    const ci = renderCIAnnotations(result);
+    expect(ci).toContain("::notice title=AMC Overall Grade::none yet");
+    expect(ci).not.toMatch(/::error|15\/100/);
+    expect(renderUnifiedResult({ ...result, nothingToAssess: false }).replace(/\x1b\[[0-9;]*m/g, "")).toContain("(15/100)");
+  });
 });

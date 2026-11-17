@@ -39,9 +39,10 @@ export interface PostureScorecard {
   schemaVersion: "amc.posture-scorecard.v1";
   scannedAt: number;
   root: string;
-  overallLevel: PostureLevel;
-  overallScore: number;
-  verdict: "CLEAN" | "REVIEW" | "BLOCK";
+  /** CLI-06: null, with verdict NOT_ASSESSED and no dimensions, when the path holds no agent or MCP configuration. */
+  overallLevel: PostureLevel | null;
+  overallScore: number | null;
+  verdict: "CLEAN" | "REVIEW" | "BLOCK" | "NOT_ASSESSED";
   dimensions: PostureDimension[];
   topActions: string[];
   receiptHash: string;
@@ -113,9 +114,10 @@ export function buildPostureScorecard(params: { root: string; now: number }): Po
 
   // 1. Agent config
   const cfg = scanAgentConfig({ root, now: params.now });
-  dims.push({
+  // CLI-06: no agent configuration is no agent-config grade (an MCP config alone still grades the rest).
+  if (cfg.securityLevel !== null && cfg.securityScore !== null) dims.push({
     id: "agent-config",
-    level: cfg.securityLevel as PostureLevel,
+    level: cfg.securityLevel,
     score: cfg.securityScore,
     status: statusFor(cfg.securityScore),
     summary: `${cfg.filesScanned.length} config file(s); ${cfg.findings.length} finding(s); ${cfg.riskLabel}.`
@@ -137,6 +139,12 @@ export function buildPostureScorecard(params: { root: string; now: number }): Po
 
   // 3. MCP trust
   const mcpConfigs = findMcpConfigs(root);
+  if (cfg.filesScanned.length === 0 && mcpConfigs.length === 0) {
+    // Nothing an agent runs with is here: no level, no score, and no dimension graded on absence alone.
+    const body = { schemaVersion: "amc.posture-scorecard.v1" as const, scannedAt: params.now, root, overallLevel: null, overallScore: null,
+      verdict: "NOT_ASSESSED" as const, dimensions: [], topActions: cfg.recommendations.slice(0, 1) };
+    return { ...body, receiptHash: sha256Hex(canonicalize({ ...body, root: "." })) };
+  }
   if (mcpConfigs.length > 0) {
     const receipt = buildMcpTrustReceipt({ targets: mcpConfigs, generatedAt: params.now });
     const mcpScore = receipt.aggregateRisk === "CLEAN" ? 90 : receipt.aggregateRisk === "REVIEW" ? 55 : 20;

@@ -75,6 +75,8 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/assurance/assuranceRunner.ts", why: "assurance run bookkeeping; scenario results are `test` rows, untagged" },
   { module: "src/assurance/evidenceWriters.ts", why: "assurance run start and abort bookkeeping" },
   { module: "src/redteam/runner.ts", why: "red-team attack bookkeeping (SH-TRUST-03): an unmeasured attack binds to no question and can never raise a level" },
+  { module: "src/redteam/effectRow.ts", why: "red-team bookkeeping for effect-graded rows moved out of runner.ts (rejected receipts, unmeasured attacks); untagged, never maturity evidence" },
+  { module: "src/redteam/adaptiveRow.ts", why: "red-team and assurance bookkeeping for attacker-model rounds (injected text, rejected receipts, unmeasured attacks); untagged, never maturity evidence" },
   { module: "src/auth/userAudit.ts", why: "console account changes (LIVE-VAULT-09); operator account bookkeeping, untagged, never maturity evidence" },
   { module: "src/assurance/packs/mobilityFunctionalSafetyPack.ts", why: "failure findings; a finding against the agent cannot raise its level" },
   { module: "src/bridge/bridgeAuth.ts", why: "lease refusal; read only by score caps" },
@@ -88,11 +90,13 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/dataflow/providerAdmission.ts", why: "protected-data admission records (P2-02) for native, gateway and bridge requests: aggregate classes and counts only, AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/dataflow/purposePolicy.ts", why: "protected-data refusals (P2-02): code, reason and registry identifiers only; AMC enforcement bookkeeping, never maturity evidence" },
   { module: "src/dataflow/redactingSession.ts", why: "redaction receipts (P2-02): classes, detector names, counts and the redacted digest only; AMC enforcement bookkeeping, never maturity evidence" },
+  { module: "src/enforce/inputGuardProfile.ts", why: "operator switched the untrusted-input guard (on, log-only, off): configuration bookkeeping, untagged, never maturity evidence" },
   { module: "src/diagnostic/audits.ts", why: "the diagnostic's own derived findings; excluded from scoring and read as penalties" },
   { module: "src/diagnostic/runner.ts", why: "the diagnostic's own findings about a run" },
   { module: "src/drift/driftDetector.ts", why: "drift regressions and freezes; they cap scores" },
   { module: "src/enforce/actionEvidenceLogic.ts", why: "policy evidence-logic changes; untagged, so they bind to no question" },
   { module: "src/enforce/scopeTemplates.ts", why: "policy scope template applied; untagged, so it binds to no question" },
+  { module: "src/fleet/fleetActions.ts", why: "a person froze an agent by hand (who, which agent, why); operator control bookkeeping, untagged, never maturity evidence" },
   { module: "src/eoc/flows.ts", why: "education, ownership and commitment bookkeeping" },
   { module: "src/eval/evalImporters.ts", why: "import bookkeeping and imported failures; self-reported by provenance" },
   { module: "src/eval/suiteRunner.ts", why: "eval suite run records (SH-OBS-04): the results digest a gate checks; eval bookkeeping, untagged, never maturity evidence" },
@@ -144,6 +148,8 @@ export const NON_MATURITY_AUDIT_MODULES: ReadonlyArray<{ module: string; why: st
   { module: "src/tools/toolEvidence.ts", why: "authorization records (P1-02) for AMC enforcement; untagged, so they bind to no question" },
   { module: "src/watch/continuousMonitor.ts", why: "score-drop alert about a prior score" },
   { module: "src/watch/observabilityBridge.ts", why: "observability ingestion; external reports are self-reported" },
+  { module: "src/watch/otlpReceiver.ts", why: "OTLP telemetry an agent runtime sends about itself; self-reported, digests only, never maturity evidence" },
+  { module: "src/bridge/sessionObservations.ts", why: "session hook reports in Claude Code's or Codex's own words; self-reported, never maturity evidence" },
   { module: "src/workspaces/workspaceRouter.ts", why: "workspace override refusal" }
 ];
 
