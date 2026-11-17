@@ -5,7 +5,7 @@
  */
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { afterAll, afterEach, describe, expect, test, vi } from "vitest";
 import { applyGuardrailControlProfile } from "../src/enforce/guardrailControlState.js";
 import { assertInputGuardAuthority, type InputGuardMode } from "../src/enforce/inputGuardProfile.js";
@@ -33,6 +33,11 @@ afterAll(() => {
 const RANK = { allow: 0, ask: 1, steer: 2, deny: 3 } as const;
 /** Where cat really opens: AMC allowlists a pure Bash binary by its real path, and /bin is a link to usr/bin on Linux. */
 const CAT = realpathSync("/bin/cat");
+/**
+ * The guard knows cat only in a system folder. Where the system's cat is a link into a folder it does not list, AMC
+ * sees a program it does not know and says so; the session is labelled untrusted either way.
+ */
+const CAT_READ = ["/bin", "/usr/bin", "/usr/lib/cargo/bin/coreutils"].includes(dirname(CAT)) ? "a file outside this project (Bash: cat)" : "the output of a program that can reach outside this project (Bash: cat)";
 
 /** A Claude Code control workspace whose signed ToolHub config lets a fetch, curl and a (private) read through today. */
 function workspaceWith(mode: InputGuardMode, readIsPrivate = true): string {
@@ -187,6 +192,9 @@ describe("untrusted-input guard rules", () => {
       expect(at("process.spawn", { binary: "cat", argv: ["notes.txt"] })).toMatchObject({ untrusted: null, outbound: false });
       expect(at("process.spawn", { binary: "./cat", argv: [] })).toMatchObject({ outbound: true });
       expect(at("process.spawn", { binary: "/bin/cat", argv: [] })).toMatchObject({ outbound: false, untrusted: null });
+      // Ubuntu's Rust coreutils folder is a system folder too; a folder beside it is not.
+      expect(at("process.spawn", { binary: "/usr/lib/cargo/bin/coreutils/cat", argv: [] })).toMatchObject({ outbound: false, untrusted: null });
+      expect(at("process.spawn", { binary: "/usr/lib/cargo/bin/cat", argv: [] })).toMatchObject({ outbound: true });
       expect(at("process.spawn", { binary: "find", argv: [".", "-exec", "sh", "{}", ";"] }).outbound).toBe(true);
       expect(at("process.spawn", { binary: "cat", argv: ["~/.ssh/id_rsa"] })).toMatchObject({ untrusted: "a file outside this project (T: cat)", private: "a secret file (T: cat)" });
       expect(at("process.spawn", { binary: "node", argv: ["x.js"] })).toMatchObject({ outbound: true });
@@ -254,7 +262,7 @@ describe("untrusted-input guard rules", () => {
       writeFileSync(join(outside, "page.txt"), "text from elsewhere");
       symlinkSync(join(outside, "page.txt"), join(workspace, "hostslink"));
       expect(call(workspace, session, "PreToolUse-bash", { command: `'${CAT}' '${join(workspace, "hostslink")}'`, description: "read" }).requestedDecision).toBe("allow");
-      expect(curl(workspace, session).reason).toContain("This session earlier read a file outside this project (Bash: cat)");
+      expect(curl(workspace, session).reason).toContain(`This session earlier read ${CAT_READ}`);
     } finally {
       rmSync(outside, { recursive: true, force: true });
     }
