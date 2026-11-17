@@ -96,12 +96,12 @@
       <div class="wrap">
         <header class="band-head">
           <h2>Install, then type amc</h2>
-          <p>The current source build, for macOS and Linux. It needs git and Node.js 20 or newer (tested on 22 and 24) with Corepack, which Node.js 25 and later no longer include.</p>
+          <p>The current source build, for macOS and Linux. It needs git and Node.js 20, 22 or 24 (tested on 22 and 24; 25 and later lack Corepack, which the build needs).</p>
         </header>
         <pre class="cmd" tabindex="0"><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
         <div class="prose lite-prose">
           <p><code>amc</code> shows one menu with what can work on your machine: Watch Claude Code as it works and Watch Codex as it works (each once you are signed in to it), Chat with a model (when a provider key is set), Try a demo chat (no account or key needed), Build an agent for my industry (A4 Forge preview), Open the console in my browser, and Just show my score.</p>
-          <p>It fetches AMC from GitHub, builds it on your computer and puts <code>amc</code> on your PATH; open a new terminal and type <code>amc</code>. This address serves the script only after the website is published; until then, build by hand as shown in <a href="docs/getting-started.html#install">Getting started</a>. On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same, but it has not been tested on a real Windows machine.</p>
+          <p>It fetches AMC from GitHub, builds it on your computer and puts <code>amc</code> on your PATH (the list of folders your terminal looks in, so you can type <code>amc</code> in any folder); open a new terminal and type <code>amc</code>. If the command says the address is not found, build by hand as shown in <a href="docs/getting-started.html#install">Getting started</a>. On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same, but it has not been tested on a real Windows machine.</p>
           <p>The source build is not released yet (the source reports version 1.2.0). The release installers (<code>curl -fsSL https://agentmaturity.co/install.sh | sh</code>, or <code>irm https://agentmaturity.co/install.ps1 | iex</code> on Windows) and npm give the older published 1.1.1 release. It has no menu, no A4 Forge, no Claude Code or Codex sign-in, and its Industry Packs are still behind the earlier licence gate.</p>
           <p><strong>On a first run</strong> a report can be signed and <code>VALID</code> and still say <code>INSUFFICIENT_EVIDENCE</code>. That is normal for a new folder. A signature shows who wrote a report and that it has not changed, not that it is true or that there is enough evidence behind it.</p>
         </div>

@@ -17,7 +17,7 @@
 curl -fsSL https://agentmaturity.co/install-source.sh | sh
 Pin a tag or commit: curl -fsSL https://agentmaturity.co/install-source.sh | sh -s -- --ref <tag or full commit id>
 
-Needs git and Node.js (>=20, tested on 22 and 24) with Corepack (Node.js 25 and later do not include Corepack). The script builds AMC from GitHub into ~/.amc-source and puts amc on the PATH. Three limits: the address serves the script only after the website is published (until then: git clone the repository, then pnpm install --frozen-lockfile && pnpm run build && npm link); install.sh below installs the older published 1.1.1; the Windows twin (irm https://agentmaturity.co/install-source.ps1 | iex) has not been tested on Windows. The source build is unreleased and reports version 1.2.0.
+Needs git and Node.js 20, 22 or 24 (tested on 22 and 24; 25 and later lack Corepack, which the build needs). The script builds AMC from GitHub into ~/.amc-source and puts amc on the PATH. Three limits: if the address is not found, build by hand (git clone the repository, then pnpm install --frozen-lockfile && pnpm run build && npm link); install.sh below installs the older published 1.1.1; the Windows twin (irm https://agentmaturity.co/install-source.ps1 | iex) has not been tested on Windows. The source build is unreleased and reports version 1.2.0.
 
 Published 1.1.1 release (older; no menu, no vendor sign-in, Industry Packs still behind the earlier licence gate):
 macOS/Linux: curl -fsSL https://agentmaturity.co/install.sh | sh

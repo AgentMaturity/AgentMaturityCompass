@@ -699,7 +699,7 @@ function showWelcome() {
           <div class="welcome-install-option">
             <div class="welcome-platform">Current source build, macOS and Linux</div>
             <div class="welcome-command"><span>$</span> curl -fsSL https://agentmaturity.co/install-source.sh | sh</div>
-            <p class="welcome-note">This address serves the script only after the website is published; until then, build by hand as <a href="getting-started.html#install">Getting started</a> shows. On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same but has not been tested on a real Windows machine.</p>
+            <p class="welcome-note">Needs git and Node.js 20, 22 or 24. If the command says the address is not found, build by hand as <a href="getting-started.html#install">Getting started</a> shows. On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same but has not been tested on a real Windows machine.</p>
           </div>
           <div class="welcome-install-option">
             <div class="welcome-platform">Published 1.1.1 release (older)</div>

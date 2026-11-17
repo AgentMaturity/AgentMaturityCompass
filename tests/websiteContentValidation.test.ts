@@ -106,8 +106,11 @@ describe("website hero truth", () => {
     const install = page.match(/<section id="install"[\s\S]*?<\/section>/)?.[0] ?? "";
     expect(read("README.md")).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
     expect(install).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
-    // The three limits README gives: the address waits for publication, install.sh is 1.1.1, Windows is untested.
-    expect(install).toContain("only after the website is published");
+    // The three limits: a by-hand build if the address is not found, install.sh is 1.1.1, Windows is untested.
+    // Changed on purpose: "only after the website is published" made no sense on the published page.
+    expect(install).toContain("If the command says the address is not found, build by hand");
+    expect(install).not.toContain("only after the website is published");
+    expect(install).toContain("so you can type <code>amc</code> in any folder");
     expect(install).toContain("installs the published 1.1.1");
     expect(install).toContain("has not been tested on a real Windows machine");
     // Every "choose: <line>" and "choose <line>." the page prints must be a line the amc menu really shows.

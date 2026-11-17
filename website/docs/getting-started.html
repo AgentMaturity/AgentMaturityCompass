@@ -90,8 +90,8 @@
         <h2 id="prerequisites">What you need</h2>
         <ul>
           <li><strong>macOS or Linux.</strong> The source build has not been tested on Windows.</li>
-          <li><strong>Node.js 20 or newer.</strong> AMC is tested on Node.js 22 and 24. <a href="https://nodejs.org" target="_blank" rel="noopener">Get Node.js</a>.</li>
-          <li><strong>Corepack and git.</strong> Corepack comes with Node.js 20, 22 and 24 and gives AMC the pnpm it builds with. Node.js 25 and later no longer include it, so install 22 or 24.</li>
+          <li><strong>Node.js 20, 22 or 24.</strong> AMC is tested on Node.js 22 and 24; Node.js 25 and later lack Corepack (next line). <a href="https://nodejs.org" target="_blank" rel="noopener">Get Node.js</a>.</li>
+          <li><strong>Corepack and git.</strong> Corepack comes with Node.js 20, 22 and 24 and gives AMC the pnpm it builds with.</li>
         </ul>
         <pre><code>node --version
 git --version</code></pre>
@@ -99,9 +99,9 @@ git --version</code></pre>
         <h2 id="install">Install AMC</h2>
         <p>The current version is the source build. It is not released yet, and the source reports version 1.2.0. On macOS or Linux, one command installs it:</p>
         <pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
-        <p>It fetches AMC from GitHub, builds it on your computer (a few minutes, no administrator password) and puts <code>amc</code> on your PATH. It prints the commit it built. Open a new terminal afterwards. Run the same command again to update; if an update fails to build, the version you had keeps working. To remove it, delete the folder <code>~/.amc-source</code> and the line marked <code># AMC source install</code> in your shell profile. To pin a tag or commit, add <code>-s -- --ref &lt;tag or full commit id&gt;</code> after <code>sh</code>.</p>
-        <p>Three limits. This address serves the script only after the website is published. The older <code>install.sh</code> installs the published 1.1.1 (see below). On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same, but it has not been tested on a real Windows machine.</p>
-        <p>Until the website is published, build by hand:</p>
+        <p>It fetches AMC from GitHub, builds it on your computer (a few minutes, no administrator password) and puts <code>amc</code> on your PATH (the list of folders your terminal looks in, so you can type <code>amc</code> in any folder). It prints the commit it built. Open a new terminal afterwards. Run the same command again to update; if an update fails to build, the version you had keeps working. To remove it, delete the folder <code>~/.amc-source</code> and the line marked <code># AMC source install</code> in your shell profile. To pin a tag or commit, add <code>-s -- --ref &lt;tag or full commit id&gt;</code> after <code>sh</code>.</p>
+        <p>Three limits. If the command says the address is not found, build by hand as shown just below. The older <code>install.sh</code> installs the published 1.1.1 (see below). On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same, but it has not been tested on a real Windows machine.</p>
+        <p>To build by hand instead:</p>
         <pre><code>corepack enable
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
