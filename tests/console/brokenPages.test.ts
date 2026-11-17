@@ -228,3 +228,13 @@ describe("load failures and untrusted text (2026-11-14 source audit)", () => {
     expect(ops).toContain("if (confirmWhat && !confirmPress(event.currentTarget, confirmWhat)) return;");
   });
 });
+
+describe("Records wording", () => {
+  test("cards, columns and buttons say record, not proof, and buttons start with a capital", () => {
+    const assurance = readFileSync("src/console/assets/assurance.js", "utf8");
+    expect(app).not.toMatch(/Enforce Resource Proof|Finding Proofs|<th>Proof<\/th>|>activate changes<|>rollback previous</);
+    expect(assurance).not.toContain("<th>Proof</th>");
+    expect(app).toContain('card("Enforce resource records"');
+    expect(app).toContain(">Roll back to previous</button>");
+  });
+});

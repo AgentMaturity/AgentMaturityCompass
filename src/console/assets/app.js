@@ -793,7 +793,7 @@ async function renderEvidence() {
           <button id="evidenceWriteMemory" data-roles="OWNER,OPERATOR" class="secondary">Write memory</button>
         </div>
       `)}
-      ${card("Enforce Resource Proof", `
+      ${card("Enforce resource records", `
         <div class="lifecycle-summary">
           <div><span class="muted">Active</span><strong>${htmlEscape(shortId(resourceStatusData?.active?.manifestId, 18))}</strong></div>
           <div><span class="muted">Previous</span><strong>${htmlEscape(shortId(resourceStatusData?.previous?.manifestId, 18))}</strong></div>
@@ -819,8 +819,8 @@ async function renderEvidence() {
           <button id="evidenceValidateResources" class="secondary">Check the gates</button>
           <button id="evidenceApplyDryRun" data-roles="OWNER" class="secondary">Preview apply</button>
           <button id="evidenceRestoreDryRun" data-roles="OWNER" class="secondary">Preview restore</button>
-          <button id="evidenceActivateResources" data-roles="OWNER" ${resourceStatusData?.state === "DRIFTED" ? "" : "disabled"}>activate changes</button>
-          <button id="evidenceRollbackResources" data-roles="OWNER" ${resourceStatusData?.rollbackTarget?.manifestId ? "" : "disabled"}>rollback previous</button>
+          <button id="evidenceActivateResources" data-roles="OWNER" ${resourceStatusData?.state === "DRIFTED" ? "" : "disabled"}>Activate changes</button>
+          <button id="evidenceRollbackResources" data-roles="OWNER" ${resourceStatusData?.rollbackTarget?.manifestId ? "" : "disabled"}>Roll back to previous</button>
         </div>
       `)}
       ${card("Neutral Import", `
@@ -882,8 +882,8 @@ async function renderEvidence() {
       ${card("Observability Records", `
         <div class="scroll"><table><thead><tr><th>Record</th><th>Run</th><th>Status</th><th>Created</th></tr></thead><tbody>${renderEvidenceRows(observabilityRecords, "observability", agentId)}</tbody></table></div>
       `)}
-      ${card("Finding Proofs", `
-        <div class="scroll"><table><thead><tr><th>Proof</th><th>Run</th><th>Surface</th><th>Status</th></tr></thead><tbody>${renderEvidenceRows(proofs, "proof", agentId)}</tbody></table></div>
+      ${card("Finding records", `
+        <div class="scroll"><table><thead><tr><th>Record</th><th>Run</th><th>Surface</th><th>Status</th></tr></thead><tbody>${renderEvidenceRows(proofs, "proof", agentId)}</tbody></table></div>
       `)}
       ${card("Lifecycle Receipts", `
         <div class="scroll"><table><thead><tr><th>Receipt</th><th>Run</th><th>Type</th><th>Status</th></tr></thead><tbody>${renderEvidenceRows(lifecycleReceipts, "lifecycle-receipt", agentId)}</tbody></table></div>

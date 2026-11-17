@@ -127,7 +127,7 @@ export async function renderAssurancePage(params) {
       <p class="muted">Exploit confirmation is fail-closed. It requires an explicit signed scope and exports hashes, signal refs, and receipts instead of exploit instructions.</p>
       <div class="scroll">
         <table>
-          <thead><tr><th>Proof</th><th>Status</th><th>Finding</th><th>Technique</th><th>Mode</th><th>Signals</th></tr></thead>
+          <thead><tr><th>Record</th><th>Status</th><th>Finding</th><th>Technique</th><th>Mode</th><th>Signals</th></tr></thead>
           <tbody>${renderConfirmationProofRows(confirmationProofs) || "<tr><td colspan='6' class='muted'>No confirmation proofs yet.</td></tr>"}</tbody>
         </table>
       </div>
