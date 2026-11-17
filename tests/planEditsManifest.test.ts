@@ -94,6 +94,8 @@ describe("committed plan-edits manifest (D-15)", () => {
     expect(validatePlanEdits(manifest([lane]))).toEqual([lane]);
     const cli2 = entry({ issue: "L-CLI2-1115", archivePath: "unused-code/plan-edits/L-CLI2-1115/src/a.ts.landed" });
     expect(validatePlanEdits(manifest([cli2]))).toEqual([cli2]);
+    const pages = entry({ issue: "L-CONSOLE-PAGES-1115", archivePath: "unused-code/plan-edits/L-CONSOLE-PAGES-1115/src/a.ts.landed" });
+    expect(validatePlanEdits(manifest([pages]))).toEqual([pages]);
     const bad: Array<[unknown, string]> = [
       [{ ...manifest([]), schemaVersion: 2 }, "header"],
       [{ ...manifest([]), decision: "D-14" }, "header"],

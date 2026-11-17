@@ -598,6 +598,13 @@
       "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d"
     },
     {
+      "path": "src/lifecycle/lifecycleRunArtifact.ts",
+      "issue": "L-CONSOLE-PAGES-1115",
+      "baseCommit": "f093c7918962c67511f5f908aac280730ab8cb08",
+      "archivePath": "unused-code/plan-edits/L-CONSOLE-PAGES-1115/src/lifecycle/lifecycleRunArtifact.ts.landed",
+      "sha256": "9d18ddef8603dcb1052e62ae40ca5c553e2d5620fb6fa19b02f95effa19d1d03"
+    },
+    {
       "path": "src/lifecycle/signedControlJournal.ts",
       "issue": "P0-27",
       "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
