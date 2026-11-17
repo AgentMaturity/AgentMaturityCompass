@@ -91,18 +91,22 @@
         <ul>
           <li><strong>macOS or Linux.</strong> The source build has not been tested on Windows.</li>
           <li><strong>Node.js 20 or newer.</strong> AMC is tested on Node.js 22 and 24. <a href="https://nodejs.org" target="_blank" rel="noopener">Get Node.js</a>.</li>
-          <li><strong>pnpm and git.</strong> <code>corepack enable</code> turns on the pnpm that comes with Node.js.</li>
+          <li><strong>Corepack and git.</strong> Corepack comes with Node.js 20, 22 and 24 and gives AMC the pnpm it builds with. Node.js 25 and later no longer include it, so install 22 or 24.</li>
         </ul>
         <pre><code>node --version
-git --version
-corepack enable</code></pre>
+git --version</code></pre>
 
         <h2 id="install">Install AMC</h2>
-        <p>The current version is the source build. It is not released yet, and the source reports version 1.2.0.</p>
-        <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
+        <p>The current version is the source build. It is not released yet, and the source reports version 1.2.0. On macOS or Linux, one command installs it:</p>
+        <pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
+        <p>It fetches AMC from GitHub, builds it on your computer (a few minutes, no administrator password) and puts <code>amc</code> on your PATH. It prints the commit it built. Open a new terminal afterwards. Run the same command again to update; if an update fails to build, the version you had keeps working. To remove it, delete the folder <code>~/.amc-source</code> and the line marked <code># AMC source install</code> in your shell profile. To pin a tag or commit, add <code>-s -- --ref &lt;tag or full commit id&gt;</code> after <code>sh</code>.</p>
+        <p>Three limits. This address serves the script only after the website is published. The older <code>install.sh</code> installs the published 1.1.1 (see below). On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same, but it has not been tested on a real Windows machine.</p>
+        <p>Until the website is published, build by hand:</p>
+        <pre><code>corepack enable
+git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</code></pre>
-        <p><code>npm link</code> makes the <code>amc</code> command available everywhere. Check it:</p>
+        <p><code>npm link</code> makes the <code>amc</code> command available everywhere. Either way, check it:</p>
         <pre><code>amc --version
 amc doctor</code></pre>
         <p><code>amc --version</code> prints <code>1.2.0</code>. In a folder AMC has not set up yet, <code>amc doctor</code> checks only the install and ends with "CLI install checks passed".</p>
@@ -140,7 +144,7 @@ amc user init --username &lt;you&gt;   # new workspace only: the first console l
         <p><code>amc up</code> starts AMC and its console, called the Compass Console, and prints the address to open. The first time, it asks for a passphrase for the folder's vault, the store of keys AMC signs records with. Then sign in to the Compass Console at the address <code>amc up</code> printed. If the workspace already has logins, an owner adds yours with <code>amc user add</code>. <code>amc down</code> stops AMC again.</p>
 
         <h2 id="score">Your score</h2>
-        <p>AMC scores an agent from records of what it did, in five areas, on a scale from L0 to L5. Today the highest level AMC gives is L2, and only behaviour AMC observed itself can reach it. What an agent or its makers report about themselves reaches L1 at most. A score is not a certificate and does not show that an agent meets any law. <a href="methodology.html">How the score works</a>.</p>
+        <p>AMC scores an agent from records of what it did, in five areas, on a scale from L0 to L5. Today the highest level AMC gives is L2, and only behaviour AMC observed itself can reach it. 240 of the 244 questions cannot rise above L1 yet, and L3 to L5 are not evaluated. What an agent or its makers report about themselves reaches L1 at most. A score is not a certificate and does not show that an agent meets any law. <a href="methodology.html">How the score works</a>.</p>
 
         <h2 id="surfaces">The eight tools</h2>
         <table>

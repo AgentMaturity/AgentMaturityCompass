@@ -698,13 +698,12 @@ function showWelcome() {
         <div class="welcome-install-grid">
           <div class="welcome-install-option">
             <div class="welcome-platform">Current source build, macOS and Linux</div>
-            <div class="welcome-command"><span>$</span> git clone https://github.com/AgentMaturity/AgentMaturityCompass.git</div>
-            <div class="welcome-command"><span>$</span> cd AgentMaturityCompass</div>
-            <div class="welcome-command"><span>$</span> pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</div>
+            <div class="welcome-command"><span>$</span> curl -fsSL https://agentmaturity.co/install-source.sh | sh</div>
+            <p class="welcome-note">This address serves the script only after the website is published; until then, build by hand as <a href="getting-started.html#install">Getting started</a> shows. On Windows, <code>irm https://agentmaturity.co/install-source.ps1 | iex</code> does the same but has not been tested on a real Windows machine.</p>
           </div>
           <div class="welcome-install-option">
             <div class="welcome-platform">Published 1.1.1 release (older)</div>
-            <p class="welcome-note">The one-line installers, <code>curl -fsSL https://agentmaturity.co/install.sh | sh</code> and <code>irm https://agentmaturity.co/install.ps1 | iex</code>, install the published 1.1.1 release. It has no menu, no A4 Forge and no Claude Code or Codex sign-in, so these guides describe the source build.</p>
+            <p class="welcome-note">The release installers, <code>curl -fsSL https://agentmaturity.co/install.sh | sh</code> and <code>irm https://agentmaturity.co/install.ps1 | iex</code>, install the published 1.1.1 release. It has no menu, no A4 Forge and no Claude Code or Codex sign-in, so these guides describe the source build.</p>
           </div>
         </div>
       </section>
@@ -749,11 +748,11 @@ function showWelcome() {
           </div>
         </a>
         <a class="feature-card-link" href="#EVIDENCE_TRUST" onclick="event.preventDefault();loadDoc('EVIDENCE_TRUST')">
-          <div class="feature-card-icon">proof</div>
+          <div class="feature-card-icon">records</div>
           <div class="feature-card-body">
             <h3>Evidence & Receipts</h3>
             <p>What AMC records, what a signature shows (who wrote a record and that it is unchanged, not that it is true) and when a score may back a claim.</p>
-            <span>Follow the proof chain →</span>
+            <span>Follow the chain of records →</span>
           </div>
         </a>
         <a class="feature-card-link" href="#EU_AI_ACT_COMPLIANCE" onclick="event.preventDefault();loadDoc('EU_AI_ACT_COMPLIANCE')">

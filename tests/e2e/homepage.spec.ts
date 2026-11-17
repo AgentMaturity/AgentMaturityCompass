@@ -74,7 +74,7 @@ test.describe('Homepage', () => {
   test('install section gives the source build first and the older release installers second', async ({ page }) => {
     const commands = page.locator('#install pre.cmd');
     await expect(commands).toHaveCount(2);
-    await expect(commands.nth(0)).toContainText('pnpm install --frozen-lockfile && pnpm run build && npm link');
+    await expect(commands.nth(0)).toContainText('curl -fsSL https://agentmaturity.co/install-source.sh | sh');
     await expect(commands.nth(1)).toContainText('curl -fsSL https://agentmaturity.co/install.sh | sh');
     await expect(commands.nth(1)).toContainText('irm https://agentmaturity.co/install.ps1 | iex');
     await expect(page.locator('#install .install-card').nth(1)).toContainText('1.1.1');

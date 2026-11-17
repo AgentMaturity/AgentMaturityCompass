@@ -83,8 +83,8 @@ describe("cross-surface AMC brand identity", () => {
     expect(docs).toContain("Build, run and check AI agents for regulated work.");
     expect(docs).not.toContain("Run one command");
     expect(docs).toContain("Evidence over claims.");
-    // The source build is the current way in; the one-line installers are shown as the older 1.1.1 release.
-    expect(docs).toContain("pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link");
+    // The source install is the current way in; the release installers are shown as the older 1.1.1 release.
+    expect(docs).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
     expect(docs).toContain("install the published 1.1.1 release");
     expect(docs).toContain("curl -fsSL https://agentmaturity.co/install.sh | sh");
     expect(docs).toContain("irm https://agentmaturity.co/install.ps1 | iex");

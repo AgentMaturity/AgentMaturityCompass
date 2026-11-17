@@ -104,8 +104,12 @@ describe("website hero truth", () => {
     expect(hero).not.toMatch(/No terminal|Free forever|Download 1\.1\.1/);
     expect(hero).toContain('href="#install"');
     const install = page.match(/<section id="install"[\s\S]*?<\/section>/)?.[0] ?? "";
-    expect(read("README.md")).toContain("pnpm install --frozen-lockfile && pnpm run build && npm link");
-    expect(install).toContain("pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link");
+    expect(read("README.md")).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
+    expect(install).toContain("curl -fsSL https://agentmaturity.co/install-source.sh | sh");
+    // The three limits README gives: the address waits for publication, install.sh is 1.1.1, Windows is untested.
+    expect(install).toContain("only after the website is published");
+    expect(install).toContain("installs the published 1.1.1");
+    expect(install).toContain("has not been tested on a real Windows machine");
     // Every "choose: <line>" and "choose <line>." the page prints must be a line the amc menu really shows.
     const named = [...page.matchAll(/then choose: ([^<\n]+)/g), ...page.matchAll(/menu, choose ([^.<]+)\./g)].map((m) => m[1].trim());
     expect(named).toEqual(expect.arrayContaining(["Try a demo chat", "Just show my score", "Build an agent for my industry"]));
