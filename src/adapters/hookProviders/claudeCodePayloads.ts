@@ -57,7 +57,7 @@ function schemas2_1_296() {
 /**
  * The schemas of each qualified release; a release qualifies only with a passing conformance receipt. 2.1.325 ships the
  * same tool input types (sdk-tools.d.ts) and passed the same conformance run with 2.1.296's payload schemas
- * (qualification/2026-11-16-watch/claude-code-conformance.json).
+ * (qualification/2026-11-16-P1-23-watch/claude-code-conformance.json).
  */
 export const CLAUDE_HOOK_SCHEMAS: Readonly<Record<string, ReturnType<typeof schemas2_1_296>>> = { "2.1.296": schemas2_1_296(), "2.1.325": schemas2_1_296() };
 export type ClaudeHookPayload = z.infer<ReturnType<typeof schemas2_1_296>["payload"]>;

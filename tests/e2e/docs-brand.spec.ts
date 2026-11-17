@@ -63,13 +63,16 @@ test.describe("AMC Docs brand shell", () => {
       viewportWidth: window.innerWidth,
       documentWidth: document.documentElement.scrollWidth,
       commands: Array.from(document.querySelectorAll<HTMLElement>(".welcome-command")).map(command => ({
+        text: command.textContent?.trim() ?? "",
         clientWidth: command.clientWidth,
         scrollWidth: command.scrollWidth
       }))
     }));
     expect(layout.documentWidth).toBe(layout.viewportWidth);
-    // The source build's three commands; the older installers are named in a sentence, not as commands.
-    expect(layout.commands).toHaveLength(3);
+    // The source build's one-line installer; the by-hand build and the older installers are named in sentences, not as commands.
+    expect(layout.commands.map(command => command.text)).toEqual([
+      "$ curl -fsSL https://agentmaturity.co/install-source.sh | sh"
+    ]);
     for (const command of layout.commands) {
       expect(command.scrollWidth).toBeLessThanOrEqual(command.clientWidth);
     }

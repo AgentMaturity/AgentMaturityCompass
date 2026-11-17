@@ -3,7 +3,7 @@
  * web fetch then curl asks; with a protected read too it denies; without an untrusted read today's decision stands;
  * log-only changes nothing; and with the guard on no decision is ever looser than with it off.
  */
-import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, afterEach, describe, expect, test, vi } from "vitest";
@@ -31,6 +31,8 @@ afterAll(() => {
 });
 
 const RANK = { allow: 0, ask: 1, steer: 2, deny: 3 } as const;
+/** Where cat really opens: AMC allowlists a pure Bash binary by its real path, and /bin is a link to usr/bin on Linux. */
+const CAT = realpathSync("/bin/cat");
 
 /** A Claude Code control workspace whose signed ToolHub config lets a fetch, curl and a (private) read through today. */
 function workspaceWith(mode: InputGuardMode, readIsPrivate = true): string {
@@ -38,7 +40,7 @@ function workspaceWith(mode: InputGuardMode, readIsPrivate = true): string {
   const tools = defaultToolsConfig();
   for (const tool of tools.tools.allowedTools) {
     if (tool.name === "http.fetch") Object.assign(tool, { actionClass: "READ_ONLY", allow: { hostAllowlist: ["example.com"] } });
-    if (tool.name === "process.spawn") Object.assign(tool, { actionClass: "READ_ONLY", requireExecTicket: false, allow: { binariesAllowlist: ["/usr/bin/curl", "/bin/echo", "/bin/cat", "/usr/bin/diff", "/usr/bin/grep"] } });
+    if (tool.name === "process.spawn") Object.assign(tool, { actionClass: "READ_ONLY", requireExecTicket: false, allow: { binariesAllowlist: ["/usr/bin/curl", "/bin/echo", CAT, "/usr/bin/diff", "/usr/bin/grep"] } });
     if (tool.name === "fs.read" && readIsPrivate) tool.labels = ["private-data"];
   }
   initToolsConfig(workspace, tools);
@@ -251,7 +253,7 @@ describe("untrusted-input guard rules", () => {
     try {
       writeFileSync(join(outside, "page.txt"), "text from elsewhere");
       symlinkSync(join(outside, "page.txt"), join(workspace, "hostslink"));
-      expect(call(workspace, session, "PreToolUse-bash", { command: `'/bin/cat' '${join(workspace, "hostslink")}'`, description: "read" }).requestedDecision).toBe("allow");
+      expect(call(workspace, session, "PreToolUse-bash", { command: `'${CAT}' '${join(workspace, "hostslink")}'`, description: "read" }).requestedDecision).toBe("allow");
       expect(curl(workspace, session).reason).toContain("This session earlier read a file outside this project (Bash: cat)");
     } finally {
       rmSync(outside, { recursive: true, force: true });

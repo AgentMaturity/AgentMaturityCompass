@@ -295,7 +295,8 @@ function personaCommands(persona, amc) {
   return [
     ["version", [amc, "--version"], "Version command must exit successfully."],
     ["help", [amc, "--help"], "Help command must exit successfully."],
-    ["full-score", [amc, "--agent", persona.agentId, "--json"], "Full-score command must exit successfully and return its JSON contract."],
+    // --yes: a fresh folder with no terminal is set up only on explicit consent (L-03, src/cli/firstRunGuards.ts).
+    ["full-score", [amc, "--yes", "--agent", persona.agentId, "--json"], "Full-score command must exit successfully and return its JSON contract."],
     ["domain-packs", [amc, "domain", "pack", "list", "--json"], "Domain catalog JSON is required."],
     ["runtime-create", [amc, "runtime", "create", "--run", `${persona.id}-runtime`, "--agent", persona.agentId, "--json"], "Runtime creation command must exit successfully."],
     ...persona.checks.map(([id, args, remediation]) => [id, [amc, ...args], remediation])

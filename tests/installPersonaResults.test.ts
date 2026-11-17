@@ -25,7 +25,7 @@ function fixture(role: keyof typeof roleChecks = "solo", output: Record<string, 
   let tick = 1000;
   vi.spyOn(Date, "now").mockImplementation(() => tick);
   const execute = (command: string, args: string[], options: { cwd: string }) => {
-    const id = command === "npm" ? "package-install" : args[0] === "--agent" ? "full-score" : args[0] === "domain" ? "domain-packs"
+    const id = command === "npm" ? "package-install" : args[0] === "--yes" ? "full-score" : args[0] === "domain" ? "domain-packs"
       : args[0] === "strategy" ? "strategy-compare" : args[0] === "import" ? "neutral-import" : args.join(" ");
     calls.push(id); tick += id === "package-install" ? 200 : 700;
     if (command === "npm" && exposeBin) {
@@ -198,7 +198,7 @@ child.spawnSync = (command, args, options) => {
     mkdirSync(join(options.cwd, "node_modules", ".bin"), { recursive: true });
     writeFileSync(join(options.cwd, "node_modules", ".bin", "amc"), "fixture never executed");
   }
-  const data = args[0] === "--agent" ? ${JSON.stringify(score)} : args[0] === "domain" ? ${JSON.stringify(packs)}
+  const data = args[0] === "--yes" ? ${JSON.stringify(score)} : args[0] === "domain" ? ${JSON.stringify(packs)}
     : args[0] === "strategy" ? (mode === "strategy-missing" ? null : { run: { recommendedStrategyId: "local-safe" } })
     : args[0] === "import" ? { plan: { status: "ready" } } : {};
   return { status: 0, stdout: JSON.stringify(data), stderr: "" };
