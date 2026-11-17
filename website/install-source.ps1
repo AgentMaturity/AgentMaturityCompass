@@ -133,12 +133,17 @@ function Install-AmcSource {
   # cmd looks for a bare "node" in the current folder before PATH, so the launcher names the checked Node.js by its
   # full path. cmd reads a batch file in the console code page, which can change, so only an ASCII path is written
   # (anything else would turn into "?"); "%" is doubled so cmd does not expand it. The version check runs amc.cmd.
+  # It runs dist\amc.js, the fast-start entry, when the build has it (a build of an older ref has only cli.js).
   if ($Node.Source -notmatch '^[\x20-\x7E]+$') {
     Stop-AmcInstall "The Node.js found is in a folder whose name has letters outside plain English ($($Node.Source)), and the amc launcher cannot name it safely. Install Node.js 22 or 24 from https://nodejs.org (it goes to Program Files) and run this again."
   }
   $NodeCmd = $Node.Source -replace '%', '%%'
   $Launcher = @(
     "@if not exist `"$NodeCmd`" goto gone",
+    "@if not exist `"%~dp0..\current\dist\amc.js`" goto slow",
+    "@`"$NodeCmd`" `"%~dp0..\current\dist\amc.js`" %*",
+    "@exit /b %errorlevel%",
+    ":slow",
     "@`"$NodeCmd`" `"%~dp0..\current\dist\cli.js`" %*",
     "@exit /b %errorlevel%",
     ":gone",

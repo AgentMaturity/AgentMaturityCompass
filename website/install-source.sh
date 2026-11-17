@@ -144,7 +144,10 @@ amc_source_install() {
     printf '[ -x %s ] || { printf '\''%%s\\n'\'' %s %s >&2; exit 1; }\n' "$(quote "$node_found")" \
       "$(quote "The Node.js AMC was installed with is gone: $node_found")" \
       "$(quote "Run the AMC install command again to use the Node.js you have now.")"
-    printf 'exec %s %s "$@"\n' "$(quote "$node_found")" "$(quote "$prefix/current/dist/cli.js")"
+    # dist/amc.js is the fast-start entry (it loads dist/cli.js for everything but --version); a build of an older
+    # ref has only cli.js.
+    printf 't=%s; [ -f "$t" ] || t=%s\n' "$(quote "$prefix/current/dist/amc.js")" "$(quote "$prefix/current/dist/cli.js")"
+    printf 'exec %s "$t" "$@"\n' "$(quote "$node_found")"
   } > "$prefix/bin/.amc-new"
   chmod 755 "$prefix/bin/.amc-new"
   mv -f -- "$prefix/bin/.amc-new" "$prefix/bin/amc"
