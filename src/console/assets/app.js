@@ -474,7 +474,7 @@ function renderOnboardingActivation(activation, agentId) {
             <strong>${htmlEscape(row.label || row.id || "Outcome")}</strong>
             ${activationHelpHtml(row, agentId)}
             <p class="muted">${htmlEscape(row.summary || "")}</p>
-            ${row.evidence?.studioPath ? `<a href="${htmlEscape(row.evidence.studioPath.replace(/^\/console\//, "./"))}">View signed proof</a>` : ""}
+            ${row.evidence?.studioPath ? `<a href="${htmlEscape(row.evidence.studioPath.replace(/^\/console\//, "./"))}">View the signed record</a>` : ""}
           </div>
           ${statusPill(row.status || "WAITING")}
         </div>

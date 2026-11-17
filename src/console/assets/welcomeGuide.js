@@ -25,7 +25,7 @@ export const GUIDE_STEPS = [
   {
     title: "What AMC is",
     body: `<p>AMC (Agent Maturity Compass) checks how far you can trust an AI agent.</p>
-      <p>It does not take the agent's word for it. It looks at recorded proof of what the agent actually did, and gives
+      <p>It does not take the agent's word for it. It looks at signed records of what the agent actually did, and gives
       you a score and a list of gaps to fix.</p>`
   },
   {
