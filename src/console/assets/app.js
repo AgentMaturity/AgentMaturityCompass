@@ -1612,10 +1612,11 @@ async function renderAgent() {
       <p>Overall: <strong>${((report.layerScores || []).reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, (report.layerScores || []).length)).toFixed(3)}</strong></p>
       <p>IntegrityIndex: <strong>${runSealFails(row.latestRun) ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(runSealFails(row.latestRun) ? UNTRUSTED_SEAL_LABEL : String(report.trustLabel ?? ""))})</p>
       <p>Evidence Coverage: ${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%</p>
-      <p>Artifact Status: <strong>${htmlEscape(String(report.status || "UNKNOWN"))}</strong></p>
+      <p>Artifact Status: <strong>${htmlEscape(runSealFails(row.latestRun) ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
       <p>Evidence Readiness: <strong>${htmlEscape(String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
       <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !runSealFails(row.latestRun) ? "ELIGIBLE" : "BLOCKED"}</strong></p>
-      <p class="muted">${htmlEscape(String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
+      <p class="muted">${htmlEscape(runSealFails(row.latestRun) ? "This run's record does not pass its seal check, so none of these numbers can back a claim."
+        : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
       <canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>
       `
       : ""
