@@ -46,4 +46,4 @@ At minimum, a team deployment should have:
 
 ## Bottom line
 
-AMC is a trust tool. If the deployment itself is sloppy, you kneecap the exact thing the product is trying to prove.
+AMC is a trust tool. If the deployment itself is sloppy, you kneecap the exact thing the product is trying to show.

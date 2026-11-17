@@ -11,7 +11,7 @@ AMC assumes the evaluated agent is adversarial. It may:
 - Produce narratives not anchored in observed traffic
 - Attempt to inflate its own maturity score
 
-AMC defends against all of these through layered tamper-proofing.
+AMC defends against all of these through layered tamper detection.
 
 ## Trust Tiers
 
@@ -31,7 +31,7 @@ Evidence in AMC carries a trust tier. No trust weight is applied to a maturity l
 - Level 5 on high-risk questions requires SANDBOX_EXECUTION_ENABLED attestation
 - Evidence without attestation defaults to SELF_REPORTED
 
-## Tamper-Proof Evidence Chain
+## Tamper-Evident Evidence Chain
 
 ### Hash-Chained Ledger
 
@@ -223,7 +223,7 @@ Missing truth protocol sections trigger `TRUTH_PROTOCOL_MISSING` audit events an
 
 ## Design Principles
 
-1. **Tamper-proof**: The evaluated agent cannot write evidence, alter results, or self-certify
+1. **Tamper-evident**: The evaluated agent cannot write evidence, alter results, or self-certify
 2. **Evidence-gated**: All maturity claims are driven by OBSERVED evidence captured by trusted infrastructure
 3. **Provider-agnostic**: Works across all model providers via gateway routing
 4. **Framework-agnostic**: Works with any agent framework via supervise/sandbox

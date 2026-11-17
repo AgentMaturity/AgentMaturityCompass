@@ -45,7 +45,7 @@ Every declaration includes exact events, controls, activation conditions, defini
 
 Receipt validity and capability status are separate. A correctly signed `partial` or `fail_closed` receipt is valid proof of a limitation; tampered bytes, an untrusted signer, unknown schema fields, or an inconsistent effective projection make the receipt itself invalid.
 
-## What The Base Adapter Path Can Prove
+## What The Base Adapter Path Can Show
 
 When `amc adapters run` is active, the adapter process path can emit `process.started`, redacted `process.stdout`, redacted `process.stderr`, and `process.exited`. Model request/response evidence is effective only when the signed agent profile routes a compatible runtime through AMC's gateway. Provider-native requested, completed, and failed action evidence is effective only for a current signed Claude Code or Gemini CLI hook installation. Control mode also records the requested outcome, actual provider wire decision, effective outcome, capability mapping, and whether the mapping was lossy.
 
@@ -55,7 +55,7 @@ Inspect one action without opening raw provider data:
 amc connect hooks lifecycle --agent my-agent --action <action-id>
 ```
 
-The projection joins immutable receipts by agent and stable action ID. A verified Claude steer means the current call was denied with bounded corrective context; any retry must use a new action ID and pass every AMC control again. Gemini maps a requested steer to a lossy hard deny and is never labeled steered. The projection fails closed on a missing or duplicate request, invalid decision mapping, ambiguous terminal correlation, conflicting decision or terminal state, execution after denial, cross-agent collision, impossible order, receipt mismatch, or ledger tamper. Gemini CLI exposes no general provider call ID, so AMC resolves an `AfterTool` event only when exactly one unmatched hash-only request correlation exists.
+The projection joins the recorded receipts by agent and stable action ID. A verified Claude steer means the current call was denied with bounded corrective context; any retry must use a new action ID and pass every AMC control again. Gemini maps a requested steer to a lossy hard deny and is never labeled steered. The projection fails closed on a missing or duplicate request, invalid decision mapping, ambiguous terminal correlation, conflicting decision or terminal state, execution after denial, cross-agent collision, impossible order, receipt mismatch, or ledger tamper. Gemini CLI exposes no general provider call ID, so AMC resolves an `AfterTool` event only when exactly one unmatched hash-only request correlation exists.
 
 Supported shell calls also receive a compound-command blast-radius review. AMC parses a bounded quote-aware subset, maps every segment to an existing ToolHub tool, evaluates every segment against the same signed controls, and returns the most restrictive outcome. Substitution, redirection, grouping, background execution, unquoted pathname expansion, malformed separators, and exceeded bounds fail closed before partial policy output. The signed review excludes the raw command and argument values.
 

@@ -4278,7 +4278,7 @@ studioLan
 
 const connect = program
   .command("connect")
-  .description("Connect an agent runtime and track first action, decision, and proof")
+  .description("Connect an agent runtime and track its first action, decision, and evidence")
   .option("--agent <agentId>", "agent ID (overrides global --agent)")
   .option("--adapter <adapterId>", "adapter ID (e.g. claude-cli, gemini-cli, generic-cli)")
   .option("--token-file <path>", "lease token file (pair redeem output)")
@@ -6571,11 +6571,11 @@ evidenceObservability
 
 const evidenceFindingProofs = evidence
   .command("finding-proofs")
-  .description("List, inspect, and export finding proof chains");
+  .description("List, inspect, and export finding evidence chains");
 
 evidenceFindingProofs
   .command("list")
-  .description("List persisted finding proof chains")
+  .description("List saved finding evidence chains")
   .option("--agent <agentId>", "agent id to list")
   .option("--limit <n>", "maximum proofs to show", "30")
   .option("--json", "Output as JSON")
@@ -6603,7 +6603,7 @@ evidenceFindingProofs
 
 evidenceFindingProofs
   .command("inspect <proof>")
-  .description("Inspect one finding proof by proof id, finding id, run id, or question id")
+  .description("Inspect one finding evidence chain by its proofId, finding id, run id, or question id")
   .option("--agent <agentId>", "agent id to inspect")
   .option("--json", "Output as JSON")
   .action(async (proof: string, opts: { agent?: string; json?: boolean }) => {
@@ -6632,7 +6632,7 @@ evidenceFindingProofs
 
 evidenceFindingProofs
   .command("export")
-  .description("Export finding proofs as JSON")
+  .description("Export finding evidence chains as JSON")
   .requiredOption("--out <path>", "output file path")
   .option("--agent <agentId>", "agent id to export")
   .option("--run <runId>", "only export proofs for one run")
@@ -6853,7 +6853,7 @@ const canon = program.command("canon").description("Compass Canon signed content
 const cgx = program.command("cgx").description("Context Graph (CGX) build and verify operations");
 const diagnostic = program.command("diagnostic").description("Diagnostic bank/render operations");
 const truthguard = program.command("truthguard").description("Deterministic output truth-constraint validator");
-const proof = program.command("proof").description("Domain Proof Lane source-to-rule proof checks");
+const proof = program.command("proof").description("Domain Proof Lane source-to-rule checks");
 const mode = program.command("mode").description("Switch CLI role mode");
 const loop = program.command("loop").description("Continuous self-serve maturity loop");
 registerUserCommands(program);
@@ -6885,7 +6885,7 @@ const backup = program.command("backup").description("Signed encrypted backup/re
 const maintenance = program.command("maintenance").description("Operational maintenance operations");
 const metrics = program.command("metrics").description("Prometheus metrics endpoint helpers");
 const lifecycle = program.command("lifecycle").description("Agent lifecycle responsibility and governance mapping");
-const transparencyMerkle = transparency.command("merkle").description("Merkle transparency root/proof operations");
+const transparencyMerkle = transparency.command("merkle").description("Merkle transparency root and inclusion-proof operations");
 const policyAction = policy.command("action").description("Signed autonomy action policy");
 const policyApproval = policy.command("approval").description("Signed dual-control approval policy");
 const policyPack = policy.command("pack").description("Policy packs by archetype and risk tier");
@@ -8124,7 +8124,7 @@ incident
 
 incident
   .command("oversight <id>")
-  .description("Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer)")
+  .description("Append a signed human-oversight record (the auditor key shows which workspace signed, not who reviewed)")
   .requiredOption("--decision <decision>", "ACKNOWLEDGED|ESCALATED|REPORT_REQUIRED|NO_REPORT_REQUIRED|CLOSED")
   .requiredOption("--reviewer <id>", "reviewer id, stored as stated")
   .requiredOption("--rationale <text>", "why the reviewer decided this")
@@ -11329,7 +11329,7 @@ program
 
 cert
   .command("generate")
-  .description("Generate execution-proof trust certificate (signed PDF or JSON)")
+  .description("Generate a trust certificate from execution evidence (PDF or JSON; signed unless --no-sign)")
   .requiredOption("--agent <id>", "agent ID")
   .requiredOption("--output <path>", "output certificate path (.pdf or .json)")
   .option("--valid-days <n>", "certificate validity period in days", "30")
@@ -12315,7 +12315,7 @@ transparencyMerkle
 
 transparencyMerkle
   .command("prove")
-  .description("Export signed inclusion proof bundle for entry hash")
+  .description("Export a signed inclusion proof bundle for an entry hash")
   .requiredOption("--entry-hash <hash>", "transparency entry hash")
   .requiredOption("--out <file>", "output .amcproof file")
   .action(async (opts: { entryHash: string; out: string }) => {
@@ -12332,7 +12332,7 @@ transparencyMerkle
 
 withTrustFlags(transparencyMerkle
   .command("verify-proof")
-  .description("Verify signed inclusion proof bundle")
+  .description("Verify a signed inclusion proof bundle")
   .argument("<file>"), { pubkey: "pin the auditor public key that signed the proof (artifact-seal)", json: true })
   .action((file: string, opts: TrustFlags) => {
     const out = transparencyMerkleVerifyProofCli(resolve(process.cwd(), file), trustFromFlags(opts, ["artifact-seal"]),
@@ -19920,7 +19920,7 @@ shieldConfirm
 
 shieldConfirm
   .command("proofs")
-  .description("List safe exploit-confirmation proof artifacts")
+  .description("List safe exploit-confirmation records")
   .option("--json", "Output as JSON")
   .action(async (opts: { json?: boolean }) => {
     try {
@@ -20869,7 +20869,7 @@ enforce
 // ── Enforce Formal Verification ───────────────────────────────────────────────
 enforce
   .command("formal-verify")
-  .description("Formally verify safety properties using proof trees and certificates")
+  .description("Model-check AMC's built-in safety properties (not your agent) and print the results")
   .option("--property <name>", "Specific property name to verify")
   .option("--all", "Verify all core safety properties")
   .option("--strategy <strategy>", "Verification strategy: exhaustive, case_split, or inductive", "exhaustive")
@@ -20935,7 +20935,7 @@ enforce
 
 withTrustFlags(enforce
   .command("verify-certificate <certificateJson>")
-  .description("Verify the integrity of a proof certificate (pass JSON as string)"), { json: true })
+  .description("Check the hash of a formal-verification certificate; it is unsigned, so never trusted (pass JSON as string)"), { json: true })
   .action(async (certificateJson: string, opts: TrustFlags) => {
     try {
       const { verifyCertificate } = await import("./enforce/formalVerification.js");

@@ -19,7 +19,7 @@ Each row answers four operator questions:
 | When | The signed conditions, threshold, quorum, trust tier, or assurance requirement that applies |
 | Then | Requested action followed by the effective action AMC can safely take now |
 | Status | Active, inactive, unavailable, or fail closed, plus whether the source is trusted |
-| Scope template | The one immutable AMC action-class group for Action and Approval controls; Runtime controls have none |
+| Scope template | The one built-in, fixed AMC action-class group for Action and Approval controls; Runtime controls have none |
 
 The three families are:
 

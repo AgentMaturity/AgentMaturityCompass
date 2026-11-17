@@ -241,7 +241,7 @@ Assurance runs store **privacy-safe trace references only** (`trace.refs.json`):
 - Decision outcomes (allowed/denied/rejected/flagged)
 - Policy hashes and evidence event hashes
 
-Raw prompts and outputs are **not stored by default**. This is intentional — the evidence proves what happened without exposing sensitive content.
+Raw prompts and outputs are **not stored by default**. This is intentional — the evidence records what happened without exposing sensitive content.
 
 ### Policy Configuration
 
@@ -429,7 +429,7 @@ Keyword stuffing, mocked execution, forged artifacts, selective evidence and tem
 | Failure Category | Which pack and specific scenario failed |
 | Decision Outcome | What the agent actually did (allowed/denied/rejected/flagged) |
 | Policy Hash | Which version of the policy was active during the test |
-| Evidence Hash | Tamper-proof identifier for the test evidence |
+| Evidence Hash | Tamper-evident identifier for the test evidence |
 
 ### Severity Levels
 
@@ -646,7 +646,7 @@ amc assurance cert-issue --run <runId>
 amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 ```
 
-Certificates are evidence artifacts — they prove that at a specific point in time, with a specific policy, the agent passed specific security tests. They don't prove the agent is secure forever.
+Certificates are evidence artifacts — they record that at a specific point in time, with a specific policy, the agent passed specific security tests. They don't prove the agent is secure forever.
 
 ---
 
@@ -677,7 +677,7 @@ Certificates are evidence artifacts — they prove that at a specific point in t
 ┌────────────────────────────────────────────────────────────┐
 │ Layer 4: Continuous Assurance (scheduled re-testing)       │
 ├────────────────────────────────────────────────────────────┤
-│ Layer 3: Evidence & Notary (tamper-proof audit trail)      │
+│ Layer 3: Evidence & Notary (tamper-evident audit trail)    │
 ├────────────────────────────────────────────────────────────┤
 │ Layer 2: Runtime Enforcement (Governor, Truthguard, Vault) │
 ├────────────────────────────────────────────────────────────┤

@@ -13,7 +13,7 @@ This page exists to show momentum without making users read the entire changelog
 - Explicit provider-native signed control for Claude Code and Gemini CLI: observe by default, opt into loopback-only Enforce decisions backed by existing signed policies and receipts
 - Least-privilege Studio module API authorization: route-level viewer, operator, approver, auditor, and owner boundaries replace the former shared human-role gate
 - Domain Proof API containment: inline schema-validated checks, realpath-confined deprecated fixtures, bounded errors, and no caller-selected server writes
-- Evidence-readiness contract across CLI, Studio, lifecycle artifacts, report sharing, and executive briefs: `VALID` proves artifact integrity, while `READY` governs claim eligibility
+- Evidence-readiness contract across CLI, Studio, lifecycle artifacts, report sharing, and executive briefs: `VALID` shows artifact integrity, while `READY` governs claim eligibility
 - Unified AMC visual identity across the website, Studio, desktop launchers, Docs, CLI output, and GitHub README
 - 244-question default diagnostic bank with a 264-question lifecycle-expanded option
 - <!-- amc:count:cliCommandPaths -->1,302<!-- /amc:count --> generated CLI command paths in the public command inventory

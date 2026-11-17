@@ -18,7 +18,7 @@ AMC's score history system provides regression testing by storing historical sco
 
 Score history is stored in `.amc/score_history.sqlite` with two main tables:
 
-- `score_history`: Immutable, append-only score snapshots
+- `score_history`: Append-only score snapshots
 - `regression_alerts`: Regression alerts with status tracking
 
 All snapshots are cryptographically signed using AMC's monitor key.
@@ -190,7 +190,7 @@ if (alerts.length > 0) {
 ## Security
 
 - All snapshots are cryptographically signed using AMC's monitor key
-- Score history is append-only and immutable
+- Score history is append-only
 - Integrity can be verified at any time using `verifyIntegrity()`
 - Tampering with score history will be detected during verification
 

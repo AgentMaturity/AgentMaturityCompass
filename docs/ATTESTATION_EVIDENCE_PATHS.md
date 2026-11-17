@@ -54,4 +54,4 @@ amc audit binder verify ./exports/latest.amcaudit --pubkey <recorded-auditor.pub
 - [ ] All files resolved under canonical paths (or approved policy override)
 - [ ] All signatures/proofs verified offline
 - [ ] Artifact hashes captured in incident/release notes
-- [ ] Export set stored with immutable retention policy
+- [ ] Export set stored with a write-once (WORM) retention policy

@@ -148,9 +148,9 @@ function renderContext(ctx) {
     : passed && (open ?? met) ? view.held("The probe already passed; running it again would supersede the open approval request.") : ctx.allowed.build;
   return `<p class="muted">Build writes your audience, market, sector, language, accessibility, data-handling and regulatory-note answers as one attributed
       context plugin (order 160), signed. An in-process run loads it, and a Studio native task started after Build loads it into its system prompt
-      when its signature checks out (in a regulated workspace a plugin that does not verify refuses the task). A deployed agent does not load it. The probe runs one turn on the stub provider and AMC checks that session's signed user/message row for the
-      plugin's text. A4 ran the turn on the stub provider, so the probe's ref is a synthetic example, never observed, and the runtime writes no
-      effective-policy receipt for a turn with no tool call. A workspace on the JSONL session store cannot record the probe: an owner acknowledges that instead.</p>
+      when its signature checks out (in a regulated workspace a plugin that does not verify refuses the task). A deployed agent does not load it. The probe sends one short message to the stand-in model and AMC checks that its signed record of that message
+      holds the plugin's text. A4 sent that message itself to the stand-in model, so the probe's record is a made-up example, never an observation of
+      a real agent, and the runtime writes no effective-policy receipt for a turn with no tool call. A workspace on the JSONL session store cannot record the probe: an owner acknowledges that instead.</p>
     ${isObject(context) ? `<p class="muted">Plugin <code>${esc(context.name)}</code> · sha256 <code>${esc(context.sha256)}</code> · source <code>${esc(context.source)}</code>
       · file <code>${esc(context.path)}</code></p>` : "<p class=\"muted\">No context plugin built yet.</p>"}
     <div class="row wrap">${view.actionButton("Run the context probe", "probe", isObject(context) ? probeOffer : view.held("Build writes the context plugin first"))}</div>

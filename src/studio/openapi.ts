@@ -337,7 +337,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
           "200": okJson("Decision recorded", "#/components/schemas/DecisionResponse"),
           "400": errJson("Invalid decision"),
           "401": errJson("Unauthorized"),
-          "403": errJson("Reviewer role, browser proof, demo or read-only policy refused the decision"),
+          "403": errJson("Reviewer role, browser check (CSRF token and Origin), demo or read-only policy refused the decision"),
           "409": errJson("Approval request is no longer pending")
         },
       },
@@ -351,7 +351,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         responses: {
           "200": okJson("Approval request cancelled", "#/components/schemas/ApprovalCancelResponse"),
           "401": errJson("Unauthorized"),
-          "403": errJson("Owner role, browser proof, demo or read-only policy refused cancellation"),
+          "403": errJson("Owner role, browser check (CSRF token and Origin), demo or read-only policy refused cancellation"),
           "404": errJson("Approval request not found"),
           "409": errJson("Approval request is no longer pending")
         }
@@ -458,7 +458,7 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
     },
     "/api/v1/policy/scope-templates": {
       get: {
-        summary: "List immutable AMC action-class scope templates",
+        summary: "List AMC's built-in action-class scope templates (fixed; they cannot be edited)",
         tags: ["Studio", "Enforce", "Fleet", "Policy"],
         security: [{ adminToken: [] }, { sessionCookie: [] }],
         responses: {

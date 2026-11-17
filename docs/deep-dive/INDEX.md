@@ -10,7 +10,7 @@ Use it after [../ARCHITECTURE_BRIEF.md](../ARCHITECTURE_BRIEF.md) when you want 
    How commands, services, workspaces, gateway routing, and operator entrypoints fit together.
 
 2. [trust-evidence-plane.md](trust-evidence-plane.md)  
-   How AMC records, signs, verifies, and proves what happened.
+   How AMC records, signs, verifies, and shows what happened.
 
 3. [governance-execution-plane.md](governance-execution-plane.md)  
    How approvals, policies, leases, plugins, and identity become runtime controls.

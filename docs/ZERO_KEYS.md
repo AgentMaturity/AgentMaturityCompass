@@ -27,7 +27,7 @@ GEMINI_API_KEY=amc_dummy
 
 These are compatibility placeholders only. They are never treated as secrets or used for upstream auth.
 
-## Verifiable Guarantees
+## What you can check
 
 - Evidence is redacted before hashing/storage.
 - Provider keys are never expected in evidence blobs.

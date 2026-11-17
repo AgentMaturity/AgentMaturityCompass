@@ -192,7 +192,7 @@ Crosswalk verification fails closed when source citations are missing, a row lac
 
 ## Reviewer Independence Receipts
 
-High-risk approval reviews can use `buildReviewerIndependenceReceipt` from `src/audit/reviewerIndependence.ts` to prove reviewer separation without adding a separate workflow engine. The receipt is a generic audit artifact for existing Comply, Passport, and Vault evidence paths.
+High-risk approval reviews can use `buildReviewerIndependenceReceipt` from `src/audit/reviewerIndependence.ts` to show reviewer separation without adding a separate workflow engine. The receipt is a generic audit artifact for existing Comply, Passport, and Vault evidence paths.
 
 Each reviewer row includes:
 
@@ -208,7 +208,7 @@ Reviewer-independence verification fails closed when source citations are missin
 
 ## Post-Hoc Audit Sampling Receipts
 
-Completed autonomous actions can use `buildPosthocAuditSamplingReceipt` from `src/audit/posthocAuditSampling.ts` to prove retrospective human audit coverage without adding a separate audit-workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for sampled action reviews, audit findings, corrective actions, and scoring deltas.
+Completed autonomous actions can use `buildPosthocAuditSamplingReceipt` from `src/audit/posthocAuditSampling.ts` to show retrospective human audit coverage without adding a separate audit-workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for sampled action reviews, audit findings, corrective actions, and scoring deltas.
 
 Each sampled action row includes:
 
@@ -224,7 +224,7 @@ Post-hoc audit sampling verification fails closed when source citations are miss
 
 ## Governance Exception Lifecycle Receipts
 
-Governance exception and waiver reviews can use `buildGovernanceExceptionLifecycleReceipt` from `src/compliance/exceptionLifecycle.ts` to prove temporary risk acceptances without adding a separate workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for policy exceptions, compliance waivers, and compensating-control windows.
+Governance exception and waiver reviews can use `buildGovernanceExceptionLifecycleReceipt` from `src/compliance/exceptionLifecycle.ts` to record temporary risk acceptances without adding a separate workflow engine. The receipt is a generic Comply, Passport, and Vault artifact for policy exceptions, compliance waivers, and compensating-control windows.
 
 Each exception row includes:
 
@@ -240,7 +240,7 @@ Exception-lifecycle verification fails closed when source citations are missing,
 
 ## Policy Drift Impact Receipts
 
-Policy changes can use `buildPolicyDriftImpactReceipt` from `src/compliance/policyDrift.ts` to prove change impact before rollout without adding a separate policy-management platform. The receipt is a generic Comply, Passport, and Vault artifact for policy diffs, affected agents, affected controls, affected tests, prior decisions, recheck lists, and rollout receipts.
+Policy changes can use `buildPolicyDriftImpactReceipt` from `src/compliance/policyDrift.ts` to show change impact before rollout without adding a separate policy-management platform. The receipt is a generic Comply, Passport, and Vault artifact for policy diffs, affected agents, affected controls, affected tests, prior decisions, recheck lists, and rollout receipts.
 
 Each policy drift row includes:
 

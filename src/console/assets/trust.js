@@ -18,7 +18,7 @@ export async function renderTrustPage(params) {
   params.root.innerHTML = `
     ${params.card("Trust Mode", `
       <div class="grid">
-        <div><div class="muted">Mode</div><div class="tile-value">${params.htmlEscape(state.mode || "unknown")}</div></div>
+        <div><div class="muted">Mode</div><div class="tile-value">${(params.plainCodeHtml || params.htmlEscape)(state.mode || "unknown")}</div></div>
         <div><div class="muted">Setup checks pass</div><div class="tile-value">${state.ok ? "YES" : "NO"}</div></div>
         <div><div class="muted">Settings file signature</div><div class="tile-value">${signature.valid ? "VALID" : "INVALID"}</div></div>
         <div><div class="muted">Signing service reachable</div><div class="tile-value">${state.notaryReachable ? "YES" : "NO"}</div></div>

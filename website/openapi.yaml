@@ -4977,7 +4977,7 @@ paths:
           description: Decision and bounded non-authoritative delivery summary
         '400': { description: Invalid decision }
         '401': { description: Unauthorized }
-        '403': { description: 'Reviewer role, browser proof, demo or read-only policy refused the decision' }
+        '403': { description: 'Reviewer role, browser check (CSRF token and Origin), demo or read-only policy refused the decision' }
         '409': { description: Request is no longer pending }
 
   /approvals/requests/{id}/cancel:
@@ -5019,7 +5019,7 @@ paths:
       responses:
         '200': { description: Cancelled request and bounded delivery summary }
         '401': { description: Unauthorized }
-        '403': { description: 'Owner role, browser proof, demo or read-only policy refused cancellation' }
+        '403': { description: 'Owner role, browser check (CSRF token and Origin), demo or read-only policy refused cancellation' }
         '404': { description: Approval request not found }
         '409': { description: Request is no longer pending }
 
@@ -6273,7 +6273,7 @@ paths:
   /v1/policy/scope-templates:
     get:
       tags: [policy, enforce, fleet]
-      summary: List immutable AMC action-class scope templates
+      summary: List AMC's built-in action-class scope templates (fixed; they cannot be edited)
       responses:
         '200':
           description: Bounded scope template catalog
@@ -7207,7 +7207,7 @@ paths:
   /v1/crypto/merkle/prove:
     post:
       tags: [crypto]
-      summary: Export signed inclusion proof
+      summary: Export a signed inclusion proof
       requestBody:
         content:
           application/json:
@@ -7222,12 +7222,12 @@ paths:
                   description: Bundle path, resolved against the workspace. It must lie under .amc/transparency/proofs/ (for example .amc/transparency/proofs/<entryHash>.amcproof), where verify-proof reads; any other path is refused with 400 before anything is written.
       responses:
         '201':
-          description: Proof exported
+          description: Inclusion proof exported
 
   /v1/crypto/merkle/verify-proof:
     post:
       tags: [crypto]
-      summary: Verify signed inclusion proof
+      summary: Verify a signed inclusion proof
       requestBody:
         content:
           application/json:
@@ -7237,10 +7237,10 @@ paths:
               properties:
                 file:
                   type: string
-                  description: Proof bundle path, relative to the workspace (or the absolute outFile prove returned); it must lie under .amc/transparency/proofs/. Anything outside that directory, a missing file, a link or a non-regular file verifies as UNREADABLE.
+                  description: Inclusion proof bundle path, relative to the workspace (or the absolute outFile that /v1/crypto/merkle/prove returned); it must lie under .amc/transparency/proofs/. Anything outside that directory, a missing file, a link or a non-regular file verifies as UNREADABLE.
       responses:
         '200':
-          description: Proof verification
+          description: Inclusion proof check result
           content:
             application/json:
               schema:
@@ -8025,7 +8025,7 @@ paths:
     post:
       tags: [firewall]
       summary: Verify and preserve legacy Runtime Firewall policy semantics in the signed control journal
-      description: OWNER-only in Studio. Captures and verifies one immutable policy/sidecar snapshot, validates the policy, commits its canonical semantics, and signs source and committed digests in migration metadata. Byte-for-byte preservation is not claimed.
+      description: OWNER-only in Studio. Captures and verifies one point-in-time policy/sidecar snapshot, validates the policy, commits its canonical semantics, and signs source and committed digests in migration metadata. Byte-for-byte preservation is not claimed.
       requestBody:
         required: true
         content:
@@ -9554,7 +9554,7 @@ paths:
     post:
       tags: [shield]
       summary: Run controlled exploit confirmation
-      description: Converts an authorized security finding into safe proof. Public artifacts include hashes, receipts, and signal refs, not exploit instructions or raw payloads.
+      description: Converts an authorized security finding into a safe proof. Public artifacts include hashes, receipts, and signal refs, not exploit instructions or raw payloads.
       requestBody:
         required: true
         content:
@@ -9571,7 +9571,7 @@ paths:
                   type: integer
       responses:
         '201':
-          description: Confirmation completed with safe proof
+          description: Confirmation completed with a safe proof
           content:
             application/json:
               schema:
@@ -9586,7 +9586,7 @@ paths:
   /v1/shield/exploit-confirmation/proofs:
     get:
       tags: [shield]
-      summary: List safe exploit-confirmation proofs
+      summary: List safe exploit-confirmation records
       responses:
         '200':
           description: Safe proof list
@@ -9594,8 +9594,8 @@ paths:
   /v1/shield/exploit-confirmation/proofs/{proofId}/export:
     post:
       tags: [shield]
-      summary: Export safe exploit-confirmation proof
-      description: Exports redacted proof suitable for Vault or Passport evidence bundles without exploit instructions.
+      summary: Export a safe exploit-confirmation record
+      description: Exports a redacted record suitable for Vault or Passport evidence bundles without exploit instructions.
       parameters:
         - name: proofId
           in: path

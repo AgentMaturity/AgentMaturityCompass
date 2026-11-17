@@ -35,7 +35,7 @@ AMC's evidence chain is built on two cryptographic primitives:
 
 Every evidence artifact — a log entry, a test result, an observation record — is digitally signed using Ed25519 elliptic curve signatures. This provides:
 
-- **Authenticity**: proof that the evidence came from a specific, identified source
+- **Authenticity**: a signature that shows the evidence came from a specific, identified source
 - **Integrity**: any modification to the evidence after signing invalidates the signature
 - **Non-repudiation**: the signer cannot later deny having produced the evidence
 
@@ -182,7 +182,7 @@ A refusal throws `DetokenizeRefused` (code `PROTECTED_DATA_EGRESS_REFUSED`, the 
 
 ## Summary
 
-AMC's security architecture is designed around a single conviction: **trust in AI agents must be grounded in cryptographic proof of observed behavior.** The combination of tiered evidence, digital signatures, transparency logs, anti-gaming mechanisms, disciplined key management, clear trust boundaries, and evidence decay creates a system where scores are meaningful, verifiable, and resistant to manipulation.
+AMC's security architecture is designed around a single conviction: **trust in AI agents must be grounded in signed records of observed behavior.** The combination of tiered evidence, digital signatures, transparency logs, anti-gaming mechanisms, disciplined key management, clear trust boundaries, and evidence decay creates a system where scores are meaningful, verifiable, and resistant to manipulation.
 
 The goal is not to make gaming impossible in theory — it's to make gaming harder than simply building a trustworthy agent.
 

@@ -39,6 +39,22 @@ export const isOwner = (who) => Array.isArray(who?.roles) && who.roles.includes(
 export const canCreate = (who, options) => Array.isArray(who?.roles) && who.roles.some((role) => role === "OPERATOR" || role === "OWNER")
   && options?.workspace?.readOnly === false;
 
+/**
+ * Engine requests (a stage's second request) this tab recorded a decision on, per username: readiness names no engine
+ * decisions, and a second one is refused (distinct_approvers). Kept in sessionStorage so a reload in the same tab
+ * remembers; Studio still refuses any repeat. The panel and the effect card both read it.
+ */
+const DECIDED_KEY = "amc.a4.decidedEngineRequests";
+const decidedHere = (() => {
+  try { return new Set(JSON.parse(sessionStorage.getItem(DECIDED_KEY) ?? "[]")); } catch { return new Set(); }
+})();
+const decidedKey = (username, approvalRequestId) => `${username ?? ""}:${approvalRequestId}`;
+export const decidedByMe = (username, approvalRequestId) => decidedHere.has(decidedKey(username, approvalRequestId));
+export const rememberDecided = (approvalRequestId, username) => {
+  decidedHere.add(decidedKey(username, approvalRequestId));
+  try { sessionStorage.setItem(DECIDED_KEY, JSON.stringify([...decidedHere].slice(-200))); } catch { /* storage unavailable: this load still remembers */ }
+};
+
 const listOf = (data, key) => (Array.isArray(data) ? data : Array.isArray(data?.[key]) ? data[key] : []);
 
 /**

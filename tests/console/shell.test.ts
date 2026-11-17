@@ -5,7 +5,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { CANONICAL_NAV, canonicalNavHtml, decorateNav, initShell, renderCanonicalNav, topbarHtml } from "../../src/console/assets/shell.js";
+import { CANONICAL_NAV, canonicalNavHtml, decorateNav, initShell, renderCanonicalNav, renderTopbar, topbarHtml } from "../../src/console/assets/shell.js";
 import { FakeDocument, type FakeElement } from "./fakeDom.js";
 
 function pageWithNav(doc: FakeDocument, hrefs: string[], page = ""): FakeElement {
@@ -122,7 +122,9 @@ describe("every console page with a nav reaches the shell", () => {
     expect(navPages).toContain("ops.html"); // C-07: Maintenance (ops) is on the console shell now
     for (const file of navPages) {
       const html = readFileSync(`src/console/pages/${file}`, "utf8");
-      const scripts = [...html.matchAll(/src="\.\/assets\/([\w/-]+\.js)(?:\?v=[^"]*)?"/g)].map((match) => match[1]!);
+      // pageTransition.js is the one classic <head> script (it must run before the first frame), not a page module.
+      const scripts = [...html.matchAll(/src="\.\/assets\/([\w/-]+\.js)(?:\?v=[^"]*)?"/g)].map((match) => match[1]!)
+        .filter((script) => script !== "pageTransition.js");
       expect(scripts.length, file).toBeGreaterThan(0);
       for (const script of scripts) {
         expect(existsSync(`${assets}/${script}`), `${file} ${script}`).toBe(true);
@@ -266,14 +268,42 @@ describe("topbarHtml", () => {
     for (const variant of [html, topbar({ me: null }), topbar({ demoMode: true })]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 
-  test("app.js renders the top bar from it, refreshes it after sign-in and wires Sign out to logout then the login page", () => {
+  test("app.js renders the top bar through renderTopbar, refreshes it after sign-in and wires Sign out to logout then the login page", () => {
     const app = readFileSync("src/console/assets/app.js", "utf8");
     const shellFn = app.slice(app.indexOf("function decorateShell()"), app.indexOf("\n}\n", app.indexOf("function decorateShell()")));
-    expect(shellFn).toContain("topbarHtml({");
-    expect(shellFn).toContain("me: getCurrentUser()");
-    expect(shellFn).toMatch(/onAction\(topbar\.querySelector\("#signOutBtn"\), "click"[\s\S]*logout\(\)[\s\S]*"\.\/login"/);
+    expect(shellFn).toMatch(/renderTopbar\(document, getCurrentUser\(\), \(\) => logout\(\)[\s\S]*"\.\/login"[\s\S]*currentAgent\(\)\)/);
     const render = app.slice(app.indexOf("async function renderPage()"));
     expect(render.indexOf("decorateShell();", render.indexOf("ensureAuthenticated()"))).toBeGreaterThan(-1);
     expect(render.indexOf("decorateShell();", render.indexOf("ensureAuthenticated()"))).toBeLessThan(render.indexOf("const me = getCurrentUser();"));
+  });
+});
+
+// C-15: pages with their own script (Benchmarks, Mechanic, Simulator, operator pages, ...) had no top bar, because only
+// app.js and a4.js drew it. api.js now draws it whenever it learns who is signed in, through one shared function.
+describe("renderTopbar", () => {
+  const draw = renderTopbar as unknown as (doc: FakeDocument, me: unknown, onSignOut?: () => void, agent?: string) => void;
+
+  test("puts one top bar first in main, redraws it in place, keeps the agent and wires Sign out", () => {
+    const doc = new FakeDocument();
+    pageWithNav(doc, ["./home"]);
+    let signedOut = 0;
+    draw(doc, null, undefined, "bot-1");
+    draw(doc, { username: "a" }, () => { signedOut += 1; });
+    const bars = doc.querySelectorAll(".topbar");
+    expect(bars).toHaveLength(1);
+    expect(bars[0]!.dataset.agent).toBe("bot-1");
+    expect(bars[0]!.querySelector("#topbarPrimaryAction")!.getAttribute("href")).toContain("agent=bot-1");
+    for (const listener of bars[0]!.querySelector("#signOutBtn")!.listeners.get("click") ?? []) listener({} as never);
+    expect(signedOut).toBe(1);
+  });
+
+  test("draws nothing on a page without a menu, and api.js draws it whenever it learns who is signed in", () => {
+    const doc = new FakeDocument();
+    doc.body.appendChild(doc.el("main", {}, [doc.el("p", { id: "status" }, "")]));
+    draw(doc, { username: "a" });
+    expect(doc.querySelectorAll(".topbar")).toHaveLength(0);
+    const api = readFileSync("src/console/assets/api.js", "utf8");
+    const whoami = api.slice(api.indexOf("export async function whoami()"), api.indexOf("export async function apiGet"));
+    expect(whoami).toContain('if (!document.querySelector("main .topbar")) renderTopbar(document, state.me, signOut);');
   });
 });

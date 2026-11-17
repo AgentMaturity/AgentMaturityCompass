@@ -177,14 +177,14 @@ before any packet is signed.
 
 `delegate` and `delegate_continue` are `READ_ONLY` tools, so several calls in
 one model step run concurrently, up to the loop's `maxParallelToolCalls` (10 by
-default); `tests/delegateParallelDispatch.test.ts` proves two children are live
+default); `tests/delegateParallelDispatch.test.ts` checks that two children are live
 at once. `--max-active-children` (default 8) bounds every active, reserved or
 kept-open child under one root session, across `delegate`, `workflow` and their
 descendants. A call over the cap is refused at admission with
 `maxActiveChildren=N reached`; it is not queued. A `workflow` plan queues its
 own parallel nodes within the same cap instead (`docs/NATIVE_WORKFLOWS.md`).
 
-## What a stop proves
+## What a stop shows
 
 The signed handoff records the exact supported conditions. The native spawn
 boundary enforces them; a packet created or verified independently is only a

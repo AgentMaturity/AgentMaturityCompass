@@ -157,7 +157,7 @@ All new controls require L3+ question-scoped compliance evidence and L4/L5 obser
 | **OBS-1** Structured logging for agent actions | MG-3.1 Incident detection | §9.1 Monitoring & measurement | L3 (Defined) — Audit trail | Art 12 Logging obligations |
 | **OBS-2** Token usage & cost tracking per session | MS-2.6 Resource measurement | §9.1 Performance metrics | L3 (Defined) — Measurement | Art 9(7) Monitoring |
 | **OBS-3** Agent performance dashboards | MS-2.9 Monitoring metrics | §9.3 Management review | L3 (Defined) — KPI tracking | Art 9(7) Ongoing monitoring |
-| **OBS-4** Tamper-evident action receipts | GV-6.1 Audit mechanisms | §7.5 Documented information | L4 (Optimizing) — Immutable audit | Art 12(1) Logging requirements |
+| **OBS-4** Tamper-evident action receipts | GV-6.1 Audit mechanisms | §7.5 Documented information | L4 (Optimizing) — Hash-chained audit | Art 12(1) Logging requirements |
 | **OBS-5** SIEM integration & alerting | MG-3.2 Risk response monitoring | §9.1 Monitoring | L4 (Optimizing) — Integration | Art 9(7) Monitoring obligations |
 | **OBS-6** Cross-agent trace correlation | *(not addressed)* | *(not addressed)* | *(not addressed)* | *(not addressed)* |
 

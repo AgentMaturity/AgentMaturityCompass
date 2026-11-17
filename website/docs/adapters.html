@@ -171,7 +171,7 @@ amc adapters capabilities --agent my-agent --adapter generic-cli --json</code></
       <p>Without <code>--agent</code> the command uses this folder's agent; without <code>--adapter</code> it uses the adapter that agent is set up with (<code>amc adapters configure</code>), or <code>generic-cli</code> when none is set. The receipt is signed, so the vault must be open: run the command in a terminal, or set <code>AMC_VAULT_PASSPHRASE_FILE</code> to a file that holds the passphrase.</p>
       <div class="callout callout-green">
         <strong>Honest by construction</strong>
-        <code>verified</code> means AMC-owned declaration evidence and the inspected proof inputs are valid for this subject. <code>partial</code> records a host/shell-only version probe or an absent/observe-only optional hook. <code>fail_closed</code> records missing runtime/version, invalid signed config, unverified or publisher-only plugin metadata, or hook drift. Plugins cannot self-certify; partner certification remains a separate lane. A valid partial receipt is proof of a limitation, not a green badge.
+        <code>verified</code> means AMC-owned declaration evidence and the inspected evidence inputs are valid for this subject. <code>partial</code> records a host/shell-only version probe or an absent/observe-only optional hook. <code>fail_closed</code> records missing runtime/version, invalid signed config, unverified or publisher-only plugin metadata, or hook drift. Plugins cannot self-certify; partner certification remains a separate lane. A valid partial receipt is evidence of a limitation, not a green badge.
       </div>
       <p>The receipt never includes prompts, tool arguments, model/tool output, stdout/stderr content, cwd, transcript paths, raw session identifiers, lease tokens, or secrets. The same contract is available from <code>POST /api/v1/adapters/capability-receipts</code>.</p>
 
@@ -370,7 +370,7 @@ amc adapters run --agent my-hermes --adapter hermes-cli -- hermes</code></pre>
     print(result.stop_reason, result.text)
     session_id = session.session_id
 
-<span class="comment"># After the agent closes and seals the session, export a proof another party can verify</span>
+<span class="comment"># After the agent closes and seals the session, export an inclusion proof another party can check</span>
 proof = export_proof(session_id, <span class="string">"run.amcproof.json"</span>, workspace=<span class="string">"."</span>)
 print(proof.auditor_key_fingerprint)</code></pre>
         <p>The <code>python-amc-sdk</code> adapter itself launches a Python process with the gateway URL in <code>OPENAI_BASE_URL</code> and a lease in <code>OPENAI_API_KEY</code>: <code>amc adapters run --agent my-python-agent --adapter python-amc-sdk -- python3 my_agent.py</code>.</p>

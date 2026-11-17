@@ -70,6 +70,6 @@ function failed(reason) {
 
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   document.addEventListener("click", remember, true);
-  window.addEventListener("unhandledrejection", (event) => { if (failed(event.reason)) event.preventDefault(); });
+  window.addEventListener("unhandledrejection", (event) => { if (!event.defaultPrevented && failed(event.reason)) event.preventDefault(); });
   window.addEventListener("error", (event) => { if (event.error && failed(event.error)) event.preventDefault(); });
 }

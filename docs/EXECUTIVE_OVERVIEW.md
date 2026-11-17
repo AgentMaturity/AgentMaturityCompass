@@ -67,7 +67,7 @@ We tested a content moderation agent with two methods:
 | **L4** | Managed | Continuity, anchoring and sampling | Not evaluated yet |
 | **L5** | Optimizing | Independently attested | Not evaluated yet |
 
-No AMC level is a legal compliance threshold. A `VALID` signature proves artifact integrity; only evidence readiness `READY` permits AMC trust claims, and AMC does not certify legal compliance. The European Commission's current high-risk timeline applies Annex III rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 under Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI). See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
+No AMC level is a legal compliance threshold. A `VALID` signature shows artifact integrity; only evidence readiness `READY` permits AMC trust claims, and AMC does not certify legal compliance. The European Commission's current high-risk timeline applies Annex III rules from 2 December 2027 and product-integrated high-risk rules from 2 August 2028 under Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI). See the [official high-risk guidance](https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems) and [AI Act policy page](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai).
 
 Board L3 business-risk memo: [docs/BOARD_RISK_L3_MEMO.md](BOARD_RISK_L3_MEMO.md)
 
@@ -129,4 +129,4 @@ AMC is MIT licensed and free: scoring, evidence, reports, Studio, adapters, CI g
 
 ---
 
-*The question isn't whether your AI agents are safe. The question is: can you prove it?*
+*The question isn't whether your AI agents are safe. The question is: can you show the evidence?*

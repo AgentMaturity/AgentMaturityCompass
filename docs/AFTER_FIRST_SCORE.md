@@ -111,7 +111,7 @@ That is how you move from exploratory scoring into execution evidence. Then scor
 - **Score** — maturity score and gap analysis
 - **Shield** — red-team and assurance packs
 - **Enforce** — action governance and approvals
-- **Vault** — cryptographic proof and evidence integrity
+- **Vault** — signed records and evidence integrity checks
 - **Watch** — traces, anomalies, monitoring, and decision observability
 - **Comply** — framework mapping and audit reporting
 - **Fleet** — multi-agent comparison and governance

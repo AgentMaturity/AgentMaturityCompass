@@ -57,7 +57,7 @@ with AmcAgent(workspace=".", provider="stub") as agent:
 
 Updates are completed blocks from committed session rows, not raw token deltas. `stop_reason == "end_turn"` is not a success verdict, and `result.verification` is always `"not-verified"`: use the signed record for the authoritative ending.
 
-## Prove the run to someone else
+## Show the run to someone else
 
 ```python
 from amc_sdk import export_proof, verify_proof

@@ -233,7 +233,7 @@
             <tr><td><code>amc adapters verify</code></td><td>Verify <code>adapters.yaml</code> signature</td></tr>
             <tr><td><code>amc adapters list</code></td><td>List built-in adapters and per-agent preferences</td></tr>
             <tr><td><code>amc adapters detect</code></td><td>Detect installed adapter runtimes</td></tr>
-            <tr><td><code>amc adapters capabilities</code></td><td>Issue a signed receipt for declared/effective events, controls, version proof, and lossiness</td></tr>
+            <tr><td><code>amc adapters capabilities</code></td><td>Issue a signed receipt for declared/effective events, controls, runtime version evidence, and lossiness</td></tr>
             <tr><td><code>amc adapters configure</code></td><td>Set adapter profile for an agent</td></tr>
             <tr><td><code>amc adapters env</code></td><td>Print adapter-compatible environment exports</td></tr>
             <tr><td><code>amc adapters init-project</code></td><td>Generate runnable local adapter sample</td></tr>
@@ -293,7 +293,7 @@
           <thead><tr><th>Command</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>amc run --window &lt;days&gt;d</code></td><td>Run maturity diagnostic</td></tr>
-            <tr><td><code>amc run --question-set lifecycle</code></td><td>Opt into lifecycle, evidence, runtime, proof, memory, and fleet question coverage</td></tr>
+            <tr><td><code>amc run --question-set lifecycle</code></td><td>Opt into lifecycle, evidence, runtime, portable export, memory, and fleet question coverage</td></tr>
             <tr><td><code>amc proof check --manifest &lt;path&gt; --input &lt;path&gt;</code></td><td>Emit a fail-closed <code>amcproof</code> artifact for declared source-to-rule correctness checks</td></tr>
             <tr><td><code>amc report &lt;runId|alias|latest&gt;</code></td><td>Render report for a run, saved alias, or latest run</td></tr>
             <tr><td><code>amc report &lt;id&gt; --html r.html</code></td><td>Styled HTML report (print to PDF)</td></tr>
@@ -552,8 +552,8 @@
             <tr><td><code>amc assurance runs</code></td><td>List past runs</td></tr>
             <tr><td><code>amc assurance show &lt;runId&gt;</code></td><td>Show run details</td></tr>
             <tr><td><code>amc shield confirm scope-write --file security-scope.json</code></td><td>Write a signed authorization scope for controlled exploit confirmation</td></tr>
-            <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Run fail-closed confirmation and emit safe proof without exploit instructions</td></tr>
-            <tr><td><code>amc shield confirm proofs|export &lt;proof&gt;</code></td><td>List and export redacted confirmation proof for Vault or Passport evidence</td></tr>
+            <tr><td><code>amc shield confirm run --scope &lt;scope&gt; --task finding-task.json</code></td><td>Run fail-closed confirmation and write a safe proof without exploit instructions</td></tr>
+            <tr><td><code>amc shield confirm proofs|export &lt;proof&gt;</code></td><td>List and export redacted confirmation records for Vault or Passport evidence</td></tr>
             <tr><td><code>amc assurance cert-issue|cert-verify</code></td><td>Assurance certificates</td></tr>
             <tr><td><code>amc assurance scheduler status</code></td><td>Scheduler controls</td></tr>
             <tr><td><code>amc assurance waiver request</code></td><td>Temporary waiver</td></tr>
@@ -615,7 +615,7 @@
             <tr><td><code>amc loop init|run|plan</code></td><td>Continuous maturity loop</td></tr>
             <tr><td><code>amc dashboard build|serve</code></td><td>Build/serve local dashboard</td></tr>
             <tr><td><code>amc transparency init|verify|tail</code></td><td>Transparency log</td></tr>
-            <tr><td><code>amc transparency merkle rebuild|root</code></td><td>Merkle proofs</td></tr>
+            <tr><td><code>amc transparency merkle rebuild|root</code></td><td>Merkle inclusion proofs</td></tr>
             <tr><td><code>amc metrics status</code></td><td>Prometheus metrics endpoint</td></tr>
             <tr><td><code>amc maintenance stats|vacuum</code></td><td>Operational maintenance</td></tr>
           </tbody>

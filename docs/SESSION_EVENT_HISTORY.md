@@ -53,7 +53,7 @@ session-envelope ordering and existing lifecycle seals. Missing, malformed,
 unsigned, modified and unsupported evidence fails visibly; no partial success or
 fallback rows are returned. `sessionId` selects the exact persisted identity;
 `agentId` additionally matches its signed native `session/open` metadata.
-The returned rows, records and verdict are immutable snapshots. Hash and
+The returned rows, records and verdict are point-in-time snapshots. Hash and
 signature verification applies to AMC's existing event-hash preimage; separately
 attached receipt fields and retention annotations do not gain an independent
 verification verdict merely by appearing in a returned row.

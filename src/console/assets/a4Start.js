@@ -3,7 +3,7 @@
 // answers. Pure: data in, HTML or plain values out; every server string goes through esc(). Studio re-checks every
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
 import { QUESTION_LABELS } from "./a4Questions.js";
-import { SELF_APPROVE, selfApproves, selfCountsOnce } from "./a4Who.js";
+import { SELF_APPROVE, decidedByMe, selfApproves, selfCountsOnce } from "./a4Who.js";
 import { itemTitle } from "./a4Plain.js";
 import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
@@ -206,6 +206,10 @@ function gateMove(ctx, kind) {
     if (needed && effectStatus && effectStatus !== "QUORUM_MET" && effectStatus !== "CONSUMED") {
       // Whoever the completion gate excludes (its requester, authors, builders) is excluded from the effect's request too.
       const excludedHere = typeof me?.userId === "string" && list(liveGate(ctx, "completion")?.excludedKeys).some((key) => String(key).endsWith(`:${me.userId}`));
+      // Readiness names no engine decisions; this tab remembers its own (a4Who.decidedByMe), as the card's buttons do.
+      const requestId = String(prefixed(effect, "APPROVAL_REQUEST:")[0] ?? "").split(":")[0];
+      if (requestId && decidedByMe(me?.username, requestId)) return { effect: true, now: `You have decided the second request, which ${what}. `
+        + `Waiting for the other approvers on the ${cardName} (now ${effectStatus}).`, why: WAITING_HOW, act: COPY_LINK };
       if (!excludedHere && ctx.allowed?.requestChanges?.allowed === true) return { effect: true, now: `Your approval is needed on a second request, which ${what}: `
         + `the approval of the completion above does not count for it. Write a reason on the ${cardName}, then press Approve there. If you have approved it already, nothing more is needed from you.`,
       act: { label: "Write your reason", focus: `${cardSel} [name="engine-reason"]` } };

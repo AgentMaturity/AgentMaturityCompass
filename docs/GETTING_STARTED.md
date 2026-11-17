@@ -546,7 +546,7 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | `amc guardrails enable prompt-injection-detection` | Add a signed, additive request for a runtime-bound control |
 | `amc guardrails disable prompt-injection-detection` | Remove the request without weakening a separately signed Runtime Firewall policy |
 | `amc shield confirm scope-write --file security-scope.json` | Authorize controlled exploit confirmation with ownership, time window, safe mode, and allowed techniques |
-| `amc shield confirm run --scope <scope> --task finding-task.json` | Convert an authorized finding into safe proof with hashes, signals, and receipts instead of exploit instructions |
+| `amc shield confirm run --scope <scope> --task finding-task.json` | Convert an authorized finding into a safe proof with hashes, signals, and receipts instead of exploit instructions |
 | `amc shield confirm export <proof> --out safe-proof.json` | Export redacted confirmation proof for Vault/Passport evidence bundles |
 | `amc import <path> --dry-run` / `amc import <path>` | Detect and import neutral traces, runs, workflow graphs, configs, memory, evaluator outputs, and benchmarks as redacted AMC evidence |
 | `amc executive brief --run latest --out board-brief.html` | Write a print-ready board one-pager from a diagnostic run without certificate signing |
@@ -587,7 +587,7 @@ amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent
 | `amc experiment optimizer-list` / `amc experiment optimizer-show latest` | Review accepted/rejected optimizer candidates and reasons |
 | `amc evidence export --agent <id> --format json --out evidence.json` | Export verifier-ready evidence for one agent: rows whose metadata names the agent plus every row of the native sessions it opened, never the shared `system` session. Prints `events=`, `sessions=` and `excluded=`; the JSON (`schemaVersion` 2) records the same in `agentFilter`, with `systemSession: "excluded"` and `insufficientFor: ["requires_no_audit"]`: system rows can count against an agent, so recompute those controls from an unfiltered export |
 | `amc evidence finding-proofs list` | Trace each major finding to evidence, resources, receipts, and recommendation ids |
-| `amc evidence finding-proofs export --out proofs.json --redacted` | Export shareable proof chains without local workspace paths |
+| `amc evidence finding-proofs export --out proofs.json --redacted` | Export shareable finding evidence chains without local workspace paths |
 | `amc evidence lifecycle-receipts list` | List proposal, validation, commit, rollback, and monitor receipts |
 | `amc evidence lifecycle-receipts export --out receipts.json --redacted` | Export lifecycle change receipts without local workspace paths |
 

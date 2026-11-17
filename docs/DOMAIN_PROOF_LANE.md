@@ -17,9 +17,9 @@ The Domain Proof Lane is a bounded cross-surface capability for proving or faili
 
 AMC separates three proof classes:
 
-1. **Evidence integrity proof** — AMC proves what happened, what was captured, what was signed, and what was not silently altered.
-2. **Runtime policy proof** — AMC proves a run or action respected declared policy/runtime invariants.
-3. **Domain correctness proof** — AMC proves or disproves that one answer follows one declared source-to-rule manifest.
+1. **Evidence integrity proof** — AMC shows what happened, what was captured, what was signed, and what was not silently altered.
+2. **Runtime policy proof** — AMC checks that a run or action respected declared policy/runtime invariants.
+3. **Domain correctness proof** — AMC checks whether one answer follows one declared source-to-rule manifest.
 
 Allowed `correctnessProofStatus` values:
 
@@ -110,8 +110,8 @@ Rejected requests return bounded errors. AMC does not echo host paths, attempted
 
 ## Open Compass Standard
 
-`amcproof.schema.json` is part of the Open Compass Standard bundle. Schema validation proves artifact shape only. Correctness requires a `result: "proven"` artifact with rule refs, checked constraints, and valid proof bindings.
+`amcproof.schema.json` is part of the Open Compass Standard bundle. Schema validation checks artifact shape only. Correctness requires a `result: "proven"` artifact with rule refs, checked constraints, and valid proof bindings.
 
 ## Claim boundary
 
-AMC proves what your agent did. Domain Proof Lane shows when a specific answer follows a declared rule set, and when it does not. If no declared rule set was checked, AMC says `unsupported`.
+AMC records what your agent did. Domain Proof Lane shows when a specific answer follows a declared rule set, and when it does not. If no declared rule set was checked, AMC says `unsupported`.

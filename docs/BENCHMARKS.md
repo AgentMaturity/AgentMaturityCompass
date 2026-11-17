@@ -19,7 +19,7 @@ AMC `bench` artifacts are deterministic, signed, privacy-safe ecosystem checkpoi
 - secrets/tokens/keys
 - free-form user text/PII
 
-## Privacy Guarantees
+## Privacy protections
 
 - allowlist-only export model
 - free-text export blocked

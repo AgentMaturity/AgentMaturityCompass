@@ -15,7 +15,7 @@ Unsigned/invalid budgets config is treated as untrusted and restricts execute be
 - Per-minute and per-day model request allowances. Native admission refuses the next request when the allowance is reached.
 - Per-day tool execution allowances by `ActionClass`. Executed attempts and pending reservations consume slots. Policy-denied calls are reported separately; a tool body that runs and fails still consumes an attempt.
 - Token thresholds checked between model dispatches. A single admitted request can cross a token threshold because its final usage is not yet known.
-- Native USD admission when `daily.maxCostUsd` is present: reserve an auditor-attested worst-case request ceiling before dispatch. Measured settled spend plus outstanding reservations must fit the signed daily allowance. This guarantee depends on the auditor's ceiling contract covering the request; indicative catalog pricing is insufficient.
+- Native USD admission when `daily.maxCostUsd` is present: reserve an auditor-attested worst-case request ceiling before dispatch. Measured settled spend plus outstanding reservations must fit the signed daily allowance. This limit holds only as far as the auditor's ceiling contract covering the request; indicative catalog pricing is insufficient.
 
 Budget checks run in:
 - Native agent, chat, SDK and ACP sessions (model admission and tool guards)
@@ -79,7 +79,7 @@ Daily and minute model fields use their respective windows. The `ok` field repor
 
 ## Missing Usage and Recovery
 
-The signed per-agent `unknownTokenUsage` setting defaults to `BLOCK` when omitted. It decides what happens when AMC cannot tell what an earlier model request cost. AMC first works out what it can prove, so that one failed or cancelled request does not stop the agent:
+The signed per-agent `unknownTokenUsage` setting defaults to `BLOCK` when omitted. It decides what happens when AMC cannot tell what an earlier model request cost. AMC first works out what it can show, so that one failed or cancelled request does not stop the agent:
 
 - **Nothing was sent.** A request refused before the transport, or one whose connection never opened (nothing listening, no such host: `ECONNREFUSED`, `ENOTFOUND`, `EAI_AGAIN`, `EHOSTUNREACH`, `ENETUNREACH`, recorded as `connectFailed` on the request's failure row), counts as a request that used no tokens. The same holds for the gateway: when no attempt to reach the upstream got an answer and every attempt failed before connecting, its `request_error` row carries `connectFailed`. Once the upstream has answered, a later failure is never counted as "nothing sent".
 - **The stand-in model.** A request to the built-in stand-in model (`--provider stub`) goes nowhere and costs nothing, so it counts as zero, and unknown usage elsewhere never stops it. The request and token limits still apply to it.

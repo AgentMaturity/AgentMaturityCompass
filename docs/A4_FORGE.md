@@ -204,11 +204,11 @@ synthetic refs are exported labelled, never stripped.
 AMC's own integrity checks (signatures, the chain, side rows) are a separate integrity section. They describe bytes,
 never the agent, and are never a lane, a ref or a claim kind.
 
-## What each record proves
+## What each record shows
 
 A signature shows who wrote a record and that it is unchanged since, never that its statement is true.
 
-| Record | Signed by | Proves |
+| Record | Signed by | Shows |
 | --- | --- | --- |
 | every transition | its `audit` ledger row (monitor key, hash-chained) with a receipt over the transition's bytes | this workspace wrote these bytes and has not changed them; the chain names every side row, so a deleted or altered row shows |
 | gate request, decision, release, deployment and rollback | additionally an `A4_RECORD` envelope (auditor key) | an auditor-key statement a verifier can admit from its own pinned trust list |
@@ -498,7 +498,8 @@ the agent's prompt pack.
   `CLOCK_REVIEW_STATUS`), the signed configs' states and the active plan's head. The missing facts name the questions
   that resolve them. An answer given before a carried question had any value at Adapt, and current then, is stamped
   against the values Understand carries, so the first carry does not mark it stale; one given against another, earlier
-  carried value stays stale.
+  carried value stays stale. A carried question the earlier stage left empty (Aspire's `markets`, Adapt's
+  `deploymentNeeds`) keeps the answer a person gives at the later stage; once the earlier stage has a value, it wins.
 - **Explain** quotes the catalog's own notice at every level, never a sentence of Adapt's: "Every record here is `experimental`: it
   was drafted by an agent, its citations are not yet fetched, hashed or legally reviewed, and no named expert has
   approved it." (D-08). It renders applicability, missing facts, the required reviews of the completion rule (a role's
@@ -1114,7 +1115,7 @@ residency or retention.
 - **Verify in place.** `GET /api/v1/a4/projects/:id/verify` returns a `VerifierReportV1` under the server operator's
   trust list. It takes no query parameter and no body: `?trustList=` is 400 `QUERY_INVALID`, and any trust a request
   names is refused. The report is the same for every reader allowed to see it: a workspace OWNER or AUDITOR, the admin
-  token, or a member proven by member rows that verify. When the member rows themselves fail, any other reader gets
+  token, or a member shown by member rows that verify. When the member rows themselves fail, any other reader gets
   `409 A4_INTEGRITY_FAILED` with the fixed BLOCKED detail. `amc verify all` runs the same check
   (`a4-projects`) for every project.
 - **Export.** Unless `AMC_A4_PREVIEW=0`, `amc bundle export` adds each A4 project of the run's agent to the `.amcbundle`

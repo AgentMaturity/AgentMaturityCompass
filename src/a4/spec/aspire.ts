@@ -157,12 +157,15 @@ export function carriedGaps(ids: readonly string[], answers: readonly A4Answer[]
     : JSON.stringify(values.get(id) ?? null) !== JSON.stringify(carried.get(id) ?? null) ? [`CARRIED_STALE:${id}`] : []);
 }
 /**
- * Understand's carry at a later stage: the stage's own answers without the carried ids (`kept`), the values they give with
+ * Understand's carry at a later stage: the stage's own answers without the carried ids, except a person's own answer to one
+ * the earlier stage left empty (`kept`), the values they give with
  * the carried ones over them, and the carried answers recorded at `revisionNo` (`source: "carried"`).
  */
 export function carryAnswers(answers: readonly A4Answer[], ids: readonly string[], carried: ReadonlyMap<string, unknown>, revisionNo: number):
   { kept: A4Answer[]; values: Map<string, unknown>; carriedAnswers: A4Answer[] } {
-  const kept = answers.filter((answer) => !ids.includes(answer.questionId));
+  // A person's own answer to a carried question stays when the earlier stage gave it no value: dropping it would throw
+  // away what they typed and leave every answer that depends on it stale (the Activate walk, deploymentNeeds).
+  const kept = answers.filter((answer) => !ids.includes(answer.questionId) || (answer.source === "user" && !carried.has(answer.questionId)));
   const values = answerValues(kept);
   for (const [id, value] of carried) values.set(id, value);
   const carriedAnswers: A4Answer[] = [...carried].map(([questionId, value]) => ({ questionId, value, source: "carried", answeredAtRevision: revisionNo,

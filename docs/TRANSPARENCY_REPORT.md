@@ -51,7 +51,7 @@ What the agent can **see and use**:
 - Cross-border data transfer status
 
 ### Trust Evidence
-Cryptographic proof of the assessment:
+Signed records of the assessment:
 - Run ID and report SHA-256 hash
 - Integrity index (0–1)
 - Assurance packs covered and passed

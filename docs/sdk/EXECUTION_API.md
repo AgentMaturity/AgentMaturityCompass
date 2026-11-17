@@ -45,7 +45,7 @@ What each verb means on every surface:
   the session. Without `--keep-open` the CLI seals the session at exit instead. Studio's `archive` is housekeeping for a
   closed task, not an execution verb.
 - **verify** re-derives every request in the session from the signed log and checks the chains (`verifyAgentRun`). Pin
-  the monitor key (`AMC_EXPECTED_MONITOR_FINGERPRINT` or `--expect-monitor`); without a pin the result proves internal
+  the monitor key (`AMC_EXPECTED_MONITOR_FINGERPRINT` or `--expect-monitor`); without a pin the result shows internal
   consistency only. Signatures checked against the workspace's own keys are a local audit trail, not a portable verdict.
 
 ## The four phases

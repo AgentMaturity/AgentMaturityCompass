@@ -255,7 +255,7 @@ Promptfoo and DeepEval test _what your LLM says_. AMC tests _how your agent beha
 
 Every AMC score is backed by cryptographically signed evidence:
 - Ed25519 signatures on all artifacts
-- Merkle tree proof chains linking evidence together
+- Merkle-tree hash chains linking evidence together
 - Append-only records — a later change to a past record shows up when the records are checked
 - Verifiable by third parties: `amc verify`
 

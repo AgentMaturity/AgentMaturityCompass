@@ -99,7 +99,7 @@ amc --agent default agent-loop run "Check recording with a local demonstration."
 amc agent-loop verify <session-id> --expect-monitor <monitor sha256>   # 3. verify the recorded evidence (the run prints the session id)
 ```
 
-Since P0-09, verification fails when the ledger is unanchored: the monitor key lives inside the workspace, so a verdict anchored only to it proves internal consistency, not authorship. Pin the fingerprint you recorded with `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`); `--allow-unanchored` gives an integrity-only result with exit code 2.
+Since P0-09, verification fails when the ledger is unanchored: the monitor key lives inside the workspace, so a verdict anchored only to it shows internal consistency, not authorship. Pin the fingerprint you recorded with `--expect-monitor` (or `AMC_EXPECTED_MONITOR_FINGERPRINT`); `--allow-unanchored` gives an integrity-only result with exit code 2.
 
 The `export` line is optional in your own terminal. If `AMC_VAULT_PASSPHRASE` is not set
 there, `amc init --minimal` generates a passphrase and remembers it on this computer
@@ -428,7 +428,7 @@ amc adapters run --agent my-agent --adapter generic-cli -- your-agent-command
 | Lifecycle-expanded diagnostic (264 questions) | `amc run --question-set lifecycle` |
 | EU AI Act compliance check | `amc compliance report --framework EU_AI_ACT` |
 | Red-team your agent | `amc assurance run --all` |
-| Prove governed resources did not drift | `amc resource snapshot` / `amc resource validate` |
+| Check that governed resources did not drift | `amc resource snapshot` / `amc resource validate` |
 | Protect live traffic | `amc firewall enable --mode block` / `amc firewall events` |
 | Inspect effective guardrails | `amc guardrails list` / `amc guardrails enable prompt-injection-detection` |
 | Confirm security findings safely | `amc shield confirm scope-write --file security-scope.json` / `amc shield confirm run --task finding-task.json` |
