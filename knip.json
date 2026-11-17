@@ -3,7 +3,7 @@
   "workspaces": {
     ".": {
       "entry": [
-        "src/index.ts", "src/cli.ts", "src/amc.ts", "api/index.ts",
+        "src/index.ts", "src/cli.ts", "api/index.ts",
         "src/sdk/mobileFetch.ts", "src/sdk/nativeAgentClient.ts",
         "src/standard/externalEvidenceProfile.ts", "src/importers/piTelemetryCallbacks.ts",
         "examples/hello-agent/agent.js",
