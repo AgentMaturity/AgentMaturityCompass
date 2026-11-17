@@ -11,6 +11,7 @@ import { plainErrorText } from "../../src/console/assets/plainError.js";
 import { codeWords, keyWords, recordRows, recordDetails, workspacePath } from "../../src/console/assets/pageKit.js";
 import { renderValueEvidenceBanner } from "../../src/console/assets/components/valueEvidenceBanner.js";
 import { renderNavSession } from "../../src/console/assets/shell.js";
+import { renderPassportPage } from "../../src/console/assets/passport.js";
 import { studioInputError, studioSetupError } from "../../src/studio/studioInputErrors.js";
 import { assertNewUsername, createUserRecord, UsernamePolicyError } from "../../src/auth/userSchema.js";
 import { autoAnswerFromLatestRun } from "../../src/diagnostic/autoAnswer/autoAnswerEngine.js";
@@ -152,5 +153,24 @@ describe("C-16: no browser prompt or alert boxes on these pages", () => {
     for (const name of ["app.js", "assurance.js", "audit.js", "auditBinder.js", "auditRequests.js", "northstar.js", "passport.js"]) {
       expect(asset(name), name).not.toMatch(/window\.prompt\(|[^.\w]alert\(/);
     }
+  });
+});
+
+describe("Passport page with no passport yet", () => {
+  test("it says so and shows no UNTRUSTED or UNKNOWN status tiles", async () => {
+    const root = { innerHTML: "" };
+    const saved = (globalThis as { document?: unknown }).document;
+    (globalThis as { document?: unknown }).document = { getElementById: () => null };
+    try {
+      await renderPassportPage({
+        root, currentAgent: () => "<b>bot</b>", card: (title: string, body: string) => `<section><h3>${title}</h3>${body}</section>`,
+        apiGet: async (path: string) => path === "/agents" ? { agents: [{ id: "default" }] } : path.startsWith("/passport/cache") ? { passport: null } : {},
+        apiPost: async () => ({})
+      });
+    } finally {
+      (globalThis as { document?: unknown }).document = saved;
+    }
+    expect(root.innerHTML).toContain("No passport yet for <strong>&lt;b&gt;bot&lt;/b&gt;</strong>");
+    expect(root.innerHTML).not.toMatch(/UNTRUSTED|UNKNOWN|Risk avg/);
   });
 });
