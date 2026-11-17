@@ -33,11 +33,12 @@ export async function renderStandardPage(params) {
   if (status?.passport?.policySignatureValid === false) {
     warnings.push("<div class='card status-bad'><strong>PASSPORT POLICY UNTRUSTED</strong></div>");
   }
-  if (schemas?.verify?.ok === false) {
-    warnings.push(`<div class='card status-warn'><strong>SCHEMA BUNDLE NOT VERIFIED</strong>: ${esc((schemas.verify.errors || []).join(", "))}</div>`);
+  const rows = Array.isArray(schemas?.schemas) ? schemas.schemas : [];
+  // Before the first Generate there is no bundle to check: that is the empty state, not a failed check.
+  if (schemas?.verify?.ok === false && rows.length > 0) {
+    warnings.push(`<div class='card status-warn'><strong>The schema bundle does not check out</strong>: ${esc((schemas.verify.errors || []).join(", "))}</div>`);
   }
 
-  const rows = Array.isArray(schemas?.schemas) ? schemas.schemas : [];
   params.root.innerHTML = [
     ...warnings,
     params.card(
@@ -47,7 +48,8 @@ export async function renderStandardPage(params) {
         <button id="standardGenerateBtn" data-roles="OWNER">Generate Schemas</button>
         <button id="standardVerifyBtn" class="secondary">Verify Bundle</button>
       </div>
-      <div class="muted">bundle ok=${esc(String(Boolean(schemas?.verify?.ok)))} schemas=${esc(String(rows.length))}</div>
+      <div class="muted">${rows.length === 0 ? "No schemas yet: press Generate Schemas to write them."
+        : `${esc(String(rows.length))} schemas; the bundle ${schemas?.verify?.ok ? "checks out" : "does not check out"}.`}</div>
       <pre id="standardOut" class="scroll muted"></pre>
       `
     ),

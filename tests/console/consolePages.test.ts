@@ -12,6 +12,7 @@ import { codeWords, keyWords, recordRows, recordDetails, workspacePath } from ".
 import { renderValueEvidenceBanner } from "../../src/console/assets/components/valueEvidenceBanner.js";
 import { renderNavSession } from "../../src/console/assets/shell.js";
 import { renderPassportPage } from "../../src/console/assets/passport.js";
+import { renderStandardPage } from "../../src/console/assets/standard.js";
 import { studioInputError, studioSetupError } from "../../src/studio/studioInputErrors.js";
 import { assertNewUsername, createUserRecord, UsernamePolicyError } from "../../src/auth/userSchema.js";
 import { autoAnswerFromLatestRun } from "../../src/diagnostic/autoAnswer/autoAnswerEngine.js";
@@ -172,5 +173,26 @@ describe("Passport page with no passport yet", () => {
     }
     expect(root.innerHTML).toContain("No passport yet for <strong>&lt;b&gt;bot&lt;/b&gt;</strong>");
     expect(root.innerHTML).not.toMatch(/UNTRUSTED|UNKNOWN|Risk avg/);
+  });
+});
+
+describe("Open Standard before any schema exists", () => {
+  test("it names the next step instead of a failed bundle check or raw ok=false", async () => {
+    const root = { innerHTML: "" };
+    const g = globalThis as { document?: unknown; window?: unknown };
+    const saved = [g.document, g.window];
+    g.document = { getElementById: () => null };
+    g.window = { location: { href: "http://127.0.0.1/console/standard" } };
+    try {
+      await renderStandardPage({
+        root, card: (title: string, body: string) => `<section><h3>${title}</h3>${body}</section>`,
+        apiGet: async (path: string) => path === "/standard/schemas" ? { schemas: [], verify: { ok: false, errors: ["meta.json missing"] } } : {},
+        apiPost: async () => ({})
+      });
+    } finally {
+      [g.document, g.window] = saved;
+    }
+    expect(root.innerHTML).toContain("No schemas yet: press Generate Schemas to write them.");
+    expect(root.innerHTML).not.toMatch(/NOT VERIFIED|ok=|meta\.json/);
   });
 });
