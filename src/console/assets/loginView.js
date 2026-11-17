@@ -71,8 +71,11 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
   `;
 }
 
-const WRONG_PASSWORD = "Sign-in failed: the user name or password is wrong. Check both and try again. If you forgot the password, the "
-  + "workspace owner can set a new one in a terminal in the workspace folder with amc user password <your user name>.";
+// Studio answers "invalid credentials" for every refusal (wrong password, revoked account, unreadable users file),
+// so this one message names both causes and never says which accounts exist.
+const WRONG_PASSWORD = "Sign-in failed: the user name or password is wrong, or this account cannot sign in (ask the workspace owner). "
+  + "Check both and try again. If you forgot the password, the workspace owner can set a new one in a terminal in the "
+  + "workspace folder with amc user password <your user name>.";
 
 /** The status line after a failed sign-in: Studio's "no users.yaml" and wrong-password replies become plain next steps; any other error is shown as is. */
 export function loginFailureText(message) {

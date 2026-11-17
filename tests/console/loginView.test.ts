@@ -119,6 +119,7 @@ describe("loginFailureText", () => {
   test("a wrong user name or password says so in plain words, with how to get a new password", () => {
     const text = loginFailureText("invalid credentials");
     expect(text).toContain("the user name or password is wrong");
+    expect(text).toContain("or this account cannot sign in (ask the workspace owner)");
     expect(text).toContain("amc user password <your user name>");
     expect(text).not.toContain("invalid credentials");
   });
