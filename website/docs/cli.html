@@ -145,7 +145,7 @@
           <tr><td><code>amc evidence finding-proofs</code></td><td>Trace findings to evidence, resources, receipts, and recommendations</td><td><code>amc evidence finding-proofs list</code></td></tr>
           <tr><td><code>amc report</code></td><td>Render diagnostic report by run ID, alias, prefix, or latest</td><td><code>amc report q1-assessment --share --public-base-url https://reports.example.com/amc</code></td></tr>
           <tr><td><code>amc badge</code></td><td>Print a one-line maturity badge</td><td><code>amc badge --agent my-agent</code></td></tr>
-          <tr><td><code>amc assurance run</code></td><td>Run red team assurance packs</td><td><code>amc assurance run --scope full</code></td></tr>
+          <tr><td><code>amc assurance run</code></td><td>Run red team assurance packs</td><td><code>amc assurance run --all</code></td></tr>
           <tr><td><code>amc compliance report</code></td><td>Generate compliance mapping report</td><td><code>amc compliance report --framework EU_AI_ACT</code></td></tr>
           <tr><td><code>amc domain assess</code></td><td>Assess against an industry domain</td><td><code>amc domain assess --domain health</code></td></tr>
           <tr><td><code>amc vault init</code></td><td>Initialize encrypted key vault</td><td><code>amc vault init</code></td></tr>
@@ -253,7 +253,7 @@
           <tbody>
             <tr><td><code>amc wrap &lt;name&gt; -- &lt;args&gt;</code></td><td>Wrap and capture evidence (claude, gemini, openclaw, any)</td></tr>
             <tr><td><code>amc supervise --route &lt;r&gt; -- &lt;cmd&gt;</code></td><td>Supervise with gateway routing</td></tr>
-            <tr><td><code>amc sandbox run --agent &lt;id&gt; -- &lt;cmd&gt;</code></td><td>Run in hardened Docker sandbox</td></tr>
+            <tr><td><code>amc sandbox run --agent &lt;id&gt; -- &lt;cmd&gt;</code></td><td>Run in a Docker sandbox</td></tr>
             <tr><td><code>amc monitor --stdin --runtime &lt;n&gt;</code></td><td>Record stdin stream as evidence</td></tr>
             <tr><td><code>amc connect</code></td><td>Connect wizard for any agent/provider</td></tr>
             <tr><td><code>amc connect hooks install --provider &lt;id&gt; [--mode observe|control]</code></td><td>Install a reversible observer by default, or opt into loopback signed control</td></tr>

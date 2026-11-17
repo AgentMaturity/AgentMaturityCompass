@@ -76,7 +76,7 @@ describe("AMC public comparison identity and claim boundary", () => {
     const html = read("website/compare.html");
     expect(html).toContain("Use these approaches together");
     expect(html).toContain("AMC does not certify legal compliance.");
-    expect(html).toContain("A signed artifact proves integrity, not evidence sufficiency.");
+    expect(html).toContain("A signed artifact shows integrity, not evidence sufficiency.");
     expect(html).toContain("INSUFFICIENT_EVIDENCE");
     expect(html).toContain("AMC does not replace model benchmarks, model cards, organizational assurance reports, or expert adversarial testing.");
   });

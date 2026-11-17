@@ -76,7 +76,7 @@ var PRODUCTS=[
     {label:'generated fix',value:'.amc/guardrails/dlp-base64.yaml'},
     {label:'report',value:'.amc/shield/latest.md'}
   ]},
-  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing proof',summary:'Preview one immutable action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, transparency proof, and a ledger receipt.'}],lines:[
+  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing the record',summary:'Preview one fixed action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, transparency proof, and a ledger receipt.'}],lines:[
     {type:'code',label:'$ amc policy scope compile release-external --pack code-agent.high'},
     {label:'scope',value:'workspace · fleet-wide'},
     {label:'action classes',value:'DEPLOY · NETWORK_EXTERNAL'},
@@ -86,12 +86,12 @@ var PRODUCTS=[
     {label:'policy signatures',value:'verified'},
     {label:'evidence',value:'transparency + ledger receipt'}
   ]},
-  {name:'amc vault',title:'Vault',headline:'Show what happened, with signatures',summary:'Signs each record and links it to the one before, so an auditor can see if anything was changed or removed.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Makes records anyone can check',text:'Every record can be signed, linked to the one before, and checked by someone else.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need proof that survives handoffs, audits, and disputes.'},{label:'output',title:'A signed chain of records',text:'A ledger (an ordered log) with hashes, proofs, and what is needed to verify it.'}],lines:[
+  {name:'amc vault',title:'Vault',headline:'Show what happened, with signatures',summary:'Signs each record and links it to the one before, so an auditor can see if anything was changed or removed.',badges:['Ed25519 signing','Merkle chain','audit-ready'],info:[{label:'what it does',title:'Makes records anyone can check',text:'Every record can be signed, linked to the one before, and checked by someone else.'},{label:'why it matters',title:'Because “trust me” is not evidence',text:'Teams need records that survive handoffs, audits, and disputes. A signature shows who wrote a record and that it is unchanged, not that it is true.'},{label:'output',title:'A signed chain of records',text:'A ledger (an ordered log) with hashes and what is needed to check it.'}],lines:[
     {type:'code',label:'$ amc vault verify --chain .amc/evidence/'},
     {label:'chain length',value:'23 artifacts'},
     {label:'root hash',value:'a7f3c2d1...e890b4'},
     {label:'signatures',value:'23/23 valid'},
-    {label:'merkle proof',value:'VERIFIED'},
+    {label:'hash chain',value:'checks out'},
     {label:'tamper check',value:'clean'},
     {label:'notary timestamp',value:'2026-03-12T18:30:00Z'},
     {label:'status',value:'auditor-ready'}
