@@ -20,7 +20,7 @@
     "LICENSE"
   ],
   "bin": {
-    "amc": "dist/cli.js"
+    "amc": "dist/amc.js"
   },
   "engines": {
     "node": ">=20"

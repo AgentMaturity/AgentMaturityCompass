@@ -34,5 +34,4 @@ for (const name of readdirSync(join(root, manifestDir)).filter((entry) => entry.
     cpSync(join(root, path), join(claims, path));
   }
 }
-const cli = join(root, "dist/cli.js");
-if (existsSync(cli)) chmodSync(cli, 0o755);
+for (const entry of ["dist/cli.js", "dist/amc.js"]) if (existsSync(join(root, entry))) chmodSync(join(root, entry), 0o755);
