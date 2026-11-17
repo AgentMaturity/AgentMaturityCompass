@@ -107,6 +107,7 @@ import { recordNativeComposition } from "../prompt/context/nativeCompositionCont
 import type { NativeResourceStatus } from "../prompt/context/nativeResourceStatus.js";
 import type { CompositionSource } from "../prompt/context/compositionProvenance.js";
 import { renderPrompt } from "../prompt/assembly/interpolate.js";
+import { storageAdmissionRefusal } from "../residency/admissionWords.js";
 
 /** The section name a pinned system prompt is registered under. */
 export const PINNED_PROMPT_SECTION = "host:pinned-prompt";
@@ -412,6 +413,9 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   }
   // AXR-20: refuse a lease-less run with root tools once, before any session row, instead of denying every governed call.
   if (options.tools !== undefined && options.leaseToken === undefined && planRequiresAgentLease(loadActiveCompiledPolicy(options.workspace))) {
+    // Session open would refuse this workspace's storage first: say that reason in words rather than "start it from Studio".
+    const held = storageAdmissionRefusal(options.workspace);
+    if (held !== null) throw new Error(`RESIDENCY_REFUSED: ${held.message}`);
     throw new Error("IDENTITY_UNRESOLVED: the active plan's identity-binding requires a verified agent lease for every tool call, and this run holds none; no session was opened. Start the task from Studio, or issue a lease with `amc lease issue` and pass it with --lease-file <path> (a private 0600 file).");
   }
   if (options.delegation !== undefined) {

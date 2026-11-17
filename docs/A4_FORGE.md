@@ -656,6 +656,49 @@ the agent's prompt pack.
   (P1-67), and CLI agent runs, SDK native client sessions, ACP sessions and in-process sessions with workspace tools
   mint their own for the OS account's active `users.yaml` user, which their delegated children inherit (P1-79); tasks
   started before it are denied every call.
+- **What activation requires of the workspace.** An active compiled plan makes every session in the workspace subject
+  to storage admission (`SessionService.open`; docs/OPS_HARDENING.md, Residency routing), for every agent and every A4
+  project, not only the one that activated it. Until the workspace has a signed destination registry that matches the
+  plan, every new session is held: Studio refuses Run a task and A4 Build before writing anything, with `409
+  NATIVE_RESIDENCY_REFUSED` and the reason in words, and `amc agent-loop run` says the same where it would otherwise
+  report the lease refusal. The Adapt card says so
+  next to "Open the plan review" while the workspace has no registry that verifies. The registry must name the exact
+  deployment profile the plan was compiled from, because the plan pins that profile's digest, and A4 keeps that profile
+  only in the project's own records: `amc residency profile --out .amc/residency/profile.yaml` writes it (it refuses
+  unless the digest matches). A hand-written profile matches only if every field is identical, including each fact's
+  source, which names the revision it was answered at; compiling again after an answer changed changes the digest, so
+  the registry then needs the new profile. The registry also needs at least one rule, a storage URL and destination for it, and a
+  destination for every model the sessions call: the stand-in model's dispatch names `stub.invalid` on the `provider`
+  channel even though it is never dialled. An owner writes the registry and signs it with `amc residency init --file
+  <registry.yaml>`; `amc residency status` says what is still missing. A laptop operator in the United States could
+  truthfully declare:
+
+  ```yaml
+  schemaVersion: amc.residency-destinations/v1
+  profile:
+    path: .amc/residency/profile.yaml   # written by amc residency profile
+    storageUrl: http://localhost/amc-workspace
+  destinations:
+    - destinationId: this-laptop
+      match: { hosts: [localhost] }
+      channels: [storage]
+      region: { jurisdiction: US, code: us-operator-laptop }
+      transferBasis: null
+    - destinationId: stand-in-model     # runs inside AMC on this laptop
+      match: { hosts: [stub.invalid] }
+      channels: [provider]
+      region: { jurisdiction: US, code: us-operator-laptop }
+      transferBasis: null
+  rules:
+    - ruleId: us-data-stays-us
+      controlId: operator-us-01          # the operator's own id, not a catalog control
+      appliesTo: { dataClasses: [health], jurisdictions: [US] }
+      allowedJurisdictions: [US]
+      acceptsTransferBasis: false
+  ```
+
+  Every value is the operator's declaration, signed with the workspace's keys: it is not legal approval and not
+  evidence of where data physically resides. A real model provider needs its own destination and region the same way.
 - **Lifecycle bridge.** Adapt's rows (`testing → staging`) are the only source of `controlsSatisfied` for that advance:
   `integration_tests_passing` from executed checks that all passed on a non-stub provider, `security_review_signed`
   only from a `review_record` entry met by an admitted external record (an AUDITOR role vote alone leaves it

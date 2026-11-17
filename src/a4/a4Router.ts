@@ -58,6 +58,7 @@ import { verifyA4Chain } from "./a4Verify.js";
 export { A4_API_PREFIX, A4_UNPARSED_RECORD, sendA4Error } from "./a4RouterError.js";
 import { A4_API_PREFIX, sendA4Error } from "./a4RouterError.js";
 import { currentRelease } from "./spec/activate.js";
+import { loadDestinationRegistrySnapshot } from "../residency/destinationRegistry.js";
 import { witnessA4Project } from "../transparency/configWitness.js";
 
 const BODY_LIMIT = 1024 * 1024;
@@ -546,7 +547,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   const now = Date.now();
   const state = loadA4State(store, projectId, now);
   assertVisible(route, state.members);
-  const readinessAt = (stage: A4Stage) => viewerReadiness(evaluateFor(store, state, route.principal, route.principal ? callOf(route, undefined, true) : { fullIntegrity: true }, stage, now), state, route.native);
+  const readinessAt = (stage: A4Stage) => viewerReadiness(evaluateFor(store, state, route.principal, route.principal ? callOf(route, undefined, true) : { fullIntegrity: true }, stage, now), state, route.native, route.workspace);
   if (rest === "") {
     assertQuery(params, []);
     const readiness = readinessAt(headStage(state.project));
@@ -555,7 +556,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
       practice: openedAsPractice(state.chain), practiceActive: state.practice === true, regulated: regulatedOrClosed(route.workspace, state),
       selfApprovalAllowed: readiness.selfApprovalAllowed, revision: revision && { revisionNo: revision.revision_no, stage: revision.stage, parentRevisionNo: revision.parent_revision_no,
         specDigest: revision.spec_digest, resourceDigestsSha256: revision.resource_digests_sha256, createdByKey: revision.created_by_key, ts: revision.ts },
-      gates: readiness.gates, claim: readiness.claim });
+      gates: readiness.gates, claim: readiness.claim, destinationRegistry: loadDestinationRegistrySnapshot(route.workspace).state });
     return true;
   }
   if (rest === "/readiness") {

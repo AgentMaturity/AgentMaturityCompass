@@ -38,9 +38,9 @@ function nextGateOf(state: A4ReadinessState, query: A4ReadinessQuery, readiness:
 
 /** Readiness as the console reads it: `nextGate`, and Review held while a build session of this caller's is still open. */
 export function viewerReadiness(evaluated: { readiness: A4ReadinessV1; query: A4ReadinessQuery }, state: A4ReadinessState,
-  native: NativeTaskApiContext | undefined): A4ReadinessV1 {
+  native: NativeTaskApiContext | undefined, workspace: string): A4ReadinessV1 {
   const { readiness, query } = evaluated;
-  const held = query.stage === "assemble" ? reviewRefusals(native, state, query.principal) : [];
+  const held = query.stage === "assemble" ? reviewRefusals(native, state, query.principal, workspace) : [];
   const review = readiness.allowed.review;
   return { ...readiness, nextGate: nextGateOf(state, query, readiness),
     ...(held.length > 0 && review ? { allowed: { ...readiness.allowed, review: { allowed: false, reasonCodes: [...new Set([...review.reasonCodes, ...held])] } } } : {}) };

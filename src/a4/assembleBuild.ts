@@ -30,9 +30,11 @@ import { LeasePrincipalRefused, resolveLeasePrincipal } from "../leases/leasePri
 import { openLedger } from "../ledger/ledger.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { readPresets, savePresets } from "../presets/agentPresets.js";
+import { registryStatus, residencyRefusalWords } from "../residency/admissionWords.js";
 import { assertNativeExecutionIdentity, NativeAdmissionError } from "../studio/nativeAdmission.js";
 import { nativeTaskId } from "../studio/nativeTaskDescriptors.js";
 import { nativeTaskStartSchema } from "../studio/nativeTaskInput.js";
+import { assertNativeStorageAdmission } from "../studio/nativeResidency.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskStartRequest, type NativeTaskView } from "../studio/nativeTaskTypes.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { loadTrustContext } from "../trust/trustContext.js";
@@ -112,6 +114,7 @@ async function plannedSession(ctx: A4ProducerContext, spec: Record<string, unkno
   if (task?.prompt === undefined) throw fail(409, "A4_NOT_READY", "The plan names no native build turn; propose again.", { reasonCodes: ["PLAN_STALE"] });
   if (!native.executionAllowed()) throw fail(403, "NATIVE_READ_ONLY", "Workspace signatures require read-only operation; no build session was started.");
   try {
+    assertNativeStorageAdmission(ctx.workspace); // the start's own residency refusal, before the graph, the preset or the journaled session
     assertNativeExecutionIdentity({ actor: native.admissionActor, provider: session.provider, tools: session.tools });
   } catch (error) {
     throw nativeRefusal(error);
@@ -341,6 +344,12 @@ function bindingMismatch(view: NativeTaskView, start: NativeTaskStartRequest): s
 /** What Review records about the prompt binding until the native task lane exposes the first submission's bodyHash. */
 const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
 
+/** A build session that never started or failed while storage admission holds every session: the reason in words, not "resume it". */
+function assertNoResidencyHold(workspace: string, taskId: string): void {
+  const held = registryStatus(workspace).held;
+  if (held !== null) throw fail(409, "A4_NOT_READY", residencyRefusalWords("registry_unverifiable", held, false), { reasonCodes: ["NATIVE_RESIDENCY_REFUSED", `TASK:${taskId}`] });
+}
+
 /**
  * One build session as its owner reads it now; refuses one that is not the journaled start (409 BUILD_SESSION_MISMATCH),
  * refuses while it runs or is still open (BUILD_SESSION_OPEN: Review takes closed sessions only), and names the way on
@@ -356,6 +365,7 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
     view = native.service.poll(nativeActor(native, ctx.state.project.agent_id), planned.taskId).task;
   } catch (error) {
     if (error instanceof NativeTaskServiceError && error.code === "NATIVE_TASK_NOT_FOUND") {
+      assertNoResidencyHold(ctx.workspace, planned.taskId);
       throw fail(409, "A4_NOT_READY", "The build session never started: start it again with the body Build recorded (POST /api/v1/native-tasks).",
         { reasonCodes: ["BUILD_FAILED", `TASK:${planned.taskId}`] });
     }
@@ -368,6 +378,7 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
   }
   if (RUNNING.has(view.state)) throw fail(409, "A4_NOT_READY", "A build session is still running; review once it settles.", { reasonCodes: ["BUILD_RUNNING", `TASK:${planned.taskId}`] });
   if (view.state === "failed" || view.sessionId === null) {
+    assertNoResidencyHold(ctx.workspace, planned.taskId);
     throw fail(409, "A4_NOT_READY", view.canResume ? `The build session failed; resume task ${planned.taskId} on Studio's Native Tasks page and review once it settles.`
       : "The build session failed and cannot be resumed; request changes and build again.", { reasonCodes: ["BUILD_FAILED", `TASK:${planned.taskId}`] });
   }
@@ -385,11 +396,12 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
  * BUILD_RUNNING, BUILD_FAILED, SESSION_OWNER_REQUIRED, ...), so the guide offers "Close the build session" and not Review too
  * early (readiness itself reads no native task). Empty off Assemble's Build step, or with no native service to ask.
  */
-export function reviewRefusals(native: NativeTaskApiContext | undefined, state: A4ProducerContext["state"], principal: A4ProducerContext["principal"] | null): string[] {
+export function reviewRefusals(native: NativeTaskApiContext | undefined, state: A4ProducerContext["state"], principal: A4ProducerContext["principal"] | null,
+  workspace: string): string[] {
   if (native === undefined || principal === null || state.project.stage !== "assemble" || state.project.step !== "built") return [];
   const sessions = (assembleSpecOf(state).spec.build as { sessions?: PlannedSession[] } | undefined)?.sessions ?? [];
   try {
-    for (const planned of sessions) settledView({ native, principal, state } as A4ProducerContext, planned);
+    for (const planned of sessions) settledView({ native, principal, state, workspace } as A4ProducerContext, planned);
     return [];
   } catch (error) {
     const codes = (error as { detail?: { reasonCodes?: unknown } }).detail?.reasonCodes;

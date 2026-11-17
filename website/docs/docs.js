@@ -712,7 +712,7 @@ function showWelcome() {
         <div class="stat-card"><div class="num">${PUBLIC_DOCS.length}</div><div class="label">Guides</div></div>
         <div class="stat-card"><div class="num">${PUBLIC_CATEGORIES.length}</div><div class="label">Categories</div></div>
         <div class="stat-card"><div class="num">244</div><div class="label">Score questions</div></div>
-        <div class="stat-card"><div class="num">1,302</div><div class="label">CLI Paths</div></div>
+        <div class="stat-card"><div class="num">1,306</div><div class="label">CLI Paths</div></div>
         <div class="stat-card"><div class="num">41</div><div class="label">Industry Packs</div></div>
         <div class="stat-card"><div class="num">16</div><div class="label">Framework Adapters</div></div>
       </div>

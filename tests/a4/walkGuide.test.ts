@@ -4,7 +4,8 @@
  * "Use an example" lowered a pack project's risk level; Add a person for an existing account left nothing to do; amc a4
  * readiness printed bare PRODUCED_AT_* items; and nobody was told, before asking, that an approval needed more people.
  */
-import { writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
 import { afterEach, describe, expect, test, vi } from "vitest";
@@ -179,11 +180,28 @@ describe("Assemble: from Build to closing the build session to Review", () => {
   const owner = { key: "LOCAL_USER:u1" };
 
   test("Studio holds Review while the session is open, and lets it run once it is closed", () => {
-    expect(reviewRefusals(native("idle") as never, state as never, owner as never)).toEqual(["BUILD_SESSION_OPEN"]);
-    expect(reviewRefusals(native("running") as never, state as never, owner as never)).toEqual(["BUILD_RUNNING"]);
-    expect(reviewRefusals(native("closed") as never, state as never, owner as never)).toEqual([]);
-    expect(reviewRefusals(native("closed") as never, state as never, { key: "LOCAL_USER:u2" } as never)).toEqual(["SESSION_OWNER_REQUIRED"]);
-    expect(reviewRefusals(native("idle") as never, { ...state, project: { ...state.project, step: "reviewed" } } as never, owner as never)).toEqual([]);
+    expect(reviewRefusals(native("idle") as never, state as never, owner as never, "no-workspace")).toEqual(["BUILD_SESSION_OPEN"]);
+    expect(reviewRefusals(native("running") as never, state as never, owner as never, "no-workspace")).toEqual(["BUILD_RUNNING"]);
+    expect(reviewRefusals(native("closed") as never, state as never, owner as never, "no-workspace")).toEqual([]);
+    expect(reviewRefusals(native("closed") as never, state as never, { key: "LOCAL_USER:u2" } as never, "no-workspace")).toEqual(["SESSION_OWNER_REQUIRED"]);
+    expect(reviewRefusals(native("idle") as never, { ...state, project: { ...state.project, step: "reviewed" } } as never, owner as never, "no-workspace")).toEqual([]);
+  });
+
+  test("a failed build session while residency holds every session names that reason, not the resume loop", () => {
+    const ws = mkdtempSync(join(tmpdir(), "amc-walk-residency-")), checkpoints = mkdtempSync(join(tmpdir(), "amc-walk-residency-checkpoints-"));
+    try {
+      vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", checkpoints);
+      mkdirSync(join(ws, ".amc", "residency"), { recursive: true });
+      writeFileSync(join(ws, ".amc", "residency", "destinations.yaml"), "schemaVersion: amc.residency-destinations/v1\n"); // no signature
+      expect(reviewRefusals(native("failed") as never, state as never, owner as never, ws)).toEqual(["NATIVE_RESIDENCY_REFUSED"]);
+      const c = ctx({ stage: "assemble", project: project({ stage: "assemble", step: "built" }), stageRevision: { spec: { build: { sessions: [planned] } } },
+        allowed: { review: { allowed: false, reasonCodes: ["NATIVE_RESIDENCY_REFUSED"] } } });
+      expect(move(c).now).toContain("amc residency status");
+      expect(move(c).now).not.toContain("resume");
+    } finally {
+      vi.unstubAllEnvs();
+      for (const dir of [ws, checkpoints]) rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   test("the panel names the step, Close the build session, and opens that session's own page", () => {

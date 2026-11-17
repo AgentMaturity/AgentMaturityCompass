@@ -127,12 +127,15 @@ function sessionMove(ctx) {
     + `&project=${encodeURIComponent(ctx.project.projectId)}` : "./native-tasks";
   if (codes.includes("SESSION_OWNER_REQUIRED")) return { now: `${session?.ownerUsername ?? "The person who pressed Build"} started the build session, so they close it and run Review.` };
   if (codes.includes("BUILD_RUNNING")) return { now: "The build session is still running. Open it, wait until it stops, then press Close and verify there.", act: { label: "Open the build session", href } };
+  if (codes.includes("NATIVE_RESIDENCY_REFUSED")) {
+    return { now: "AMC holds every new session in this workspace until a signed destination registry matches its active compiled plan. An owner runs amc residency status in the workspace folder to see what is missing, then amc residency init --file <registry.yaml>; after that, request changes and build again." };
+  }
   if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Native Tasks to resume it, or request changes and build again.", act: { label: "Open the build session", href } };
   return { now: "Close the build session: it opens on Native Tasks. Press Close and verify there, then Back to the agent project. Review comes next.",
     act: { label: "Close the build session", href } };
 }
 /** Review's refusals that come from the build session itself (assembleBuild.reviewRefusals). */
-const SESSION_CODES = ["BUILD_SESSION_OPEN", "BUILD_RUNNING", "BUILD_FAILED", "SESSION_OWNER_REQUIRED"];
+const SESSION_CODES = ["BUILD_SESSION_OPEN", "BUILD_RUNNING", "BUILD_FAILED", "NATIVE_RESIDENCY_REFUSED", "SESSION_OWNER_REQUIRED"];
 
 function askMove(ctx) {
   const codes = codesOf(ctx.readiness, "ask_complete");

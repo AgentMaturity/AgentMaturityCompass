@@ -70,7 +70,7 @@ function sendFailure(res: ServerResponse, error: unknown): void {
   if (error instanceof NativeTaskServiceError || error instanceof NativeAdmissionError) {
     res.statusCode = error.statusCode;
     res.setHeader("content-type", "application/json");
-    res.end(JSON.stringify({ ok: false, error: error.message, code: error.code }));
+    res.end(JSON.stringify({ ok: false, error: error.message, code: error.code, ...(error instanceof NativeTaskServiceError && error.detail ? { detail: error.detail } : {}) }));
     return;
   }
   apiError(res, 500, "Native task could not be completed. Refresh its status before submitting again.");

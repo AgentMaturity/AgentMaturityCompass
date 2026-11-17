@@ -761,7 +761,7 @@ import { truthguardValidateCli } from "./truthguard/truthguardCli.js";
 import { domainProofCheckCli } from "./domainProof/domainProofCli.js";
 import { toErrorMessage } from "./utils/errors.js";
 import { registerLateStageCliCommands } from "./cli-late-stage-commands.js";
-import { registerLeaseCliCommands, registerWorkloadTrustCommands } from "./cli-lease-commands.js";
+import { registerLeaseCliCommands, registerResidencyCommands, registerWorkloadTrustCommands } from "./cli-lease-commands.js";
 import { registerDomainProductCliCommands } from "./cli-domain-product-commands.js";
 import { registerGuardrailControlCommands } from "./enforce/guardrailCli.js";
 import { registerControlInspectionCommands } from "./enforce/controlInspectionCli.js";
@@ -15909,7 +15909,7 @@ program
     }
   });
 
-registerLeaseCliCommands(program);
+registerLeaseCliCommands(program); registerResidencyCommands(program);
 
 registerBudgetCommands(program);
 

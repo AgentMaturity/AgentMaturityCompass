@@ -39,6 +39,7 @@ import { readNativeTaskProjection, projectNativeTaskUpdate, type NativeTaskProje
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
 import { deriveExecutionStatus } from "../execution/executionContract.js";
 import { sessionReceipts } from "../execution/executionStatus.js";
+import { assertNativeStorageAdmission } from "./nativeResidency.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -544,7 +545,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
             || !selectSupportedNativeTools(tools).some(tool => tool.name === "bash"))
             throw new NativeTaskServiceError("VALIDATION_SCOPE_REQUIRED", 403, "Public checks require signed workspace bash and an authenticated operator; selecting a check creates no grant.");
         }
-        capacity();
+        assertNativeStorageAdmission(workspace); capacity();
         if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "This workspace has 256 current tasks. Close and explicitly archive a reviewed task before creating more tasks.");
         const now = Date.now();
         const descriptor: NativeTaskDescriptor = { kind: "amc/studio-native-task/v1", taskId, principalId: actor.principalId, agentId: actor.agentId,
@@ -693,7 +694,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         assertUniqueSubmission(actor, childId, clientRequestId);
         const existing = descriptors.read(childId);
         if (existing) { assertOwner(actor, existing); if (existing.submissions[0]!.bodyHash !== bodyHash) throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already names a different task."); return existing; }
-        capacity();
+        capacity(); assertNativeStorageAdmission(workspace);
         if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "This workspace has 256 current tasks. Close and explicitly archive a reviewed task before creating more tasks.");
         const now = Date.now();
         const descriptor: NativeTaskDescriptor = { kind: parent.kind, taskId: childId, principalId: parent.principalId, agentId: parent.agentId, demo: parent.demo,

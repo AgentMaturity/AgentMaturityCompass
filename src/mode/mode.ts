@@ -95,6 +95,10 @@ export const OWNER_ONLY_COMMAND_PATHS: readonly string[] = [
     "integrations source admit",
     "lease issue",
     "lease revoke",
+    // The destination registry admits or holds every session once a plan is active; profile writes under .amc/.
+    "residency init",
+    "residency sign",
+    "residency profile",
     // P1-23: clearing the hook audit latch (src/bridge/hookAuditLatch.ts).
     "connect hooks health --recover-latch",
     "target set",

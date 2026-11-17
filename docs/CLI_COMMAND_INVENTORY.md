@@ -1002,6 +1002,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc release scan` | Run strict secret scan on a .amcrelease bundle | `--in <file>`<br>`--out <file>` | - |
 | `amc release verify` | Verify a .amcrelease bundle offline | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc report` | Render report for run ID, saved alias, prefix, or 'latest' | `--executive`<br>`--html <path>`<br>`--share`<br>`--share-dir <path>`<br>`--public-base-url <url>` | - |
+| `amc residency` | The signed destination registry a workspace with an active compiled plan needs before sessions open | - | - |
+| `amc residency init` | Validate an operator-written destination registry, write it to .amc/residency/destinations.yaml and sign it (owner mode) | `--file <yaml>` | - |
+| `amc residency profile` | Write the deployment profile the active compiled plan pins, for the registry's profile.path | `--out <file>` | - |
+| `amc residency status` | Say whether this workspace's destination registry lets sessions open, and what is missing | - | - |
 | `amc residency-policy` | Create or list data residency policies | `--list`<br>`--region <region>`<br>`--isolation <level>`<br>`--custody <mode>` | - |
 | `amc residency-report` | Generate data residency compliance report for a tenant | `--tenant <id>`<br>`--redaction-tests` | - |
 | `amc resource` | Govern prompts, tools, memory, policies, routes, and other agent-defining resources | - | - |
