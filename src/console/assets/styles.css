@@ -1202,6 +1202,8 @@ a:hover {
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;
+    /* The menu row keeps its own height; spare height on a short page goes to the content (C-27). */
+    grid-template-rows: auto 1fr;
   }
   nav {
     position: relative;
