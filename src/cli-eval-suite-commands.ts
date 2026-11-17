@@ -71,7 +71,7 @@ export function registerEvalSuiteCommands(program: Command): void {
         console.log(`  pass rate ${results.summary.passRate === null ? "n/a" : (results.summary.passRate * 100).toFixed(1) + "%"} over ${results.summary.attempts - results.summary.errors} graded attempt(s)${results.summary.errors ? ` (${results.summary.errors} error(s) neither pass nor fail)` : ""}; task pass rate ${results.summary.taskPassRate === null ? "n/a" : (results.summary.taskPassRate * 100).toFixed(1) + "%"}`);
         console.log(`  cost ${cost.complete && cost.attributedUsd !== null ? `$${cost.attributedUsd.toFixed(6)}` : `unavailable (${cost.unknownRequests} unknown requests)`}; latency p50 ${results.summary.latency.p50Ms ?? "n/a"} ms, p95 ${results.summary.latency.p95Ms ?? "n/a"} ms`);
         console.log(chalk.gray(`  results sha256 ${resultsSha256} recorded as ${"EVAL_SUITE_RUN"}${opts.out ? `; written to ${resolve(opts.out)}` : ""}`));
-        if (results.provider.providerId === "stub") console.log(chalk.gray("  stub provider: this run proves the grading path, not model quality."));
+        if (results.provider.providerId === "stub") console.log(chalk.gray("  stub provider: this run checks the grading path, not model quality."));
       } catch (error) {
         console.error(chalk.red(`eval suite run failed: ${error instanceof Error ? error.message : String(error)}`));
         process.exitCode = 1;

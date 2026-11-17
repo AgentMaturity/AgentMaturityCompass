@@ -144,6 +144,8 @@ export type AgentPromptResult =
       readonly failureCodes?: readonly string[];
       /** With DATA_FLOW_REFUSED (P2-02): the recorded refusal's reason, processor and purpose, never the refused content. */
       readonly dataFlow?: NativeRunDiagnostic["dataFlow"];
+      /** With AMC_RESIDENCY_EGRESS_BLOCKED: the refusal's fixed codes and channel, never its message. */
+      readonly residency?: NativeRunDiagnostic["residency"];
       /** Original durable admission when a caller retries an already admitted request id. */
       readonly submission?: InboxReceipt;
     };
@@ -423,8 +425,9 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           if (failed) {
             const diagnostics = (summary.diagnostics ?? []).filter(row => row.turn === failed.turn);
             const failureCodes = diagnostics.map(row => row.guidance.code), dataFlow = diagnostics.filter(row => row.dataFlow).at(-1)?.dataFlow;
+            const residency = diagnostics.filter(row => row.residency).at(-1)?.residency;
             return { ok: false, reason: `signed turn ${failed.turn} ended ${failed.reason}; idle is not successful completion`,
-              ...(failureCodes.length === 0 ? {} : { failureCodes }), ...(dataFlow === undefined ? {} : { dataFlow }) };
+              ...(failureCodes.length === 0 ? {} : { failureCodes }), ...(dataFlow === undefined ? {} : { dataFlow }), ...(residency === undefined ? {} : { residency }) };
           }
           const turnEndReason = knownEndings.find(reason => reason === endings.at(-1)?.reason);
           if (turnEndReason === undefined) return { ok: false, reason: "the prompt produced no recorded turn ending" };

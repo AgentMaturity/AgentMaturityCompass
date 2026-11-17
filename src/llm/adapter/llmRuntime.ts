@@ -40,7 +40,7 @@
  */
 import type { CredentialsService } from "../../credentials/credentialsService.js";
 import { credentialRefName } from "../../credentials/credentialRef.js";
-import type { RecordedCredential } from "../../session/requestOutcomeMeta.js";
+import type { RecordedCredential, RecordedResidency } from "../../session/requestOutcomeMeta.js";
 import type { PreparedRequest, SessionService } from "../../session/sessionService.js";
 import { LLM_FAILURE_CODE, LlmError, isLlmError, normalizeLlmFailure } from "../llmFailure.js";
 import type { LlmFailure } from "../llmFailure.js";
@@ -471,10 +471,11 @@ export class LlmRuntime {
   private transportFailure(
     error: unknown,
     signal: AbortSignal | undefined
-  ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string; connectFailed?: string } {
+  ): { failure: LlmFailure; kind: "error" | "aborted"; httpStatus: null; cause: string; connectFailed?: string; residency?: RecordedResidency } {
     if (error instanceof EgressBlocked) {
-      return { failure: { message: error.message, code: "AMC_RESIDENCY_EGRESS_BLOCKED" },
-        kind: "error", httpStatus: null, cause: "residency_blocked" };
+      // The decision's fixed codes are recorded beside the failure, so a reader never parses its message for them.
+      return { failure: { message: error.message, code: "AMC_RESIDENCY_EGRESS_BLOCKED" }, kind: "error", httpStatus: null, cause: "residency_blocked",
+        residency: { reason: error.decision.reason, detail: error.decision.detail ?? error.decision.reason } };
     }
     if (signal?.aborted === true) {
       return {

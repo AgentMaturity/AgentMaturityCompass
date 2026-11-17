@@ -3,6 +3,7 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { createAcpConnection, type AcpConnection, type AcpHandlers } from "../src/acp/acpConnection.js";
 import { classifyAcpMessage } from "../src/acp/acpEnvelope.js";
 import { ACP_ERROR, AcpFailure } from "../src/acp/acpErrors.js";
+import { EgressBlocked } from "../src/residency/checkEgress.js";
 import { createAcpStdioSink } from "../src/acp/acpStdioMain.js";
 import { ACP_MAX_TURN_UPDATE_BYTES } from "../src/acp/acpCommittedUpdates.js";
 
@@ -55,6 +56,21 @@ describe("P08 ACP connection boundaries (unexecuted)", () => {
     h.connection.ingest(bytes(request(1, "intentional"), request(2))); await settled();
     expect(h.frames[0]).toMatchObject({ id: 1, error: { code: -32602, message: "exact refusal", data: { reason: "unsupported" } } });
     expect(h.frames[1]).toMatchObject({ id: 2, error: { code: -32603, message: "the method failed" } });
+  });
+
+  test("a residency refusal carries only its fixed codes, never its message", async () => {
+    const blocked = new EgressBlocked({ verdict: "blocked", reason: "destination_unregistered", detail: "destination_unregistered", destinationId: "private-host",
+      ruleIds: ["private-rule"] }, { status: "not_evaluated", controlIds: [], reason: "destination_unregistered" }, "private cause");
+    const h = peer(async () => { throw blocked; });
+    h.connection.ingest(bytes(request(1))); await settled();
+    expect(h.frames).toEqual([{ jsonrpc: "2.0", id: 1, error: { code: -32603, message: "AMC's residency check refused a request before it was sent",
+      data: { code: "AMC_RESIDENCY_EGRESS_BLOCKED", reason: "destination_unregistered", detail: "destination_unregistered" } } }]);
+    expect(JSON.stringify(h.frames)).not.toMatch(/private/);
+    // A decision without a detail code carries its reason as the detail.
+    const bare = new EgressBlocked({ verdict: "blocked", reason: "region_unknown", ruleIds: [] }, { status: "not_evaluated", controlIds: [], reason: "region_unknown" });
+    const g = peer(async () => { throw bare; });
+    g.connection.ingest(bytes(request(1))); await settled();
+    expect(g.frames[0]).toMatchObject({ error: { data: { code: "AMC_RESIDENCY_EGRESS_BLOCKED", reason: "region_unknown", detail: "region_unknown" } } });
   });
 
   test.each([undefined, 1n, () => {}, Symbol("unsupported")])("invalid result %s never becomes a response without a result", async result => {

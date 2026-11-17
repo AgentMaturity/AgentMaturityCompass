@@ -703,6 +703,10 @@ the agent's prompt pack.
 
   Every value is the operator's declaration, signed with the workspace's keys: it is not legal approval and not
   evidence of where data physically resides. A real model provider needs its own destination and region the same way.
+  When a model host is not declared, the session opens and its first model request is refused before it is sent: Run a
+  task and the A4 project page say that AMC's residency check refused a model provider request because the registry
+  declares no model provider destination for that address, and that an owner declares it and signs the registry with
+  `amc residency init --file <registry.yaml>` (`amc residency status` shows what the registry declares).
 - **Lifecycle bridge.** Adapt's rows (`testing → staging`) are the only source of `controlsSatisfied` for that advance:
   `integration_tests_passing` from executed checks that all passed on a non-stub provider, `security_review_signed`
   only from a `review_record` entry met by an admitted external record (an AUDITOR role vote alone leaves it

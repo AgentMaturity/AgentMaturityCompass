@@ -282,6 +282,17 @@ describe("session/prompt and cancellation", () => {
       data: { failureCodes: ["DATA_FLOW_REFUSED"], dataFlow: { reason: "class_not_permitted", processorId: "proc-clinic", purposeId: "triage" } } });
   });
 
+  it("names a residency refusal's fixed codes and channel as recorded, never its message", async () => {
+    const { h, sessionId } = await promptingHarness();
+    h.send({ jsonrpc: "2.0", id: 2, method: "session/prompt", params: { sessionId, prompt: [{ type: "text", text: "hi" }] } });
+    await settle();
+    h.finish({ ok: false, reason: "signed turn 1 ended error; idle is not successful completion", failureCodes: ["AMC_RESIDENCY_EGRESS_BLOCKED"],
+      residency: { reason: "destination_unregistered", detail: "destination_unregistered", channel: "provider" } });
+    await replied(h, 2);
+    expect(replyTo(h.sent, 2)?.["error"]).toMatchObject({ code: -32603, message: "the turn did not complete", data: { failureCodes: ["AMC_RESIDENCY_EGRESS_BLOCKED"],
+      residency: { code: "AMC_RESIDENCY_EGRESS_BLOCKED", reason: "destination_unregistered", detail: "destination_unregistered", channel: "provider" } } });
+  });
+
   it("refuses a second prompt on a session already running one", async () => {
     const { h, sessionId } = await promptingHarness();
     const body = { sessionId, prompt: [{ type: "text", text: "x" }] };

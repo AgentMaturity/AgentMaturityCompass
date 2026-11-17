@@ -37,6 +37,7 @@ import type {
   RecordedBlockRef,
   RecordedCredential,
   RecordedFailure,
+  RecordedResidency,
   RecordedUsage,
   RequestOutcomeParams
 } from "../../session/requestOutcomeMeta.js";
@@ -166,15 +167,18 @@ export class StreamRecorder {
     readonly httpStatus: number | null;
     readonly cause: string;
     readonly connectFailed?: string;
+    readonly residency?: RecordedResidency;
   }): SettledStream {
     const assembly = this.assembler.abort(input.cause);
     return this.record(assembly, { kind: input.kind, failure: input.failure, httpStatus: input.httpStatus,
-      ...(input.connectFailed === undefined ? {} : { connectFailed: input.connectFailed }) });
+      ...(input.connectFailed === undefined ? {} : { connectFailed: input.connectFailed }),
+      ...(input.residency === undefined ? {} : { residency: input.residency }) });
   }
 
   private record(
     assembly: StreamAssembly,
-    failed: { readonly kind: "error" | "aborted"; readonly failure: LlmFailure; readonly httpStatus: number | null; readonly connectFailed?: string } | null,
+    failed: { readonly kind: "error" | "aborted"; readonly failure: LlmFailure; readonly httpStatus: number | null; readonly connectFailed?: string;
+      readonly residency?: RecordedResidency } | null,
     successStatus = 0
   ): SettledStream {
     if (this.settled) {
@@ -223,7 +227,8 @@ export class StreamRecorder {
               retryable: isRetryableFailure(this.init.pinned.retryPolicy, failed.failure)
             },
             credential: this.init.credential,
-            ...(failed.connectFailed === undefined ? {} : { connectFailed: failed.connectFailed })
+            ...(failed.connectFailed === undefined ? {} : { connectFailed: failed.connectFailed }),
+            ...(failed.residency === undefined ? {} : { residency: failed.residency })
           };
 
     const ref: SessionEventRef = this.init.session.recordRequestOutcome(params);

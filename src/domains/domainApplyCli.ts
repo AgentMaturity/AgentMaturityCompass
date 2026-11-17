@@ -31,7 +31,7 @@ function signedBundleLines(path: string, signature: IndustryPackAuditSignature):
   return [
     chalk.green(`\nSigned industry-pack audit written: ${path}`),
     `  Signer: auditor key ${signature.keyFingerprint}${signer}`,
-    "  Answers: self-reported. The signature proves who produced this file and that it is unchanged, not that the answers are true.",
+    "  Answers: self-reported. The signature shows who produced this file and that it is unchanged, not that the answers are true.",
     `  Verify: amc audit binder verify ${path} --pubkey <recorded-auditor.pub>`
   ];
 }

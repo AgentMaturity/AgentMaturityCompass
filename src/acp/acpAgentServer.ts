@@ -568,6 +568,7 @@ export function createAcpAgent(init: AcpAgentInit): AcpAgent {
         throw new AcpFailure(ACP_ERROR.internal, "the turn did not complete", { reason: outcome.reason,
           ...(outcome.failureCodes?.length ? { failureCodes: [...outcome.failureCodes] } : {}),
           ...(outcome.dataFlow ? { dataFlow: outcome.dataFlow } : {}),
+          ...(outcome.residency ? { residency: { code: "AMC_RESIDENCY_EGRESS_BLOCKED", ...outcome.residency } } : {}),
           ...(outcome.submission ? { submission: outcome.submission } : {}), ...executionOf(request.sessionId, "error") });
       }
 

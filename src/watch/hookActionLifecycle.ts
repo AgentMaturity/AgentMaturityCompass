@@ -385,7 +385,7 @@ export function inspectHookActionLifecycle(input: {
       ...postExecution(ledger, events, input.agentId, input.actionId),
       observationNotRecorded: notRecorded,
       rawProviderPayloadStored: false,
-      claimBoundary: "Verified AMC evidence lifecycle only; steer proves a blocked corrective signal, not retry execution, success, or protocol conformance beyond signed receipts.",
+      claimBoundary: "Verified AMC evidence lifecycle only; steer records a blocked corrective signal, not retry execution, success, or protocol conformance beyond signed receipts.",
     };
   } finally {
     ledger.close();

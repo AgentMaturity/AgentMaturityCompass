@@ -19,6 +19,7 @@ const GUIDANCE = {
   ABORTED: ["The request ended without a completed provider response.", "Inspect the recorded cancellation/termination cause and any partial output before a deliberate continuation. Do not infer zero usage or completion."],
   AMC_NATIVE_BUDGET_REFUSED: ["AMC's signed budget for this agent refused the model request before sending it.", "Run amc budgets status --agent <agent>: it names the limit that was reached and the command, or the wait, that lets you continue (docs/BUDGETS.md, Missing Usage and Recovery)."],
   DATA_FLOW_REFUSED: ["Protected-data admission refused this model request before it was sent (P2-02).", "Inspect the recorded refusal reason, processor and purpose, then the signed processor registry (.amc/dataflow/processors.yaml) the operator maintains. Do not retry the same request or remove the registry to bypass admission."],
+  AMC_RESIDENCY_EGRESS_BLOCKED: ["AMC's residency check refused the model request before sending it.", "Run amc residency status in the workspace folder to see what the registry declares; an owner declares the destination, with its region, and signs the registry with amc residency init --file <registry.yaml> (docs/OPS_HARDENING.md, Residency routing). Do not remove the registry to bypass the check."],
   AMC_EVIDENCE_INTEGRITY: ["Workspace evidence failed verification before budget admission.", "Run amc verify and amc budgets verify. Rows written with AMC_NO_SIGN=1, or edited rows, make signed budgets unverifiable in this workspace. Do not reset budgets to bypass this."],
   METADATA_UNAVAILABLE: ["Recorded failure metadata is missing or inconsistent.", "Inspect amc session show <session-id> and separately run amc agent-loop verify <session-id>. Do not infer a provider failure class or repair history implicitly."],
   UNKNOWN: ["The native operation failed without a supported public failure classification.", "Inspect the session with amc session show <session-id>, then amc agent-loop verify <session-id>; use amc doctor for local setup. Preserve the evidence and avoid automatic retries or policy changes."]
@@ -42,6 +43,8 @@ export interface NativeRunDiagnostic {
   readonly budgetCause?: string;
   /** For DATA_FLOW_REFUSED: the recorded refusal's reason and registry identifiers, never the refused content. */
   readonly dataFlow?: { readonly reason: string; readonly processorId: string | null; readonly purposeId: string | null };
+  /** For AMC_RESIDENCY_EGRESS_BLOCKED: the refusal's fixed reason and detail codes and the channel it was checked on. */
+  readonly residency?: { readonly reason: string; readonly detail: string; readonly channel: "provider" };
 }
 function own(value: unknown, key: string): unknown {
   if (value === null || (typeof value !== "object" && typeof value !== "function")) return undefined;
@@ -55,6 +58,12 @@ function httpStatus(value: unknown): number | null { return typeof value === "nu
 function safeOrigin(value: unknown): string | null {
   if (typeof value !== "string") return null;
   try { const url = new URL(value); return ["http:", "https:"].includes(url.protocol) ? url.origin : null; } catch { return null; }
+}
+/** A recorded residency refusal's codes when both are fixed-code shaped (lower case and underscores), else null. */
+function safeResidency(value: unknown): NativeRunDiagnostic["residency"] | null {
+  const reason = own(value, "reason"), detail = own(value, "detail"), code = (text: unknown): text is string => typeof text === "string" && /^[a-z_]{1,64}$/.test(text);
+  // LlmRuntime checks a model request on the provider channel only (src/llm/adapter/llmRuntime.ts).
+  return code(reason) && code(detail) ? { reason, detail, channel: "provider" } : null;
 }
 /** AMC's own budget refusal text (never a provider's), one line, printable characters only. */
 function safeBudgetCause(value: unknown): string | null {
@@ -131,9 +140,10 @@ export function projectNativeRunDiagnostics(events: readonly EvidenceEvent[], se
       && (own(meta, "finishReason") === "error" || own(meta, "finishReason") === "aborted");
     const origin = valid && (code === "TRANSPORT" || code === "TIMEOUT") ? safeOrigin(header?.physicalRoute?.baseUrl) : null;
     const budgetCause = valid && code === "AMC_NATIVE_BUDGET_REFUSED" ? safeBudgetCause(own(failure, "message")) : null;
+    const residency = valid && code === "AMC_RESIDENCY_EGRESS_BLOCKED" ? safeResidency(own(meta, "residency")) : null;
     rows.push({ eventId: event.id, source: "request-failure", turn, step,
       guidance: nativeFailureGuidance(valid ? code : "METADATA_UNAVAILABLE", valid ? own(failure, "status") : undefined),
-      ...(origin === null ? {} : { origin }), ...(budgetCause === null ? {} : { budgetCause }) });
+      ...(origin === null ? {} : { origin }), ...(budgetCause === null ? {} : { budgetCause }), ...(residency === null ? {} : { residency }) });
     if (turn !== null) failureTurns.add(turn);
   }
   for (const event of events) {
@@ -173,6 +183,8 @@ export function renderNativeRunDiagnostics(value: unknown): string {
     const flow = own(raw, "dataFlow"), refusal = flow === undefined ? null
       : DataFlowRefused.from({ reason: own(flow, "reason"), processorId: own(flow, "processorId"), purposeId: own(flow, "purposeId") });
     if (refusal) lines.push(`  refused: ${refusal.reason}; processor ${refusal.processorId ?? "none"}; purpose ${refusal.purposeId ?? "none"}`);
+    const residency = safeResidency(own(raw, "residency"));
+    if (residency) lines.push(`  residency: ${residency.reason}; ${residency.detail}; channel ${residency.channel}`);
   }
   return lines.join("\n");
 }

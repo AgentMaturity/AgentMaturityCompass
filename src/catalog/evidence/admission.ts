@@ -79,7 +79,7 @@ export function admitEvidence(item: EvidenceItem, contract: EvaluatedContract, r
   const { provenance } = item;
   if (!provenance.verified) return reject("producer_unverified", provenance.detail);
   if (provenance.producerId !== item.producerId || provenance.trustTier === null) {
-    return reject("producer_unverified", `the record proves ${provenance.producerId ?? "no AMC producer"}, not ${item.producerId}`);
+    return reject("producer_unverified", `the record names ${provenance.producerId ?? "no AMC producer"}, not ${item.producerId}`);
   }
   const binding = bindingRejection(item, contract, record, ctx);
   if (binding) return binding;

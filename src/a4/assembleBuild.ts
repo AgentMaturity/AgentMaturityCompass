@@ -34,7 +34,7 @@ import { registryStatus, residencyRefusalWords } from "../residency/admissionWor
 import { assertNativeExecutionIdentity, NativeAdmissionError } from "../studio/nativeAdmission.js";
 import { nativeTaskId } from "../studio/nativeTaskDescriptors.js";
 import { nativeTaskStartSchema } from "../studio/nativeTaskInput.js";
-import { assertNativeStorageAdmission } from "../studio/nativeResidency.js";
+import { assertNativeStorageAdmission, isResidencyTurnWords } from "../studio/nativeResidency.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskStartRequest, type NativeTaskView } from "../studio/nativeTaskTypes.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { loadTrustContext } from "../trust/trustContext.js";
@@ -419,6 +419,21 @@ export function reviewRefusals(native: NativeTaskApiContext | undefined, state: 
     const codes = (error as { detail?: { reasonCodes?: unknown } }).detail?.reasonCodes;
     return Array.isArray(codes) ? codes.map(String).filter((code) => !code.includes(":")) : [String((error as { code?: unknown }).code ?? "BUILD_SESSION_UNREAD")];
   }
+}
+
+/**
+ * Studio's words for this caller's build session when a residency check refused its request (src/studio/nativeResidency.ts):
+ * which kind of destination, why and the next step, for the project page. Null otherwise, or off Assemble's Build step.
+ */
+export function buildSessionRefusal(native: NativeTaskApiContext | undefined, state: A4ProducerContext["state"], principal: A4ProducerContext["principal"] | null): string | null {
+  if (native === undefined || principal === null || state.project.stage !== "assemble" || state.project.step !== "built") return null;
+  for (const planned of (assembleSpecOf(state).spec.build as { sessions?: PlannedSession[] } | undefined)?.sessions ?? []) {
+    if (planned.ownerKey !== principal.key) continue;
+    let error: string | null = null;
+    try { error = native.service.poll(nativeActor(native, state.project.agent_id), planned.taskId).task.error; } catch { /* unread: reviewRefusals names why */ }
+    if (isResidencyTurnWords(error)) return error;
+  }
+  return null;
 }
 
 /**

@@ -45,6 +45,7 @@ import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
 import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
 import { monitorView } from "./a4Monitor.js";
 import { viewerReadiness } from "./a4NextGate.js";
+import { buildSessionRefusal } from "./assembleBuild.js";
 import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
 import { assertTuneMechanicPlan } from "./a4Mechanic.js";
@@ -556,7 +557,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
       practice: openedAsPractice(state.chain), practiceActive: state.practice === true, regulated: regulatedOrClosed(route.workspace, state),
       selfApprovalAllowed: readiness.selfApprovalAllowed, revision: revision && { revisionNo: revision.revision_no, stage: revision.stage, parentRevisionNo: revision.parent_revision_no,
         specDigest: revision.spec_digest, resourceDigestsSha256: revision.resource_digests_sha256, createdByKey: revision.created_by_key, ts: revision.ts },
-      gates: readiness.gates, claim: readiness.claim, ...residencyView(route.workspace) });
+      gates: readiness.gates, claim: readiness.claim, ...residencyView(route.workspace), buildRefusal: buildSessionRefusal(route.native, state, route.principal) });
     return true;
   }
   if (rest === "/readiness") {

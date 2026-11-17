@@ -69,7 +69,7 @@ A signed write prints:
 ```
 Signed industry-pack audit written: clinical-trials.audit.json
   Signer: auditor key sha256:<key id> (VAULT, SOFTWARE)
-  Answers: self-reported. The signature proves who produced this file and that it is unchanged, not that the answers are true.
+  Answers: self-reported. The signature shows who produced this file and that it is unchanged, not that the answers are true.
   Verify: amc audit binder verify clinical-trials.audit.json --pubkey <recorded-auditor.pub>
 ```
 
