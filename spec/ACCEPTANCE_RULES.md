@@ -23,7 +23,7 @@ verdict. A check whose input an earlier failure made untrustworthy is reported a
 
 Rules for every record:
 
-- A signature proves who wrote a record and that it is unchanged, not that it is true.
+- A signature shows who wrote a record and that it is unchanged, not that it is true.
 - A key carried inside the record never vouches for the record. Keys are admitted only from a trust list the verifier
   pinned (docs/TRUST_LIST.md).
 - Never strip, add or reorder fields of a signed record before verifying it. Parse a copy; verify the original bytes.
@@ -99,7 +99,7 @@ sha256 of the whole receipt string.
 2. Signature over the decoded payload bytes as received, never re-serialized.
 3. Issuer admission: the monitor key, purpose `receipt`.
 4. Binding: `event_hash` names the ledger row the receipt is for, and `body_sha256` the request or response body.
-   A receipt proves the row was written; it says nothing about the work's outcome.
+   A receipt shows the row was written; it says nothing about the work's outcome.
 
 ## receipt
 
@@ -125,7 +125,7 @@ schema cannot express (docs/RECEIPTS.md):
   otherwise `UNANCHORED`. Only `eventHash` is signed, so the row's other fields are unauthenticated until the export
   carries a portable pre-image. Completeness needs the body `body_sha256` names, naming the same execution, state and
   agent.
-  A receipt proves that a row was written, not the work's outcome: satisfaction is `NOT_RECOMPUTABLE`
+  A receipt shows that a row was written, not the work's outcome: satisfaction is `NOT_RECOMPUTABLE`
   (docs/STANDALONE_VERIFIER.md).
 
 ## authorization-record
@@ -395,7 +395,7 @@ Integrity (`integrity: fail` with the code named):
    columns (`projectId`, `seq`, `kind`, `stage`, `revisionNo`, `actorKey`, `actorUsername`, `ts`, `prevDigest`,
    `readinessSha256`), `kind` is in the closed v1 set, and the head row equals the last transition (`head_seq`,
    `head_digest`, `verified_seq`, `verified_digest`, and the head columns equal the last body's `headAfter`). The head
-   row itself is unsigned: a record proves a prefix. A tail cut back together with its head shows only against a later
+   row itself is unsigned: a record shows a prefix. A tail cut back together with its head shows only against a later
    signed statement, such as the bundle manifest (`A4_SLICE_HEAD_MISMATCH`), or the ledger: the store's session or
    audit row in `a4-<projectId>-<head_seq + 1>` witnesses a later transition (in the workspace, `A4_CHAIN_INVALID`; in a bundle's own
    ledger, `A4_SLICE_TRUNCATED`).

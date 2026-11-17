@@ -27,7 +27,7 @@ amc vault dsar complete <requestId> --json
 amc vault dsar list --json
 ```
 
-Requests are stored under `.amc/vault/dsar/requests.json`, and each submit/complete action appends a JSONL audit event under `.amc/vault/dsar/audit.jsonl`. The audit trail hashes the subject identifier so operators can prove request handling without duplicating raw subject identifiers in the audit log.
+Requests are stored under `.amc/vault/dsar/requests.json`, and each submit/complete action appends a JSONL audit event under `.amc/vault/dsar/audit.jsonl`. The audit trail hashes the subject identifier so operators can show request handling without duplicating raw subject identifiers in the audit log.
 
 External regulator guidance checked on 2026-06-16: ICO guidance for subject access requests says organizations should respond without delay and within one month, and provide copies in accessible, concise, intelligible formats; ICO erasure guidance says Article 17 requests can be verbal or written and require one-month handling; ICO data portability guidance emphasizes structured, commonly used, machine-readable formats and one-month response handling. See:
 

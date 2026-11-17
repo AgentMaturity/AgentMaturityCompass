@@ -156,6 +156,26 @@ export function topbarHtml({ workspace = "local", demoMode = false, me = null, a
   `;
 }
 
+/**
+ * Draws the top bar at the start of <main> on every page with a menu (C-15), or redraws the one already there. api.js
+ * calls it whenever it learns who is signed in, so pages with their own script get it too; app.js passes its agent.
+ */
+export function renderTopbar(doc, me, onSignOut, agent) {
+  const main = doc?.querySelector?.("main");
+  if (!main || !doc.querySelector("nav")) return;
+  let bar = main.querySelector(".topbar");
+  if (!bar) {
+    bar = doc.createElement("section");
+    bar.className = "topbar";
+    main.insertBefore(bar, main.firstChild);
+  }
+  const prefix = String(doc.location?.pathname || "").match(/^\/w\/([^/]+)\//)?.[1];
+  const workspace = prefix ? decodeURIComponent(prefix) : "local";
+  bar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", me, agent: agent || bar.dataset.agent || "default" });
+  if (agent) bar.dataset.agent = agent;
+  bar.querySelector("#signOutBtn")?.addEventListener("click", () => onSignOut?.());
+}
+
 /** Runs once per page load. A page without a <nav> (ops, score) still gets the status role. */
 export function initShell(doc) {
   const status = doc.getElementById("status");

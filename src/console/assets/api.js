@@ -1,7 +1,7 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
-import { renderNavSession, showShellNotice } from "./shell.js";
+import { renderNavSession, renderTopbar, showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
 import { trackRequest } from "./actionFeedback.js";
 import { plainErrorText } from "./plainError.js";
@@ -225,7 +225,10 @@ export async function whoami() {
   if (body && !result.ok && !getAdminToken()) body.dataset.session = "none";
   if (body && result.ok) delete body.dataset.session;
   if (typeof document !== "undefined") {
-    renderNavSession(document, state.me, () => logout().then(() => window.location.assign("./login"), () => window.location.assign("./login")));
+    const signOut = () => logout().then(() => window.location.assign("./login"), () => window.location.assign("./login"));
+    renderNavSession(document, state.me, signOut);
+    // Pages with their own script get the top bar here (C-15); app.js redraws its own, so an existing bar is left alone.
+    if (!document.querySelector("main .topbar")) renderTopbar(document, state.me, signOut);
   }
   return state.me;
 }

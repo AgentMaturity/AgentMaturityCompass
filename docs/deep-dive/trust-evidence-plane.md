@@ -68,7 +68,7 @@ The core pattern is simple: capture first, preserve integrity second, verify lat
 ### Thin Or Dependent
 
 - Any surface that bypasses the AMC gateway or CLI runtime reduces the strength of the evidence story, even if the broader docs describe the resulting output.
-- Demo or wrapper surfaces can still be useful, but the trust guarantees depend on whether events actually pass through the evidence path.
+- Demo or wrapper surfaces can still be useful, but the trust properties depend on whether events actually pass through the evidence path.
 
 ## How It Connects To Adjacent Planes
 
@@ -91,7 +91,7 @@ The vault and privacy-oriented modules cover a wide range of concerns. That is v
 
 ### Verification Is Strongest When AMC Owns The Path
 
-AMC's verification story is best when commands, providers, and governed actions actually pass through AMC-controlled flows. If users adopt only the outermost reporting surface, the trust guarantees are necessarily weaker.
+AMC's verification story is best when commands, providers, and governed actions actually pass through AMC-controlled flows. If users adopt only the outermost reporting surface, the trust properties are necessarily weaker.
 
 ### Transparency And Proof Surfaces Need Routing Clarity
 

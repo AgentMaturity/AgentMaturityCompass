@@ -59,7 +59,7 @@ export function registerScopeTemplateCommands(policy: Command): void {
 
   scope
     .command("list")
-    .description("List immutable AMC action-class scope templates")
+    .description("List AMC's built-in action-class scope templates (fixed; they cannot be edited)")
     .option("--json", "Output as JSON")
     .action((options: { json?: boolean }) => {
       const templates = listScopeTemplates();

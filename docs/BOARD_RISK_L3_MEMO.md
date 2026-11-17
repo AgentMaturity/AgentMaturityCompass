@@ -30,7 +30,7 @@ Boards should avoid approving:
 | Board question | L3 answer | Required evidence |
 |---|---|---|
 | Can we explain what the agent is allowed to do? | Yes, with defined scope and controls. | Agent inventory, policy boundaries, approval gates |
-| Can we prove the score was not self-reported? | Partially to strongly, depending on evidence mix. | Evidence coverage, integrity index, trust-tier breakdown |
+| Can we show the score was not self-reported? | Partially to strongly, depending on evidence mix. | Evidence coverage, integrity index, trust-tier breakdown |
 | Can we quantify residual risk? | Directionally, using incident frequency, impact, and maturity multipliers. | Business risk report, heatmap, appetite status |
 | Can we detect drift? | Yes, if monitoring is configured and owned. | Watch or monitor run status, thresholds, alert owners |
 | Can we assess high-risk governance expectations? | L3 is a maturity signal, not legal compliance or certification. | Applicable-obligation mapping, legal review, signed evidence refs, audit binder |

@@ -1,5 +1,5 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
-import { plainErrorText } from "./plainError.js";
+import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { toolRatesHtml } from "./runtimeRates.js";
@@ -8,7 +8,7 @@ import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, 
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
-import { decorateNav, primaryActionHref, primaryActionLabel, topbarHtml } from "./shell.js";
+import { decorateNav, primaryActionHref, primaryActionLabel, renderTopbar } from "./shell.js";
 import { loginCardHtml, loginFailureText, safeNextPage } from "./loginView.js";
 import { BANNER_TIPS, activationHelpHtml, bannerHelpHtml, installWelcomeGuide, progressLineText } from "./welcomeGuide.js";
 import { renderQrLike } from "./qr.js";
@@ -263,7 +263,7 @@ function renderToolContext(projection) {
       const rows = (Array.isArray(group?.tools) ? group.tools : []).map((tool) => `
         <tr>
           <td data-label="Tool"><code>${htmlEscape(tool.name || "unknown")}</code></td>
-          <td data-label="Action class">${htmlEscape(tool.actionClass || "unknown")}</td>
+          <td data-label="Action class">${plainCodeHtml(tool.actionClass || "unknown")}</td>
           <td data-label="Exec ticket">${tool.requireExecTicket ? "Required" : "No"}</td>
           <td data-label="Identity"><code title="${htmlEscape(tool.toolIdentity || "")}">${htmlEscape(String(tool.toolIdentity || "").slice(0, 24))}</code></td>
         </tr>
@@ -297,15 +297,8 @@ function currentWorkspaceLabel() {
 function decorateShell() {
   decorateNav(document.querySelector("nav"), page);
 
-  const main = document.querySelector("main");
-  if (!main) {
-    return;
-  }
-  const topbar = main.querySelector(".topbar") || main.insertBefore(Object.assign(document.createElement("section"), { className: "topbar" }), main.firstChild);
-  const workspace = currentWorkspaceLabel();
-  topbar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", me: getCurrentUser(), agent: currentAgent() });
-  onAction(topbar.querySelector("#signOutBtn"), "click", () => logout()
-    .then(() => window.location.assign("./login"), (error) => setStatus(`Sign out failed: ${errText(error)}`, true)));
+  renderTopbar(document, getCurrentUser(), () => logout()
+    .then(() => window.location.assign("./login"), (error) => setStatus(`Sign out failed: ${errText(error)}`, true)), currentAgent());
 }
 
 const FALLBACK_SURFACES = [
@@ -377,7 +370,7 @@ function statusPill(status) {
     : ["DEGRADED", "FAILED", "FAIL", "INVALID", "MISSING"].includes(normalized)
       ? "status-bad"
       : "muted";
-  return `<span class="pill ${className}">${htmlEscape(normalized)}</span>`;
+  return `<span class="pill ${className}">${plainCodeHtml(normalized)}</span>`;
 }
 
 function renderSurfaceRail(surfaceResp, latestRun) {
@@ -688,7 +681,7 @@ async function renderEvidence() {
           <div class="studio-terminal-line"><strong>Latest run</strong><span>${htmlEscape(shortId(latestRun?.runId, 16))}</span></div>
           <div class="studio-terminal-line"><strong>Full score latency</strong><span>${latestRun?.elapsedMs === null || latestRun?.elapsedMs === undefined ? "-" : `${Number(latestRun.elapsedMs)}ms`}</span></div>
           <div class="studio-terminal-line"><strong>Evidence coverage</strong><span>${latestRun ? `${(Number(latestRun.evidence?.evidenceCoverage || 0) * 100).toFixed(1)}%` : "-"}</span></div>
-          <div class="studio-terminal-line"><strong>Resource state</strong><span>${htmlEscape(resourceStatusData?.state || "NOT_INITIALIZED")}</span></div>
+          <div class="studio-terminal-line"><strong>Resource state</strong><span>${plainCodeHtml(resourceStatusData?.state || "NOT_INITIALIZED")}</span></div>
           <div class="studio-terminal-line"><strong>Resource gates</strong><span>${htmlEscape(resourceValidationData?.status || "unknown")}</span></div>
           <div class="studio-terminal-line"><strong>Signature</strong><span>${htmlEscape(resourceSignature)}</span></div>
         </div>
@@ -1616,7 +1609,7 @@ async function renderAgent() {
       <p>IntegrityIndex: <strong>${sealFails ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(sealFails ? UNTRUSTED_SEAL_LABEL : String(report.trustLabel ?? ""))})</p>
       <p>Evidence Coverage: ${sealFails ? "N/A" : `${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%`}</p>
       <p>Artifact Status: <strong>${htmlEscape(sealFails ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
-      <p>Evidence Readiness: <strong>${htmlEscape(sealFails ? "UNVERIFIED" : String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
+      <p>Evidence Readiness: <strong>${plainCodeHtml(sealFails ? "UNVERIFIED" : String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
       <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !sealFails ? "ELIGIBLE" : "BLOCKED"}</strong></p>
       <p class="muted">${htmlEscape(sealFails ? "This run's record does not pass its seal check, so none of these numbers can back a claim."
         : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
@@ -1737,11 +1730,11 @@ async function renderApprovals() {
           </label>
           <label>
             <span class="muted">Status</span>
-            <select id="approvalStatus">${statusOptions.map((value) => `<option value="${value}"${approvalActivityState.status === value ? " selected" : ""}>${value || "All"}</option>`).join("")}</select>
+            <select id="approvalStatus">${statusOptions.map((value) => `<option value="${value}"${approvalActivityState.status === value ? " selected" : ""}>${value ? plainCode(value) : "All"}</option>`).join("")}</select>
           </label>
           <label>
             <span class="muted">Action class</span>
-            <select id="approvalActionClass">${actionClasses.map((value) => `<option value="${value}"${approvalActivityState.actionClass === value ? " selected" : ""}>${value || "All"}</option>`).join("")}</select>
+            <select id="approvalActionClass">${actionClasses.map((value) => `<option value="${value}"${approvalActivityState.actionClass === value ? " selected" : ""}>${value ? plainCode(value) : "All"}</option>`).join("")}</select>
           </label>
           <label>
             <span class="muted">Risk</span>
@@ -1803,10 +1796,10 @@ async function renderApprovals() {
         ? htmlEscape(row.approvalRequestId)
         : `<a title="${htmlEscape(row.approvalRequestId)}" href="./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}">${htmlEscape(requestLabel)}</a>`}</td>
       <td>${htmlEscape(row.intentId || row.riskTier || "-")}</td>
-      <td>${htmlEscape(row.actionClass)}</td>
+      <td>${plainCodeHtml(row.actionClass)}</td>
       <td>${htmlEscape(row.effectiveMode || "-")}</td>
-      <td>${htmlEscape(row.status || "-")}</td>
-      <td>${Number(row.quorum?.received || 0)}/${Number(row.quorum?.required || 0)} (${htmlEscape(row.quorum?.status || "PENDING")})</td>
+      <td>${plainCodeHtml(row.status || "-")}</td>
+      <td>${Number(row.quorum?.received || 0)}/${Number(row.quorum?.required || 0)} (${plainCodeHtml(row.quorum?.status || "PENDING")})</td>
       <td>${row.decisions
         ? row.decisions.map((d) => `${htmlEscape(d.username)}:${htmlEscape(d.decision)}`).join(", ") || "-"
         : Number(row.decisionCount || 0)}</td>
@@ -1905,13 +1898,14 @@ async function renderApprovals() {
 // L4: the roles a console user can hold (src/auth/roles.ts USER_ROLES without AGENT, which is for agent tokens).
 const CONSOLE_USER_ROLES = ["OWNER", "AUDITOR", "APPROVER", "OPERATOR", "VIEWER"];
 
-function userRolesSelect(id, current) {
-  return `<select id="${htmlEscape(id)}" multiple size="3">${CONSOLE_USER_ROLES.map((role) =>
-    `<option value="${role}" ${current.includes(role) ? "selected" : ""}>${role}</option>`).join("")}</select>`;
+// C-27: one checkbox per role (a multi-select list needed Cmd-click and was cut off on a phone).
+function userRolesSelect(id, current, legend = "Roles") {
+  return `<fieldset id="${htmlEscape(id)}" class="role-picker"><legend>${htmlEscape(legend)}</legend>${CONSOLE_USER_ROLES.map((role) =>
+    `<label><input type="checkbox" value="${role}" ${current.includes(role) ? "checked" : ""} /> ${plainCodeHtml(role)}</label>`).join("")}</fieldset>`;
 }
 
 function selectedRoles(id) {
-  return [...(document.getElementById(id)?.selectedOptions || [])].map((option) => option.value);
+  return [...(document.getElementById(id)?.querySelectorAll("input:checked") || [])].map((input) => input.value);
 }
 
 async function renderUsers() {
@@ -1929,7 +1923,7 @@ async function renderUsers() {
       <div class="row wrap">
         <label>Username <input id="addUserName" autocomplete="off" maxlength="64" pattern="[\p{L}\p{N}._@\-]{1,64}" /></label>
         <label>Password <input id="addUserPass" type="password" autocomplete="new-password" /></label>
-        <label for="addUserRoles">Roles</label> ${userRolesSelect("addUserRoles", ["VIEWER"])}
+        ${userRolesSelect("addUserRoles", ["VIEWER"])}
         <button id="addUserBtn" data-roles="OWNER">Add</button>
       </div>
       <p id="usersOut" role="status"></p>
@@ -1939,12 +1933,11 @@ async function renderUsers() {
   body.innerHTML = (users.users || []).map((row) => `
     <tr>
       <td>${htmlEscape(row.username)}</td>
-      <td>${htmlEscape(row.roles.join(","))}</td>
-      <td>${htmlEscape(row.status)}</td>
+      <td>${row.roles.map(plainCodeHtml).join(", ")}</td>
+      <td>${plainCodeHtml(row.status)}</td>
       <td>
         <div class="row wrap">
-          <label class="visually-hidden" for="roles-${htmlEscape(row.username)}">Roles for ${htmlEscape(row.username)}</label>
-          ${userRolesSelect(`roles-${row.username}`, row.roles)}
+          ${userRolesSelect(`roles-${row.username}`, row.roles, `Roles for ${row.username}`)}
           <button class="secondary" data-role="${htmlEscape(row.username)}" data-roles="OWNER">Set Roles</button>
           <button class="danger" data-revoke="${htmlEscape(row.username)}" data-roles="OWNER">Revoke</button>
         </div>
@@ -1966,10 +1959,11 @@ async function renderUsers() {
       const username = button.getAttribute("data-role");
       const roles = selectedRoles(`roles-${username}`);
       if (roles.length === 0) throw new Error("Choose at least one role.");
-      if (!confirmPress(button, `set ${roles.join(", ")}`)) return;
+      const words = roles.map(plainCode).join(", ");
+      if (!confirmPress(button, `set ${words}`)) return;
       await apiPost("/users/roles", { username, roles });
       await renderUsers();
-      setStatus(`${username} now has: ${roles.join(", ")}.`);
+      setStatus(`${username} now has: ${words}.`);
     });
   });
   onAction(document.getElementById("addUserBtn"), "click", async () => {
@@ -2012,7 +2006,7 @@ async function renderTransparency() {
       <p>Leaf count: ${Number(merkleRoot?.current?.leafCount || 0)}</p>
       ${jsonDetails(`${(merkleRoot?.history || []).length} earlier root(s).`, merkleRoot?.history || [])}
     `)}
-    ${card("Last 100 Entries", jsonDetails(`${(raw.entries || []).length} entries; latest: ${htmlEscape(raw.entries?.at(-1)?.type || "none")}${raw.entries?.at(-1)?.ts ? ` at ${new Date(raw.entries.at(-1).ts).toISOString()}` : ""}.`, raw.entries || []))}
+    ${card("Last 100 Entries", jsonDetails(`${(raw.entries || []).length} entries; latest: ${htmlEscape(plainCode(raw.entries?.at(-1)?.type || "none"))}${raw.entries?.at(-1)?.ts ? ` at ${new Date(raw.entries.at(-1).ts).toLocaleString()}` : ""}.`, raw.entries || []))}
   `;
 }
 
@@ -2036,7 +2030,7 @@ async function renderPolicyPacks() {
         <label>
           <span class="muted">Action class</span>
           <select id="evidenceLogicActionClass">
-            ${actionEvidenceClasses.map((actionClass) => `<option value="${actionClass}"${actionClass === "DEPLOY" ? " selected" : ""}>${actionClass}</option>`).join("")}
+            ${actionEvidenceClasses.map((actionClass) => `<option value="${actionClass}"${actionClass === "DEPLOY" ? " selected" : ""}>${plainCode(actionClass)}</option>`).join("")}
           </select>
         </label>
         <button id="evidenceLogicAddGroup" class="secondary">Add alternative group</button>
@@ -2549,7 +2543,7 @@ async function renderCompliance() {
     ${card("Compliance Coverage", `
       <div class="row wrap">
         ${frameworks
-          .map((item) => `<a class="pill" href="./compliance?agent=${encodeURIComponent(agentId)}&framework=${encodeURIComponent(item)}">${item}</a>`)
+          .map((item) => `<a class="pill" href="./compliance?agent=${encodeURIComponent(agentId)}&framework=${encodeURIComponent(item)}">${plainCodeHtml(item)}</a>`)
           .join("")}
       </div>
       <p>Config signature: ${verify.valid ? "<strong>VALID</strong>" : verify.reason === "compliance maps missing"
@@ -2594,11 +2588,11 @@ async function renderIntegrations() {
       : "No verified event";
     return `<tr>
       <td><strong>${htmlEscape(health.provider)}</strong></td>
-      <td><span class="pill ${statusClass}">${htmlEscape(health.status)}</span></td>
+      <td><span class="pill ${statusClass}">${plainCodeHtml(health.status)}</span></td>
       <td>${htmlEscape(health.agentId || "not bound")}</td>
       <td>${htmlEscape(health.mode || "none")}</td>
       <td>${htmlEscape(lastObserved)}</td>
-      <td>${htmlEscape((health.reasonCodes || []).join(", ") || "none")}</td>
+      <td>${(health.reasonCodes || []).map(plainCodeHtml).join(", ") || "none"}</td>
     </tr>`;
   }).join("");
   const integrationStatus = status.status || {};
@@ -4098,7 +4092,8 @@ async function renderPage() {
         root,
         apiGet,
         card,
-        htmlEscape
+        htmlEscape,
+        plainCodeHtml
       });
     }
     if (page === "plugins") return await renderPlugins();

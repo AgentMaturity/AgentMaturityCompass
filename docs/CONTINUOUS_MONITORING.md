@@ -487,7 +487,7 @@ alerts:
 | Alert thresholds | ❌ No | ✅ Configurable score drops & anomalies |
 | Dashboard metrics | ✅ Yes | ✅ Real-time feed |
 | Webhook notifications | ✅ Yes | ✅ On score drops & incidents |
-| Evidence-backed | ❌ No | ✅ Ed25519 + Merkle tree proof chains |
+| Evidence-backed | ❌ No | ✅ Ed25519 signatures + Merkle tree hash chains |
 | Tamper-evident | ❌ No | ✅ Cryptographic signatures |
 
 ## Best Practices

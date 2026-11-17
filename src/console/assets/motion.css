@@ -1,9 +1,12 @@
 /* Compass Console motion. Short, and only where it tells the user something: a page arrived, a control was pressed,
    content is loading, a section opened. Everything here is switched off under prefers-reduced-motion. */
 
-/* Page to page: the browser cross-fades the old page into the new one where it supports it. */
-@view-transition {
-  navigation: auto;
+/* Page to page: the browser cross-fades the old page into the new one where it supports it, unless the person asked
+   for less motion. pageTransition.js handles a fade the browser skips. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
 }
 
 ::view-transition-old(root),

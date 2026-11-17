@@ -107,7 +107,7 @@ Claim: Self-reported · Result: not evaluated (this result is not yet bound to c
 Claim kinds: see docs/CLAIM_KINDS.md
 ```
 
-The same fields are in `structuredContent`: `{ claimKind, statusDimensions, claimLabel }`. Some clients ignore `structuredContent` without an output schema, so the text line is the guaranteed label. Errors (`isError`) carry no claim.
+The same fields are in `structuredContent`: `{ claimKind, statusDimensions, claimLabel }`. Some clients ignore `structuredContent` without an output schema, so the text line is the label that is always present. Errors (`isError`) carry no claim.
 
 | Tool | Claim source |
 | --- | --- |

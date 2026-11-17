@@ -103,12 +103,12 @@ AMC's advantage: it doesn't trust self-reported security claims. The Execution-P
 | **Governance** (D1) | ✅ Direct | Q18: Access control via least privilege. Policy-as-code enforcement gates. Exception process with expiry prevents permanent access grants. Approval workflows for elevated actions. |
 | **Safety** (D2) | ✅ Direct | Threat models map initial access vectors to controls. Red-team testing verifies prompt injection defenses. Runtime guardrails (policy checks, tool restrictions, fail-safe defaults) block exploitation. Sensitive action controls with approval thresholds. |
 | **Reliability** (D3) | 🔶 Indirect | Circuit breaking and controlled degradation limit blast radius after initial access. Deterministic tests for critical paths verify that access controls work under degraded conditions. |
-| **Observability** (D5) | ✅ Direct | End-to-end traceability detects unauthorized access patterns. Alert quality metrics surface initial access attempts. Forensic readiness (immutable logs, retention) preserves evidence chain. |
+| **Observability** (D5) | ✅ Direct | End-to-end traceability detects unauthorized access patterns. Alert quality metrics surface initial access attempts. Forensic readiness (hash-chained logs, retention) preserves evidence chain. |
 | **Operating Model** (D7) | 🔶 Indirect | On-call/escalation paths ensure access anomalies trigger response. Release/canary practices limit exposure of new attack surfaces. |
 
 ### Key AMC Evidence Checks
 - **Trust Boundary Model:** Five explicit trust boundaries (Agent, Gateway, Vault, Notary, Hardened) — each crossing requires authentication and produces a signed record.
-- **EPES Tiered Evidence:** Self-reported security claims capped. Only observed/hardened evidence proves access controls actually work.
+- **EPES Tiered Evidence:** Self-reported security claims capped. Only observed/hardened evidence counts toward showing that access controls work.
 - **Gateway Observation:** AMC's gateway proxy sits between agent and external services, observing all interactions. Initial access attempts are visible at this boundary.
 - **Temporal Verification:** Evidence timestamps cross-referenced against observation windows. Claims outside observed execution periods flagged — detects post-compromise evidence fabrication.
 
@@ -139,7 +139,7 @@ AMC's advantage: it doesn't trust self-reported security claims. The Execution-P
 | **Governance** (D1) | ✅ Direct | Versioned policy controls and change approvals detect unauthorized modifications. Decision logs link changes to outcomes — unauthorized staging leaves a gap. Audit trail for overrides. |
 | **Safety** (D2) | ✅ Direct | Abuse cases mapped to controls include data/knowledge poisoning. Red-team testing covers staged attack scenarios. Runtime guardrails detect behavioral shifts from poisoned inputs. |
 | **Evaluation** (D4) | ✅ Direct | Drift monitoring detects model/behavior shifts from staged attacks. Pre/post release gate reports catch poisoned artifacts before deployment. Regression detection is timely — staged changes that alter behavior trigger alerts. |
-| **Observability** (D5) | ✅ Direct | Structured logs with consistent IDs trace data lineage. End-to-end traceability across agents/tools/pipelines surfaces unauthorized modifications. Immutable logs prevent adversary from covering staging activity. |
+| **Observability** (D5) | ✅ Direct | Structured logs with consistent IDs trace data lineage. End-to-end traceability across agents/tools/pipelines surfaces unauthorized modifications. Hash-chained logs make later edits to staging records detectable. |
 
 ### Key AMC Evidence Checks
 - **Cryptographic Foundation (Ed25519 + Merkle Trees):** Every evidence artifact is signed. Merkle tree append-only logs mean any tampering with historical records breaks the chain. Staged poisoning of evidence is cryptographically detectable.
@@ -205,13 +205,13 @@ AMC's advantage: it doesn't trust self-reported security claims. The Execution-P
 |---------------|----------|-----|
 | **Governance** (D1) | ✅ Direct | Q17: Data handling policies enforce what agents can disclose. Q18: Least privilege limits data access scope. Q19: Approval checkpoints for high-risk outputs catch exfiltration attempts at decision points. |
 | **Safety** (D2) | ✅ Direct | Runtime guardrails block data disclosure. Kill-switch capability stops active exfiltration. Sensitive action controls with approval thresholds gate data-touching operations. Red-team testing covers extraction attempts. |
-| **Observability** (D5) | ✅ Direct | Structured logging captures all data flows. End-to-end traceability across tools/pipelines detects unauthorized data movement. Alert quality metrics surface exfiltration patterns. Immutable logs prevent cover-up. |
+| **Observability** (D5) | ✅ Direct | Structured logging captures all data flows. End-to-end traceability across tools/pipelines detects unauthorized data movement. Alert quality metrics surface exfiltration patterns. Hash-chained logs make a cover-up detectable. |
 | **Reliability** (D3) | 🔶 Indirect | Controlled degradation modes limit data exposure during failures. Circuit breaking prevents cascading data leaks. |
 | **Operating Model** (D7) | 🔶 Indirect | Incident response runbooks cover data breach scenarios. Cross-functional rituals (eng + risk + ops) ensure exfiltration events get multi-perspective response. |
 
 ### Key AMC Evidence Checks
 - **EPES Observation:** Gateway proxy observes all agent outputs. Data leaving through conversation, tool calls, or API responses is visible and auditable.
-- **Cryptographic Binding:** Signed evidence chain proves what data was accessed and when. Non-repudiation prevents denial of data handling.
+- **Cryptographic Binding:** Signed evidence chain records what data was accessed and when. Non-repudiation prevents denial of data handling.
 - **Anti-Gaming:** Tiered evidence weighting means agents can't claim data protection without demonstrating it under observation. The 84-point gap specifically catches agents that claim data controls but don't enforce them.
 - **Trust Boundary Model:** Every boundary crossing (agent→gateway, gateway→external) is authenticated and signed. Unauthorized data movement creates traceable anomalies.
 
@@ -243,12 +243,12 @@ AMC's advantage: it doesn't trust self-reported security claims. The Execution-P
 | **Reliability** (D3) | ✅ Direct | SLO/SLI tracking detects degradation. Error budget and release decisions prevent degraded agents from reaching production. Resilience testing (load, chaos, dependency failure). Automated rollback/circuit breaking limits impact duration. |
 | **Evaluation** (D4) | ✅ Direct | Pre/post release gates catch output manipulation before deployment. Calibration and drift monitoring detect quality degradation over time. Regression detection is timely and actionable. |
 | **Governance** (D1) | ✅ Direct | Incident/error/policy violation tracking (Q20) with corrective action loops. Decision logs link impact events to responses. Exception process ensures impact events get formal review. |
-| **Observability** (D5) | ✅ Direct | Fast root-cause analysis from telemetry. Actionable alerts with low noise. Clear linkage between user-impact and internal signals. Immutable forensic record. |
+| **Observability** (D5) | ✅ Direct | Fast root-cause analysis from telemetry. Actionable alerts with low noise. Clear linkage between user-impact and internal signals. Hash-chained forensic record. |
 | **Cost** (D6) | 🔶 Indirect | Financial impact from corrupted decisions detected through cost anomaly tracking. Budget guardrails limit financial damage. Unit economics reveal impact on value delivery. |
 | **Operating Model** (D7) | ✅ Direct | On-call + escalation for rapid impact response. Runbooks for security/impact incidents. Fast learning loops from incidents. Predictable delivery with controlled change failure rate. |
 
 ### Key AMC Evidence Checks
-- **Full EPES Stack:** Impact is where all of AMC's evidence chain converges. Signed observations prove what happened. Merkle trees prove when. Gateway proxy proves how. Tiered evidence proves the defenses actually worked (or didn't).
+- **Full EPES Stack:** Impact is where all of AMC's evidence chain converges. Signed observations record what happened. The Merkle index lets one entry be checked against a signed root. The gateway proxy shows how. Tiered evidence shows whether the defenses worked.
 - **Evidence Decay:** Ensures ongoing resilience. Past safety doesn't guarantee current safety. Continuous assessment is incentivized.
 - **Compromise Recovery:** Key rotation and revocation mechanisms. Evidence signed by uncompromised keys remains valid even during incident response.
 - **Anti-Gaming:** The 84-point gap is the impact tactic's natural enemy. Agents that claim safety controls but don't have them are exactly the agents most vulnerable to impact attacks.

@@ -239,7 +239,7 @@ The existing integration router handles these events:
 
 Each versioned notification contains only the opaque request ID and digest, action class, risk tier, requested/effective mode, creation/expiry timestamps, lifecycle status, quorum counts, and relative authenticated review path. It is explicitly `notificationOnly: true` and `proofEligible: false`.
 
-Delivery uses the existing HMAC signature, Vault resolution, ordered queue, retries, dead letters, delivery journal, and signed ledger receipt path. Every queued row binds its immutable channel, event, agent, payload digest, sequence, retry limit, and creation time with an auditor signature; payload or routing metadata tampering is dead-lettered before any network call. Studio drains due rows on startup and each scheduler tick, and terminal journal/dead-letter finalization is idempotent across restarts. Queue and journal records retain a destination hash and normalized error code, not a destination URL, Vault reference, shared secret, or raw transport error. The shared HMAC secret is never sent as a header.
+Delivery uses the existing HMAC signature, Vault resolution, ordered queue, retries, dead letters, delivery journal, and signed ledger receipt path. Every queued row binds its fixed channel, event, agent, payload digest, sequence, retry limit, and creation time with an auditor signature; payload or routing metadata tampering is dead-lettered before any network call. Studio drains due rows on startup and each scheduler tick, and terminal journal/dead-letter finalization is idempotent across restarts. Queue and journal records retain a destination hash and normalized error code, not a destination URL, Vault reference, shared secret, or raw transport error. The shared HMAC secret is never sent as a header.
 
 Studio persists and delivers `EXPIRED` when an authenticated detail/status read first observes expiry. Successful ToolHub execution delivers `CONSUMED`. Persist-before-notify and serialized transition checks prevent duplicate expiry delivery, and a consumption artifact is accepted only when its signed embedded request and agent IDs match the addressed path.
 
@@ -255,7 +255,7 @@ Studio persists and delivers `EXPIRED` when an authenticated detail/status read 
 
 A failed, duplicated, reordered, expired, or replayed notification cannot approve or execute an action. Missing or tampered request, decision, consumption, approval policy, action policy, tools, budgets, or Integrations evidence remains denied by default.
 
-## Security Guarantees
+## Security properties
 
 - Auditor signatures protect requests, decisions, consumption records, policies, and delivery evidence.
 - Quorum enforces allowed roles, distinct users, expiry, and requested mode.

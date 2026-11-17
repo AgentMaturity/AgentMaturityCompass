@@ -38,7 +38,7 @@ Forecast generation and advisory creation append transparency entries:
 - `FORECAST_CREATED`
 - `ADVISORY_CREATED`
 
-This provides immutable issuance history and Merkle-proofable inclusion.
+This gives a hash-chained issuance history and Merkle inclusion proofs.
 
 ## Safe Update Process
 

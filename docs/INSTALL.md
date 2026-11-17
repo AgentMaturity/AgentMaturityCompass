@@ -158,7 +158,7 @@ built on the composition kernel `@amc/core` and the vendored `@amc/cordis`
 family, which are private workspace packages. Since the build bundles that
 closure into `dist/kernel/amcRuntime.js` (`scripts/bundle-kernel.mjs`), the
 packed tarball carries the runtime too: `npm run check:packed-install` packs as
-`npm publish` would, installs into a fresh directory with an empty HOME, proves
+`npm publish` would, installs into a fresh directory with an empty HOME, checks that
 `@amc/core` is *not* resolvable there, and still completes a keyless native
 turn over a fully signed session. `npm run check:clean-source` runs the
 documented frozen install and build with an empty HOME/config and only OS/tool

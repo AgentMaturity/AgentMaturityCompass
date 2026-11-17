@@ -7,7 +7,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { plainErrorText } from "../../src/console/assets/plainError.js";
+import { plainCode, plainCodeHtml, plainErrorText } from "../../src/console/assets/plainError.js";
 import { codeWords, keyWords, recordRows, recordDetails, workspacePath } from "../../src/console/assets/pageKit.js";
 import { renderValueEvidenceBanner } from "../../src/console/assets/components/valueEvidenceBanner.js";
 import { renderNavSession } from "../../src/console/assets/shell.js";
@@ -54,6 +54,32 @@ describe("C-02: no value data is not a green OK", () => {
     expect(html).toContain("No value data yet.");
     expect(html).not.toContain("status-ok");
     expect(renderValueEvidenceBanner({ status: "INSUFFICIENT_EVIDENCE", reasons: ["<b>x</b>"] })).toContain("&lt;b&gt;x&lt;/b&gt;");
+  });
+});
+
+describe("code words shown as values read as words, with the code kept on the title", () => {
+  test("known codes, codes with numbers, unknown codes and plain text", () => {
+    expect(plainCode("INSUFFICIENT_EVIDENCE")).toBe("Not enough evidence yet");
+    expect(plainCode("INTEGRITY_BELOW_MIN:0.000<0.850")).toBe("Integrity is below the minimum (0.000, minimum 0.850)");
+    expect(plainCode("NO_TRUSTED_RUN")).toBe("No trusted run yet");
+    expect(plainCode("SOME_NEW_CODE")).toBe("Some new code");
+    expect(plainCode("not_installed")).toBe("Not installed");
+    expect(plainCode("NIST_AI_RMF")).toBe("NIST AI RMF");
+    expect(plainCode("OWNER")).toBe("Owner");
+    // statusPill shows PENDING for surfaces and setup steps too, so it must not speak of approvals.
+    expect(plainCode("PENDING")).toBe("Waiting");
+    for (const text of ["AMC", "UNTRUSTED", "toString", "sha256:abc", "Hello world", ""]) expect(plainCode(text)).toBe(text);
+    expect(plainCodeHtml("HOOK_NOT_INSTALLED")).toBe('<span class="code-word" title="Code: HOOK_NOT_INSTALLED">Hook not installed</span>');
+    expect(plainCodeHtml("<b>x</b>")).toBe("&lt;b&gt;x&lt;/b&gt;");
+  });
+
+  test("role pickers are checkboxes in words, not a multi-select of codes (C-27)", () => {
+    const app = readFileSync("src/console/assets/app.js", "utf8");
+    const picker = app.slice(app.indexOf("function userRolesSelect("), app.indexOf("async function renderUsers()"));
+    expect(picker).toContain('<input type="checkbox" value="${role}"');
+    expect(picker).toContain("plainCodeHtml(role)");
+    expect(picker).toContain('querySelectorAll("input:checked")');
+    expect(picker).not.toContain("multiple");
   });
 });
 

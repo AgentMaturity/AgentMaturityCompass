@@ -1308,8 +1308,8 @@ a:hover {
   }
 }
 
-/* Industry Pack questionnaire (M3): one labelled radio group per question, readable at 375px. */
-.pack-questions fieldset {
+/* Every group of choices (Industry Pack questions, roles, formats; C-27) in the theme's border, readable at 375px. */
+fieldset {
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   margin: 0 0 12px;
@@ -1317,9 +1317,14 @@ a:hover {
   min-width: 0;
 }
 
-.pack-questions legend {
+legend {
   padding: 0 4px;
 }
+
+/* Checkboxes in a group sit beside their words and wrap as whole items on a phone. */
+fieldset.role-picker, fieldset.check-row { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+fieldset.role-picker legend, fieldset.check-row legend { width: auto; }
+fieldset.role-picker label, fieldset.check-row label { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; }
 
 .pack-level {
   display: flex;

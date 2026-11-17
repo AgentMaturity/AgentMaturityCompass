@@ -177,12 +177,13 @@
 
 <h3>1. Assess your current state</h3>
 
-<pre><code><span style="color:#6a9955"># Install AMC</span>
+<pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
+<p>If the command says the address is not found, build by hand instead:</p>
+<pre><code><span style="color:#6a9955"># Install AMC by hand</span>
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
-pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link
-
-<span style="color:#6a9955"># Get your baseline score with EU AI Act classification</span>
+pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</code></pre>
+<pre><code><span style="color:#6a9955"># Get your baseline score with EU AI Act classification</span>
 amc compliance report --framework EU_AI_ACT</code></pre>
 
 <p>This creates a local classification signal and shows which mapped obligations have supporting evidence or gaps. It is not a legal classification decision.</p>
@@ -270,6 +271,8 @@ amc domain report --domain health --output reports/health-compliance.md</code></
 <div class="cta-box">
   <h3>Start your compliance assessment today</h3>
   <p>AMC is open source and MIT-licensed. Get your EU AI Act gap analysis in 2 minutes.</p>
+  <pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
+  <p>If the command says the address is not found, build by hand instead:</p>
   <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link

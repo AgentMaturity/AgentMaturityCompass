@@ -81,3 +81,6 @@ body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { backgrou
 .a4-approvers label, .a4-invite label:has(input[type="checkbox"]) { display: flex; gap: 8px; align-items: center; }
 .a4-approvers input[type="radio"], .a4-invite input[type="checkbox"] { width: auto; flex: none; margin: 0; }
 .a4-approvers p { margin: 0 0 8px 26px; }
+
+/* A notice can hold a long project link (Add a person): it wraps instead of pushing the page sideways at phone width. */
+#a4Notice { overflow-wrap: anywhere; }

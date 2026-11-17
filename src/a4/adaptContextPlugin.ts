@@ -373,7 +373,7 @@ export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQue
   const built = reached(state, "built");
   const deliveries = [
     item("model_delivery", "NOT_EVALUATED", { kind: "not_evaluated", mandatory: false, reasonCodes: ["STUB_PROVIDER", "NO_REAL_PROVIDER_RECEIPT"],
-      nextAction: { label: "Delivery to a model is not evaluated: the probe runs on the stub provider (no network, no credential)" } }),
+      nextAction: { label: "Whether a real model receives this text is not checked: the probe uses the stand-in model (no network, no credential)" } }),
     nativeDeliveryItem(spec, context?.sha256)
   ];
   if (context === undefined) {
@@ -391,7 +391,7 @@ export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQue
       item("prompts_attributed", "READY", { reasonCodes: [`CONTEXT_PLUGIN:${context.sha256.slice(0, 16)}`, `ORDER:${context.order}`, `SOURCE:${context.source}`,
         "PROMPT_PACK_NATIVE_TASKS_ONLY"] }),
       item("context_reaches_runtime_frame", "NOT_EVALUATED", { kind: "source_unavailable", mandatory: false, reasonCodes: ["SESSION_STORE_JSONL", "PROBE_NOT_RECORDABLE"],
-        nextAction: { label: "This workspace's session store is JSONL, so the probe cannot be recorded and the plugin's delivery to the runtime frame is not evaluated" } }),
+        nextAction: { label: "This workspace keeps its sessions in JSONL files, so the probe cannot be recorded and whether the agent receives this project's text is not checked" } }),
       item("context_probe_unavailable", "WAITING", { kind: "source_unavailable", reasonCodes: ["SESSION_STORE_JSONL"],
         nextAction: { label: "An owner acknowledges, with a reason, that this project completes with the context plugin's delivery not evaluated (Acknowledge); "
           + "a workspace on the SQLite session store runs the probe instead" } }),
@@ -402,18 +402,18 @@ export function contextItems(state: A4ReadinessState, query: Pick<A4ReadinessQue
   const recheck = link !== undefined && reviewed !== undefined && reviewed.refEventId === link.body.refId ? reviewed.frame : undefined;
   const frame = link === undefined
     ? item("context_reaches_runtime_frame", "WAITING", { kind: "evidence_missing", reasonCodes: ["CONTEXT_PROBE_NOT_RUN"],
-      nextAction: { label: "Run the context probe: one in-process turn on the stub provider; AMC checks its signed user/message row for the plugin's text", route } })
+      nextAction: { label: "Run the context probe: AMC sends one short message to the stand-in model and checks that its signed record of that message holds the text this project adds to the agent's instructions", route } })
     : link.body.turnStatus !== "complete" || link.body.inFrame !== true
       ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory",
         reasonCodes: [link.body.turnStatus !== "complete" ? "PROBE_DENIED" : "CONTEXT_NOT_IN_FRAME", `TURN_END:${String(link.body.turnStatus)}`, `SESSION:${String(link.body.sessionId)}`],
-        nextAction: { label: "The probe's turn did not complete, or its session does not show the plugin in its frame: build again, then probe again", route } })
+        nextAction: { label: "The probe did not finish, or its record does not hold the text this project adds to the agent's instructions: run Build again, then the probe again", route } })
       : ref === undefined || (ref.status !== "resolved" && ref.status !== "payload_pruned")
         ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_untrusted", reasonCodes: ["PROBE_REF_UNRESOLVED", ...(ref?.reasonCodes ?? ["REF_DANGLING"])],
           nextAction: { label: "The probe session's row is missing, changed or unsigned: probe again", route } })
         : recheck !== undefined && recheck !== "resolved"
           ? item("context_reaches_runtime_frame", "BLOCKED", { kind: "evidence_contradictory", reasonCodes: [typeof recheck === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(recheck)
             ? recheck : "FRAME_ROW_NOT_RECHECKED", `SNAPSHOT:${String(link.body.snapshotEventId)}`],
-            nextAction: { label: "At Review the probe's user/message row no longer showed the plugin's text (gone, changed or unverified): probe again, then review again", route } })
+            nextAction: { label: "At Review the probe's signed record no longer held this project's text (gone, changed or unsigned): run the probe again, then Review again", route } })
           // AMC's check of the signed user/message row (at the probe, and again at Review) behind A4's synthetic_example ref: never the observed lane.
           : item("context_reaches_runtime_frame", "READY", { reasonCodes: ["CONTEXT_IN_RUNTIME_FRAME", recheck === "resolved" ? "FRAME_ROW_RECHECKED_AT_REVIEW" : "FRAME_ROW_CHECKED_AT_PROBE",
             `SNAPSHOT:${String(link.body.snapshotEventId)}`, "PROBE_SYNTHETIC_EXAMPLE", "NO_EFFECTIVE_POLICY_RECEIPT", "IN_PROCESS_ONLY", `SESSION:${String(link.body.sessionId)}`],

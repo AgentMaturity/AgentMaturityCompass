@@ -28,7 +28,7 @@
   <text x="176" y="84" class="mono muted">amc-demo --community-kit</text>
 
   <text x="84" y="154" class="title">Agent Maturity Compass in five minutes</text>
-  <text x="84" y="188" class="sub">Score an agent, avoid placeholder confusion, then export business-risk proof.</text>
+  <text x="84" y="188" class="sub">Score an agent, avoid placeholder confusion, then export a business-risk record.</text>
   <line x1="84" y1="214" x2="1114" y2="214" class="line"/>
 
   <text x="84" y="260" class="mono cmd">$ amc quickscore --rapid</text>

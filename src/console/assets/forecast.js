@@ -1,4 +1,5 @@
 import { recordRows } from "./pageKit.js";
+import { plainCodeHtml } from "./plainError.js";
 import { renderChartBand } from "./components/chartBand.js";
 import { renderIndicatorList } from "./components/indicatorList.js";
 import { renderAdvisoryCards } from "./components/advisoryCard.js";
@@ -36,10 +37,10 @@ export async function renderForecastScopePage(params) {
 
   root.innerHTML = `
     ${card(`Forecast · ${scopeLabel(scope, targetId)}`, `
-      <p><strong>Status:</strong> ${htmlEscape(status)}</p>
+      <p><strong>Status:</strong> ${plainCodeHtml(status)}</p>
       ${
         status !== "OK"
-          ? `<div class="card status-bad"><strong>Honesty:</strong> INSUFFICIENT_EVIDENCE<br/>${(latest.reasons || []).map((r) => htmlEscape(r)).join("<br/>")}</div>`
+          ? `<div class="card status-bad"><strong>Honesty:</strong> ${plainCodeHtml("INSUFFICIENT_EVIDENCE")}<br/>${(latest.reasons || []).map(plainCodeHtml).join("<br/>")}</div>`
           : `<div class="grid">
                <div><div class="muted">Maturity</div><div class="tile-value">${latestMaturity === null ? "n/a" : Number(latestMaturity).toFixed(3)}</div></div>
                <div><div class="muted">Integrity</div><div class="tile-value">${latestIntegrity === null ? "n/a" : Number(latestIntegrity).toFixed(3)}</div></div>

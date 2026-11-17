@@ -1,9 +1,8 @@
 // A4 Studio page module (P1-58, design §11). a4.html and a4Project.html mount it from their own <script type="module">,
 // and home.html loads it for the "Start an agent project" card; app.js is byte-pinned and never learns about these pages.
 // Every call goes through apiNativeRequest. Studio re-checks every action: a disabled button is a convenience only.
-import { apiGet, apiNativeRequest, logout, onClaims, whoami } from "./api.js";
+import { apiGet, apiNativeRequest, onClaims, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
-import { topbarHtml } from "./shell.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
 import { stageAction, stageCards } from "./a4Cards.js";
 import * as view from "./a4View.js";
@@ -687,24 +686,12 @@ function mountProject(projectId, options) {
   })();
 }
 
-/** The console's top bar on the A4 pages too (C-15): workspace, the guide, Records, a task and, signed in, Sign out. */
-function addTopbar(who) {
-  const main = document.querySelector("main");
-  if (!main || main.querySelector(".topbar")) return;
-  const bar = Object.assign(document.createElement("section"), { className: "topbar" });
-  const prefix = location.pathname.match(/^\/w\/([^/]+)\//)?.[1];
-  bar.innerHTML = topbarHtml({ workspace: prefix ? decodeURIComponent(prefix) : "local", demoMode: prefix === "demo", me: who });
-  main.insertBefore(bar, main.firstChild);
-  bar.querySelector("#signOutBtn")?.addEventListener("click", () => void logout().then(() => location.assign("./login"), showError));
-}
-
 async function main() {
   if (page === "home") return showHomeEntry();
   // A loading skeleton until the first render (motion.css animates [aria-busy]); every render replaces it.
   root.setAttribute("aria-busy", "true");
   root.innerHTML = '<section class="card skeleton" aria-label="Loading"><p class="muted">Loading…</p></section>';
   setMe(await whoami().catch(() => null));
-  addTopbar(me);
   if (!me) {
     root.removeAttribute("aria-busy");
     const next = `${page}${location.search}`;

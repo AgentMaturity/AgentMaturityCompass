@@ -1,11 +1,4 @@
-function esc(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
+import { plainCodeHtml } from "../plainError.js";
 
 function cssForStatus(status) {
   const value = String(status ?? "INSUFFICIENT_EVIDENCE").toUpperCase();
@@ -20,5 +13,5 @@ function cssForStatus(status) {
 
 export function renderControlStatusChip(status) {
   const value = String(status ?? "INSUFFICIENT_EVIDENCE").toUpperCase();
-  return `<span class="${cssForStatus(value)}">${esc(value)}</span>`;
+  return `<span class="${cssForStatus(value)}">${plainCodeHtml(value)}</span>`;
 }

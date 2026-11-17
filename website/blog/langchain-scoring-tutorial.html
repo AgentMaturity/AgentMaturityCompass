@@ -85,6 +85,8 @@
 
 <div class="step">
 <p><span class="step-number">1</span> <strong>Install the verified AMC release</strong></p>
+<pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
+<p>If the command says the address is not found, build by hand instead:</p>
 <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link</code></pre>
@@ -224,6 +226,8 @@ amc fix --target-level L3    <span style="color:#6a9955"># Writes guardrails int
 <div class="cta-box">
   <h3>Ready to score your agent?</h3>
   <p>Two minutes. Zero code changes. Real answers.</p>
+  <pre><code>curl -fsSL https://agentmaturity.co/install-source.sh | sh</code></pre>
+  <p>If the command says the address is not found, build by hand instead:</p>
   <pre><code>git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
 cd AgentMaturityCompass
 pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link

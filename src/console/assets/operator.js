@@ -3,7 +3,8 @@
 // reasons are printed as Studio returned them. The inbox never says "all clear": an empty list says what was evaluated
 // and when, and an unavailable source is shown as such. Studio re-checks every action; buttons are conveniences.
 import { apiGet, apiPost, showSignIn, whoami } from "./api.js";
-import { plainErrorText } from "./plainError.js";
+import { plainCode, plainErrorText } from "./plainError.js";
+import { notReadyWords, say as sayPlain } from "./a4Plain.js";
 import { renderControlStatusChip } from "./components/controlStatusChip.js";
 import { createReviewTimer } from "./reviewTimer.js";
 
@@ -16,6 +17,13 @@ const list = (value) => (Array.isArray(value) ? value : []);
 const code = (value) => `<code>${esc(value)}</code>`;
 const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table><thead><tr>${head.map((cell) => `<th scope="col">${esc(cell)}</th>`).join("")}</tr></thead>
   <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` : `<p class="muted">${esc(empty)}</p>`);
+// Inbox kinds and the A4 source's "WAITING: GATE_PENDING" next actions in words; the code stays on the title.
+const titled = (code, words) => `<span title="Code: ${esc(code)}">${esc(words)}</span>`;
+const kindHtml = (kind) => titled(kind, sayPlain("blockerKind", kind).replace(/^./, (first) => first.toUpperCase()));
+const nextActionHtml = (text) => {
+  const codes = /^[A-Z_]+: ([A-Z_]+)$/.exec(String(text ?? ""));
+  return codes ? titled(text, notReadyWords({ reasonCodes: [codes[1]] }) ?? plainCode(codes[1])) : esc(text);
+};
 const say = (text, bad = false) => { status.textContent = text; status.className = bad ? "status-bad" : "muted"; };
 /** A failure is said at the top and, when a form or button sent it, beside that control (C-05), in plain words (C-10). */
 const failure = (error, near = null) => {
@@ -104,9 +112,9 @@ async function inboxPage() {
   root.innerHTML = `${sourcesLine(inbox.sources)}
     ${a4Off ? '<p class="muted">A4 agent projects are turned off in this workspace, so they are not checked here.</p>' : ""}
     <p class="muted">Expiry window: ${esc(inbox.expiryWindowDays)} days. Evaluated ${esc(inbox.evaluatedAt)}.</p>
-    ${table(["Kind", "Severity", "Control", "Agent", "Due", "Next action"], items.map((item) => [code(item.kind), esc(item.severity),
+    ${table(["Kind", "Severity", "Control", "Agent", "Due", "Next action"], items.map((item) => [kindHtml(item.kind), esc(item.severity),
       item.controlId ? code(item.controlId) : "", esc(item.subject?.agentId ?? ""), item.dueTs ? esc(new Date(item.dueTs).toISOString()) : "",
-      `${esc(item.nextAction)}${list(item.links).map((link) => ` <a href="${esc(link)}">open</a>`).join("")}`]), empty)}`;
+      `${nextActionHtml(item.nextAction)}${list(item.links).map((link) => ` <a href="${esc(link)}">open</a>`).join("")}`]), empty)}`;
 }
 
 // ---- Review packet and opt-in timing ----
@@ -142,7 +150,7 @@ async function packetPage() {
       <label>Plan digest (copy it from the <a href="./operator-plan">Plans</a> page; it starts with sha256:) <input id="packetPlan" required pattern="sha256:[0-9a-f]{64}" autocomplete="off" /></label>
       <label>From <input id="packetFrom" type="datetime-local" required value="${new Date(Date.now() - 30 * day).toISOString().slice(0, 16)}" /></label>
       <label>To <input id="packetTo" type="datetime-local" required value="${new Date(Date.now() - 60_000).toISOString().slice(0, 16)}" /></label>
-      <fieldset><legend>Formats</legend>${["json", "oscal", "pdf"].map((format) => `<label><input type="checkbox" name="format" value="${format}" checked /> ${format}</label>`).join(" ")}</fieldset>
+      <fieldset class="check-row"><legend>Formats</legend>${["json", "oscal", "pdf"].map((format) => `<label><input type="checkbox" name="format" value="${format}" checked /> ${format.toUpperCase()}</label>`).join(" ")}</fieldset>
       <button type="submit" id="packetBuild">Build packet</button></form><div id="packetArea"></div>`;
   document.getElementById("packetForm").addEventListener("submit", async (event) => {
     event.preventDefault();

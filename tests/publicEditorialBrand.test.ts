@@ -74,6 +74,12 @@ describe("AMC public editorial identity", () => {
     // The source build is the current way in; the old installer is gone from the posts (S-04).
     expect(read("website/blog/langchain-scoring-tutorial.html")).toContain("pnpm install --frozen-lockfile &amp;&amp; pnpm run build &amp;&amp; npm link");
     for (const path of editorialPages) expect(read(path), path).not.toContain("install.sh | sh");
+    // Each by-hand build in a post comes after the current one-line install.
+    for (const path of editorialPages) {
+      const html = read(path);
+      const byHand = html.split("git clone https://github.com/AgentMaturity/AgentMaturityCompass.git").length - 1;
+      expect(html.split("curl -fsSL https://agentmaturity.co/install-source.sh | sh").length - 1, path).toBe(byHand);
+    }
     expect(read("website/blog/the-84-point-gap.html")).toContain("Documentation Inflation Gap");
   });
 

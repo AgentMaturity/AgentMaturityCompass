@@ -24,7 +24,7 @@ amc policy approval init
 
 Scope templates do not create a separate policy store. Workspace policies remain fleet-wide, so review the selected Policy Pack posture as a workspace-wide change before compiling it.
 
-List the immutable catalog:
+List the built-in catalog:
 
 ```bash
 amc policy scope list

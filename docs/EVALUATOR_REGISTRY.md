@@ -44,6 +44,6 @@ Custom metrics are disclosed as `custom-metric://amc/...`, with no AMC version o
 
 ## Claim Boundary
 
-Registry status proves only which evaluator definitions are loaded and which exact metadata was signed. It is not evaluator-result evidence. It does not prove that an evaluator ran, that its result passed, that an agent is safe, or that a maturity score is justified. Those claims still require AMC's execution evidence and signed receipts.
+Registry status shows only which evaluator definitions are loaded and which exact metadata was signed. It is not evaluator-result evidence. It does not prove that an evaluator ran, that its result passed, that an agent is safe, or that a maturity score is justified. Those claims still require AMC's execution evidence and signed receipts.
 
 The snapshot is derived and replaceable. It is not an append-only evidence ledger, external evaluator marketplace, remote service, dynamic discovery system, or scoring-methodology version.

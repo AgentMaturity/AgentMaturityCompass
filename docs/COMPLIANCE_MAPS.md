@@ -163,7 +163,7 @@ refusal before DNS. HTTP 200 or a body hash alone establishes no quotation,
 pinpoint, legal or human approval. The new review target is
 qualification/2026-10-20-P1-45-solo/; packet assembly and qualification are
 separate from these source-text decisions. The six-file
-qualification/2026-10-18-P1-45/ packet remains immutable history.
+qualification/2026-10-18-P1-45/ packet is kept as it was, as history.
 
 Each mapping says what AMC evidence shows and what it does not. AMC observes
 the agent, so entity-level duties (a management body's approval, notifying a

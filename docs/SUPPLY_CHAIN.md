@@ -33,7 +33,7 @@ External anchors:
 - [NIST SP 800-161r1-upd1](https://doi.org/10.6028/NIST.SP.800-161r1-upd1) covers cybersecurity supply-chain risk management practices for systems and organizations.
 - [GS1 EPCIS 2.0](https://ref.gs1.org/standards/epcis/) defines visibility event data shared within and across enterprises.
 
-## Release Supply Chain Guarantees
+## Release Supply Chain Checks
 
 AMC release engineering produces signed, offline-verifiable release evidence.
 

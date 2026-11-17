@@ -27,7 +27,7 @@ The acceptance rules are [`spec/ACCEPTANCE_RULES.md`](../ACCEPTANCE_RULES.md). T
    signature, issuer admission, scope, freshness, completeness, satisfaction.
 2. A verifier MUST apply the per-record rules there for every record type it accepts, and MUST refuse a record type
    it does not implement rather than pass it.
-3. A signature proves who wrote a record and that it is unchanged. A verifier MUST NOT read it as proof that the
+3. A signature shows who wrote a record and that it is unchanged. A verifier MUST NOT read it as proof that the
    record's statement is true.
 4. A verifier MUST take the as-of time as an input and MUST NOT read the clock to decide freshness implicitly.
 

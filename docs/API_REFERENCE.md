@@ -256,7 +256,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 237 | `amc catalog check` | Check each pack's declared support against the ten admission criteria (exit 0 when every declared support is admissible, 1 otherwise) |
 | 238 | `amc catalog compile` | Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error) |
 | 239 | `amc cert` | Certificate operations |
-| 240 | `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) |
+| 240 | `amc cert generate` | Generate a trust certificate from execution evidence (PDF or JSON; signed unless --no-sign) |
 | 241 | `amc cert inspect` | Inspect any AMC certificate (.amccert bundle or trust-certificate JSON) |
 | 242 | `amc cert revoke` | Create signed revocation file for a certificate |
 | 243 | `amc cert verify` | Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON) |
@@ -317,7 +317,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 298 | `amc config provenance` | Show which layer and file set each resolved amcconfig.yaml value; with a JSON Pointer, the winner and every shadowed value |
 | 299 | `amc config run` | Run the evaluation pipeline declared in amcconfig.yaml |
 | 300 | `amc config validate` | Validate amcconfig.yaml without running anything |
-| 301 | `amc connect` | Connect an agent runtime and track first action, decision, and proof |
+| 301 | `amc connect` | Connect an agent runtime and track its first action, decision, and evidence |
 | 302 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks |
 | 303 | `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event |
 | 304 | `amc connect hooks install` | Install a reversible project hook for Claude Code, Gemini CLI, Pi, DSH (control) or Codex (observe) |
@@ -401,7 +401,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 382 | `amc enforce blind-secrets` | Redact secrets from text |
 | 383 | `amc enforce check` | Check policy for an agent action |
 | 384 | `amc enforce exec-guard` | Check if a command is safe to execute |
-| 385 | `amc enforce formal-verify` | Formally verify safety properties using proof trees and certificates |
+| 385 | `amc enforce formal-verify` | Model-check AMC's built-in safety properties (not your agent) and print the results |
 | 386 | `amc enforce numeric-check` | Validate a numeric value within bounds |
 | 387 | `amc enforce resources` | Snapshot, diff, and verify agent resources governed by Enforce |
 | 388 | `amc enforce resources apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set |
@@ -421,7 +421,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 402 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest |
 | 403 | `amc enforce taint` | Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard) |
 | 404 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model |
-| 405 | `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) |
+| 405 | `amc enforce verify-certificate` | Check the hash of a formal-verification certificate; it is unsigned, so never trusted (pass JSON as string) |
 | 406 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance |
 | 407 | `amc enterprise activate` | Activate a signed enterprise licence key, verified against a key pinned in the AMC trust list |
 | 408 | `amc enterprise audit-export` | Export audit trail in SIEM format |
@@ -447,10 +447,10 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 428 | `amc evidence episodes inspect` | Inspect one EpisodeRecord by episode id, lifecycle id, or run id |
 | 429 | `amc evidence episodes list` | List persisted EpisodeRecord evidence objects |
 | 430 | `amc evidence export` | Export verifier-ready evidence (json|csv|pdf) |
-| 431 | `amc evidence finding-proofs` | List, inspect, and export finding proof chains |
-| 432 | `amc evidence finding-proofs export` | Export finding proofs as JSON |
-| 433 | `amc evidence finding-proofs inspect` | Inspect one finding proof by proof id, finding id, run id, or question id |
-| 434 | `amc evidence finding-proofs list` | List persisted finding proof chains |
+| 431 | `amc evidence finding-proofs` | List, inspect, and export finding evidence chains |
+| 432 | `amc evidence finding-proofs export` | Export finding evidence chains as JSON |
+| 433 | `amc evidence finding-proofs inspect` | Inspect one finding evidence chain by its proofId, finding id, run id, or question id |
+| 434 | `amc evidence finding-proofs list` | List saved finding evidence chains |
 | 435 | `amc evidence help` | Show high-signal evidence command groups |
 | 436 | `amc evidence lifecycle` | List, inspect, and export full lifecycle run artifacts |
 | 437 | `amc evidence lifecycle export` | Export one lifecycle artifact as JSON |
@@ -636,7 +636,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 617 | `amc incident create` | Create a manual incident |
 | 618 | `amc incident link` | Link evidence to an incident |
 | 619 | `amc incident list` | List incidents for an agent |
-| 620 | `amc incident oversight` | Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer) |
+| 620 | `amc incident oversight` | Append a signed human-oversight record (the auditor key shows which workspace signed, not who reviewed) |
 | 621 | `amc incident show` | Show incident details, or write its regulator evidence packet with --packet |
 | 622 | `amc incidents` | Incident operations and dispatch workflows |
 | 623 | `amc incidents alert` | Dispatch INCIDENT_CREATED to configured integration channels |
@@ -955,7 +955,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 936 | `amc policy scope` | Compile reusable action-class scopes into existing signed policies |
 | 937 | `amc policy scope apply` | Apply a scope preview after exact compile-ID confirmation |
 | 938 | `amc policy scope compile` | Preview a deterministic selected-rule merge without writing |
-| 939 | `amc policy scope list` | List immutable AMC action-class scope templates |
+| 939 | `amc policy scope list` | List AMC's built-in action-class scope templates (fixed; they cannot be edited) |
 | 940 | `amc policy simulate` | Simulate one projected control through its production evaluator without recording |
 | 941 | `amc policy test` | Run deterministic policy fixtures through production control evaluators |
 | 942 | `amc policy-canary-report` | Generate canary mode report for an agent |
@@ -987,7 +987,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 968 | `amc prompt scheduler status` | Show prompt scheduler status |
 | 969 | `amc prompt status` | List per-agent prompt pack status |
 | 970 | `amc prompt verify` | Verify prompt policy, pack, lint and scheduler signatures |
-| 971 | `amc proof` | Domain Proof Lane source-to-rule proof checks |
+| 971 | `amc proof` | Domain Proof Lane source-to-rule checks |
 | 972 | `amc proof check` | Check a claim against a declared source-to-rule manifest and emit an amcproof artifact |
 | 973 | `amc provider` | Provider template operations |
 | 974 | `amc provider add` | Assign or update provider template for an agent |
@@ -1113,7 +1113,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1094 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence |
 | 1095 | `amc session export` | Export a session for offline verification as an HTML viewer or a sealed JSON bundle |
 | 1096 | `amc session latest` | Show the most recent session `agent-loop run --continue` would continue for this agent, or why none qualifies |
-| 1097 | `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) |
+| 1097 | `amc session proof` | Export a session's inclusion proof (checkable offline, without this workspace) |
 | 1098 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) |
 | 1099 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest |
 | 1100 | `amc session show` | Show a session's projected conversation and its event spine |
@@ -1131,7 +1131,7 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1112 | `amc shield analyze-runtime` | Analyze a proposed runtime agent action through the Shield trust pipeline |
 | 1113 | `amc shield confirm` | Controlled exploit confirmation with strict authorization gates |
 | 1114 | `amc shield confirm export` | Export a redacted safe proof without exploit instructions |
-| 1115 | `amc shield confirm proofs` | List safe exploit-confirmation proof artifacts |
+| 1115 | `amc shield confirm proofs` | List safe exploit-confirmation records |
 | 1116 | `amc shield confirm run` | Run authorized safe exploit confirmation from a task JSON file |
 | 1117 | `amc shield confirm scope-write` | Write a signed exploit-confirmation authorization scope from JSON |
 | 1118 | `amc shield confirm scopes` | List exploit-confirmation authorization scopes |
@@ -1212,11 +1212,11 @@ AMC provides 1,302 public CLI command paths in the live command inventory.
 | 1193 | `amc transparency` | Append-only transparency log operations |
 | 1194 | `amc transparency export` | Export transparency bundle |
 | 1195 | `amc transparency init` | Initialize append-only transparency log |
-| 1196 | `amc transparency merkle` | Merkle transparency root/proof operations |
-| 1197 | `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash |
+| 1196 | `amc transparency merkle` | Merkle transparency root and inclusion-proof operations |
+| 1197 | `amc transparency merkle prove` | Export a signed inclusion proof bundle for an entry hash |
 | 1198 | `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log |
 | 1199 | `amc transparency merkle root` | Show current Merkle root and history |
-| 1200 | `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle |
+| 1200 | `amc transparency merkle verify-proof` | Verify a signed inclusion proof bundle |
 | 1201 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is |
 | 1202 | `amc transparency tail` | Tail transparency entries |
 | 1203 | `amc transparency verify` | Verify transparency chain + seal signature |
@@ -3125,7 +3125,7 @@ Compile a deployment profile against the catalog into a signed, experimental con
 
 #### `amc cert generate`
 
-Generate execution-proof trust certificate (signed PDF or JSON)
+Generate a trust certificate from execution evidence (PDF or JSON; signed unless --no-sign)
 
 
 | Option | Description |
@@ -3725,7 +3725,7 @@ Validate amcconfig.yaml without running anything
 
 #### `amc connect`
 
-Connect an agent runtime and track first action, decision, and proof
+Connect an agent runtime and track its first action, decision, and evidence
 
 
 | Option | Description |
@@ -4506,7 +4506,7 @@ Check if a command is safe to execute
 
 #### `amc enforce formal-verify`
 
-Formally verify safety properties using proof trees and certificates
+Model-check AMC's built-in safety properties (not your agent) and print the results
 
 
 | Option | Description |
@@ -4715,7 +4715,7 @@ Generate a TLA+ specification for the AMC safety model
 
 #### `amc enforce verify-certificate`
 
-Verify the integrity of a proof certificate (pass JSON as string)
+Check the hash of a formal-verification certificate; it is unsigned, so never trusted (pass JSON as string)
 
 
 | Option | Description |
@@ -4917,7 +4917,7 @@ Export verifier-ready evidence (json|csv|pdf)
 
 #### `amc evidence finding-proofs export`
 
-Export finding proofs as JSON
+Export finding evidence chains as JSON
 
 
 | Option | Description |
@@ -4930,7 +4930,7 @@ Export finding proofs as JSON
 
 #### `amc evidence finding-proofs inspect`
 
-Inspect one finding proof by proof id, finding id, run id, or question id
+Inspect one finding evidence chain by its proofId, finding id, run id, or question id
 
 
 | Option | Description |
@@ -4940,7 +4940,7 @@ Inspect one finding proof by proof id, finding id, run id, or question id
 
 #### `amc evidence finding-proofs list`
 
-List persisted finding proof chains
+List saved finding evidence chains
 
 
 | Option | Description |
@@ -6400,7 +6400,7 @@ List incidents for an agent
 
 #### `amc incident oversight`
 
-Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer)
+Append a signed human-oversight record (the auditor key shows which workspace signed, not who reviewed)
 
 
 | Option | Description |
@@ -8556,7 +8556,7 @@ Preview a deterministic selected-rule merge without writing
 
 #### `amc policy scope list`
 
-List immutable AMC action-class scope templates
+List AMC's built-in action-class scope templates (fixed; they cannot be edited)
 
 
 | Option | Description |
@@ -9939,7 +9939,7 @@ Show the most recent session `agent-loop run --continue` would continue for this
 
 #### `amc session proof`
 
-Export a session's inclusion proof (verifiable offline, without this workspace)
+Export a session's inclusion proof (checkable offline, without this workspace)
 
 
 | Option | Description |
@@ -10121,7 +10121,7 @@ Export a redacted safe proof without exploit instructions
 
 #### `amc shield confirm proofs`
 
-List safe exploit-confirmation proof artifacts
+List safe exploit-confirmation records
 
 
 | Option | Description |
@@ -10694,7 +10694,7 @@ Export transparency bundle
 
 #### `amc transparency merkle prove`
 
-Export signed inclusion proof bundle for entry hash
+Export a signed inclusion proof bundle for an entry hash
 
 
 | Option | Description |
@@ -10713,7 +10713,7 @@ Rebuild Merkle leaves/roots from transparency log
 
 #### `amc transparency merkle verify-proof`
 
-Verify signed inclusion proof bundle
+Verify a signed inclusion proof bundle
 
 
 | Option | Description |

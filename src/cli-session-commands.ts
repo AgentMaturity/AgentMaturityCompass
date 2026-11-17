@@ -232,7 +232,7 @@ export function registerSessionCommands(program: Command): void {
 
   session
     .command("proof")
-    .description("Export a session's inclusion proof (verifiable offline, without this workspace)")
+    .description("Export a session's inclusion proof (checkable offline, without this workspace)")
     .argument("<id>", "session id")
     .requiredOption("--out <path>", "file to write the proof bundle to")
     .action(async (id: string, opts: { out: string }) => {

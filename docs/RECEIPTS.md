@@ -1,6 +1,6 @@
 # RECEIPTS
 
-AMC receipts are compact cryptographic proofs minted by trusted monitor/gateway processes.
+AMC receipts are compact signed records minted by trusted monitor/gateway processes.
 
 ## Format (AMC Receipt v1)
 
@@ -63,7 +63,7 @@ whose evidence is incomplete, or a `started` one whose process died or whose hea
 same agent's later consequential calls (`blocked_by_unreconciled`) until it is reconciled or an operator resolves it
 (below); the denial names the execution and the command. The block is read when the
 call enters, again after any approval wait, and once more inside the transaction that writes `started`, so neither a
-long approval wait nor another process can start a call past it. A body that proves no effect happened throws `DefiniteFailureError` and gets `completed` /
+long approval wait nor another process can start a call past it. A body that shows no effect happened throws `DefiniteFailureError` and gets `completed` /
 `not_applied`. AMC never promises exactly-once delivery: a local ledger cannot make an external effect happen once,
 so it records what it knows and refuses to guess.
 

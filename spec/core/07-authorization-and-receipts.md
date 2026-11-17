@@ -42,7 +42,7 @@ generated from `ALLOWED_TRANSITIONS` (`src/actions/receiptStates.ts`):
 2. From `authorized` on, every receipt MUST carry the digest of the execution's authorization record.
 3. A receipt that settles an `outcome_unknown` execution MUST carry `reconciliation` naming the `outcome_unknown`
    receipt it follows.
-4. A receipt proves that a row was written. It MUST NOT be read as proof that the effect happened or succeeded.
+4. A receipt shows that a row was written. It MUST NOT be read as proof that the effect happened or succeeded.
 
 ## Failure behaviour
 

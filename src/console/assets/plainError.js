@@ -32,3 +32,39 @@ export function plainErrorText(error) {
   }
   return text || "Something went wrong. Refresh the page and try again.";
 }
+
+// Codes a page shows as a value (status, reason, class, role) in plain words. The code itself stays on the element's
+// title so support can still read it; API responses are unchanged.
+const CODE_WORDS = {
+  INSUFFICIENT_EVIDENCE: "Not enough evidence yet", NO_TRUSTED_RUN: "No trusted run yet", NOT_INITIALIZED: "Not set up yet",
+  HOOK_NOT_INSTALLED: "Hook not installed", NOT_INSTALLED: "Not installed", NOT_BOUND: "Not connected",
+  INTEGRITY_BELOW_MIN: "Integrity is below the minimum", CORRELATION_NOT_MEASURED: "Not yet measured against outcomes",
+  OBSERVED_EVIDENCE_INSUFFICIENT: "Too little observed evidence", GATE_PENDING: "Waiting for an approval", NOT_PROPOSED: "Not proposed yet",
+  READ_ONLY: "Reading only", WRITE_LOW: "Small changes", WRITE_HIGH: "Bigger changes", DEPLOY: "Releasing",
+  SECURITY: "Security settings", FINANCIAL: "Money", NETWORK_EXTERNAL: "Outside network", DATA_EXPORT: "Data leaving",
+  IDENTITY: "Identity and access", PENDING: "Waiting", QUORUM_MET: "Approved, not used yet", DENIED: "Turned down",
+  EXPIRED: "Expired", CANCELLED: "Cancelled", CONSUMED: "Approved and used", APPROVED: "Approved", OWNER: "Owner", AUDITOR: "Auditor", APPROVER: "Approver",
+  OPERATOR: "Operator", VIEWER: "Viewer", ACTIVE: "Active", REVOKED: "Revoked", LOCAL_VAULT: "Local vault",
+  SOC2: "SOC 2", NIST_AI_RMF: "NIST AI RMF", ISO_27001: "ISO 27001", ISO_42001: "ISO 42001", EU_AI_ACT: "EU AI Act"
+};
+// Words joined by underscores are codes; a single word only when the table names it (so "AMC" stays "AMC").
+const isCode = (text) => /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$|^[a-z]+(?:_[a-z]+)+$/.test(text) || Object.hasOwn(CODE_WORDS, text);
+
+/** The plain words for a code ("INTEGRITY_BELOW_MIN:0.000<0.850" keeps its numbers); any other text comes back unchanged. */
+export function plainCode(value) {
+  const text = String(value ?? "");
+  const [head, ...rest] = text.split(":");
+  const key = head.toUpperCase();
+  if (!isCode(head)) return text;
+  const words = CODE_WORDS[key] || `${key.charAt(0)}${key.slice(1).toLowerCase().replaceAll("_", " ")}`;
+  const detail = rest.join(":").replace(/^([\d.]+)<([\d.]+)$/, "$1, minimum $2");
+  return detail ? `${words} (${detail})` : words;
+}
+
+/** The same as HTML: the words, with the code on the title. */
+export function plainCodeHtml(value) {
+  const text = String(value ?? "");
+  const esc = (part) => part.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  const words = plainCode(text);
+  return words === text ? esc(text) : `<span class="code-word" title="Code: ${esc(text)}">${esc(words)}</span>`;
+}

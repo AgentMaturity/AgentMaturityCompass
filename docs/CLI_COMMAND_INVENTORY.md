@@ -243,7 +243,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc catalog check` | Check each pack's declared support against the ten admission criteria (exit 0 when every declared support is admissible, 1 otherwise) | `--pack <id>`<br>`--catalog <dir>`<br>`--json`<br>`--write` | - |
 | `amc catalog compile` | Compile a deployment profile against the catalog into a signed, experimental control plan (exit 0 ready, 2 blocked, 1 error) | `--profile <file>`<br>`--previous <plan.json>`<br>`--lock <catalog.lock.json>`<br>`--out <dir>`<br>`--request-review`<br>`--allow-weakening`<br>`--activate <approvalRequestId>`<br>`--json` | - |
 | `amc cert` | Certificate operations | - | - |
-| `amc cert generate` | Generate execution-proof trust certificate (signed PDF or JSON) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
+| `amc cert generate` | Generate a trust certificate from execution evidence (PDF or JSON; signed unless --no-sign) | `--agent <id>`<br>`--output <path>`<br>`--valid-days <n>`<br>`--no-sign`<br>`--preview`<br>`--badge`<br>`--url`<br>`--base-url <url>` | - |
 | `amc cert inspect` | Inspect any AMC certificate (.amccert bundle or trust-certificate JSON) | - | - |
 | `amc cert revoke` | Create signed revocation file for a certificate | `--reason <text>`<br>`--cert <file>`<br>`--out <file>` | - |
 | `amc cert verify` | Verify any AMC certificate offline (.amccert bundle or trust-certificate JSON) | `--revocation <path>`<br>`--pubkey <path>`<br>`--expect-monitor <sha256>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
@@ -304,7 +304,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc config provenance` | Show which layer and file set each resolved amcconfig.yaml value; with a JSON Pointer, the winner and every shadowed value | `--config <path>`<br>`--user-config [path]`<br>`--json` | - |
 | `amc config run` | Run the evaluation pipeline declared in amcconfig.yaml | `--config <path>`<br>`--user-config [path]`<br>`--no-user-config`<br>`--window <window>`<br>`--format <format>`<br>`--output <path>`<br>`--dry-run`<br>`--verbose`<br>`--json` | - |
 | `amc config validate` | Validate amcconfig.yaml without running anything | `--config <path>`<br>`--user-config [path]`<br>`--no-user-config`<br>`--json`<br>`--schema [name]` | - |
-| `amc connect` | Connect an agent runtime and track first action, decision, and proof | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd`<br>`--runtime <runtime>` | - |
+| `amc connect` | Connect an agent runtime and track its first action, decision, and evidence | `--agent <agentId>`<br>`--adapter <adapterId>`<br>`--token-file <path>`<br>`--bridge-url <url>`<br>`--mode <mode>`<br>`--status`<br>`--json`<br>`--print-env`<br>`--print-cmd`<br>`--runtime <runtime>` | - |
 | `amc connect hooks` | Install, inspect, or remove provider-native AMC observation and control hooks | - | - |
 | `amc connect hooks health` | Verify signed hook setup and show the latest verified provider event | `--provider <provider>`<br>`--recover-latch`<br>`--json` | - |
 | `amc connect hooks install` | Install a reversible project hook for Claude Code, Gemini CLI, Pi, DSH (control) or Codex (observe) | `--provider <provider>`<br>`--mode <mode>`<br>`--agent <agentId>`<br>`--bridge-url <url>`<br>`--ttl <ttl>`<br>`--rpm <rpm>`<br>`--dry-run`<br>`--json` | - |
@@ -388,7 +388,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce blind-secrets` | Redact secrets from text | `--json` | - |
 | `amc enforce check` | Check policy for an agent action | `--json` | - |
 | `amc enforce exec-guard` | Check if a command is safe to execute | `--json` | - |
-| `amc enforce formal-verify` | Formally verify safety properties using proof trees and certificates | `--property <name>`<br>`--all`<br>`--strategy <strategy>` | - |
+| `amc enforce formal-verify` | Model-check AMC's built-in safety properties (not your agent) and print the results | `--property <name>`<br>`--all`<br>`--strategy <strategy>` | - |
 | `amc enforce numeric-check` | Validate a numeric value within bounds | `--json` | - |
 | `amc enforce resources` | Snapshot, diff, and verify agent resources governed by Enforce | - | - |
 | `amc enforce resources apply` | Accept current resources as the new signed manifest; dry-run unless --yes is set | `--agent <agentId>`<br>`--manifest <path>`<br>`--yes`<br>`--force`<br>`--json` | `activate` |
@@ -408,7 +408,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc enforce resources verify` | Verify the current workspace resources against an Enforce resource manifest | `--agent <agentId>`<br>`--manifest <path>`<br>`--json` | - |
 | `amc enforce taint` | Demo of taint tracking (not enforced: no AMC decision reads it; for that, see amc guardrails profile untrusted-input-guard) | `--json` | - |
 | `amc enforce tla-spec` | Generate a TLA+ specification for the AMC safety model | `--properties <list>`<br>`--output <path>` | - |
-| `amc enforce verify-certificate` | Verify the integrity of a proof certificate (pass JSON as string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
+| `amc enforce verify-certificate` | Check the hash of a formal-verification certificate; it is unsigned, so never trusted (pass JSON as string) | `--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc enterprise` | Enterprise tier — licensing, audit export, SSO, fleet governance | - | - |
 | `amc enterprise activate` | Activate a signed enterprise licence key, verified against a key pinned in the AMC trust list | - | - |
 | `amc enterprise audit-export` | Export audit trail in SIEM format | `--format <format>`<br>`--output <path>`<br>`--limit <count>`<br>`--signed` | - |
@@ -434,10 +434,10 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc evidence episodes inspect` | Inspect one EpisodeRecord by episode id, lifecycle id, or run id | `--agent <agentId>`<br>`--json` | - |
 | `amc evidence episodes list` | List persisted EpisodeRecord evidence objects | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
 | `amc evidence export` | Export verifier-ready evidence (json\|csv\|pdf) | `--format <format>`<br>`--out <file>`<br>`--agent <agentId>`<br>`--include-chain`<br>`--include-rationale` | - |
-| `amc evidence finding-proofs` | List, inspect, and export finding proof chains | - | - |
-| `amc evidence finding-proofs export` | Export finding proofs as JSON | `--out <path>`<br>`--agent <agentId>`<br>`--run <runId>`<br>`--redacted`<br>`--json` | - |
-| `amc evidence finding-proofs inspect` | Inspect one finding proof by proof id, finding id, run id, or question id | `--agent <agentId>`<br>`--json` | - |
-| `amc evidence finding-proofs list` | List persisted finding proof chains | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
+| `amc evidence finding-proofs` | List, inspect, and export finding evidence chains | - | - |
+| `amc evidence finding-proofs export` | Export finding evidence chains as JSON | `--out <path>`<br>`--agent <agentId>`<br>`--run <runId>`<br>`--redacted`<br>`--json` | - |
+| `amc evidence finding-proofs inspect` | Inspect one finding evidence chain by its proofId, finding id, run id, or question id | `--agent <agentId>`<br>`--json` | - |
+| `amc evidence finding-proofs list` | List saved finding evidence chains | `--agent <agentId>`<br>`--limit <n>`<br>`--json` | - |
 | `amc evidence help` | Show high-signal evidence command groups | - | - |
 | `amc evidence lifecycle` | List, inspect, and export full lifecycle run artifacts | - | - |
 | `amc evidence lifecycle export` | Export one lifecycle artifact as JSON | `--out <path>`<br>`--agent <agentId>`<br>`--redacted`<br>`--json` | - |
@@ -623,7 +623,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc incident create` | Create a manual incident | `--title <title>`<br>`--severity <severity>`<br>`--agent <agentId>` | - |
 | `amc incident link` | Link evidence to an incident | `--evidence <evidenceId>` | - |
 | `amc incident list` | List incidents for an agent | `--status <status>`<br>`--limit <n>`<br>`--agent <agentId>` | - |
-| `amc incident oversight` | Append a signed human-oversight record (the auditor key proves the workspace, not the reviewer) | `--decision <decision>`<br>`--reviewer <id>`<br>`--rationale <text>`<br>`--clock <clockId...>` | - |
+| `amc incident oversight` | Append a signed human-oversight record (the auditor key shows which workspace signed, not who reviewed) | `--decision <decision>`<br>`--reviewer <id>`<br>`--rationale <text>`<br>`--clock <clockId...>` | - |
 | `amc incident show` | Show incident details, or write its regulator evidence packet with --packet | `--packet <dir>`<br>`--station <station>`<br>`--clocks` | - |
 | `amc incidents` | Incident operations and dispatch workflows | - | - |
 | `amc incidents alert` | Dispatch INCIDENT_CREATED to configured integration channels | `--agent <agentId>`<br>`--summary <text>`<br>`--details <json>` | - |
@@ -942,7 +942,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc policy scope` | Compile reusable action-class scopes into existing signed policies | - | - |
 | `amc policy scope apply` | Apply a scope preview after exact compile-ID confirmation | `--pack <packId>`<br>`--confirm <compileId>`<br>`--json` | - |
 | `amc policy scope compile` | Preview a deterministic selected-rule merge without writing | `--pack <packId>`<br>`--json` | - |
-| `amc policy scope list` | List immutable AMC action-class scope templates | `--json` | - |
+| `amc policy scope list` | List AMC's built-in action-class scope templates (fixed; they cannot be edited) | `--json` | - |
 | `amc policy simulate` | Simulate one projected control through its production evaluator without recording | `--content <text>`<br>`--direction <direction>`<br>`--agent <agentId>`<br>`--risk <tier>`<br>`--mode <mode>`<br>`--exec-ticket`<br>`--json` | - |
 | `amc policy test` | Run deterministic policy fixtures through production control evaluators | `--json` | - |
 | `amc policy-canary-report` | Generate canary mode report for an agent | `--agent <agentId>` | - |
@@ -974,7 +974,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc prompt scheduler status` | Show prompt scheduler status | - | - |
 | `amc prompt status` | List per-agent prompt pack status | - | - |
 | `amc prompt verify` | Verify prompt policy, pack, lint and scheduler signatures | - | - |
-| `amc proof` | Domain Proof Lane source-to-rule proof checks | - | - |
+| `amc proof` | Domain Proof Lane source-to-rule checks | - | - |
 | `amc proof check` | Check a claim against a declared source-to-rule manifest and emit an amcproof artifact | `--domain <domain>`<br>`--manifest <path>`<br>`--input <path>`<br>`--out <path>`<br>`--json` | - |
 | `amc provider` | Provider template operations | - | - |
 | `amc provider add` | Assign or update provider template for an agent | `--agent <agentId>` | - |
@@ -1100,7 +1100,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc session compact` | List signed history origins, then apply an explicit native summary or drop without rewriting evidence | `--list`<br>`--origins <ids>`<br>`--summary-file <path>`<br>`--expect-head <hash>`<br>`--reason <text>`<br>`--summary-role <role>`<br>`--replace`<br>`--drop`<br>`--json` | - |
 | `amc session export` | Export a session for offline verification as an HTML viewer or a sealed JSON bundle | `--out <path>`<br>`--json`<br>`--include-content`<br>`--decrypt-content`<br>`--json-out <path>` | - |
 | `amc session latest` | Show the most recent session `agent-loop run --continue` would continue for this agent, or why none qualifies | `--agent <id>`<br>`--json` | - |
-| `amc session proof` | Export a session's inclusion proof (verifiable offline, without this workspace) | `--out <path>` | - |
+| `amc session proof` | Export a session's inclusion proof (checkable offline, without this workspace) | `--out <path>` | - |
 | `amc session recover` | Recover a crashed session by appending synthetic closers under a fenced claim (append-only) | `--force`<br>`--close`<br>`--stale-after <ms>`<br>`--json` | - |
 | `amc session replay-request` | Rebuild each request this session sent from its signed rows and check it against the recorded digest | `--json`<br>`--out <path>` | - |
 | `amc session show` | Show a session's projected conversation and its event spine | `--json`<br>`--spine`<br>`--limit <rows>`<br>`--cursor <cursor>` | - |
@@ -1118,7 +1118,7 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc shield analyze-runtime` | Analyze a proposed runtime agent action through the Shield trust pipeline | `--agent <id>`<br>`--action <action>`<br>`--tool <tool>`<br>`--parameters <json>`<br>`--sensitive-fields <csv>`<br>`--instruction-source <source>`<br>`--session <id>`<br>`--workspace-id <id>`<br>`--credential-age-minutes <n>`<br>`--confidence <n>`<br>`--step <n>`<br>`--previous-actions <csv>`<br>`--fail-on-block`<br>`--json` | - |
 | `amc shield confirm` | Controlled exploit confirmation with strict authorization gates | - | - |
 | `amc shield confirm export` | Export a redacted safe proof without exploit instructions | `--out <path>`<br>`--json` | - |
-| `amc shield confirm proofs` | List safe exploit-confirmation proof artifacts | `--json` | - |
+| `amc shield confirm proofs` | List safe exploit-confirmation records | `--json` | - |
 | `amc shield confirm run` | Run authorized safe exploit confirmation from a task JSON file | `--task <path>`<br>`--scope <scopeId>`<br>`--json` | - |
 | `amc shield confirm scope-write` | Write a signed exploit-confirmation authorization scope from JSON | `--file <path>`<br>`--json` | - |
 | `amc shield confirm scopes` | List exploit-confirmation authorization scopes | `--json` | - |
@@ -1199,11 +1199,11 @@ Generated from the live Commander command registry. Use this as the source of tr
 | `amc transparency` | Append-only transparency log operations | - | - |
 | `amc transparency export` | Export transparency bundle | `--out <file>` | - |
 | `amc transparency init` | Initialize append-only transparency log | - | - |
-| `amc transparency merkle` | Merkle transparency root/proof operations | - | - |
-| `amc transparency merkle prove` | Export signed inclusion proof bundle for entry hash | `--entry-hash <hash>`<br>`--out <file>` | - |
+| `amc transparency merkle` | Merkle transparency root and inclusion-proof operations | - | - |
+| `amc transparency merkle prove` | Export a signed inclusion proof bundle for an entry hash | `--entry-hash <hash>`<br>`--out <file>` | - |
 | `amc transparency merkle rebuild` | Rebuild Merkle leaves/roots from transparency log | `--algorithm <algorithm>` | - |
 | `amc transparency merkle root` | Show current Merkle root and history | - | - |
-| `amc transparency merkle verify-proof` | Verify signed inclusion proof bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
+| `amc transparency merkle verify-proof` | Verify a signed inclusion proof bundle | `--pubkey <path>`<br>`--trust-list <file>`<br>`--trust-root <sha256>`<br>`--allow-unpinned`<br>`--allow-unanchored`<br>`--json` | - |
 | `amc transparency report` | Generate an Agent Transparency Report — what the agent does, can access, and how trustworthy it is | `--agent <id>`<br>`--format <fmt>`<br>`--out <file>`<br>`--all`<br>`--workspace <path>` | - |
 | `amc transparency tail` | Tail transparency entries | `--n <count>` | - |
 | `amc transparency verify` | Verify transparency chain + seal signature | - | - |
