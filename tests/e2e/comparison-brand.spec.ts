@@ -13,7 +13,7 @@ test.describe("AMC comparison brand and evidence boundary", () => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await expect(page.locator(".nav-brand")).toHaveText("amc_");
     await expect(page.locator(".footer-tagline")).toContainText("Evidence over claims.");
-    await expect(page.getByRole("heading", { name: "Pick the proof that fits your decision." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pick the evidence that fits your decision." })).toBeVisible();
     await expect(page.locator(".decision-card")).toHaveCount(7);
     await expect(page.locator(".source-item")).toHaveCount(8);
     await expect(page.getByRole("table", { name: "Evidence fit by evaluation approach" })).toBeVisible();

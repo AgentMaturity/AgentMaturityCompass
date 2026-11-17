@@ -41,7 +41,7 @@ Watching uses hooks. Observe mode records each tool call. Claude Code control mo
 - Ed25519 signatures and hash-chained records (a signature shows who wrote a record and that it is unchanged, not that it is true)
 - 244 default diagnostic questions across 5 trust dimensions, plus a 264-question lifecycle-expanded set
 - 16 framework adapters (LangChain, CrewAI, AutoGen, etc.)
-- Signed adapter capability receipts separate declared/effective events and controls, runtime/version proof, hook mode, and lossiness; metadata-only adapters fail closed
+- Signed adapter capability receipts separate declared/effective events and controls, runtime and version record, hook mode, and lossiness; metadata-only adapters fail closed
 - Domain Proof Lane with amcproof artifacts for source-to-rule correctness checks
 - Evidence sources cap levels: self-reported records reach L1 at most; no trust weight is applied to a level
 - 41 Industry Packs, free in the current source build with no licence, account or payment (the published 1.1.1 release still locks them): self-reported questionnaires whose content is experimental, AI-drafted until a named expert signs it; access never changes a result

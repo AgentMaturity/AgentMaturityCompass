@@ -54,10 +54,10 @@ function initReveals(){
 }
 
 var PRODUCTS=[
-  {name:'amc score',title:'Score',headline:'Score your agent before you ship',summary:'Scores your agent from what it actually did, not from what its documentation says.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Gives you a starting score',text:'Shows where the agent is weak across governance, security, reliability, cost, proof, and state.'},{label:'why it matters',title:'Claims cannot inflate the score',text:'What AMC saw counts in full. What the agent says about itself is capped.'},{label:'output',title:'A report you can act on',text:'A scored report, a signed bundle of the records behind it, a proof status, and a list of what to fix.'}],lines:[
+  {name:'amc score',title:'Score',headline:'Score your agent before you ship',summary:'Scores your agent from what it actually did, not from what its documentation says.',badges:['244 default questions','264 lifecycle set','instant full score'],info:[{label:'what it does',title:'Gives you a starting score',text:'Shows where the agent is weak across governance, security, reliability, cost, evidence, and state.'},{label:'why it matters',title:'Claims cannot inflate the score',text:'What AMC saw counts in full. What the agent says about itself is capped.'},{label:'output',title:'A report you can act on',text:'A scored report, a signed bundle of the records behind it, a record status, and a list of what to fix.'}],lines:[
     {type:'code',label:'$ amc'},
     {label:'full score',value:'244 default questions · VALID'},
-    {label:'lifecycle option',value:'264 questions · runtime/proof/fleet'},
+    {label:'lifecycle option',value:'264 questions · runtime/evidence/fleet'},
     {label:'overall maturity',value:'L3.2 · 64%'},
     {label:'security',value:'L4.0 · hardened execution'},
     {label:'governance',value:'L2.8 · approvals missing'},
@@ -66,17 +66,17 @@ var PRODUCTS=[
     {label:'fixes generated',value:'12 mapped remediations'},
     {label:'signed artifact',value:'.amc/reports/latest.md'}
   ]},
-  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs sets of attack tests, with a controlled way to confirm each finding, against prompt injection, data leaks, memory poisoning, and flattery.',badges:['registered assurance packs','authorized confirmation','safe proof'],info:[{label:'what it does',title:'Tests the agent you actually run',text:'Runs attack scenarios against your real prompts, tools, and memory.'},{label:'why it matters',title:'Finds weak defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe proof',text:'Lists the tests that failed, a redacted record confirming each one, and generated settings that reduce the risk.'}],lines:[
+  {name:'amc shield',title:'Shield',headline:'Attack your agent before attackers do',summary:'Runs sets of attack tests, with a controlled way to confirm each finding, against prompt injection, data leaks, memory poisoning, and flattery.',badges:['registered assurance packs','authorized confirmation','safe record'],info:[{label:'what it does',title:'Tests the agent you actually run',text:'Runs attack scenarios against your real prompts, tools, and memory.'},{label:'why it matters',title:'Finds weak defenses fast',text:'One missed path can turn a polished demo into a production incident.'},{label:'output',title:'Pack report + safe record',text:'Lists the tests that failed, a redacted record confirming each one, and generated settings that reduce the risk.'}],lines:[
     {type:'code',label:'$ amc shield confirm run --scope sec-1 --task finding.json'},
     {label:'injection pack',value:'PASS · 12/12 probes blocked'},
     {label:'exfiltration pack',value:'WARN · 1 DLP bypass found'},
     {label:'memory poisoning',value:'PASS · persistence blocked'},
     {label:'sycophancy',value:'PASS · 8/8 resisted'},
-    {label:'safe proof',value:'confirmed · raw payload omitted'},
+    {label:'safe record',value:'confirmed · raw payload omitted'},
     {label:'generated fix',value:'.amc/guardrails/dlp-base64.yaml'},
     {label:'report',value:'.amc/shield/latest.md'}
   ]},
-  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing the record',summary:'Preview one fixed action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, transparency proof, and a ledger receipt.'}],lines:[
+  {name:'amc enforce',title:'Enforce',headline:'Reuse policy without losing the record',summary:'Preview one fixed action-class scope, merge rules from an existing Policy Pack, and apply only after exact confirmation.',badges:['signed policies','exact confirmation','fleet-wide scope'],info:[{label:'what it does',title:'Changes only the selected action classes',text:'Compiles a bounded scope into the existing signed Action and Approval Policies while preserving every unselected rule.'},{label:'why it matters',title:'Narrow changes need a clear blast radius',text:'Workspace policies remain fleet-wide, and stale or untrusted state fails closed before mutation.'},{label:'output',title:'Verified policy + evidence',text:'Returns candidate hashes, a content-bound compile ID, a transparency log entry, and a ledger receipt.'}],lines:[
     {type:'code',label:'$ amc policy scope compile release-external --pack code-agent.high'},
     {label:'scope',value:'workspace · fleet-wide'},
     {label:'action classes',value:'DEPLOY · NETWORK_EXTERNAL'},
