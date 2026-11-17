@@ -73,7 +73,7 @@ export function nextMove(ctx) {
 const ITEM_ACTIONS = { context_reaches_runtime_frame: ["Run the context probe", "probe"] };
 /** The readiness.allowed entry each pressed step needs. */
 const PRESS_ALLOWED = { understand: "understand", confirm: "understand", explain: "explain", propose: "propose", build: "build", review: "review",
-  complete: "progress", "request-direction": "requestGate", "request-completion": "requestGate", "open-effect": "openEffect" };
+  complete: "progress", "request-direction": "requestGate", "request-completion": "requestGate", "open-effect": "openEffect", "open-release": "openEffect", release: "release" };
 
 function rawMove(ctx) {
   const { project, readiness, stage } = ctx;
@@ -103,7 +103,9 @@ function rawMove(ctx) {
   if (step === "proposed") return gateMove(ctx, "direction");
   if (step === "direction_approved") {
     if (stage === "activate") return { now: "Activate's build is the release: the Release card builds it once the release approval is in.", act: { label: "Open the Release card", focus: '[data-card="release"]' } };
-    return { now: "Build: AMC writes what the approved direction describes. Every file it writes is recorded with its digest.", act: { label: "Build", press: "build" } };
+    // Assemble's Build starts a session: while storage admission holds every new session (Studio's residencyHeld) it is refused, so the hold comes first.
+    const held = stage === "assemble" && typeof project.residencyHeld === "string" ? `First: ${HOLD_WORDS} Until then Studio refuses Build and writes nothing. ` : "";
+    return { now: `${held}Build: AMC writes what the approved direction describes. Every file it writes is recorded with its digest.`, act: { label: "Build", press: "build" } };
   }
   if (step === "built") {
     if (stage === "assemble" && list(ctx.allowed?.review?.reasonCodes).some((value) => SESSION_CODES.includes(value))) return sessionMove(ctx);
@@ -113,6 +115,36 @@ function rawMove(ctx) {
   const nextStage = STAGES[STAGES.indexOf(stage) + 1];
   return nextStage ? { now: `${title(stage)} is complete.`, act: { label: `Go to ${title(nextStage)}`, href: `./a4Project?project=${encodeURIComponent(project.projectId)}&stage=${nextStage}` } }
     : { now: `${title(stage)} is complete.` };
+}
+
+/**
+ * Activate once its plan is approved: the release is a second request (release_effect, read from the engine request's
+ * status), opened by a project owner, approved by the project's approvers on the Release card, then released by an owner.
+ */
+function releaseMove(ctx) {
+  const codes = codesOf(ctx.readiness, "release_effect");
+  const status = prefixed(codes, "APPROVAL_STATUS:")[0];
+  const card = '[data-card="release"]';
+  const owner = ctx.allowed?.openEffect?.allowed === true;
+  if (codes.includes("EFFECT_GATE_NOT_OPEN") || (status && ["DENIED", "EXPIRED", "CANCELLED"].includes(status))) {
+    const again = status ? `The release request was not approved (${status}), so a new one is needed. ` : "";
+    return owner ? { now: `${again}The plan is approved. Releasing it is a second request: open the release request on the Release card, then the project's approvers approve it there.`,
+      act: { label: "Open the release request", press: "open-release" } }
+      : { now: `${again}The plan is approved. A project owner opens the release request next; the project's approvers then approve it on the Release card.`, why: WAITING_HOW, act: COPY_LINK };
+  }
+  if (status === "PENDING") {
+    const requestId = String(prefixed(codes, "APPROVAL_REQUEST:")[0] ?? "").split(":")[0];
+    const excluded = typeof ctx.me?.userId === "string" && list(liveGate(ctx, "direction")?.excludedKeys).some((key) => String(key).endsWith(`:${ctx.me.userId}`));
+    if (requestId && decidedByMe(ctx.me?.username, requestId)) return { now: "You have decided the release request. Waiting for the other approvers on the Release card.", why: WAITING_HOW, act: COPY_LINK };
+    if (!excluded && ctx.allowed?.requestChanges?.allowed === true) return { now: "The release request waits for your approval: the approval of the plan does not count for it. "
+      + "Write a reason on the Release card, then press Approve there.", act: { label: "Write your reason", focus: `${card} [name="release-reason"]` } };
+    return { now: "Waiting for the project's approvers to approve the release request on the Release card. The approvals of the plan do not count for it.", why: WAITING_HOW, act: COPY_LINK };
+  }
+  if (status === "QUORUM_MET") {
+    return ctx.allowed?.release?.allowed === true ? { now: "The release request is approved. Release it on the Release card: AMC builds the signed package and shows the staging lease token once.",
+      act: { label: "Release", press: "release" } } : { now: "The release request is approved. A project owner releases it next on the Release card." };
+  }
+  return { now: "Approved. Activate's release and deployment approval are completed on the Release card.", act: { label: "Open the Release card", focus: card } };
 }
 
 /**
@@ -127,15 +159,20 @@ function sessionMove(ctx) {
     + `&project=${encodeURIComponent(ctx.project.projectId)}` : "./native-tasks";
   if (codes.includes("SESSION_OWNER_REQUIRED")) return { now: `${session?.ownerUsername ?? "The person who pressed Build"} started the build session, so they close it and run Review.` };
   if (codes.includes("BUILD_RUNNING")) return { now: "The build session is still running. Open it, wait until it stops, then press Close and verify there.", act: { label: "Open the build session", href } };
-  if (codes.includes("NATIVE_RESIDENCY_REFUSED")) {
-    return { now: "AMC holds every new session in this workspace until a signed destination registry matches its active compiled plan. An owner runs amc residency status in the workspace folder to see what is missing, then amc residency init --file <registry.yaml>; after that, request changes and build again." };
-  }
-  if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Native Tasks to resume it, or request changes and build again.", act: { label: "Open the build session", href } };
+  // The session never started (BUILD_RETRYABLE): Build runs again from here, under the same checks as the first Build.
+  const again = codes.includes("BUILD_RETRYABLE") ? { label: "Build again", press: "build" } : undefined;
+  if (codes.includes("NATIVE_RESIDENCY_REFUSED")) return { now: `The build session did not start. ${HOLD_WORDS} After that, press Build again.`, act: again };
+  if (again) return { now: "The build session did not start, so the agent was not built. Press Build again: it runs the same checks and starts a new build session.", act: again };
+  if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Native Tasks: press Release for later if it is offered, then Resume session. "
+    + "Then send a follow-up, or press Close and verify and come back for Review.", act: { label: "Open the build session", href } };
   return { now: "Close the build session: it opens on Native Tasks. Press Close and verify there, then Back to the agent project. Review comes next.",
     act: { label: "Close the build session", href } };
 }
+/** Storage admission's hold and the commands that end it (src/residency/admissionWords.ts). */
+const HOLD_WORDS = "AMC holds every new session in this workspace until a signed destination registry matches its active compiled plan. "
+  + "An owner runs amc residency status in the workspace folder to see what is missing, then amc residency init --file <registry.yaml>.";
 /** Review's refusals that come from the build session itself (assembleBuild.reviewRefusals). */
-const SESSION_CODES = ["BUILD_SESSION_OPEN", "BUILD_RUNNING", "BUILD_FAILED", "NATIVE_RESIDENCY_REFUSED", "SESSION_OWNER_REQUIRED"];
+const SESSION_CODES = ["BUILD_SESSION_OPEN", "BUILD_RUNNING", "BUILD_FAILED", "BUILD_RETRYABLE", "NATIVE_RESIDENCY_REFUSED", "SESSION_OWNER_REQUIRED"];
 
 function askMove(ctx) {
   const codes = codesOf(ctx.readiness, "ask_complete");
@@ -194,7 +231,8 @@ function gateMove(ctx, kind) {
   const status = gate?.status;
   if (status === "QUORUM_MET") {
     if (kind === "direction" && stage !== "activate") return { now: "The direction is approved. Use the approval to move on to Build.", act: { label: "Continue to Build", press: "complete" } };
-    if (stage === "activate") return { now: "Approved. Activate's release and deployment approval are completed on the Release card.", act: { label: "Open the Release card", focus: '[data-card="release"]' } };
+    if (stage === "activate") return kind === "direction" ? releaseMove(ctx) : { now: "Approved. Activate's release and deployment approval are completed on the Release card.",
+      act: { label: "Open the Release card", focus: '[data-card="release"]' } };
     // The second request completing applies: Assemble's resources (effect_gate), or a regulated Adapt plan's activation
     // (plan_review_opened, required while progress waits for plan_activated); a non-regulated Adapt completes without it.
     const adapt = stage === "adapt";
@@ -445,14 +483,18 @@ const ERROR_TEXT = {
   NATIVE_CSRF_REQUIRED: ["Studio needs a fresh page before it accepts changes.", "Reload the page and try again."],
   A4_ON_HOLD: ["The project is on hold.", "A project owner resumes it under Approvals, More."],
   FREEZE_ACTIVE: ["An incident freeze is active for this agent, so nothing can change.", "The freeze must be lifted first."],
-  A4_PREVIEW_DISABLED: ["A4 is a preview and is turned off in this Studio.", "Stop Studio with amc down and start it again without AMC_A4_PREVIEW=0 (for example AMC_A4_PREVIEW=1 amc up)."]
+  A4_PREVIEW_DISABLED: ["A4 is a preview and is turned off in this Studio.", "Stop Studio with amc down and start it again without AMC_A4_PREVIEW=0 (for example AMC_A4_PREVIEW=1 amc up)."],
+  // Studio's message names the hold and the commands that end it.
+  NATIVE_RESIDENCY_REFUSED: [null, null]
 };
 export function explainError(error) {
   const raw = String(error?.message ?? error ?? "Something went wrong.");
   const errorCode = typeof error?.code === "string" && !["HTTP_ERROR", "INVALID_RESPONSE"].includes(error.code) ? error.code : null;
   const message = errorCode && raw.startsWith(`${errorCode}: `) ? raw.slice(errorCode.length + 2) : raw;
   const [sentence, next] = ERROR_TEXT[errorCode] ?? [null, errorCode ? "If it happens again, reload the page and check the project." : null];
-  return { sentence: sentence ?? message, detail: sentence && message !== sentence ? message : null, next, code: errorCode };
+  // A residency refusal's fixed reason and detail codes (never raw error text) go beside Studio's code.
+  const fixed = [error?.data?.detail?.reason, error?.data?.detail?.detail].filter((value, at, all) => typeof value === "string" && all.indexOf(value) === at);
+  return { sentence: sentence ?? message, detail: sentence && message !== sentence ? message : null, next, code: errorCode && [errorCode, ...fixed].join(" ") };
 }
 export function errorHtml(error) {
   const { sentence, detail, next, code: errorCode } = explainError(error);
@@ -511,8 +553,22 @@ export async function understandingIsCurrent(spec) {
   return typeof recorded === "string" && recorded === await answersDigest(spec.answers);
 }
 
+/**
+ * Home's "Next:" line for an Activate project whose plan is approved: who acts on the release request (release_effect),
+ * from that project's readiness; null otherwise (STEP_NEXT then names the part).
+ */
+export function releaseNext(project, readiness) {
+  if (project?.stage !== "activate" || project.step !== "proposed" || readiness?.gates?.direction?.status !== "QUORUM_MET") return null;
+  const codes = codesOf(readiness, "release_effect");
+  const status = prefixed(codes, "APPROVAL_STATUS:")[0];
+  if (codes.includes("EFFECT_GATE_NOT_OPEN") || ["DENIED", "EXPIRED", "CANCELLED"].includes(status)) return "Next: the plan is approved; a project owner opens the release request on the Release card.";
+  if (status === "PENDING") return "Next: the project's approvers approve the release request on the Release card.";
+  if (status === "QUORUM_MET") return "Next: the release request is approved; a project owner releases it on the Release card.";
+  return null;
+}
+
 /** The project Home continues: the most recently changed one that is not retired, else null. */
-function latestProject(projects) {
+export function latestProject(projects) {
   const open = list(projects).filter((project) => isObject(project) && project.stage !== "retired");
   return open.sort((a, b) => String(b.updatedTs ?? "").localeCompare(String(a.updatedTs ?? "")))[0] ?? null;
 }
@@ -522,7 +578,7 @@ function latestProject(projects) {
  * button. With projects: "Continue <name>", what it needs now in one sentence, one button, and "Start another" as a link.
  * In the demo workspace, which cannot hold projects, it says where building works instead.
  */
-export function homeCardHtml({ projects = [], waiting = null, industryHtml = "", demo = false, start = null } = {}) {
+export function homeCardHtml({ projects = [], waiting = null, industryHtml = "", demo = false, start = null, latestReadiness = null } = {}) {
   const lead = "Pick your industry, answer plain questions, and AMC drafts the agent with you. A second person approves each step before it moves on.";
   if (demo) {
     return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
@@ -532,7 +588,8 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
     const { project: row, kind } = waiting;
     return `<h2 id="a4HomeTitle">An approval waits for you</h2>
       <p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${kind === "effect"
-        ? `needs your approval on a second request, which ${row.stage === "adapt" ? "activates the plan" : "applies what was built"}` : `asks for its ${esc(kind)} approval`}. Open it, read what it asks for, then approve it or request changes.</p>
+        ? `needs your approval on a second request, which ${row.stage === "adapt" ? "activates the plan" : "applies what was built"}`
+        : kind === "release" ? "needs your approval on its release request, a second request on the approved plan that releases it" : `asks for its ${esc(kind)} approval`}. Open it, read what it asks for, then approve it or request changes.</p>
       <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>`;
   }
   const project = latestProject(projects);
@@ -540,7 +597,8 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
     const at = STAGES.indexOf(project.stage);
     const where = at >= 0 ? `Step ${at + 1} of 4: ${STAGE_PLAIN[project.stage]} (${title(project.stage)}). Part: ${STEP_PLAIN[project.step] ?? project.step}.` : "";
     return `<h2 id="a4HomeTitle">Continue ${esc(project.name)}</h2>
-      <p class="first-use-lead">${esc(project.hold ? "This project is on hold until a project owner resumes it." : STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
+      <p class="first-use-lead">${esc(project.hold ? "This project is on hold until a project owner resumes it." : releaseNext(project, latestReadiness)
+        ?? STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
       ${where ? `<p class="muted">${esc(where)}</p>` : ""}
       <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(project.projectId ?? "")}">Continue</a>
       <a href="./a4?new=1">Start another</a></div>`;

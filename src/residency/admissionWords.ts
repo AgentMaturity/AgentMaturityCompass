@@ -95,3 +95,9 @@ export function registryStatus(workspace: string): RegistryStatus {
     destinations: registry?.destinations.map((row) => `${row.destinationId} (${row.channels.join(", ")}; region ${row.region ? `${row.region.jurisdiction}/${row.region.code}` : "not declared"})`) ?? [],
     profileMatches, held };
 }
+
+/** What an A4 project page shows: the registry's state, and the detail code an active plan holds every new session with (null when none holds). */
+export function residencyView(workspace: string): { destinationRegistry: RegistryStatus["registry"]; residencyHeld: string | null } {
+  const status = registryStatus(workspace);
+  return { destinationRegistry: status.registry, residencyHeld: status.planActive === false ? null : status.held };
+}

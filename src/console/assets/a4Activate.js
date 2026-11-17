@@ -10,6 +10,7 @@ import { apiNativeRequest } from "./api.js";
 import { registerStageAction, registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import { itemWithRecord } from "./a4Plain.js";
+import { decidedByMe, rememberDecided } from "./a4Who.js";
 
 const { esc } = view;
 const SPEC = "amc.a4-activate-spec/v1";
@@ -94,7 +95,8 @@ function tokenBox(token) {
 
 const decideForm = (ctx, request, name) => (request ? `<p class="muted">Engine request <code>${esc(request[0])}</code> (decided by project approvers or owners,
   bound to its digest)</p><label>Decision reason <textarea name="${name}" rows="2" maxlength="1000"></textarea></label>
-  <div class="row wrap">${["approve", "deny"].map((verb) => view.actionButton(verb === "approve" ? "Approve" : "Deny", "decide-engine", ctx.allowed.requestChanges,
+  <div class="row wrap">${["approve", "deny"].map((verb) => view.actionButton(verb === "approve" ? "Approve" : "Deny", "decide-engine",
+    decidedByMe(ctx.me?.username, request[0]) ? view.held("You have already decided this request.") : ctx.allowed.requestChanges,
     `data-approval="${esc(request[0])}" data-digest="${esc(request[1])}" data-verb="${verb}" data-field="${name}"`)).join(" ")}</div>` : "");
 
 /** What Propose drafted (no part is edited by hand; change the answers). */
@@ -145,9 +147,17 @@ function renderRelease(ctx) {
   const spec = specOf(ctx);
   const proposal = spec.schema === SPEC && isObject(spec.proposal) ? spec.proposal : null;
   const { direction, completion } = ctx.readiness?.gates ?? {};
-  const [request] = coded(itemOf(ctx, "release_effect"), "APPROVAL_REQUEST");
+  const releaseItem = itemOf(ctx, "release_effect");
+  const [request] = coded(releaseItem, "APPROVAL_REQUEST");
+  const [[requestStatus] = []] = coded(releaseItem, "APPROVAL_STATUS");
   const project = `data-project="${esc(ctx.project.projectId)}"`;
   const release = releaseOf(ctx);
+  // Once released, both buttons are done; before that, Release also waits for the release request's own approvals.
+  const released = list(releaseItem?.reasonCodes).includes("EFFECT_RECORDED");
+  const notMet = released ? view.held("Done: this release is recorded; the deployment approval below comes next")
+    : view.held("The release approval does not have enough approvals yet");
+  const releaseOffer = !quorumMet(direction) ? notMet : !request ? view.held("Open the release request first; the project's approvers then approve it on this card")
+    : requestStatus && requestStatus !== "QUORUM_MET" ? view.held(`The release request needs its approvals on this card first (now ${requestStatus})`) : ctx.allowed.release;
   return `<p class="muted">AMC builds a signed package and prepares the files an operator runs; it never deploys. Recorded: what the operator stated.
       Checked: what AMC's own probe found. v1 deploys by restarting the hosted Studio that built this agent.</p>
     ${proposal ? proposalSummary(proposal) : "<p class=\"muted\">Propose the release first: the draft comes from your answers.</p>"}
@@ -156,10 +166,10 @@ function renderRelease(ctx) {
     <p class="muted">Once the release approval (direction gate) has its quorum, an owner opens <code>${RELEASE_EFFECT}</code>, a second DEPLOY request decided
       separately; then an owner releases. The response carries the staging lease token (WRITE_LOW at most, the staging routes, 24 hours) once.</p>
     <div class="row wrap">${view.actionButton(request ? "Re-open the release request" : "Open the release request", "open-release",
-      quorumMet(direction) ? ctx.allowed.openEffect : view.held("The release approval does not have enough approvals yet"), `data-gate="${esc(direction?.gateId ?? "")}"`)}
-      ${view.actionButton("Release", "release", quorumMet(direction) ? ctx.allowed.release : view.held("The release approval does not have enough approvals yet"),
+      quorumMet(direction) ? ctx.allowed.openEffect : notMet, `data-gate="${esc(direction?.gateId ?? "")}"`)}
+      ${view.actionButton("Release", "release", releaseOffer,
         `data-gate="${esc(direction?.gateId ?? "")}" ${project}`)}</div>
-    ${decideForm(ctx, request, "release-reason")}
+    ${released ? "" : decideForm(ctx, request, "release-reason")}
     <h4>Deployment approval</h4>
     <p class="muted">Completing the deployment approval (completion gate) mints the production lease, whose token this page shows once, then moves the
       lifecycle to production only with every production control evidenced; in v1 it stays at staging. A DENY of it revokes the staging lease.
@@ -359,9 +369,10 @@ export function register() {
   registerStageAction("activate", "copy", ({ button }) => ({ local: true, pending: navigator.clipboard.writeText(button.dataset.copy ?? "") }));
   registerStageAction("activate", "open-release", ({ button, headBinding, projectPath }) => ({ label: "Open the release request",
     path: projectPath(`/stages/activate/effects/${RELEASE_EFFECT}/open`), body: { gateId: need(button.dataset.gate, "No approved release approval is shown."), ...headBinding() } }));
-  registerStageAction("activate", "decide-engine", ({ button, value, projectPath }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
+  registerStageAction("activate", "decide-engine", ({ button, value, projectPath, me }) => ({ label: button.dataset.verb === "deny" ? "Deny" : "Approve",
     path: projectPath(`/approvals/${encodeURIComponent(button.dataset.approval)}/${button.dataset.verb === "deny" ? "deny" : "approve"}`),
-    body: { reason: need(value(button.dataset.field), "Write a decision reason first."), expectedRequestDigestSha256: button.dataset.digest } }));
+    body: { reason: need(value(button.dataset.field), "Write a decision reason first."), expectedRequestDigestSha256: button.dataset.digest },
+    got: () => rememberDecided(button.dataset.approval, me?.username) }));
   registerStageAction("activate", "release", ({ button, headBinding, projectPath }) => ({ label: "Release", path: projectPath("/releases"),
     body: { gateId: need(button.dataset.gate, "No approved release approval is shown."), ...headBinding() },
     got: (data) => keep(tokens, button.dataset.project, { scope: "staging", ...(data?.staging ?? {}) }) }));

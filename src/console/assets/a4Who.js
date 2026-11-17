@@ -59,7 +59,8 @@ const listOf = (data, key) => (Array.isArray(data) ? data : Array.isArray(data?.
 
 /**
  * The first open project whose gate waits for this person's decision: a PENDING gate Studio lets them decide
- * (readiness.allowed.decide) that does not exclude them, unless self-approval is open. At most ten projects are read,
+ * (readiness.allowed.decide), or a second request on an approved gate (Assemble's and Adapt's effect, Activate's release),
+ * that does not exclude them, unless self-approval is open. At most ten projects are read,
  * each through `request` (the page's apiNativeRequest).
  */
 export async function approvalWaiting(projects, who, request, api = "/api/v1/a4") {
@@ -70,9 +71,16 @@ export async function approvalWaiting(projects, who, request, api = "/api/v1/a4"
     // A gate's own approval, or the second request that applies what was built (effect_gate, decided like requestChanges).
     const effect = readiness?.gates?.completion?.status === "QUORUM_MET" && readiness.allowed?.requestChanges?.allowed === true
       && listOf(readiness.items, "items").some((item) => (item.id === "effect_gate" || item.id === "plan_review_opened") && listOf(item.reasonCodes, "codes").includes("APPROVAL_STATUS:PENDING"));
-    const kind = ["direction", "completion"].find((name) => readiness?.gates?.[name]?.status === "PENDING" && readiness.allowed?.decide?.allowed === true) ?? (effect ? "effect" : null);
+    // Activate's release request, a second request on the approved plan (release_effect), unless this tab already decided it.
+    const releaseCodes = listOf(listOf(readiness?.items, "items").find((item) => item.id === "release_effect")?.reasonCodes, "codes");
+    const releaseId = String(releaseCodes.find((code) => String(code).startsWith("APPROVAL_REQUEST:")) ?? "").split(":")[1];
+    const release = readiness?.gates?.direction?.status === "QUORUM_MET" && readiness.allowed?.requestChanges?.allowed === true
+      && releaseCodes.includes("APPROVAL_STATUS:PENDING") && !decidedByMe(who?.username, releaseId);
+    const kind = ["direction", "completion"].find((name) => readiness?.gates?.[name]?.status === "PENDING" && readiness.allowed?.decide?.allowed === true)
+      ?? (effect ? "effect" : release ? "release" : null);
     if (!kind) continue;
-    const gate = listOf(await request(`${path}/gates`).catch(() => null), "gates").find((row) => row.gateId === readiness.gates[kind === "effect" ? "completion" : kind].gateId);
+    const gate = listOf(await request(`${path}/gates`).catch(() => null), "gates")
+      .find((row) => row.gateId === readiness.gates[kind === "effect" ? "completion" : kind === "release" ? "direction" : kind].gateId);
     const excluded = Array.isArray(gate?.excludedKeys) && gate.excludedKeys.some((key) => String(key).endsWith(`:${who?.userId}`));
     if (gate && (!excluded || readiness.selfApprovalAllowed === true)) return { project, kind };
   }

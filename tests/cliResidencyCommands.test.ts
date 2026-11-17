@@ -1,16 +1,37 @@
-// `amc residency init|status`: an operator-written registry is validated with the registry schema, written and signed
-// through initDestinationRegistry; a file that does not match is refused and nothing is written.
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+// `amc residency init|status|profile`: an operator-written registry is validated with the registry schema, written and signed
+// through initDestinationRegistry; a file that does not match is refused and nothing is written. `profile` writes the
+// deployment profile the active plan pins, from the A4 project that compiled it, to a new file inside the workspace.
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
-import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { registerResidencyCommands } from "../src/cli-residency-commands.js";
 import { storageAdmissionRefusal } from "../src/residency/admissionWords.js";
 import { destinationRegistryPath, loadDestinationRegistrySnapshot } from "../src/residency/destinationRegistry.js";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
 import { setMode } from "../src/mode/mode.js";
+import { parseDeploymentProfile } from "../src/catalog/compiler/compile.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { canonicalize } from "../src/utils/json.js";
+import YAML from "yaml";
+
+// `profile` reads the active plan and the A4 project that compiled it; both are stood in for here, nothing else is.
+const pin = vi.hoisted(() => ({ active: null as null | { deployment: { deploymentId: string }; profileSha256: string }, stored: null as unknown }));
+vi.mock("../src/catalog/compiler/activate.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/catalog/compiler/activate.js")>();
+  return { ...actual, loadActiveCompiledPolicy: (workspace: string) => pin.active ?? actual.loadActiveCompiledPolicy(workspace) };
+});
+vi.mock("../src/a4/a4Store.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/a4/a4Store.js")>();
+  return { ...actual, openA4Store: (workspace: string) => pin.active ? { close: () => undefined } : actual.openA4Store(workspace) };
+});
+vi.mock("../src/a4/a4Gates.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../src/a4/a4Gates.js")>();
+  return { ...actual, loadA4State: (...args: Parameters<typeof actual.loadA4State>) => pin.active ? { revisions: [{ stage: "adapt" }] } : actual.loadA4State(...args),
+    storedSpecOf: (...args: Parameters<typeof actual.storedSpecOf>) => pin.active ? { understanding: { facts: { profile: pin.stored } } } : actual.storedSpecOf(...args) };
+});
 
 vi.setConfig({ testTimeout: 60_000 });
 let root = "", files = "";
@@ -23,6 +44,7 @@ beforeEach(() => {
   vi.spyOn(process, "cwd").mockReturnValue(root);
 });
 afterEach(() => {
+  pin.active = null; pin.stored = null;
   lockVault(root); vi.restoreAllMocks(); vi.unstubAllEnvs(); process.exitCode = undefined;
   for (const dir of [root, files]) rmSync(dir, { recursive: true, force: true });
 });
@@ -85,4 +107,38 @@ test("agent mode refuses init, so an agent cannot rewrite the registry", async (
   expect(process.exitCode).toBe(1);
   expect(said).toContain("'residency init' is blocked in agent mode");
   expect(existsSync(destinationRegistryPath(root))).toBe(false);
+});
+
+describe("profile --out", () => {
+  const profile = JSON.parse(readFileSync(join(process.cwd(), "tests/fixtures/catalog/compiler/finance-ops-us.profile.json"), "utf8")) as Record<string, unknown>;
+  const pinTo = (digest: string) => { pin.active = { deployment: { deploymentId: `a4p_${"a".repeat(32)}` }, profileSha256: digest }; pin.stored = profile; };
+  const pinned = () => sha256Hex(canonicalize(parseDeploymentProfile(profile)));
+  const out = ".amc/residency/profile.yaml";
+
+  test("writes the profile the active plan pins, from the A4 project that compiled it", async () => {
+    pinTo(pinned());
+    const said = await residency(["profile", "--out", out]);
+    expect(process.exitCode).toBeUndefined();
+    expect(said).toContain(`Wrote the profile the active plan pins to ${out}. Name it in the registry as profile.path: ${out}`);
+    expect(sha256Hex(canonicalize(parseDeploymentProfile(YAML.parse(readFileSync(join(root, out), "utf8")))))).toBe(pinned());
+  });
+
+  test("refuses when no stored profile matches the active plan's digest", async () => {
+    pinTo("0".repeat(64));
+    const said = await residency(["profile", "--out", out]);
+    expect(process.exitCode).toBe(1);
+    expect(said).toContain("matches the active plan's profile digest");
+    expect(existsSync(join(root, out))).toBe(false);
+  });
+
+  test("refuses a file that exists and a path outside the workspace, writing nothing", async () => {
+    pinTo(pinned());
+    writeFileSync(join(root, "kept.yaml"), "kept\n");
+    expect(await residency(["profile", "--out", "kept.yaml"])).toContain("kept.yaml exists already; choose a new file.");
+    expect(readFileSync(join(root, "kept.yaml"), "utf8")).toBe("kept\n");
+    process.exitCode = undefined;
+    expect(await residency(["profile", "--out", join(files, "outside.yaml")])).toContain("Choose a file inside the workspace folder");
+    expect(process.exitCode).toBe(1);
+    expect(existsSync(join(files, "outside.yaml"))).toBe(false);
+  });
 });

@@ -43,6 +43,7 @@ import {
 import { PRODUCERS as ASSEMBLE_PRODUCERS, QUESTIONS as ASSEMBLE_QUESTIONS } from "./spec/assemble.js";
 import { openA4Store, type A4ChangeSpec, type A4RequestKey, type A4TransitionResult } from "./a4Store.js";
 import { assertStagingRevocable, revokeStagingAfterDeny } from "./a4Deploy.js";
+import { buildRetryAllowed } from "./assembleBuild.js";
 import { handleAssembleRoute } from "./assembleResolve.js";
 import { handleAdaptRoute } from "./adaptContextPlugin.js";
 import { handleMechanicRoute } from "./a4Mechanic.js";
@@ -222,7 +223,10 @@ async function stageStep(route: A4Route, projectId: string, stage: A4Stage, kind
     if (project.stage !== stage) throw a4Fail(409, "A4_STEP_ORDER", `The project is at ${project.stage}, not ${stage}.`);
     const { readiness } = evaluateFor(route.store, state, principal, call, stage, now);
     assertAllowed(readiness, def.action);
-    if (def.from !== null && !def.from.includes(project.step)) throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
+    // Build runs again from `built` only when its session never started (assembleBuild.buildRetryAllowed), under the checks above.
+    if (def.from !== null && !def.from.includes(project.step) && !(kind === "build" && buildRetryAllowed(route.native, state, principal, route.workspace))) {
+      throw a4Fail(409, "A4_STEP_ORDER", `${kind} follows ${def.from.join(" or ")}; the project is at ${project.step}.`);
+    }
     // Explain and Propose build on Understand's facts, so they and the confirmation need an Understand of the current answers.
     if ((stage === "aspire" || stage === "assemble") && UNDERSTANDING_STEPS.has(kind)) {
       const { spec, answers } = stageSpecOf(state, stage);

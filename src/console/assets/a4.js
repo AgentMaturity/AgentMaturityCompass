@@ -48,7 +48,11 @@ async function showHomeEntry() {
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
     const waiting = await approvalWaiting(projects, who, apiNativeRequest, API);
-    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null });
+    // Activate's Next line reads who acts on the release request from that project's readiness.
+    const latest = waiting ? null : start.latestProject(projects);
+    const latestReadiness = latest?.stage === "activate"
+      ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}/readiness`).then((reply) => reply?.readiness ?? reply, () => null) : null;
+    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null, latestReadiness });
     card.hidden = false;
     bindCreateForm(card.querySelector("#a4HomeForm"));
   } catch {

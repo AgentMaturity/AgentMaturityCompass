@@ -233,7 +233,8 @@ function stepOrderHold(ctx, from) {
   return null;
 }
 export function stepOffer(offer, ctx, route) {
-  const from = STEP_FROM[route];
+  // Build runs again at Build when its session never started (Studio's BUILD_RETRYABLE, src/a4/assembleBuild.ts).
+  const from = route === "build" && [ctx.allowed?.review?.reasonCodes].flat().includes("BUILD_RETRYABLE") ? [...STEP_FROM.build, "built"] : STEP_FROM[route];
   if (ctx.project.stage !== ctx.stage || (from !== null && !from.includes(ctx.project.step)))
     return stepOrderHold(ctx, from) ?? refuse(offer, "A4_STEP_ORDER");
   return (route === "propose" && offer?.allowed === true && askHold(ctx)) || offer;
