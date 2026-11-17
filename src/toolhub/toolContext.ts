@@ -59,7 +59,7 @@ export interface ToolHubContextProjection {
   claimBoundary: string;
 }
 
-const CLAIM_BOUNDARY = "This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.";
+const CLAIM_BOUNDARY = "This read-only view shows only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, show that a server is available, verify an MCP attestation, or show that a tool was called.";
 
 function identity(kind: "native-tool" | "mcp-tool" | "mcp-server", value: unknown): string {
   const hash = sha256Hex(canonicalize({
