@@ -236,7 +236,7 @@ describe("amc session verify and the ledger trust root", () => {
     const { workspace } = buildWorkspace();
     const text = await sessionVerify(workspace, ["--allow-unanchored"]);
     expect(text.exit).toBe(2);
-    expect(text.out).toContain("Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This proves internal consistency only.");
+    expect(text.out).toContain("Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This checks internal consistency only.");
     expect(text.err).toHaveLength(1);
     expect(text.err[0]?.startsWith("UNTRUSTED: integrity verified, but --allow-unanchored was used:")).toBe(true);
     const json = await sessionVerify(workspace, ["--allow-unanchored", "--json"]);

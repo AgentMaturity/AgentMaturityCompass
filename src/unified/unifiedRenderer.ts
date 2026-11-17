@@ -58,7 +58,7 @@ export function renderUnifiedResult(result: UnifiedRunResult, opts?: { ci?: bool
     lines.push(`  ${GREEN}${BOLD}First run — a low score here is completely normal.${RESET}`);
     lines.push(`  ${DIM}AMC hasn't watched your agent do real work yet, so there is little${RESET}`);
     lines.push(`  ${DIM}to score. Nothing is inflated: every grade below is only what AMC${RESET}`);
-    lines.push(`  ${DIM}can prove right now. Connect your agent and let it run — the score${RESET}`);
+    lines.push(`  ${DIM}can show right now. Connect your agent and let it run — the score${RESET}`);
     lines.push(`  ${DIM}climbs as real evidence builds up.${RESET}`);
     lines.push("");
   }

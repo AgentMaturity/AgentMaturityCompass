@@ -115,6 +115,8 @@ describe("LlmRuntime: failures are typed and recorded", () => {
     const error = await failure(llm.stream(spec));
     expect(error.code).toBe("AMC_RESIDENCY_EGRESS_BLOCKED");
     expect(error.message).toContain("Residency egress blocked: destination_not_allowed");
+    // The decision's codes are recorded beside the failure (a decision without a detail records its reason twice).
+    expect(failureRows(value).at(-1)).toMatchObject({ residency: { reason: "destination_not_allowed", detail: "destination_not_allowed" } });
   });
 
   test("a redirect is refused, not followed", async () => {

@@ -157,12 +157,18 @@ function sessionMove(ctx) {
   const session = list(ctx.stageRevision?.spec?.build?.sessions)[0];
   const href = session ? `./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}`
     + `&project=${encodeURIComponent(ctx.project.projectId)}` : "./native-tasks";
-  if (codes.includes("SESSION_OWNER_REQUIRED")) return { now: `${session?.ownerUsername ?? "The person who pressed Build"} started the build session, so they close it and run Review.` };
+  // Only the session's owner can read it, so this page cannot tell whether it started: say what is true either way.
+  if (codes.includes("SESSION_OWNER_REQUIRED")) return { now: `${session?.ownerUsername ? `${session.ownerUsername} pressed Build, and only they` : "Only the person who pressed Build"} `
+    + "can see its build session. If it did not start, they press Build again; if it ran, they close it and run Review." };
   if (codes.includes("BUILD_RUNNING")) return { now: "The build session is still running. Open it, wait until it stops, then press Close and verify there.", act: { label: "Open the build session", href } };
   // The session never started (BUILD_RETRYABLE): Build runs again from here, under the same checks as the first Build.
   const again = codes.includes("BUILD_RETRYABLE") ? { label: "Build again", press: "build" } : undefined;
   if (codes.includes("NATIVE_RESIDENCY_REFUSED")) return { now: `The build session did not start. ${HOLD_WORDS} After that, press Build again.`, act: again };
   if (again) return { now: "The build session did not start, so the agent was not built. Press Build again: it runs the same checks and starts a new build session.", act: again };
+  // Studio's words when a residency check refused the session's request (the project read's buildRefusal), then the way on.
+  const refused = typeof ctx.project.buildRefusal === "string" ? ctx.project.buildRefusal : null;
+  if (codes.includes("BUILD_FAILED") && refused) return { now: `The build session stopped. ${refused} Once an owner has signed the changed registry, open the build `
+    + "session on Native Tasks: press Release for later if it is offered, then Resume session and send a follow-up.", act: { label: "Open the build session", href } };
   if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Native Tasks: press Release for later if it is offered, then Resume session. "
     + "Then send a follow-up, or press Close and verify and come back for Review.", act: { label: "Open the build session", href } };
   return { now: "Close the build session: it opens on Native Tasks. Press Close and verify there, then Back to the agent project. Review comes next.",

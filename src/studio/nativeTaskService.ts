@@ -39,7 +39,7 @@ import { readNativeTaskProjection, projectNativeTaskUpdate, type NativeTaskProje
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
 import { deriveExecutionStatus } from "../execution/executionContract.js";
 import { sessionReceipts } from "../execution/executionStatus.js";
-import { assertNativeStorageAdmission } from "./nativeResidency.js";
+import { assertNativeStorageAdmission, nativeTurnFailureWords } from "./nativeResidency.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -500,7 +500,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.state = "failed";
         entry.error = budgetRefused(error) ? `${BUDGET_GUIDANCE.summary} No provider request was sent for it. ${BUDGET_GUIDANCE.nextAction}`
           : error instanceof NativeTaskServiceError ? error.message
-          : "The native turn did not complete cleanly. Inspect committed evidence; no automatic retry was sent.";
+          : nativeTurnFailureWords(error);
       }
       finally { entry.turn = undefined; entry.touchedAt = Date.now(); entry.work = undefined; entry.projectionAt = 0; }
     })();

@@ -253,7 +253,7 @@ function renderHeldVerdict(trustRoot: VerifyResult["trustRoot"], allowUnanchored
     return chalk.red(`Ledger verification FAILED: monitor key ${admission.status}. ${admission.detail ?? ""}`);
   }
   const headline = allowUnanchored
-    ? chalk.yellow("Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This proves internal consistency only.")
+    ? chalk.yellow("Ledger integrity verified, UNTRUSTED: UNANCHORED (--allow-unanchored). This checks internal consistency only.")
     : chalk.red(LEDGER_UNANCHORED_MESSAGE);
   // The full key id, so an operator can compare it with the fingerprint recorded outside the workspace and pin that.
   return `${headline}\n${chalk.gray(`  Signed by monitor key ${fingerprint ?? "(absent)"}, read from inside the workspace.`)}`;

@@ -38,6 +38,34 @@ export function residencyRefusalWords(reason: string, detail: string | undefined
   return `AMC holds every new session in this workspace: ${why}.${refused ? " Nothing was started." : ""} ${known?.[1] ?? REGISTRY_STEP}`;
 }
 
+/** What a person calls each egress channel's destination. */
+const KIND: Readonly<Record<string, string>> = { provider: "model provider", "network-tool": "tool network", storage: "storage",
+  "mcp-http": "MCP server", bridge: "bridge", callback: "callback" };
+/** The route codes, said for the refused destination's kind (WHY says them for storage, where session open checks them). */
+const ROUTE_WHY: Readonly<Record<string, (kind: string) => string>> = {
+  destination_unregistered: (kind) => `the destination registry declares no ${kind} destination for that address`,
+  destination_match_ambiguous: (kind) => `more than one ${kind} destination in the destination registry matches that address`,
+  region_unknown: (kind) => `the ${kind} destination in the registry has no declared region`,
+  region_not_allowed: (kind) => `the ${kind} destination's declared region is not one a rule that applies allows`
+};
+/** Starts every residencyRouteWords sentence, so a reader of Studio's task error can tell it apart. */
+export const ROUTE_REFUSAL_START = "AMC's residency check refused";
+
+/**
+ * One sentence and the next step for a request a residency check refused after its session opened, from the decision's
+ * fixed codes and the channel it was checked on (a model request is checked on `provider`). Nothing was sent to it.
+ */
+export function residencyRouteWords(channel: string, reason: string, detail: string): string {
+  const kind = Object.hasOwn(KIND, channel) ? KIND[channel]! : "network";
+  const route = Object.hasOwn(ROUTE_WHY, detail) ? ROUTE_WHY[detail]!(kind) : undefined;
+  const known = route === undefined && Object.hasOwn(WHY, detail) ? WHY[detail] : undefined;
+  const why = route ?? known?.[0] ?? `the residency check refused it (${reason}, ${detail})`;
+  const next = route === undefined ? known?.[1] ?? REGISTRY_STEP : `An owner declares that ${kind} destination, with its host and region, in the `
+    + "destination registry and signs it with: amc residency init --file <registry.yaml>. Run amc residency status in the workspace folder to see "
+    + "what the registry declares (docs/OPS_HARDENING.md, Residency routing).";
+  return `${ROUTE_REFUSAL_START} ${kind.startsWith("MCP") ? "an" : "a"} ${kind} request before it was sent: ${why}. ${next}`;
+}
+
 /**
  * The storage admission SessionService.open runs, asked before anything is written. A residency refusal comes back in
  * words with its codes; an active kill keeps its own refusal at session open, as before; any other error propagates.

@@ -9,6 +9,7 @@ import {
   type AcpErrorObject,
   type AcpId
 } from "./acpEnvelope.js";
+import { EgressBlocked } from "../residency/checkEgress.js";
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 
 /**
@@ -330,6 +331,11 @@ function toAcpError(error: unknown): AcpErrorObject {
     return error.acpData === undefined
       ? { code: error.acpCode, message: error.message }
       : { code: error.acpCode, message: error.message, data: error.acpData };
+  }
+  // A residency refusal carries only its decision's fixed codes, never its message (which names destinations and rules).
+  if (error instanceof EgressBlocked) {
+    return { code: ACP_ERROR.internal, message: "AMC's residency check refused a request before it was sent",
+      data: { code: "AMC_RESIDENCY_EGRESS_BLOCKED", reason: error.decision.reason, detail: error.decision.detail ?? error.decision.reason } };
   }
   return { code: ACP_ERROR.internal, message: "the method failed" };
 }

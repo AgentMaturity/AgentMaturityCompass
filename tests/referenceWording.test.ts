@@ -46,4 +46,14 @@ describe("reference wording", () => {
     expect(cells.length).toBeGreaterThan(100);
     expect(offending(cells)).toEqual([]);
   });
+
+  // 2026-11-17 A4 walk: amc up's first-run report said every grade was "only what AMC can prove right now".
+  test("the report amc up prints on a first run uses no claim verb", async () => {
+    const { renderUnifiedResult } = await import("../src/unified/unifiedRenderer.js");
+    const text = renderUnifiedResult({ agentId: "default", ts: 0, overallGrade: "F", overallScore: 0, nothingToAssess: true,
+      modules: [{ name: "Score", icon: "1", grade: "F", score: 0, summary: "0 questions scored", issues: [] }],
+      surfaceCoverage: { evaluated: 1, total: 8, pending: [], failed: [] }, topFixes: [] }, { ci: false, firstRun: true });
+    expect(text).toContain("First run");
+    expect(text).not.toMatch(/\bprov(?:e|es|en)\b/i);
+  });
 });

@@ -152,7 +152,11 @@ export interface RequestFailureMeta extends RequestOutcomeMetaBase {
   readonly credential: RecordedCredential;
   /** The connection never opened (the code, e.g. ECONNREFUSED): no request byte reached the provider. Absent otherwise. */
   readonly connectFailed?: string;
+  /** A residency check refused the request before it was sent: the decision's fixed codes only. Absent otherwise. */
+  readonly residency?: RecordedResidency;
 }
+/** An EgressBlocked decision's fixed `reason` and `detail` codes (src/residency/checkEgress.ts), never its message. */
+export interface RecordedResidency { readonly reason: string; readonly detail: string }
 
 export type RequestOutcomeMeta = RequestResponseMeta | RequestFailureMeta;
 
@@ -210,6 +214,7 @@ export function buildRequestOutcomeMeta(
     ...(params.usage === undefined ? {} : { usage: params.usage }),
     policy: params.policy,
     credential: params.credential,
-    ...(params.connectFailed === undefined ? {} : { connectFailed: params.connectFailed })
+    ...(params.connectFailed === undefined ? {} : { connectFailed: params.connectFailed }),
+    ...(params.residency === undefined ? {} : { residency: params.residency })
   };
 }

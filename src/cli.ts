@@ -1286,7 +1286,7 @@ function assuranceRemediationFix(category: string): string {
   if (normalized.includes("secret") || normalized.includes("pii") || normalized.includes("leak")) {
     return "Add DLP redaction, secret-blocking tests, and escalation for attempted sensitive-data movement.";
   }
-  return "Add a targeted control for this failure category, rerun the pack, and keep the scenario failing until evidence proves the fix.";
+  return "Add a targeted control for this failure category, rerun the pack, and keep the scenario failing until evidence shows the fix holds.";
 }
 
 function buildAssuranceRemediationItems(packResults: AssurancePackResult[]): AssuranceRemediationItem[] {
@@ -20895,7 +20895,7 @@ enforce
         const cert = matchingCerts[0];
         if (cert) {
           const verify = verifyCertificate(cert);
-          const status = verify.valid ? chalk.green("✓ PROVEN") : chalk.red("✗ FAILED");
+          const status = verify.valid ? chalk.green("✓ CHECKED") : chalk.red("✗ FAILED");
           console.log(`\n  ${status} ${chalk.bold(prop.name)}`);
           console.log(chalk.gray(`    ID: ${prop.id}`));
           console.log(chalk.gray(`    Hash: ${cert.certificateHash}`));

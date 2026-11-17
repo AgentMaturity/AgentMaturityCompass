@@ -48,7 +48,7 @@ const fail = (status: number, code: string, message: string) => new OperatorPlan
 
 export const PACKET_README = (packetId: string) => [
   "# AMC review packet", "", `Packet: ${packetId}`, "",
-  "Evidence of conformity, never a compliance statement. A signature proves who issued these bytes and that they are unchanged, not that they are true.", "",
+  "Evidence of conformity, never a compliance statement. A signature shows who issued these bytes and that they are unchanged, not that they are true.", "",
   "## Verify", "",
   "1. Verify `attestation/review-packet.dsse.json` with `amc-verify` and the issuer key pinned in your trust list (`--trust-list`, `--trust-root`).",
   "   Supply every other file of this packet as evidence: each subject digest must match the bytes you hold.",

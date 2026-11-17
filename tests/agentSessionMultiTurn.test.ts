@@ -11,6 +11,7 @@ import { credentialRef } from "../src/credentials/credentialRef.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initWorkspace } from "../src/workspace.js";
 import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
+import { initDestinationRegistry } from "../src/residency/destinationRegistry.js";
 import type { EvidenceEvent } from "../src/types.js";
 import {
   SESSION_ENVELOPE_META_KEY,
@@ -244,6 +245,20 @@ describe("a prompt protected-data admission refused (P2-02)", () => {
     const refused = await session.prompt("one");
     expect(refused).toMatchObject({ ok: false, failureCodes: ["DATA_FLOW_REFUSED"],
       dataFlow: { reason: "baa_required", processorId: "proc-general", purposeId: "support" } });
+  });
+});
+
+describe("a prompt a residency check refused", () => {
+  it("names the refusal's fixed codes and the provider channel on the failed result", async () => {
+    const dir = workspace();
+    // Storage is declared; the model provider is not, so the rule refuses the model request before it is sent.
+    initDestinationRegistry(dir, { schemaVersion: "amc.residency-destinations/v1", profile: { path: ".amc/residency/profile.yaml", storageUrl: "http://localhost/amc" },
+      destinations: [{ destinationId: "this-laptop", match: { hosts: ["localhost"] }, channels: ["storage"], region: { jurisdiction: "US", code: "us-laptop" }, transferBasis: null }],
+      rules: [{ ruleId: "us-only", controlId: "fixture-01", appliesTo: { dataClasses: ["health"], jurisdictions: ["US"] }, allowedJurisdictions: ["US"], acceptsTransferBasis: false }] });
+    const session = sessionWith(dir, ["never sent"]);
+    const refused = await session.prompt("one");
+    expect(refused).toMatchObject({ ok: false, failureCodes: ["AMC_RESIDENCY_EGRESS_BLOCKED"],
+      residency: { reason: "destination_unregistered", detail: "destination_unregistered", channel: "provider" } });
   });
 });
 
