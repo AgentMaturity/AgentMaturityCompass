@@ -12,7 +12,7 @@ import { writeExportAttestation, type ExportAttestation } from "../attest/export
 import { appendTransparencyEntryAsync } from "../transparency/logChain.js";
 import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
-import { captureOrgFiles, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { captureOrgFiles, assertOrgPairsCurrent, observedFileMode } from "../org/preparedOrgPairs.js";
 import { assertKeysetComplete } from "../keys/keyset.js";
 import { highWaterPath } from "../keys/highWater.js";
 import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
@@ -348,7 +348,7 @@ export async function issueAssuranceCertificate(input: {
     assertPreparedCurrent();
     const archive = join(tmp, "prepared.amccert"); tarCreateDeterministic(tmp, archive);
     const archiveBytes = readFileSync(archive), sha256 = sha256Hex(archiveBytes), digestBytes = Buffer.from(`${sha256}\n`);
-    const archiveMode = expectedOutputs.get(outFile)!.mode ?? (lstatSync(archive).mode & 0o777);
+    const archiveMode = expectedOutputs.get(outFile)!.mode ?? observedFileMode(lstatSync(archive).mode);
     const rows: Array<{ path: string; bytes: Buffer; mode?: number }> = [{ path: outFile, bytes: archiveBytes, mode: archiveMode }, { path: `${outFile}.sha256`, bytes: digestBytes, mode: 0o644 }];
     if (outFile !== latestPath) rows.push({ path: resolve(latestPath), bytes: archiveBytes });
     rows.push({ path: resolve(assuranceLatestCertificateShaPath(params.workspace)), bytes: digestBytes, mode: 0o644 });
@@ -358,7 +358,7 @@ export async function issueAssuranceCertificate(input: {
       try {
         for (const row of rows) {
           attemptedPath = null; assertPreparedCurrent();
-          const expectedMode = row.mode ?? (0o666 & ~process.umask()); attemptedPath = row.path;
+          const expectedMode = observedFileMode(row.mode ?? (0o666 & ~process.umask())); attemptedPath = row.path;
           writeFileAtomic(row.path, row.bytes, row.mode); publishedPaths.push(row.path);
           const acknowledged = captureOrgFiles([row.path]).members[0]!;
           if (acknowledged.bytes === null || !acknowledged.bytes.equals(row.bytes) || acknowledged.mode !== expectedMode) throw new Error("assurance certificate member differs from its exact prepared bytes or mode");

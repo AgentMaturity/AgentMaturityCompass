@@ -50,6 +50,13 @@ interface Member { readonly path: string; readonly bytes: Buffer | null; readonl
 export interface OrgPairsSnapshot { readonly members: readonly Member[] }
 export interface OrgPairsOptions { beforePublish?: () => void; assertInputsCurrent?: () => void }
 export interface OrgPairWrite { path: string; bytes: Uint8Array }
+/** Windows stores only a read-only attribute, which Node reports as 0o444, or 0o666 for a writable file whatever chmod
+ * asked. A writable file there is what writeFileAtomic(…, 0o644) produces, so it reads as 0o644; a read-only one still
+ * differs. POSIX modes are returned exactly. */
+export function observedFileMode(mode: number, platform: NodeJS.Platform = process.platform): number {
+  const bits = mode & 0o777;
+  return platform === "win32" && bits === 0o666 ? 0o644 : bits;
+}
 function read(path: string): Member {
   try {
     const first = lstatSync(path);
@@ -57,7 +64,7 @@ function read(path: string): Member {
     const bytes = readFileSync(path), last = lstatSync(path);
     if (first.dev !== last.dev || first.ino !== last.ino || first.size !== last.size || first.mtimeMs !== last.mtimeMs)
       throw new Error("signed pair member changed while being read");
-    return { path, bytes, mode: last.mode & 0o777, identity: `${last.dev}:${last.ino}` };
+    return { path, bytes, mode: observedFileMode(last.mode), identity: `${last.dev}:${last.ino}` };
   } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return { path, bytes: null, mode: null, identity: null }; throw error; }
 }
 export function captureOrgFiles(paths: readonly string[]): OrgPairsSnapshot {

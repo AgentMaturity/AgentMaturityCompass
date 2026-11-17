@@ -7,7 +7,7 @@ import { join, resolve } from "node:path";
 import { cleanupDir } from "../utils/archiveFiles.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { captureOrgFiles, captureOrgPairsAuthority, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { captureOrgFiles, captureOrgPairsAuthority, assertOrgPairsCurrent, observedFileMode } from "../org/preparedOrgPairs.js";
 import { captureWorkspaceLogAuthority, appendTransparencyEntryAttemptAsync } from "../transparency/asyncWorkspaceAppend.js";
 import { benchProofFileBytes } from "../bench/benchProofs.js";
 import { captureAuditBinderPolicies, prepareAuditBinderCollection } from "./binderCollectionPlan.js";
@@ -40,7 +40,7 @@ async function createAuditBinderArtifactOwned(input: { workspace: string; scopeT
   const outFile = resolve(workspace, params.outFile), cachePath = binderCachePath(workspace, scopeType, cacheId);
   if (new Set([outFile, `${outFile}.sha256`, cachePath, `${cachePath}.sig`]).size !== 4) throw new Error("audit archive and cache destinations must differ");
   const targets = captureOrgFiles([outFile, `${outFile}.sha256`, cachePath, `${cachePath}.sig`]);
-  const archiveMode = targets.members.find(row => row.path === outFile)!.mode ?? (0o666 & ~process.umask());
+  const archiveMode = targets.members.find(row => row.path === outFile)!.mode ?? observedFileMode(0o666 & ~process.umask());
   const collection = prepareAuditBinderCollection({ workspace, scope: { type: scopeType, id: scopeId }, policy: policies.policy, map: policies.map,
     nowTs: params.nowTs, request: params.request ?? null, trust: params.trust }, original, true);
   const destinations = Object.freeze(targets.members.map(row => row.path)), aliases = captureAuditOutputAliases(destinations, [...policies.inputPaths, ...collection.inputPaths]);

@@ -20,7 +20,7 @@ import { assertPurposePublicationCurrent, capturePurposePublication } from "../k
 import { trustConfigPath, trustConfigSigPath } from "../trust/trustConfig.js";
 import { captureRunHashAuthority } from "../ledger/runHashSignature.js";
 import { captureWorkspaceLogAuthority } from "../transparency/asyncWorkspaceAppend.js";
-import { captureOrgFiles, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { captureOrgFiles, assertOrgPairsCurrent, observedFileMode } from "../org/preparedOrgPairs.js";
 import { assertKeysetComplete } from "../keys/keyset.js";
 import { highWaterPath } from "../keys/highWater.js";
 import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
@@ -266,7 +266,7 @@ export async function exportBenchmarkArtifactAsync(input: BenchmarkExportInput, 
     writeFileAtomic(join(content, "bench.sig"), JSON.stringify(signature, null, 2), 0o644);
     writeFileAtomic(join(content, "public-keys", "auditor.pub"), signed.publicKeyPem, 0o644);
     runTarCreate(content, archive);
-    const archiveBytes = readFileSync(archive), mode = expectedOutput.members[0]!.mode ?? (lstatSync(archive).mode & 0o777);
+    const archiveBytes = readFileSync(archive), mode = expectedOutput.members[0]!.mode ?? observedFileMode(lstatSync(archive).mode);
     const preparedArchiveSha256 = sha256Hex(archiveBytes); archiveSha256 = preparedArchiveSha256;
     const assertSignedCurrent = () => { assertCurrent(); assertPurposePublicationCurrent(workspace, captured, signed); assertOrgPairsCurrent(expectedOutput); };
     locked(() => {
