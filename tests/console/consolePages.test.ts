@@ -177,6 +177,30 @@ describe("Passport page with no passport yet", () => {
 });
 
 describe("Open Standard before any schema exists", () => {
+  const render = async (verify: unknown) => {
+    const root = { innerHTML: "" };
+    const g = globalThis as { document?: unknown; window?: unknown };
+    const saved = [g.document, g.window];
+    g.document = { getElementById: () => null };
+    g.window = { location: { href: "http://127.0.0.1/console/standard" } };
+    try {
+      await renderStandardPage({
+        root, card: (title: string, body: string) => `<section><h3>${title}</h3>${body}</section>`,
+        apiGet: async (path: string) => path === "/standard/schemas" ? { schemas: [], verify } : {},
+        apiPost: async () => ({})
+      });
+    } finally {
+      [g.document, g.window] = saved;
+    }
+    return root.innerHTML;
+  };
+
+  test("a bundle whose schema files were removed still says the check failed", async () => {
+    const html = await render({ ok: false, errors: ["schema missing: a.json"], meta: { schemas: [{ name: "a.json" }] } });
+    expect(html).toContain("The schema bundle does not check out");
+    expect(html).not.toContain("No schemas yet");
+  });
+
   test("it names the next step instead of a failed bundle check or raw ok=false", async () => {
     const root = { innerHTML: "" };
     const g = globalThis as { document?: unknown; window?: unknown };

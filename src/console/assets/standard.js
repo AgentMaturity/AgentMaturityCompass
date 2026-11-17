@@ -34,8 +34,9 @@ export async function renderStandardPage(params) {
     warnings.push("<div class='card status-bad'><strong>PASSPORT POLICY UNTRUSTED</strong></div>");
   }
   const rows = Array.isArray(schemas?.schemas) ? schemas.schemas : [];
-  // Before the first Generate there is no bundle to check: that is the empty state, not a failed check.
-  if (schemas?.verify?.ok === false && rows.length > 0) {
+  // Before the first Generate there is no bundle (no meta, no schemas): that is the empty state, not a failed check.
+  const noBundle = schemas?.verify?.meta == null && rows.length === 0;
+  if (schemas?.verify?.ok === false && !noBundle) {
     warnings.push(`<div class='card status-warn'><strong>The schema bundle does not check out</strong>: ${esc((schemas.verify.errors || []).join(", "))}</div>`);
   }
 
@@ -48,7 +49,7 @@ export async function renderStandardPage(params) {
         <button id="standardGenerateBtn" data-roles="OWNER">Generate Schemas</button>
         <button id="standardVerifyBtn" class="secondary">Verify Bundle</button>
       </div>
-      <div class="muted">${rows.length === 0 ? "No schemas yet: press Generate Schemas to write them."
+      <div class="muted">${noBundle ? "No schemas yet: press Generate Schemas to write them."
         : `${esc(String(rows.length))} schemas; the bundle ${schemas?.verify?.ok ? "checks out" : "does not check out"}.`}</div>
       <pre id="standardOut" class="scroll muted"></pre>
       `
