@@ -58,9 +58,10 @@ function requireNative(ctx: A4ProducerContext): NativeTaskApiContext {
   if (ctx.native === undefined) throw fail(409, "A4_NOT_READY", "Native build sessions run through Studio's native task service.", { reasonCodes: ["NATIVE_TASKS_UNAVAILABLE"] });
   return ctx.native;
 }
-/** A native service or admission refusal keeps its status and public code. */
+/** A native service or admission refusal keeps its status, public code and fixed detail codes (a residency refusal's reason and detail). */
 function nativeRefusal(error: unknown): unknown {
-  if (error instanceof NativeTaskServiceError || error instanceof NativeAdmissionError) return fail(error.statusCode, error.code, error.message);
+  if (error instanceof NativeTaskServiceError) return fail(error.statusCode, error.code, error.message, error.detail);
+  if (error instanceof NativeAdmissionError) return fail(error.statusCode, error.code, error.message);
   return error;
 }
 
@@ -182,8 +183,8 @@ function enforcePreview(workspace: string, agentId: string) {
 }
 
 /**
- * Build (after the direction gate is consumed; owner, owner mode: it signs the workspace presets file). Every refusal
- * runs before the first write. The router refuses Build (409 RESOURCE_DRIFTED) before it runs when a resource the
+ * Build (after the direction gate is consumed, or again at `built` when its session never started: buildRetryAllowed;
+ * owner, owner mode: it signs the workspace presets file). Every refusal runs before the first write. The router refuses Build (409 RESOURCE_DRIFTED) before it runs when a resource the
  * approved revision bound has moved.
  * ponytail: as at Aspire, the graph and preset are written before the transition that records them; a head that moves in
  * between leaves them written (the same approved bytes), and Build run again is refused as drifted.
@@ -344,10 +345,19 @@ function bindingMismatch(view: NativeTaskView, start: NativeTaskStartRequest): s
 /** What Review records about the prompt binding until the native task lane exposes the first submission's bodyHash. */
 const PROMPT_BINDING = "not_evaluated (the native task view exposes no submission bodyHash to compare with the journaled start)";
 
+/**
+ * A build session with no session to resume (never started, or failed before the runtime opened one): Build may run again
+ * from `built` (BUILD_RETRYABLE), under every check a first Build passes (a4RouterStages.buildRetryAllowed).
+ */
+const RETRY = "BUILD_RETRYABLE";
+
 /** A build session that never started or failed while storage admission holds every session: the reason in words, not "resume it". */
-function assertNoResidencyHold(workspace: string, taskId: string): void {
+function assertNoResidencyHold(workspace: string, taskId: string, retryable: boolean): void {
   const held = registryStatus(workspace).held;
-  if (held !== null) throw fail(409, "A4_NOT_READY", residencyRefusalWords("registry_unverifiable", held, false), { reasonCodes: ["NATIVE_RESIDENCY_REFUSED", `TASK:${taskId}`] });
+  if (held !== null) {
+    throw fail(409, "A4_NOT_READY", residencyRefusalWords("registry_unverifiable", held, false),
+      { reasonCodes: ["NATIVE_RESIDENCY_REFUSED", ...(retryable ? [RETRY] : []), `TASK:${taskId}`] });
+  }
 }
 
 /**
@@ -365,9 +375,8 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
     view = native.service.poll(nativeActor(native, ctx.state.project.agent_id), planned.taskId).task;
   } catch (error) {
     if (error instanceof NativeTaskServiceError && error.code === "NATIVE_TASK_NOT_FOUND") {
-      assertNoResidencyHold(ctx.workspace, planned.taskId);
-      throw fail(409, "A4_NOT_READY", "The build session never started: start it again with the body Build recorded (POST /api/v1/native-tasks).",
-        { reasonCodes: ["BUILD_FAILED", `TASK:${planned.taskId}`] });
+      assertNoResidencyHold(ctx.workspace, planned.taskId, true);
+      throw fail(409, "A4_NOT_READY", "The build session never started: press Build again.", { reasonCodes: ["BUILD_FAILED", RETRY, `TASK:${planned.taskId}`] });
     }
     throw nativeRefusal(error);
   }
@@ -378,9 +387,12 @@ function settledView(ctx: A4ProducerContext, planned: PlannedSession): NativeTas
   }
   if (RUNNING.has(view.state)) throw fail(409, "A4_NOT_READY", "A build session is still running; review once it settles.", { reasonCodes: ["BUILD_RUNNING", `TASK:${planned.taskId}`] });
   if (view.state === "failed" || view.sessionId === null) {
-    assertNoResidencyHold(ctx.workspace, planned.taskId);
-    throw fail(409, "A4_NOT_READY", view.canResume ? `The build session failed; resume task ${planned.taskId} on Studio's Native Tasks page and review once it settles.`
-      : "The build session failed and cannot be resumed; request changes and build again.", { reasonCodes: ["BUILD_FAILED", `TASK:${planned.taskId}`] });
+    // Failed before the runtime opened a session: nothing ran, so Build runs again (a session that ran is never replaced here).
+    const retryable = view.state === "failed" && view.sessionId === null;
+    assertNoResidencyHold(ctx.workspace, planned.taskId, retryable);
+    throw fail(409, "A4_NOT_READY", retryable ? "The build session failed before it started: press Build again."
+      : view.canResume ? `The build session failed; resume task ${planned.taskId} on Studio's Native Tasks page and review once it settles.`
+        : `The build session failed and cannot be resumed yet: on Studio's Native Tasks page, open task ${planned.taskId}, press Release for later, then Resume session.`, { reasonCodes: ["BUILD_FAILED", ...(retryable ? [RETRY] : []), `TASK:${planned.taskId}`] });
   }
   // An idle or released session can still take turns (a released one is resumed first), and nothing re-reads its head
   // after Review: only a closed session (no turn, no resume) is the state approvers approve.
@@ -407,6 +419,15 @@ export function reviewRefusals(native: NativeTaskApiContext | undefined, state: 
     const codes = (error as { detail?: { reasonCodes?: unknown } }).detail?.reasonCodes;
     return Array.isArray(codes) ? codes.map(String).filter((code) => !code.includes(":")) : [String((error as { code?: unknown }).code ?? "BUILD_SESSION_UNREAD")];
   }
+}
+
+/**
+ * Whether Build may run again at `built` for this caller: every journaled session failed before the runtime opened it (or
+ * never started), as its owner reads it (BUILD_RETRYABLE). The route still runs every check a first Build runs.
+ */
+export function buildRetryAllowed(native: NativeTaskApiContext | undefined, state: A4ProducerContext["state"], principal: A4ProducerContext["principal"],
+  workspace: string): boolean {
+  return reviewRefusals(native, state, principal, workspace).includes(RETRY);
 }
 
 /**

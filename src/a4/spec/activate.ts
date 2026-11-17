@@ -518,17 +518,28 @@ function monitoringItem(state: A4ReadinessState, releaseId: string | null): A4Re
         : "No source of the monitor ref observed the deployed agent since its succeeded deploy receipt (an execution in its journal or AMC's check that reached the destination; the process-wide SLO report is context only); review again once one has" } });
 }
 
+/** Engine request states that leave the request needing a new one (an owner opens it again). */
+const REQUEST_CLOSED = new Set(["DENIED", "EXPIRED", "CANCELLED"]);
+
 /**
  * An effect's engine request opened on `gateId` (EFFECT_GATE_OPENED), for the card to decide bound to its digest: the
- * release (on the direction gate) and the rollback of the current release. Never mandatory and never bound; the engine
- * request's own status is the card's to read.
+ * release (on the direction gate) and the rollback of the current release. Never mandatory and never bound. The engine
+ * request's own status as Studio read it (APPROVAL_STATUS, as Adapt's plan_review_opened; REVIEW_STATUS_NOT_READ when
+ * unread): WAITING while its approvers decide it or once it is closed undecided, so the page names who acts next.
  */
-function effectRequestItem(id: string, opened: A4ChainLink | undefined, done: boolean, label: string): A4ReadinessItem {
-  if (done) return item(id, "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_RECORDED"] });
-  return opened === undefined || typeof opened.body.requestDigestSha256 !== "string"
-    ? waiting(id, ["EFFECT_GATE_NOT_OPEN"], { kind: "review_pending", section: "governance", mandatory: false, nextAction: { label } })
-    : item(id, "READY", { section: "governance", mandatory: false, reasonCodes: ["EFFECT_GATE_OPENED", "REVIEW_STATUS_NOT_READ",
-      `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`] });
+function effectRequestItem(id: string, opened: A4ChainLink | undefined, done: boolean, label: string,
+  engine: Readonly<Record<string, string>> | null | undefined, what: string): A4ReadinessItem {
+  const fields = { section: "governance", mandatory: false } as const;
+  if (done) return item(id, "READY", { ...fields, reasonCodes: ["EFFECT_RECORDED"] });
+  if (opened === undefined || typeof opened.body.requestDigestSha256 !== "string") return waiting(id, ["EFFECT_GATE_NOT_OPEN"], { ...fields, kind: "review_pending", nextAction: { label } });
+  const status = engine?.[String(opened.body.approvalRequestId)];
+  const codes = ["EFFECT_GATE_OPENED", status === undefined ? "REVIEW_STATUS_NOT_READ" : `APPROVAL_STATUS:${status}`,
+    `APPROVAL_REQUEST:${String(opened.body.approvalRequestId)}:${opened.body.requestDigestSha256}`, `GATE:${String(opened.body.gateId)}`];
+  if (status === "PENDING") return waiting(id, codes, { ...fields, kind: "review_pending", nextAction: { label: `The project's approvers decide ${what}` } });
+  if (status !== undefined && REQUEST_CLOSED.has(status)) {
+    return waiting(id, codes, { ...fields, kind: "review_pending", nextAction: { label: `${what[0]!.toUpperCase()}${what.slice(1)} was not approved (${status}): an owner opens a new one` } });
+  }
+  return item(id, "READY", { ...fields, reasonCodes: codes });
 }
 const newestOpened = (state: A4ReadinessState, match: (link: A4ChainLink) => boolean): A4ChainLink | undefined =>
   [...state.chain].reverse().find((link) => link.kind === "EFFECT_GATE_OPENED" && match(link));
@@ -590,9 +601,11 @@ export function activateItems(state: A4ReadinessState, query: A4ReadinessQuery):
     expertReviewItem(state, isRegulated(state, query.floor)),
     effectRequestItem("release_effect", direction === null ? undefined
       : newestOpened(state, (link) => link.body.effect === RELEASE_EFFECT_ID && link.body.gateId === direction.gate_id), release !== null,
-    `Once the release approval has its quorum, an owner opens ${RELEASE_EFFECT_ID}: a second, separately decided DEPLOY request`),
+    `Once the release approval has its quorum, an owner opens ${RELEASE_EFFECT_ID}: a second, separately decided DEPLOY request`, query.live.engineRequests,
+    "the release request on the Release card"),
     effectRequestItem("rollback_effect", newestOpened(state, (link) => link.body.effect === ROLLBACK_EFFECT_ID
       && (link.body.intent as { releaseId?: unknown } | undefined)?.releaseId === releaseId),
-    cycleLinks(state.chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId), "An owner previews the rollback, which opens its DEPLOY request")
+    cycleLinks(state.chain, "ROLLBACK").some((link) => link.body.releaseId === releaseId), "An owner previews the rollback, which opens its DEPLOY request",
+    query.live.engineRequests, "the rollback request")
   ];
 }

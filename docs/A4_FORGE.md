@@ -422,7 +422,11 @@ framework through a scaffold, connect instructions and a trace import.
   `users.yaml` user in that lease and refuses anyone who is not an active local user, a workspace-router session
   included, so Build answers 409 `PRINCIPAL_UNRESOLVED` first instead of journaling a session that could never start.
   Other lease-mint failures, a revoked or unreadable `lease` key (`LEASE_UNAVAILABLE`) or a plan that does not verify
-  (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. Propose already leaves such checks out of the plan and lists them as
+  (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. A build session that
+  failed before its runtime opened a session, or never started, has nothing to resume: its owner presses Build again at
+  Build (`allowed.review` carries `BUILD_RETRYABLE`), which runs every check a first Build runs and journals a new
+  session in a new revision. A session that opened and then failed is resumed on Native Tasks instead (Release for
+  later, then Resume session), never replaced. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.
   With the `stub` provider and autonomy `act_with_approval`, the stub calls the first tool it is offered; when that

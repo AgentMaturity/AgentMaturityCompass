@@ -164,9 +164,11 @@ function renderBuild(ctx) {
   // Only the owner's session starts the same task again (the task id is the owner's principal and the recorded request id).
   // Review needs each session closed: its owner closes it with "Close and verify" on the native tasks page.
   const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">Open on Native Tasks</a>`;
+  // A session that never started is built again with Build (BUILD_RETRYABLE): the same request id would only answer the failed task.
+  const retry = list(ctx.allowed?.review?.reasonCodes).includes("BUILD_RETRYABLE");
   const sessions = list(build?.sessions).map((session) => [`${short(session.taskId)} ${taskLink(session)}`, esc(session.ownerUsername),
     session.start?.provider === "stub" ? `the stand-in model <small class="a4-code">(stub)</small>` : `<code>${esc(session.start?.provider)}</code>`,
-    ctx.me?.username === session.ownerUsername && isObject(session.start)
+    !retry && ctx.me?.username === session.ownerUsername && isObject(session.start)
       ? view.actionButton("Start it again", "start-session", ctx.allowed.build, `data-start="${esc(JSON.stringify(session.start))}"`) : ""]);
   return `<p>Build writes what the approved plan describes and starts one build session. When the session stops, its owner opens it
     and presses Close and verify; Review comes next.</p>
@@ -176,7 +178,8 @@ function renderBuild(ctx) {
     baseline and the native session's admission first, then writes the revised typed graph and signs the agent's preset into
     <code>.amc/agents.yaml</code>, and journals one native build session in this revision; Studio starts it once the step is recorded,
     on its own native task service. Run further turns, cancel or resume it on the <a href="./native-tasks">native tasks</a> page as
-    its owner; other members watch. "Start it again" repeats the recorded start (the same task), only for a session that never started.</p>
+    its owner; other members watch. "Start it again" repeats the recorded start (the same task). A build session that did not start (Studio refused it, or it failed before the session opened)
+    is built again with Build, which runs every check the first Build ran and starts a new session.</p>
     ${build ? `<p class="muted">Enforce preview against the baseline: ${esc(build.preview?.added)} added, ${esc(build.preview?.changed)} changed,
       ${esc(build.preview?.removed)} removed (<code>${esc(build.preview?.validation)}</code>)</p>` : ""}
     ${list(build?.sessions).map((session) => `<p><code>${esc(session.taskId)}</code> <code>${esc(session.start?.provider)}</code></p>`).join("")}`, "build")}
