@@ -298,6 +298,7 @@ export const NON_RESULT_COMMANDS: readonly NonResultCommand[] = [
   non("fp-submit", "files a false-positive report"),
   non("identity init", "creates the host identity configuration"),
   non("identity workload-trust", GROUP),
+  non("keys revoke", "writes a key or passport revocation to a signed revocation list; no result is evaluated"),
   non("leaderboard", GROUP),
   non("lint", "lints configuration files for schema errors; no maturity or compliance result"),
   non("mcp sign", "writes the workspace signature for a reviewed project MCP config digest"),
