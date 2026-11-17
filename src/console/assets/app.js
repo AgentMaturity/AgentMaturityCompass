@@ -672,9 +672,9 @@ async function renderEvidence() {
         </p>
         ${missedSections ? `<p class="status-bad">${missedSections} section(s) could not load and show as empty below. Refresh the page to try again.</p>` : ""}
         <div class="studio-actions">
-          <button id="evidenceRunScore" data-roles="OWNER,OPERATOR">run full score -&gt;</button>
-          <button id="evidenceSnapshot" data-roles="OWNER" class="secondary">snapshot Enforce resources</button>
-          <a class="secondary" href="./passport?agent=${encodeURIComponent(agentId)}" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">passport -&gt;</a>
+          <button id="evidenceRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>
+          <button id="evidenceSnapshot" data-roles="OWNER" class="secondary">Snapshot Enforce resources</button>
+          <a class="secondary" href="./passport?agent=${encodeURIComponent(agentId)}" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">Passport</a>
         </div>
       </div>
       <div class="studio-terminal">
@@ -775,7 +775,7 @@ async function renderEvidence() {
           command: "amc mechanic rca run <run-id>"
         })}</div>
         <div class="row wrap">
-          <button id="evidenceGenerateRca" data-roles="OWNER,OPERATOR" class="secondary">find root causes</button>
+          <button id="evidenceGenerateRca" data-roles="OWNER,OPERATOR" class="secondary">Find root causes</button>
         </div>
       `)}
       ${card("Reasoning Memory", `
@@ -790,7 +790,7 @@ async function renderEvidence() {
         `).join("") || "<tr><td colspan='5' class='muted'>No reasoning memory items.</td></tr>"}</tbody></table></div>
         <div id="reasoningMemoryOut" aria-live="polite">${recordRows(reasoningMemoryItems.slice(0, 3))}</div>
         <div class="row wrap">
-          <button id="evidenceWriteMemory" data-roles="OWNER,OPERATOR" class="secondary">write memory</button>
+          <button id="evidenceWriteMemory" data-roles="OWNER,OPERATOR" class="secondary">Write memory</button>
         </div>
       `)}
       ${card("Enforce Resource Proof", `
@@ -815,10 +815,10 @@ async function renderEvidence() {
           history: resourceHistoryEntries.slice(0, 6)
         })}</div>
         <div class="row wrap">
-          <button id="evidenceVerifyResources" class="secondary">verify now</button>
-          <button id="evidenceValidateResources" class="secondary">validate gates</button>
-          <button id="evidenceApplyDryRun" data-roles="OWNER" class="secondary">preview apply</button>
-          <button id="evidenceRestoreDryRun" data-roles="OWNER" class="secondary">dry-run restore</button>
+          <button id="evidenceVerifyResources" class="secondary">Verify now</button>
+          <button id="evidenceValidateResources" class="secondary">Check the gates</button>
+          <button id="evidenceApplyDryRun" data-roles="OWNER" class="secondary">Preview apply</button>
+          <button id="evidenceRestoreDryRun" data-roles="OWNER" class="secondary">Preview restore</button>
           <button id="evidenceActivateResources" data-roles="OWNER" ${resourceStatusData?.state === "DRIFTED" ? "" : "disabled"}>activate changes</button>
           <button id="evidenceRollbackResources" data-roles="OWNER" ${resourceStatusData?.rollbackTarget?.manifestId ? "" : "disabled"}>rollback previous</button>
         </div>
@@ -826,8 +826,8 @@ async function renderEvidence() {
       ${card("Neutral Import", `
         <div class="row wrap">
           <input id="neutralImportPath" placeholder="/path/to/traces-or-run-dir" style="min-width:280px" />
-          <button id="neutralImportDryRun" data-roles="OWNER,OPERATOR" class="secondary">review import</button>
-          <button id="neutralImportApply" data-roles="OWNER,OPERATOR" disabled>apply reviewed import</button>
+          <button id="neutralImportDryRun" data-roles="OWNER,OPERATOR" class="secondary">Review import</button>
+          <button id="neutralImportApply" data-roles="OWNER,OPERATOR" disabled>Apply reviewed import</button>
         </div>
         <p class="muted">Imported claims remain self-reported and unevaluated. Review unknown timing, skipped files and mapping limits before applying.</p>
         <div id="neutralImportReview" role="status" aria-live="polite"></div>
@@ -1445,7 +1445,7 @@ async function renderHome() {
         <summary>Workspace setup</summary>
         ${renderOnboardingSteps(onboarding?.state)}
         <div class="row wrap activation-setup-actions">
-          <button id="studioRunOnboarding" data-roles="OWNER,OPERATOR">run baseline</button>
+          <button id="studioRunOnboarding" data-roles="OWNER,OPERATOR">Run baseline</button>
         </div>
         <pre id="onboardingOut" class="scroll muted"></pre>
       </details>
@@ -1492,9 +1492,9 @@ async function renderHome() {
           ${modeMeta}
         </div>
         <div class="studio-actions">
-          <button id="studioRunFullScore" data-roles="OWNER,OPERATOR">run full score →</button>
-          <a class="button secondary" href="./industrypacks">industry packs →</a>
-          <a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">lifecycle evidence →</a>
+          <button id="studioRunFullScore" data-roles="OWNER,OPERATOR">Run the full score</button>
+          <a class="button secondary" href="./industrypacks">Industry Packs</a>
+          <a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">Lifecycle records</a>
         </div>
       </div>
       <div class="studio-terminal studio-live-panel">
