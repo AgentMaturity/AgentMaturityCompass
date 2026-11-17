@@ -137,13 +137,13 @@ for (let step = 0; step < 12; step++) {
   if ((await page.locator(".a4-start").innerText()).includes("Who must approve")) break;
   const next = page.locator(".a4-start button").first();
   const label = (await next.textContent()).trim();
-  if (/invite/i.test(label)) {
-    const invite = page.locator(".a4-invite");
+  if (/invite|add (a|this) person/i.test(label)) {
+    const invite = page.locator(".a4-invite").first();
     await invite.locator("[name=inviteUsername]").fill("reviewer");
-    await invite.locator("button", { hasText: "Invite" }).click();
+    await invite.locator("button", { hasText: /^(Invite|Add this person)$/ }).first().click();
   } else if (/reason/i.test(label)) {
     // A pack project's approvers are all local users: the owner acknowledges that with a reason before the request.
-    await page.getByLabel(/^Reason/).first().fill("Both approvers are people on our team.");
+    await page.locator('.a4-approvals [name="reason"]').first().fill("Both approvers are people on our team.");
     await page.locator("button:visible", { hasText: /^Acknowledge$/ }).first().click();
   } else {
     await next.click();
