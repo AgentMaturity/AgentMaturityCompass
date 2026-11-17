@@ -68,7 +68,7 @@ describe("public Docs Pages artifact", () => {
 
 
     expect(html).toContain('src="vendor/marked.min.js"');
-    expect(html).toContain('src="docs.js?v=14"');
+    expect(html).toContain('src="docs.js?v=15"');
     expect(html).not.toContain("cdn.jsdelivr.net");
     expect(script).toContain("./content/");
     expect(script).toContain("./content-manifest.json");

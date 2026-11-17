@@ -23,7 +23,7 @@ describe("the industry pages", () => {
     for (const station of data.stations) {
       const html = read(`website/station-${station.id}.html`);
       expect(html).toContain('href="home.css?v=6"');
-      expect(html).toContain('src="script.js?v=13"');
+      expect(html).toContain('src="script.js?v=14"');
       expect(html).toContain('href="station-pages.css?v=1"');
       expect(html).not.toMatch(/unsplash|(?:<img[^>]*\ssrc=|url\()["']?https?:/i);
       for (const pack of station.packs) {

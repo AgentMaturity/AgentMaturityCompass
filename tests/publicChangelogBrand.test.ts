@@ -51,7 +51,7 @@ describe("AMC public changelog identity", () => {
 
     // Only the site's own nav scripts load; the notes themselves are static HTML.
     expect([...html.matchAll(/<script\b[^>]*>/g)].map((tag) => tag[0])).toEqual([
-      '<script src="script.js?v=13">', '<script src="home.js?v=3">', '<script src="pages.js?v=2">'
+      '<script src="script.js?v=14">', '<script src="home.js?v=3">', '<script src="pages.js?v=2">'
     ]);
     expect(html).not.toContain("marked");
     expect(html).not.toContain("raw.githubusercontent.com");
