@@ -90,6 +90,8 @@ describe("committed plan-edits manifest (D-15)", () => {
     expect(validatePlanEdits(manifest([live]))).toEqual([live]);
     const followup = entry({ issue: "FU1109-01", archivePath: "unused-code/plan-edits/FU1109-01/src/a.ts.landed" });
     expect(validatePlanEdits(manifest([followup]))).toEqual([followup]);
+    const lane = entry({ issue: "L-IMPORTERS-1115", archivePath: "unused-code/plan-edits/L-IMPORTERS-1115/src/a.ts.landed" });
+    expect(validatePlanEdits(manifest([lane]))).toEqual([lane]);
     const bad: Array<[unknown, string]> = [
       [{ ...manifest([]), schemaVersion: 2 }, "header"],
       [{ ...manifest([]), decision: "D-14" }, "header"],
