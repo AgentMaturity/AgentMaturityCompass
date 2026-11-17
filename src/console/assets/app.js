@@ -262,16 +262,16 @@ function renderToolContext(projection) {
         : "local provider";
       const rows = (Array.isArray(group?.tools) ? group.tools : []).map((tool) => `
         <tr>
-          <td><code>${htmlEscape(tool.name || "unknown")}</code></td>
-          <td>${htmlEscape(tool.actionClass || "unknown")}</td>
-          <td>${tool.requireExecTicket ? "Required" : "No"}</td>
-          <td><code title="${htmlEscape(tool.toolIdentity || "")}">${htmlEscape(String(tool.toolIdentity || "").slice(0, 24))}</code></td>
+          <td data-label="Tool"><code>${htmlEscape(tool.name || "unknown")}</code></td>
+          <td data-label="Action class">${htmlEscape(tool.actionClass || "unknown")}</td>
+          <td data-label="Exec ticket">${tool.requireExecTicket ? "Required" : "No"}</td>
+          <td data-label="Identity"><code title="${htmlEscape(tool.toolIdentity || "")}">${htmlEscape(String(tool.toolIdentity || "").slice(0, 24))}</code></td>
         </tr>
       `).join("");
       return `
         <div class="tool-context-group">
           <div class="row"><strong>${htmlEscape(heading)}</strong><span class="muted">${htmlEscape(context)}</span></div>
-          <div class="table-wrap"><table>
+          <div class="table-wrap"><table class="stack-table">
             <thead><tr><th>Tool</th><th>Action class</th><th>Exec ticket</th><th>Identity</th></tr></thead>
             <tbody>${rows}</tbody>
           </table></div>

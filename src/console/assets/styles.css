@@ -835,6 +835,15 @@ main {
   overflow-x: auto;
 }
 
+/* On a phone a .stack-table shows each row as label and value lines instead of columns cut off at the edge. */
+@media (max-width: 480px) {
+  .stack-table thead { display: none; }
+  .stack-table, .stack-table tbody, .stack-table tr, .stack-table td { display: block; width: 100%; }
+  .stack-table tr { border-bottom: 1px solid var(--border); padding: 6px 0; }
+  .stack-table td { display: flex; justify-content: space-between; gap: 12px; border: 0; padding: 2px 0; overflow-wrap: anywhere; }
+  .stack-table td::before { content: attr(data-label); color: var(--muted); flex: none; }
+}
+
 .lifecycle-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

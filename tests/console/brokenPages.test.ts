@@ -238,3 +238,13 @@ describe("Records wording", () => {
     expect(app).toContain(">Roll back to previous</button>");
   });
 });
+
+describe("Tools page on a phone", () => {
+  test("the Allowed Tools table stacks each row as labelled lines below 480 px", () => {
+    const css = readFileSync("src/console/assets/styles.css", "utf8");
+    expect(app).toContain('<table class="stack-table">');
+    for (const label of ["Tool", "Action class", "Exec ticket", "Identity"]) expect(app).toContain(`<td data-label="${label}">`);
+    expect(css).toMatch(/@media \(max-width: 480px\) \{\s*\.stack-table thead \{ display: none; \}/);
+    expect(css).toContain(".stack-table td::before { content: attr(data-label);");
+  });
+});
