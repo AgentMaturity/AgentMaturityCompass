@@ -71,7 +71,9 @@ describe("result command registry covers the built CLI", () => {
   let inventory: CliCommandInventoryEntry[];
 
   beforeAll(() => {
-    const result = child([join(projectRoot, "dist/cli.js"), "commands", "--json"], true);
+    // Hidden commands still run when named (the CLI lane hid the unsound vault zk commands from help, CLI-22), so the
+    // registry is checked against every registered command, internal ones included.
+    const result = child([join(projectRoot, "dist/cli.js"), "commands", "--json", "--include-internal"], true);
     completed(result);
     expect(result.status, `${result.stdout}\n${result.stderr}`).toBe(0);
     const document = JSON.parse(result.stdout) as { total: number; commands: CliCommandInventoryEntry[] };
@@ -123,7 +125,7 @@ describe("result command registry covers the built CLI", () => {
         if (event === "postAction") postActions++;
         return hook.call(this, event, listener);
       };
-      process.argv = [process.execPath, ${JSON.stringify(cliPath)}, "commands", "--json"];
+      process.argv = [process.execPath, ${JSON.stringify(cliPath)}, "commands", "--json", "--include-internal"];
       process.once("beforeExit", () => process.stderr.write("CLAIM_LABEL_POST_ACTION_HOOKS=" + postActions + "\\n"));
       await import(${JSON.stringify(cliUrl)});
     `;
