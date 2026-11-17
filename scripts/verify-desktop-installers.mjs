@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { assertNoAppleMetadata } from "./lib/tar-metadata.mjs";
 
@@ -17,39 +17,39 @@ function sha256(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
-function run(command, args) {
-  const result = spawnSync(command, args, {
-    cwd: root,
-    encoding: "utf8",
-    timeout: 60_000
-  });
-  if (result.status !== 0) {
-    fail(`${command} ${args.join(" ")} failed\n${result.stdout}\n${result.stderr}`);
-  }
-  return result.stdout;
-}
-
-function readArchiveEntry(archivePath, entry) {
-  const command = archivePath.endsWith(".zip") ? "unzip" : "tar";
-  const args = archivePath.endsWith(".zip")
-    ? ["-p", archivePath, entry]
-    : ["-xOzf", archivePath, entry];
-  const result = spawnSync(command, args, {
-    cwd: root,
+// GNU tar (Git Bash on Windows) reads "D:" in D:\a\... as a remote host, so tar and unzip run in the archive's own
+// folder and get its bare file name, never a path with a drive letter.
+function archiver(command, flags, archivePath, entries = []) {
+  return spawnSync(command, [...flags, basename(archivePath), ...entries], {
+    cwd: dirname(archivePath),
     encoding: null,
     timeout: 60_000,
     maxBuffer: 100 * 1024 * 1024
   });
+}
+
+function list(command, flags, archivePath) {
+  const result = archiver(command, flags, archivePath);
   if (result.status !== 0) {
-    fail(`could not read ${entry} from ${archivePath}\n${String(result.stderr ?? "")}`);
+    fail(`${command} ${flags.join(" ")} ${archivePath} failed\n${String(result.stdout ?? "")}\n${String(result.stderr ?? result.error ?? "")}`);
+  }
+  return result.stdout.toString("utf8");
+}
+
+function readArchiveEntry(archivePath, entry) {
+  const result = archivePath.endsWith(".zip")
+    ? archiver("unzip", ["-p"], archivePath, [entry])
+    : archiver("tar", ["-xOzf"], archivePath, [entry]);
+  if (result.status !== 0) {
+    fail(`could not read ${entry} from ${archivePath}\n${String(result.stderr ?? result.error ?? "")}`);
   }
   return result.stdout;
 }
 
 function assertArchiveContains(archivePath, entries) {
   const listing = archivePath.endsWith(".zip")
-    ? run("unzip", ["-Z1", archivePath])
-    : run("tar", ["-tzf", archivePath]);
+    ? list("unzip", ["-Z1"], archivePath)
+    : list("tar", ["-tzf"], archivePath);
   for (const entry of entries) {
     if (!listing.includes(entry)) {
       fail(`${archivePath} is missing ${entry}`);
@@ -90,7 +90,7 @@ if (sha256(tarballPath) !== manifest.npmTarball.sha256) {
   fail("npm tarball hash mismatch");
 }
 
-const tarballListing = run("tar", ["-tzf", tarballPath]);
+const tarballListing = list("tar", ["-tzf"], tarballPath);
 for (const entry of ["package/package.json", "package/dist/cli.js", "package/scripts/postinstall.js", "package/LICENSE"]) {
   if (!tarballListing.includes(entry)) {
     fail(`npm tarball is missing ${entry}`);

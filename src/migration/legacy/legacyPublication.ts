@@ -5,7 +5,7 @@ import { assertKeysetComplete } from "../../keys/keyset.js";
 import { captureRunHashAuthority } from "../../ledger/runHashSignature.js";
 import { withControlFileLock } from "../../lifecycle/controlFileLock.js";
 import { prepareFileSignatureWithAuditor } from "../../org/orgSigner.js";
-import { assertOrgPairsCurrent, captureOrgFiles, orgPairBytes, type OrgPairsSnapshot } from "../../org/preparedOrgPairs.js";
+import { assertOrgPairsCurrent, captureOrgFiles, observedFileMode, orgPairBytes, type OrgPairsSnapshot } from "../../org/preparedOrgPairs.js";
 import { loadTrustConfig } from "../../trust/trustConfig.js";
 import { sha256Hex } from "../../utils/hash.js";
 import { canonicalize } from "../../utils/json.js";
@@ -165,7 +165,7 @@ export function captureLegacyPublication(workspace: string, originalLog: Extract
           const index = expected.members.findIndex(row => row.path === path);
           if (index < 0) throw new Error("legacy relabel member was not originally selected");
           const old = expected.members[index]!, own = captureOrgFiles([path]).members[0]!;
-          const stat = lstatSync(path), mode = old.mode ?? (0o666 & ~mask);
+          const stat = lstatSync(path), mode = old.mode ?? observedFileMode(0o666 & ~mask);
           if (own.bytes === null || !own.bytes.equals(bytes) || own.mode !== mode || stat.nlink !== 1
             || (preserveIdentity && old.identity !== null && own.identity !== old.identity))
             throw new Error("legacy relabel member did not acknowledge exact prepared bytes, mode and identity");

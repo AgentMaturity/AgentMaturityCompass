@@ -443,15 +443,23 @@ amc doctor
 
 function createArchive(platform, packageDir) {
   const archiveBase = `amc-${pkg.version}-${platform.id}`;
+  const archivePath = join(archivesRoot, `${archiveBase}${platform.kind === "windows" ? ".zip" : ".tar.gz"}`);
+  // GNU tar (Git Bash on Windows) reads "D:" in D:\a\... as a remote host, so every archiver runs inside outRoot and
+  // gets paths relative to it, without a drive letter. Both folders sit directly under outRoot.
+  const archiveArg = relative(outRoot, archivePath).split(sep).join("/");
+  const stagingArg = relative(outRoot, stagingRoot).split(sep).join("/");
   if (platform.kind === "windows") {
-    const archivePath = join(archivesRoot, `${archiveBase}.zip`);
-    run("zip", ["-qry", archivePath, basename(packageDir)], { cwd: stagingRoot, timeoutMs: 120_000 });
+    // Git for Windows ships unzip but no zip; Windows' own bsdtar (System32\tar.exe) writes a zip for a .zip name (-a).
+    if (process.platform === "win32") {
+      run(join(process.env.SystemRoot ?? "C:\\Windows", "System32", "tar.exe"), ["-a", "-cf", archiveArg, "-C", stagingArg, basename(packageDir)], { cwd: outRoot, timeoutMs: 120_000 });
+    } else {
+      run("zip", ["-qry", relative(stagingRoot, archivePath), basename(packageDir)], { cwd: stagingRoot, timeoutMs: 120_000 });
+    }
     return archivePath;
   }
-  const archivePath = join(archivesRoot, `${archiveBase}.tar.gz`);
   // bsdtar on macOS (the release runner) adds AppleDouble ._* entries and com.apple.* xattr pax headers unless told not to.
-  run("tar", [...(process.platform === "darwin" ? ["--no-mac-metadata", "--no-xattrs"] : []), "-czf", archivePath, "-C", stagingRoot, basename(packageDir)],
-    { timeoutMs: 120_000, env: { COPYFILE_DISABLE: "1" } });
+  run("tar", [...(process.platform === "darwin" ? ["--no-mac-metadata", "--no-xattrs"] : []), "-czf", archiveArg, "-C", stagingArg, basename(packageDir)],
+    { cwd: outRoot, timeoutMs: 120_000, env: { COPYFILE_DISABLE: "1" } });
   return archivePath;
 }
 
