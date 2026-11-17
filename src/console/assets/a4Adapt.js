@@ -104,6 +104,10 @@ function renderActivation(ctx) {
       <code>PRINCIPAL_UNRESOLVED</code> before its session opens or a child starts. Tasks started before activation carry none and are denied.
       A non-regulated project therefore completes with the plan signed and not activated.</p>
     ${["plan_signed", "plan_activated", "plan_review_opened", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
+    ${ctx.project.destinationRegistry && ctx.project.destinationRegistry !== "verified" ? `<p class="status-bad">This workspace has no signed destination
+      registry that verifies, so activating this plan will hold every new session in it, for every agent, until an owner writes and signs one that matches the plan:
+      <code>amc residency profile --out .amc/residency/profile.yaml</code>, then <code>amc residency init --file &lt;registry.yaml&gt;</code>
+      (<code>amc residency status</code> says what is missing).</p>` : ""}
     <div class="row wrap">${view.actionButton(request ? "Re-open the plan review" : "Open the plan review", "open-effect", openable,
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
     ${request ? `<p class="muted">Engine request <code>${esc(request[0])}</code></p><label>Decision reason <textarea name="engine-reason" rows="2" maxlength="1000"></textarea></label>

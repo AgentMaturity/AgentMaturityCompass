@@ -7,7 +7,8 @@ import type { ExecutionStatus } from "../execution/executionContract.js";
 export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic" | "deepseek" | "gemini" | "gemini-audio" | "ollama";
 export class NativeTaskServiceError extends Error {
   readonly code: string;
-  constructor(code: string, readonly statusCode: number, message: string) {
+  /** Fixed codes a page may show beside the message (a residency refusal's reason and detail); never raw error text. */
+  constructor(code: string, readonly statusCode: number, message: string, readonly detail?: Readonly<Record<string, string>>) {
     super(message); this.name = "NativeTaskServiceError"; this.code = code.startsWith("NATIVE_") ? code : `NATIVE_${code}`;
   }
 }

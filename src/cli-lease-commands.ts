@@ -14,6 +14,8 @@ import { resolveSecretOption } from "./cli/argvSecret.js";
 
 // The workload trust commands (P2-25) are registered beside `amc identity`; re-exported here so cli.ts stays in budget.
 export { registerWorkloadTrustCommands } from "./cli-workload-trust-commands.js";
+// `amc residency` (the destination registry an active plan needs), re-exported for the same reason.
+export { registerResidencyCommands } from "./cli-residency-commands.js";
 
 export function registerLeaseCliCommands(program: Command): void {
   const leases = program.command("lease").description("Issue/verify/revoke short-lived agent leases");
