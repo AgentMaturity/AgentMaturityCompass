@@ -63,7 +63,8 @@ describe("hero card", () => {
 
 describe("progress line", () => {
   test("counts the four outcomes and names the next one in plain words", () => {
-    expect(progressLineText(null)).toBe("Your progress: 0 of 4. Next: run one task.");
+    expect(progressLineText(null)).toBe("Your progress: 0 of 4. Next: run one task with a real model or your connected agent (the stand-in model does not count).");
+    expect(progressLineText({ agentId: "default", progress: { completed: 0, total: 4 }, milestones: [] })).toMatch(/^Your progress for agent default: 0 of 4\./);
     const rows = (statuses: string[]) => ["connected_agent", "observed_action", "control_decision", "signed_proof"]
       .map((id, index) => ({ id, status: statuses[index] }));
     expect(progressLineText({ progress: { completed: 2, total: 4 }, milestones: rows(["COMPLETE", "COMPLETE", "WAITING", "WAITING"]) }))
