@@ -15,8 +15,7 @@ import { listAgents } from "../fleet/registry.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import { onboardingRunForApi, onboardingStatusForApi } from "./onboardingApi.js";
 import { runDiagnostic, generateReport, loadRunReport } from "../diagnostic/runner.js";
-import { latestRunFile } from "../diagnostic/runReportResolution.js";
-import { summarizeDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
+import { agentLastStatus } from "./agentLastStatus.js";
 import { autoAnswerFromLatestRun, runAutoAnswer } from "../diagnostic/autoAnswer/autoAnswerEngine.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import {
@@ -918,19 +917,6 @@ function resolveWebhookSecret(workspace: string, kind: "feedback" | "outcomes"):
   return null;
 }
 
-interface AgentLatestRunSummary {
-  runId: string;
-  ts: number;
-  integrityIndex: number;
-  trustLabel: string;
-  status: string;
-}
-
-interface AgentStatusResponse {
-  agentId: string;
-  latestRun: (AgentLatestRunSummary & ReturnType<typeof summarizeDiagnosticEvidenceReadiness>) | null;
-}
-
 interface OutcomeHistoryRow {
   reportId: string;
   ts: number;
@@ -998,26 +984,6 @@ function parseComplianceFramework(raw: string | null): ComplianceFramework | nul
   const match = frameworkChoices().find((item) => item === normalized);
   return (match ?? null) as ComplianceFramework | null;
 }
-
-function agentLastStatus(workspace: string, agentId: string): AgentStatusResponse {
-  const latest = latestRunFile(workspace, agentId);
-  if (!latest) {
-    return { agentId, latestRun: null };
-  }
-  const last = JSON.parse(readUtf8(latest)) as Record<string, unknown>;
-  return {
-    agentId,
-    latestRun: {
-      runId: String(last.runId ?? ""),
-      ts: Number(last.ts ?? 0),
-      integrityIndex: Number(last.integrityIndex ?? 0),
-      trustLabel: String(last.trustLabel ?? "UNKNOWN"),
-      status: String(last.status ?? "INVALID"),
-      ...summarizeDiagnosticEvidenceReadiness(last as Parameters<typeof summarizeDiagnosticEvidenceReadiness>[0])
-    }
-  };
-}
-
 
 function currentSigningAuthority(req: IncomingMessage, res: ServerResponse, workspace: string, token: string,
   initial: NonNullable<ReturnType<typeof authenticate>>, requested: UserRole[]) {

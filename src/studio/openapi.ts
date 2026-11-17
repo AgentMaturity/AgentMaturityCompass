@@ -834,6 +834,7 @@ function studioSchemas(): Record<string, unknown> {
             integrityIndex: { type: "number" },
             trustLabel: { type: "string" },
             status: { type: "string", enum: ["VALID", "INVALID", "UNSIGNED"], description: "Artifact status, not evidence sufficiency." },
+            sealVerified: { type: "boolean", description: "Whether the run file's seal verifies under this workspace's keys." },
             evidenceStatus: { type: "string", enum: ["READY", "LIMITED", "INSUFFICIENT_EVIDENCE", "UNVERIFIED"] },
             claimEligible: { type: "boolean" },
           },

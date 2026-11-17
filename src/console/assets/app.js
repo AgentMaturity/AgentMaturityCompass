@@ -1196,11 +1196,14 @@ async function verifyTransparencyClientSide(raw) {
 /**
  * The status strip's one plain line (the nine Unified Clarity fields sit under its Details). The first problem found,
  * with one link to where it is explained; otherwise the workspace, whether a result exists, and that records check out.
+ * `latestSealVerified` is Studio's seal check of the newest run (null when there is none): a run whose seal fails is a
+ * problem, never "Records check out".
  */
-function plainStatusLine({ readOnly, notaryBroken, transparencyOk, hasResult }) {
+function plainStatusLine({ readOnly, notaryBroken, transparencyOk, hasResult, latestSealVerified = null }) {
   const problem = readOnly ? ["AMC settings are not signed, so AMC is read-only.", "./trust", "Why and how to fix it"]
     : notaryBroken ? ["the separate signing service is not answering.", "./trust", "Check signing"]
-      : !transparencyOk ? ["AMC's log of signed records does not check out.", "./transparency", "See what changed"] : null;
+      : !transparencyOk ? ["AMC's log of signed records does not check out.", "./transparency", "See what changed"]
+        : latestSealVerified === false ? ["the newest result does not pass its seal check: its record was changed after it was signed, or it was never signed. Do not rely on it; run a new check with amc run.", "./score", "See the result"] : null;
   if (problem) {
     return `<p class="uc-line status-bad"><strong>Needs attention:</strong> ${htmlEscape(problem[0])} <a href="${problem[1]}">${htmlEscape(problem[2])}</a></p>`;
   }
@@ -1244,7 +1247,8 @@ async function refreshUnifiedBanner() {
     // A freeze is a safety state like the kill switch: it stays in sight, outside Details.
     const freezeLine = freezes > 0 ? `<div class="danger"><strong>Freeze active:</strong> ${freezes} ${freezes === 1 ? "pause is" : "pauses are"} stopping some agent actions until a person lifts ${freezes === 1 ? "it" : "them"}.</div>` : "";
     bannerEl.innerHTML = `${killLine}${freezeLine}
-      ${plainStatusLine({ readOnly: status.readOnlyMode, notaryBroken: trustMode === "NOTARY" && !trustOk, transparencyOk: transparency.ok, hasResult: evidenceStatus !== "NO RUN" })}
+      ${plainStatusLine({ readOnly: status.readOnlyMode, notaryBroken: trustMode === "NOTARY" && !trustOk, transparencyOk: transparency.ok, hasResult: evidenceStatus !== "NO RUN",
+        latestSealVerified: agentStatus?.latestRun ? agentStatus.latestRun.sealVerified === true : null })}
       <details class="uc-details">
       <summary>Details</summary>
       <strong>Unified Clarity</strong>

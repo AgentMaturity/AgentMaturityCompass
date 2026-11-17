@@ -4,6 +4,7 @@
  * hero card with one primary action, one progress line, and everything else under "More".
  */
 import { readdirSync, readFileSync } from "node:fs";
+import vm from "node:vm";
 import { describe, expect, test } from "vitest";
 import { activationHelpHtml, installWelcomeGuide, progressLineText } from "../../src/console/assets/welcomeGuide.js";
 import { initShell, topbarHtml } from "../../src/console/assets/shell.js";
@@ -92,6 +93,23 @@ describe("status strip and session line", () => {
     expect(plain).toContain('"No results yet"');
     expect(plain).toContain("Records check out");
     expect(plain).toContain("<strong>Needs attention:</strong>");
+  });
+
+  test("a newest run whose seal fails is named as a problem, never \"Records check out\"", () => {
+    const context = vm.createContext({ htmlEscape: (text: string) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;"),
+      currentWorkspaceLabel: () => "local" });
+    vm.runInContext(fnBody("function plainStatusLine(") + "\n}", context);
+    const line = context.plainStatusLine as (state: Record<string, unknown>) => string;
+    const healthy = { readOnly: false, notaryBroken: false, transparencyOk: true, hasResult: true };
+    const broken = line({ ...healthy, latestSealVerified: false });
+    expect(broken).toContain("<strong>Needs attention:</strong>");
+    expect(broken).toContain("does not pass its seal check");
+    expect(broken).not.toContain("Records check out");
+    expect(broken).not.toContain("Results ready");
+    expect(line({ ...healthy, latestSealVerified: true })).toContain("Results ready · Records check out");
+    expect(line({ ...healthy, hasResult: false, latestSealVerified: null })).toContain("No results yet · Records check out");
+    const banner = fnBody("async function refreshUnifiedBanner()");
+    expect(banner).toContain("latestSealVerified: agentStatus?.latestRun ? agentStatus.latestRun.sealVerified === true : null");
   });
 
   test("one wording: Signed in as <name>, with (view only) for a viewer", () => {

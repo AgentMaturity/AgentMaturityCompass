@@ -7,6 +7,7 @@ import { generateReport, runDiagnostic } from "../src/diagnostic/runner.js";
 import { latestRunId, latestRunSummary, resolveRunReport } from "../src/diagnostic/runReportResolution.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { lockVault } from "../src/vault/vault.js";
+import { agentLastStatus } from "../src/studio/agentLastStatus.js";
 
 describe("run reports read back for display", () => {
   let workspace: string;
@@ -31,6 +32,8 @@ describe("run reports read back for display", () => {
     const run = await runDiagnostic({ workspace, window: "14d", targetName: "default", claimMode: "auto" });
     const intact = resolveRunReport(workspace, run.runId);
     expect(intact.sealVerified).toBe(true);
+    // The console's status line reads Studio's seal check of the newest run from this summary.
+    expect(agentLastStatus(workspace, "default").latestRun?.sealVerified).toBe(true);
     expect(intact.report.status).toBe("VALID");
 
     const file = join(getAgentPaths(workspace, "default").runsDir, `${run.runId}.json`);
@@ -39,6 +42,7 @@ describe("run reports read back for display", () => {
 
     const tampered = resolveRunReport(workspace, run.runId);
     expect(tampered.sealVerified).toBe(false);
+    expect(agentLastStatus(workspace, "default").latestRun).toMatchObject({ runId: run.runId, sealVerified: false });
     expect(tampered.report.status).toBe("INVALID");
     expect(tampered.report.verificationPassed).toBe(false);
     const markdown = generateReport(tampered.report, "md") as string;
