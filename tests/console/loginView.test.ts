@@ -116,7 +116,14 @@ describe("loginFailureText", () => {
     expect(text).not.toContain("Sign-in failed");
   });
 
-  test.each(["users config signature invalid; login blocked", "invalid credentials", "pairing required before login"])("other errors stay verbatim: %s", (message) => {
+  test("a wrong user name or password says so in plain words, with how to get a new password", () => {
+    const text = loginFailureText("invalid credentials");
+    expect(text).toContain("the user name or password is wrong");
+    expect(text).toContain("amc user password <your user name>");
+    expect(text).not.toContain("invalid credentials");
+  });
+
+  test.each(["users config signature invalid; login blocked", "pairing required before login"])("other errors stay verbatim: %s", (message) => {
     expect(loginFailureText(message)).toBe(`Sign-in failed: ${message}`);
   });
 });

@@ -29,7 +29,7 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
     <div class="card auth-card">
       <div class="studio-kicker">Agent Maturity Compass</div>
       <h2>Sign in to Compass Console</h2>
-      <p class="auth-lead">AMC checks how far you can trust an AI agent, using recorded proof of what it did instead of promises.</p>
+      <p class="auth-lead">AMC checks how far you can trust an AI agent, using signed records of what it did instead of promises.</p>
       ${demoMode ? DEMO_BANNER : ""}
       <form id="loginForm" method="post">
         <label for="loginUser">Username</label>
@@ -71,9 +71,14 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
   `;
 }
 
-/** The status line after a failed sign-in: Studio's "no users.yaml" reply becomes the next step; any other error is shown as is. */
+const WRONG_PASSWORD = "Sign-in failed: the user name or password is wrong. Check both and try again. If you forgot the password, the "
+  + "workspace owner can set a new one in a terminal in the workspace folder with amc user password <your user name>.";
+
+/** The status line after a failed sign-in: Studio's "no users.yaml" and wrong-password replies become plain next steps; any other error is shown as is. */
 export function loginFailureText(message) {
-  return String(message).includes("users config missing") ? NO_ACCOUNT : `Sign-in failed: ${message}`;
+  if (String(message).includes("users config missing")) return NO_ACCOUNT;
+  if (String(message) === "invalid credentials") return WRONG_PASSWORD;
+  return `Sign-in failed: ${message}`;
 }
 
 /** The page to open after sign-in (M9): a console page name with an optional query, so `./<next>` cannot leave the console. */
