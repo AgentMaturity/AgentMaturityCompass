@@ -112,6 +112,26 @@ describe("status strip and session line", () => {
     expect(banner).toContain("latestSealVerified: agentStatus?.latestRun ? agentStatus.latestRun.sealVerified === true : null");
   });
 
+  test("a run whose seal fails never shows the file's own trust label, integrity or claim state", () => {
+    const context = vm.createContext({ htmlEscape: (text: string) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;"),
+      formatTime: String, shortId: String });
+    const src = app.slice(app.indexOf("const UNTRUSTED_SEAL_LABEL"), app.indexOf("// Studio has no work-order read route"));
+    vm.runInContext(src.replace("const UNTRUSTED_SEAL_LABEL", "var UNTRUSTED_SEAL_LABEL"), context);
+    const tampered = { runId: "r1", status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
+    const summary = (context.runStateSummary as (a: string, r: unknown) => string)("a", tampered);
+    expect(summary).toContain("UNTRUSTED (seal check fails)");
+    expect(summary).not.toContain("HIGH TRUST");
+    expect(summary).toContain("status <strong>INVALID</strong>");
+    expect(summary).not.toContain("ELIGIBLE");
+    expect((context.runStateWarning as (r: unknown) => string)(tampered)).toContain("does not pass its seal check");
+    expect((context.runStateWarning as (r: unknown) => string)({ ...tampered, sealVerified: true })).toBe("");
+    const banner = fnBody("async function refreshUnifiedBanner()");
+    const guard = banner.slice(banner.indexOf("if (runSealFails(agentStatus.latestRun))"));
+    expect(guard.slice(0, guard.indexOf("}"))).toMatch(/trustLabel = UNTRUSTED_SEAL_LABEL;\s+integrity = null;\s+claimEligible = false;/);
+    expect(banner.indexOf("if (runSealFails(agentStatus.latestRun))")).toBeGreaterThan(banner.indexOf("trustLabel = String(report.trustLabel"));
+    expect(banner.indexOf("if (runSealFails(agentStatus.latestRun))")).toBeLessThan(banner.indexOf("<summary>Details</summary>"));
+  });
+
   test("one wording: Signed in as <name>, with (view only) for a viewer", () => {
     expect(app).not.toContain("Logged in as");
     expect(app).toContain('setStatus(`Signed in as ${me.username}${viewOnly ? " (view only)" : ""}`);');

@@ -53,7 +53,7 @@ describe("Login while signed in", () => {
 describe("one run state across Agent, Drift and Work Orders", () => {
   const context = vm.createContext({ htmlEscape: escape });
   vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"),
-    bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)")].join("\n"), context);
+    bodyOf(app, "const UNTRUSTED_SEAL_LABEL"), bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)")].join("\n"), context);
   const summary = context.runStateSummary as (agentId: string, run: unknown) => string;
   const warning = context.runStateWarning as (run: unknown) => string;
 

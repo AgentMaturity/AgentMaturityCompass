@@ -1235,6 +1235,12 @@ async function refreshUnifiedBanner() {
         evidenceStatus = String(report.evidenceReadiness?.status || "UNVERIFIED");
         claimEligible = report.evidenceReadiness?.claimEligible === true;
       }
+      // The report route keeps a failing file's own trust label and integrity; never show those as if they held.
+      if (runSealFails(agentStatus.latestRun)) {
+        trustLabel = UNTRUSTED_SEAL_LABEL;
+        integrity = null;
+        claimEligible = false;
+      }
     }
     const freezes = Array.isArray(status?.studio?.activeFreezes) ? status.studio.activeFreezes.length : 0;
     // P2-26: an active kill switch heads the banner; an unreadable status says so rather than showing nothing.
@@ -1604,11 +1610,11 @@ async function renderAgent() {
     ${card(`Agent ${agentId}`, `<p>${runStateSummary(agentId, row.latestRun)}</p>${runStateWarning(row.latestRun)}` + (report
       ? `
       <p>Overall: <strong>${((report.layerScores || []).reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, (report.layerScores || []).length)).toFixed(3)}</strong></p>
-      <p>IntegrityIndex: <strong>${Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(String(report.trustLabel ?? ""))})</p>
+      <p>IntegrityIndex: <strong>${runSealFails(row.latestRun) ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(runSealFails(row.latestRun) ? UNTRUSTED_SEAL_LABEL : String(report.trustLabel ?? ""))})</p>
       <p>Evidence Coverage: ${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%</p>
       <p>Artifact Status: <strong>${htmlEscape(String(report.status || "UNKNOWN"))}</strong></p>
       <p>Evidence Readiness: <strong>${htmlEscape(String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
-      <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true ? "ELIGIBLE" : "BLOCKED"}</strong></p>
+      <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !runSealFails(row.latestRun) ? "ELIGIBLE" : "BLOCKED"}</strong></p>
       <p class="muted">${htmlEscape(String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
       <canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>
       `
@@ -3782,20 +3788,31 @@ async function renderGeneric(title, endpoint) {
  * One plain sentence for an agent's latest run (from /agents/:id/status), shared by Agent, Drift and Work Orders so the
  * three pages say the same thing for the same state. Inline HTML: callers wrap it in a <p> or pass it to jsonDetails.
  */
+const UNTRUSTED_SEAL_LABEL = "UNTRUSTED (seal check fails)";
+
+/** Studio's own seal check of the run file failed: its trust label, integrity and status are only what the file says. */
+function runSealFails(latestRun) {
+  return Boolean(latestRun) && latestRun.sealVerified === false;
+}
+
 function runStateSummary(agentId, latestRun) {
   if (!latestRun) {
     return `No run yet for agent <strong>${htmlEscape(agentId)}</strong>. Run <code>amc run</code> in a terminal to create one.`;
   }
   const when = latestRun.ts ? ` (${htmlEscape(formatTime(latestRun.ts))})` : "";
   return `Latest run for agent <strong>${htmlEscape(agentId)}</strong>: <code>${htmlEscape(shortId(latestRun.runId))}</code>${when}, `
-    + `status <strong>${htmlEscape(String(latestRun.status || "UNKNOWN"))}</strong>, trust label <strong>${htmlEscape(String(latestRun.trustLabel || "UNKNOWN"))}</strong>, `
-    + `claims <strong>${latestRun.claimEligible === true ? "ELIGIBLE" : "BLOCKED"}</strong>.`;
+    + `status <strong>${htmlEscape(runSealFails(latestRun) ? "INVALID" : String(latestRun.status || "UNKNOWN"))}</strong>, `
+    + `trust label <strong>${htmlEscape(runSealFails(latestRun) ? UNTRUSTED_SEAL_LABEL : String(latestRun.trustLabel || "UNKNOWN"))}</strong>, `
+    + `claims <strong>${latestRun.claimEligible === true && !runSealFails(latestRun) ? "ELIGIBLE" : "BLOCKED"}</strong>.`;
 }
 
 /** The plain warning for a run that cannot back a claim (status not VALID, or a trust label that says so); "" otherwise. */
 function runStateWarning(latestRun) {
   if (!latestRun) {
     return "";
+  }
+  if (runSealFails(latestRun)) {
+    return `<p class="status-bad">Do not rely on this run: it does not pass its seal check (its record was changed after it was signed, or it was never signed). Nothing on this page can back a claim until a new valid run exists.</p>`;
   }
   const status = String(latestRun.status || "UNKNOWN");
   const label = String(latestRun.trustLabel || "");
