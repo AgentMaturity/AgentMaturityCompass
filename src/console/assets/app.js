@@ -1606,24 +1606,27 @@ async function renderAgent() {
   if (row.latestRun?.runId) {
     report = await apiGet(`/runs/${encodeURIComponent(row.latestRun.runId)}/report`);
   }
+  // A run whose seal fails shows nothing taken from its file: no score, coverage, readiness, chart or pass state.
+  const sealFails = runSealFails(row.latestRun);
+  const layers = report?.layerScores || [];
   root.innerHTML = `
     ${card(`Agent ${agentId}`, `<p>${runStateSummary(agentId, row.latestRun)}</p>${runStateWarning(row.latestRun)}` + (report
       ? `
-      <p>Overall: <strong>${((report.layerScores || []).reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, (report.layerScores || []).length)).toFixed(3)}</strong></p>
-      <p>IntegrityIndex: <strong>${runSealFails(row.latestRun) ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(runSealFails(row.latestRun) ? UNTRUSTED_SEAL_LABEL : String(report.trustLabel ?? ""))})</p>
-      <p>Evidence Coverage: ${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%</p>
-      <p>Artifact Status: <strong>${htmlEscape(runSealFails(row.latestRun) ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
-      <p>Evidence Readiness: <strong>${htmlEscape(String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
-      <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !runSealFails(row.latestRun) ? "ELIGIBLE" : "BLOCKED"}</strong></p>
-      <p class="muted">${htmlEscape(runSealFails(row.latestRun) ? "This run's record does not pass its seal check, so none of these numbers can back a claim."
+      <p>Overall: <strong>${sealFails ? "N/A" : (layers.reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, layers.length)).toFixed(3)}</strong></p>
+      <p>IntegrityIndex: <strong>${sealFails ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(sealFails ? UNTRUSTED_SEAL_LABEL : String(report.trustLabel ?? ""))})</p>
+      <p>Evidence Coverage: ${sealFails ? "N/A" : `${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%`}</p>
+      <p>Artifact Status: <strong>${htmlEscape(sealFails ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
+      <p>Evidence Readiness: <strong>${htmlEscape(sealFails ? "UNVERIFIED" : String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
+      <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !sealFails ? "ELIGIBLE" : "BLOCKED"}</strong></p>
+      <p class="muted">${htmlEscape(sealFails ? "This run's record does not pass its seal check, so none of these numbers can back a claim."
         : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
-      <canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>
+      ${sealFails ? "" : `<canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>`}
       `
       : ""
     ))}
   `;
-  if (report) {
-    renderBars(document.getElementById("layerBars"), (report.layerScores || []).map((rowItem) => rowItem.avgFinalLevel), "#4AEF79");
+  if (report && !sealFails) {
+    renderBars(document.getElementById("layerBars"), layers.map((rowItem) => rowItem.avgFinalLevel), "#4AEF79");
   }
 }
 

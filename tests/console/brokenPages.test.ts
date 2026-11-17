@@ -70,16 +70,20 @@ describe("one run state across Agent, Drift and Work Orders", () => {
 
   test("Agent shows neither the file's own status nor its seal sentence when Studio's seal check fails", async () => {
     const root = { innerHTML: "" };
-    const report = { status: "VALID", integrityIndex: 0.99, trustLabel: "HIGH TRUST", layerScores: [],
-      evidenceReadiness: { status: "INSUFFICIENT_EVIDENCE", claimEligible: true, claimBoundary: "The artifact seal is valid, but no accepted evidence supports the score." } };
+    let bars = 0;
+    const report = { status: "VALID", integrityIndex: 0.99, trustLabel: "HIGH TRUST", evidenceCoverage: 0.9,
+      layerScores: [{ avgFinalLevel: 3.25 }, { avgFinalLevel: 2.75 }],
+      evidenceReadiness: { status: "READY", claimEligible: true, claimBoundary: "The artifact seal is valid, but no accepted evidence supports the score." } };
     const latestRun = { runId: "run-1", ts: 0, status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
     const agent = vm.createContext({ htmlEscape: escape, root, currentAgent: () => "default", card: (t: string, b: string) => `<h3>${t}</h3>${b}`,
-      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => {}, document: { getElementById: () => null } });
+      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => { bars += 1; }, document: { getElementById: () => null } });
     vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"), bodyOf(app, "const UNTRUSTED_SEAL_LABEL"),
       bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)"), bodyOf(app, "async function renderAgent()")].join("\n"), agent);
     await (agent.renderAgent as () => Promise<void>)();
     expect(root.innerHTML).toContain("Artifact Status: <strong>INVALID</strong>");
-    expect(root.innerHTML).not.toMatch(/seal is valid|HIGH TRUST|0\.990|ELIGIBLE/);
+    expect(root.innerHTML).not.toMatch(/seal is valid|HIGH TRUST|0\.990|ELIGIBLE|READY|90\.0%|3\.000|layerBars/);
+    expect(root.innerHTML).toContain("Evidence Readiness: <strong>UNVERIFIED</strong>");
+    expect(bars).toBe(0);
   });
 
   test("all three pages use the shared sentence, and none dumps raw JSON as its body", () => {
