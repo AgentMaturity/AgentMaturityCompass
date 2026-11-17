@@ -221,6 +221,14 @@ For high-risk tasks, AMC enforces a structured response format:
 
 Missing truth protocol sections trigger `TRUTH_PROTOCOL_MISSING` audit events and cap honesty scores.
 
+## Dependency Audit Exceptions
+
+`npm run audit:runtime` (`pnpm audit --prod --audit-level moderate`) runs in the release gate and in the nightly matrix. An advisory is excepted only when no patched version exists and the vulnerable code cannot be reached with untrusted input. Each exception is listed in `pnpm.auditConfig.ignoreGhsas` in `package.json` and here, with the condition that removes it.
+
+| Advisory | Package | Why it is excepted | Remove when |
+|---|---|---|---|
+| GHSA-fc5q-39xc-vjpf | `picomatch` <= 4.0.7 (ReDoS on crafted extglob patterns), inlined into the kernel bundle through the vendored hot-reload plugin | No patched version existed on 2026-11-18. The plugin compiles only its `ignored` patterns, and AMC always passes the fixed list in `packages/amc-core/src/boot.ts` (`**/node_modules`, `**/.*`, `cache`, `data`), none of which is an extglob; no AMC command, config file or route sets those patterns. | `picomatch` publishes a patched version: upgrade, then delete the entry from `ignoreGhsas` and this row. Also re-check if any caller starts passing `watch.ignored`. |
+
 ## Design Principles
 
 1. **Tamper-evident**: The evaluated agent cannot write evidence, alter results, or self-certify
