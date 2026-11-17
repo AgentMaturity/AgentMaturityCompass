@@ -2972,8 +2972,8 @@ async function renderRuntimeRuns() {
     <div class="grid two">
       ${card("Record a run by hand (advanced)", `
         <div class="row wrap">
-          <input id="runtimeRunId" placeholder="run id" value="${htmlEscape(latest?.runId || `studio-${Date.now()}`)}" />
-          <input id="runtimeStage" placeholder="stage" value="${htmlEscape(latest?.currentStage || "gateway.connected")}" />
+          <label>Run name <input id="runtimeRunId" placeholder="run id" value="${htmlEscape(latest?.runId || `studio-${Date.now()}`)}" /></label>
+          <label>Stage <input id="runtimeStage" placeholder="stage" value="${htmlEscape(latest?.currentStage || "gateway.connected")}" /></label>
           <button id="runtimeCreateBtn" data-roles="OWNER,OPERATOR">Create</button>
         </div>
         <div class="row wrap">
