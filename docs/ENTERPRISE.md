@@ -23,7 +23,7 @@ Everything else:
 
 ## Industry Packs are free
 
-All 41 domain-specific packs are free for everyone in the current source build (unreleased; the next release is 2.0.0), with no licence, account or payment; they are not an Enterprise feature. The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live. They span seven stations: Health, Wealth, Education, Mobility, Technology, Environment and Governance ([DOMAIN_PACKS.md](DOMAIN_PACKS.md) gives the counts per station; `amc domain pack list` lists every pack). Each is a self-reported questionnaire whose content is experimental, never a certification or a compliance verdict.
+All 41 domain-specific packs are free for everyone in the current source build (unreleased; the source reports version 1.2.0), with no licence, account or payment; they are not an Enterprise feature. The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live. They span seven stations: Health, Wealth, Education, Mobility, Technology, Environment and Governance ([DOMAIN_PACKS.md](DOMAIN_PACKS.md) gives the counts per station; `amc domain pack list` lists every pack). Each is a self-reported questionnaire whose content is experimental, never a certification or a compliance verdict.
 
 ## Deployment options
 

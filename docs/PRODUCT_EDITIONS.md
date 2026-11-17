@@ -7,7 +7,7 @@ AMC has one product, and it is free:
 - **Free / Open Source**: the entire trust stack and all 41 Industry Packs (sector-specific, self-reported domain questionnaires whose content is experimental), MIT licensed
 - **Enterprise (contact-first, planned)**: priority support, custom pack development and deployment assistance; not a self-serve product
 
-Industry Packs are free in the current source build (unreleased; the next release is 2.0.0): no licence, account or payment ([ADR 019](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/019-industry-packs-free.md), decided on 2026-11-07). The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live. Access never changes a score, gap, report or other result: the same inputs give the same result for everyone.
+Industry Packs are free in the current source build (unreleased; the source reports version 1.2.0): no licence, account or payment ([ADR 019](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/019-industry-packs-free.md), decided on 2026-11-07). The published 1.1.1 release still asks for a licence before pack questions and runs, and its checkout never went live. Access never changes a score, gap, report or other result: the same inputs give the same result for everyone.
 
 ## Full edition matrix
 

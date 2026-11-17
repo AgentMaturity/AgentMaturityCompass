@@ -1,6 +1,6 @@
 # Quickstart — choose your first task
 
-> **Install from source to follow this page.** The native task workflow (`amc agent-loop`), `amc init --coding` and the TypeScript SDK path need the current source build, which is unreleased (the next release is 2.0.0). The published npm package and GitHub release, which the hosted installers install, are 1.1.1 and do not contain them; 1.1.1 has most of the evidence-score steps ([2](QUICKSTART.md#2-run-amc-in-your-agent-project) to 5) in an older form; `amc connect hooks` (step 3) is new in the source build.
+> **Install from source to follow this page.** The native task workflow (`amc agent-loop`), `amc init --coding` and the TypeScript SDK path need the current source build, which is unreleased (the source reports version 1.2.0). The published npm package and GitHub release, which the hosted installers install, are 1.1.1 and do not contain them; 1.1.1 has most of the evidence-score steps ([2](QUICKSTART.md#2-run-amc-in-your-agent-project) to 5) in an older form; `amc connect hooks` (step 3) is new in the source build.
 
 Run a bounded native task, assess your existing evidence, or connect an agent you already use. Each path has a different result; a recording demonstration and an evidence baseline do not establish a completed real-model task.
 
