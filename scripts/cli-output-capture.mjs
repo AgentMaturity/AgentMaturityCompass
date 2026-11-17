@@ -11,15 +11,19 @@
  * the arguments, the exit code, stdout and stderr. compare exits 1 and names each file that differs.
  */
 import { spawn, spawnSync } from "node:child_process";
-import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const SCRATCH = join(tmpdir(), "amc-cli-output-capture");
+// Each listing and each capture gets its own fresh, private folder (mkdtemp) and removes it when done, so two
+// captures at once never share or delete each other's folders.
+const newBase = () => mkdtempSync(join(tmpdir(), "amc-cli-output-capture-"));
+/** The folder name is random, so output that names a scratch folder is compared with "<scratch>" in its place. */
+const neutral = (text, base) => [realpathSync(base), base].reduce((out, name) => out.split(name).join("<scratch>"), text);
 
-function scratch(index) {
-  const root = join(SCRATCH, String(index));
+function scratch(base, index) {
+  const root = join(base, String(index));
   rmSync(root, { recursive: true, force: true });
   mkdirSync(join(root, "ws"), { recursive: true });
   mkdirSync(join(root, "home"), { recursive: true });
@@ -27,8 +31,8 @@ function scratch(index) {
 }
 
 /** One run. stdin "closed" starts the process with file descriptor 0 not open. */
-function runOnce(entry, args, index, stdin = "empty") {
-  const { cwd, env } = scratch(index);
+function runOnce(base, entry, args, index, stdin = "empty") {
+  const { cwd, env } = scratch(base, index);
   return new Promise((done) => {
     const command = stdin === "closed" ? "/bin/sh" : process.execPath;
     const argv = stdin === "closed" ? ["-c", 'exec "$@" <&-', "sh", process.execPath, entry, ...args] : [entry, ...args];
@@ -37,15 +41,17 @@ function runOnce(entry, args, index, stdin = "empty") {
     child.stdout.on("data", (chunk) => out.push(chunk));
     child.stderr.on("data", (chunk) => err.push(chunk));
     child.on("close", (code, signal) => {
-      rmSync(join(SCRATCH, String(index)), { recursive: true, force: true });
-      done(`args: ${JSON.stringify(args)} stdin: ${stdin}\nexit: ${code ?? signal}\n--- stdout\n${Buffer.concat(out)}\n--- stderr\n${Buffer.concat(err)}`);
+      rmSync(join(base, String(index)), { recursive: true, force: true });
+      done(`args: ${JSON.stringify(args)} stdin: ${stdin}\nexit: ${code ?? signal}\n--- stdout\n${neutral(String(Buffer.concat(out)), base)}\n--- stderr\n${neutral(String(Buffer.concat(err)), base)}`);
     });
   });
 }
 
 export function commandPaths(entry) {
-  const { cwd, env } = scratch("list");
+  const base = newBase();
+  const { cwd, env } = scratch(base, "list");
   const listed = spawnSync(process.execPath, [entry, "commands", "--json", "--include-internal"], { cwd, env, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  rmSync(base, { recursive: true, force: true });
   if (listed.status !== 0) throw new Error(`amc commands failed: ${listed.stderr}`);
   return JSON.parse(listed.stdout).commands.map((command) => command.path ?? command.command).filter(Boolean);
 }
@@ -59,12 +65,13 @@ export function cases(paths, sample = 1) {
 export async function captureAll(entry, list, parallel = 6) {
   const results = new Array(list.length);
   let next = 0;
+  const base = newBase();
   await Promise.all(Array.from({ length: parallel }, async () => {
     while (next < list.length) {
       const index = next++;
-      results[index] = await runOnce(entry, list[index][0], index, list[index][1]);
+      results[index] = await runOnce(base, entry, list[index][0], index, list[index][1]);
     }
-  }));
+  })).finally(() => rmSync(base, { recursive: true, force: true }));
   return results;
 }
 
