@@ -82,7 +82,9 @@ const programName = (binary: unknown) => {
   return /^[A-Za-z0-9._+-]{1,40}$/.test(name) ? name : "a program";
 };
 /** Where a system program lives; a program named by a path elsewhere (`./cat`, `/tmp/cat`) is the workspace's own, not cat. */
-const SYSTEM_DIRS = new Set(["/bin", "/usr/bin", "/sbin", "/usr/sbin", "/usr/local/bin", "/opt/homebrew/bin"]);
+// The last entry is where Ubuntu (25.10 and later) keeps its Rust coreutils: /usr/bin/cat is a link into it, and a
+// provider adapter names a program by where it really opens.
+const SYSTEM_DIRS = new Set(["/bin", "/usr/bin", "/sbin", "/usr/sbin", "/usr/local/bin", "/opt/homebrew/bin", "/usr/lib/cargo/bin/coreutils"]);
 /** Whether every argument is a plain word or path, `-`, `--`, or an option the spec lists; after `--` everything is a word. */
 function argumentsRecognised(spec: { short: string; long?: readonly string[] }, argv: readonly unknown[]): boolean {
   let words = false;
