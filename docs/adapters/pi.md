@@ -132,7 +132,7 @@ Built-in tool inputs used by the mapping (identical in 1.0.2 and 1.0.4): `bash {
 
 ## Qualification
 
-`tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-11-16-watch/pi-conformance.json` (1.5.2 run on 2026-11-16; the 1.0.2 and 1.0.4 entries are copied from `qualification/2026-10-18-P1-22/`, the run after the evidence-latch follow-up; the first run is `qualification/2026-10-12-P1-22/`), hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
+`tests/conformance/piToolCall.conformance.test.ts` (`AMC_PI_CONFORMANCE=1`) runs each pinned `pi` CLI against a local scripted model endpoint (an OpenAI-compatible stream on loopback; no live model). The record is `qualification/2026-11-16-P1-23-watch/pi-conformance.json` (1.5.2 run on 2026-11-16; the 1.0.2 and 1.0.4 entries are copied from `qualification/2026-10-18-P1-22/`, the run after the evidence-latch follow-up; the first run is `qualification/2026-10-12-P1-22/`), hashed by that folder's `receipt.json`. The matrix below is generated from it by `npm run gen:pi-conformance-matrix`.
 
 <!-- pi-conformance-matrix:start -->
 Run 2026-11-16 on local macOS arm64 (not CI), AMC commit `22b9ce7a2e7e`.

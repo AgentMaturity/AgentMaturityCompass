@@ -59,7 +59,7 @@ describe("fresh persona environments", () => {
         expect(home).toBe(workflows.get(options.cwd));
         expect(command).toBe(join(options.cwd, "node_modules", ".bin", "amc"));
       }
-      const payload = args[0] === "--agent"
+      const payload = args[0] === "--yes"
         ? { ok: true, questionCount: 244, firstResultSla: { targetMs: 120000, elapsedMs: 100, met: true }, elapsedMs: 100 }
         : args[0] === "domain" ? { packs: Array.from({ length: 40 }, (_, i) => ({ packId: String(i) })) } : {};
       return { command: [command, ...args].join(" "), status: "passed", exitCode: 0, stdout: JSON.stringify(payload), stderr: "", startedAt: "fixture", endedAt: "fixture" };

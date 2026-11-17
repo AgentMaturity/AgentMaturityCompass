@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-23",
+  "date": "2026-11-16",
+  "commit": "22b9ce7a2e7e87d72d7ca16a9a337c3833adf0e1",
+  "branch": "rtd/l-watch-1115",
+  "node": "22 (major only; claude-code-conformance.json records Node 22)",
+  "pnpm": "not recorded",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "AMC_CLAUDE_CODE_CONFORMANCE=1 AMC_CLAUDE_CODE_VERSION=2.1.325 AMC_CLAUDE_CODE_PREFIX=<prefix> AMC_CLAUDE_CODE_CONFORMANCE_OUT=<file> AMC_CLAUDE_CODE_LATENCY_N=30 npx vitest run tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "AMC_PI_CONFORMANCE=1 AMC_PI_PREFIXES=1.5.2=<prefix> AMC_PI_CONFORMANCE_OUT=<file> AMC_PI_CONFORMANCE_FIXTURES=1 npx vitest run tests/conformance/piToolCall.conformance.test.ts",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 19,
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "claude-code-conformance.json",
+      "sha256": "41d23ccc6fec516f35bae9f253c53b08156a00eb1d422b547c47c03aaf289a45"
+    },
+    {
+      "path": "pi-conformance.json",
+      "sha256": "96b30b219f577c0b392ac7c744b66ed7f55fc37991b2da0dadd3cef5d3a5b0f5"
+    }
+  ],
+  "notes": "Watch lane qualification of Claude Code 2.1.325 and pi 1.5.2, local macOS arm64, not CI. The commit is the parent of cbf42d919, which adds the two version strings and this record; the code was built to dist/ with those additions before each run. Filed under P1-23 (Claude Code hook conformance) with the variant -watch because the Watch lane has no plan key of its own; the second command is P1-22's pi conformance test, run for pi 1.5.2 only. tests sums the two commands: Claude Code 7 of 7 and pi 12 of 12, as README.md records them. The two artifacts still carry their original label key watch-2026-11-16. Not recorded at the time and not invented here: command durations (durationMs 0 means the command was not timed), the exact Node version (only the major, 22) and the pnpm version. The 2.1.296, 1.0.2 and 1.0.4 entries in the artifacts are copied unchanged from qualification/2026-10-18-P1-23 and qualification/2026-10-18-P1-22 and were not re-run."
+}
