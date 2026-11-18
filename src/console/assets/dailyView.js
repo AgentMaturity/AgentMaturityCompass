@@ -133,7 +133,7 @@ const SURFACE_ICONS = { score: "score", shield: "shield", enforce: "lock", vault
 /** A state code in words: "PENDING" (nothing ran yet) and plain codes that have no words of their own read in sentence case. */
 const stateWords = (status) => {
   const code = String(status ?? "").toUpperCase();
-  if (code === "PENDING") return "Not run yet";
+  if (code === "PENDING") return "Not done yet";
   const words = plainCode(code);
   return words === code ? cap(code.toLowerCase().replaceAll("_", " ")) : words;
 };
@@ -174,14 +174,14 @@ function shortLine(text) {
   return words.length > 12 ? `${words.slice(0, 12).join(" ").replace(/[,.]$/, "")}…` : head;
 }
 
-/** The pack catalog: the seven stations as filter tiles (with counts), then every pack as a card with Open. */
+/** The pack catalog: the seven stations as filter tiles (with counts); a station's packs (or All) show once it is picked. */
 export function packCatalogHtml(packs) {
   const all = list(packs);
   const count = (station) => all.filter((pack) => pack.domain === station).length;
-  const stations = [`<button type="button" class="secondary station-tile" data-station="" aria-pressed="true">${icon("packs", { size: 22 })}<span>All</span><small>${all.length}</small></button>`,
+  const stations = [`<button type="button" class="secondary station-tile" data-station="" aria-pressed="false">${icon("packs", { size: 22 })}<span>All</span><small>${all.length}</small></button>`,
     ...STATIONS.filter(count).map((station) => `<button type="button" class="secondary station-tile" data-station="${esc(station)}" aria-pressed="false">`
       + `${icon(station, { size: 22 })}<span>${esc(cap(station))}</span><small>${count(station)}</small></button>`)].join("");
-  const cards = all.map((pack) => `<article class="pack-card" data-station="${esc(pack.domain ?? "")}">
+  const cards = all.map((pack) => `<article class="pack-card" hidden data-station="${esc(pack.domain ?? "")}">
       <div class="pack-card-head">${icon(STATIONS.includes(pack.domain) ? pack.domain : "packs", { size: 22 })}<strong>${esc(pack.name || pack.packId)}</strong></div>
       <p class="pack-card-line">${esc(shortLine(pack.description))}</p>
       <div class="pack-card-foot"><span class="muted">${esc(RISK_WORDS[pack.riskLevel] ?? cap(pack.riskLevel || "active"))}, ${esc(num(pack.questionCount))} questions${pack.contentStatus ? `, ${esc(pack.contentStatus)}, self-reported` : ""}</span>

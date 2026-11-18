@@ -56,7 +56,7 @@ test("surfaces draw their state as a dot and words, never a tick; runs and packs
   const tiles = surfaceTilesHtml([{ surface: "Vault", headline: "Keep a record" }], ["Vault"], { Vault: { status: "COMPLETE" } });
   expect(tiles).toContain("Complete");
   expect(tiles).not.toContain("route-dot");
-  expect(surfaceTilesHtml([], ["Watch"], {})).toContain("Not run yet");
+  expect(surfaceTilesHtml([], ["Watch"], {})).toContain("Not done yet");
   const runs = runCardsHtml([{ runId: "r<1>", status: "degraded", currentStage: "s", eventCount: 2 }]);
   expect(runs).toContain("Needs a look");
   expect(runs).toContain("r&lt;1&gt;");
@@ -68,4 +68,10 @@ test("surfaces draw their state as a dot and words, never a tick; runs and packs
   expect(packs).toContain(">First part<");
   expect(packs).toContain('data-industry-pack="a"');
   expect(packs).not.toContain("governance");
+});
+
+test("pack cards wait for a field to be picked; All shows every one", () => {
+  const html = packCatalogHtml([{ packId: "a", name: "A", domain: "health", questionCount: 1 }]);
+  expect(html).toContain('<article class="pack-card" hidden data-station="health">');
+  expect(html).toMatch(/data-station="" aria-pressed="false"/);
 });

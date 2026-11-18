@@ -16,12 +16,13 @@ const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table>
 async function render(message) {
   const { state, transitions, reassessments } = (await apiGet(API)).data;
   // The agent's state as a route (proposed, approved, active); suspended or retired stop it. The records stay one click away.
+  // A waypoint is done only when a recorded transition reached it; the state now is "you are here" (or stopped). An
+  // implicit state (no lifecycle record yet) ticks nothing it was never recorded to pass.
   const order = ["proposed", "approved", "active"];
-  const at = order.indexOf(state.state);
-  const stopped = at < 0;
-  const steps = order.map((name, i) => ({ label: name[0].toUpperCase() + name.slice(1),
-    state: stopped ? "done" : i < at ? "done" : i === at ? (name === "active" ? "done" : "now") : "todo" }));
-  if (stopped) steps.push({ label: String(state.state)[0].toUpperCase() + String(state.state).slice(1), state: "stop" });
+  const reached = new Set(list(transitions).map((row) => row.to));
+  const label = (name) => String(name)[0].toUpperCase() + String(name).slice(1);
+  const steps = order.map((name) => ({ label: label(name), state: name === state.state ? "now" : reached.has(name) ? "done" : "todo" }));
+  if (!order.includes(state.state)) steps.push({ label: label(state.state), state: "stop" });
   const fold = (summary, html) => `<details class="more-info"><summary>${esc(summary)}</summary><div class="more-info-body">${html}</div></details>`;
   panel.innerHTML = `<h2 class="section-title">Agent state</h2>
     ${message ? `<p role="status">${esc(message)}</p>` : ""}

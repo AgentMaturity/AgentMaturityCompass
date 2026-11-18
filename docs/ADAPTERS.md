@@ -239,7 +239,7 @@ Real provider API keys never leave the vault. Agents receive dummy keys (`amc_du
 
 ## Review imported records
 
-File import is optional interoperability; it does not run a source harness or verify its claims. Use `amc import /path/to/export --dry-run --json` to review the existing normalization receipt before applying. `plan.normalization.recordMapping` adds a versioned, deterministic record map with its own SHA-256 tied to the source semantic digest. CLI JSON, the import API and Studio's Evidence → Neutral Import review expose the same map; `amc imports show <import-id> --json` retains it after import.
+File import is optional interoperability; it does not run a source harness or verify its claims. Use `amc import /path/to/export --dry-run --json` to review the existing normalization receipt before applying. `plan.normalization.recordMapping` adds a versioned, deterministic record map with its own SHA-256 tied to the source semantic digest. CLI JSON, the import API and the console's Records page (Imports) review expose the same map; `amc imports show <import-id> --json` retains it after import.
 
 The map separates records projected into traces, retained source context, malformed records and unsupported values. Source-relative JSON pointers refer to the redacted parsed artifact; JSONL source lines are recorded where available. These locators are not execution identities or verified evidence. Original source digests and recognized format versions are listed separately; an unversioned format stays unknown. Records in skipped files are not counted as zero when the parser could not inspect them.
 

@@ -639,7 +639,7 @@ async function renderEvidence() {
 
   const signatureNotice = "A signature shows who wrote each record and that it has not changed, not that it is true.";
   root.innerHTML = `
-    ${pageIntroHtml("What AMC has recorded", `Signed records about agent ${agentId}. Open a kind to see them.`, {
+    ${pageIntroHtml("What AMC has recorded", `What AMC has recorded about agent ${agentId}.`, {
       id: "evidenceIntro",
       chips: noticeChip("Signature limits", signatureNotice),
       actions: `<button id="evidenceRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>
@@ -2439,7 +2439,7 @@ async function renderIndustryPacks() {
   const entitlement = response.entitlement || {};
   const packs = response.packs || [];
   root.innerHTML = `
-    ${pageIntroHtml("Pick your field", "Questionnaires for regulated work. Open a pack to answer it.", {
+    ${pageIntroHtml("Pick your field", "Questionnaires for regulated work: pick a field, then open a pack.", {
       id: "packsIntro",
       chips: noticeChip("AI-drafted, not legal advice", `Pack content is experimental and self-reported. ${QUESTIONNAIRE_NOTICE}`)
         + noticeChip("Free to use", entitlement.message || "Industry Packs are free. Access never changes a result.")
@@ -2937,7 +2937,7 @@ async function renderRuntimeRuns() {
     ${pageIntroHtml("What is running now", "Your connected agents' runs, as they happen.", { id: "runtimeIntro" })}
     ${statRowHtml([["running", Number(status.running || 0)], ["need a look", Number(status.degraded || 0)], ["finished", Number(status.completed || 0)], ["in all", Number(status.total || 0)]])}
     <section class="card">
-      ${runs.length ? runCardsHtml(runs, formatTime) : emptyState({ pictureName: "empty", line: "No live runs yet.", action: '<a class="button" href="./integrations">Connect an agent</a>' })}
+      ${runs.length ? runCardsHtml(runs, formatTime) : emptyState({ pictureName: "empty", line: "No live runs yet.", action: `<p class="muted">To connect an agent, run <code>${htmlEscape(`amc connect --agent='${String(agentId).replaceAll("'", "'\\''")}'`)}</code> in a terminal.</p>` })}
     </section>
     <div class="records-folds">
       ${moreInfo("What is a live run?", "<p>Runs of your connected agents as they happen: status, events, alerts and receipts. A run that stopped can be picked up again.</p>")}
@@ -3837,6 +3837,11 @@ async function renderPage() {
         document.documentElement.style.scrollPaddingTop = "76px";
       }
       return await renderNativeTasksPage({ root, initialAgent: currentAgent() });
+    }
+    // The claims strip sits under the page on the daily screens, so the page's own heading comes first.
+    if (["agent", "evidence", "runtime", "approvals", "industrypacks"].includes(page)) {
+      const strip = document.getElementById("claimStrip");
+      if (strip) document.querySelector("main")?.append(strip);
     }
     if (page === "agent") return await renderAgent();
     if (page === "evidence") return await renderEvidence();

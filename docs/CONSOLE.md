@@ -52,7 +52,7 @@ preview is on; A4 is reached from Home. On a phone, the menu button at the top o
 - `ToolHub`: allowed tools, recent executions, denials, receipt verify actions.
 - `Approvals`: each request as a card: what it is, its path (asked, then its decision in words, then used), the people who decided as initials with their decision, the places still open, who may decide, and Approve, Dry run only and Deny where you may decide (unchanged). **Waiting** and **All** switch the list; search and filters, and each request's details, are one click away.
 - `Records`: what AMC recorded about the agent: **Run the full score**, counts, the eight parts as tiles with their state in words, and every kind of record (with its count) one click away. The "Signature limits" chip says what a signature shows.
-- `Industry Packs`: "Pick your field": the seven stations as tiles that narrow the packs, each pack as a card with Open; the "AI-drafted, not legal advice" chip opens the full notice. An open pack asks one question at a time with **Score** always in reach; what the pack is for, its rules and how scoring works are one click away.
+- `Industry Packs`: "Pick your field": the seven stations as tiles (and All); picking one shows its packs as cards with Open; the "AI-drafted, not legal advice" chip opens the full notice. An open pack asks one question at a time with **Score** always in reach; what the pack is for, its rules and how scoring works are one click away.
 - `Live runs`: runs of connected agents as cards with their state in words; tool-call numbers, latest events, the table and recording a run by hand are one click away.
 - `Users`: owner-managed user/role administration.
 - `Leases`: active lease metadata (no token disclosure), expiry, revoke.
