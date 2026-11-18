@@ -11,7 +11,7 @@ import type { AgentToolSeam, ToolCallOutcome } from "./toolSeam.js";
 import { sha256Hex } from "../utils/hash.js";
 
 /** A settled tool call for observers: outcome, digest and size, never the content (SH-EXT-01). */
-export function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
+function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
   const content = typeof outcome.content === "string" ? Buffer.from(outcome.content, "utf8") : outcome.content;
   return { ok: outcome.outcome === "OK" && !outcome.denied, outputSha256: sha256Hex(content), outputBytes: content.length };
 }

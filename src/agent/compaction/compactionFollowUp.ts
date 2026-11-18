@@ -33,7 +33,7 @@ import type { StepRunnerInit } from "../stepRunner.js";
 export const RESTORE_MAX_FILES = 5;
 const RESTORE_MAX_BYTES = 32_000;
 /** All restored text over one session, so repeated compactions cannot keep refilling the context. */
-export const RESTORE_SESSION_MAX_BYTES = 96_000;
+const RESTORE_SESSION_MAX_BYTES = 96_000;
 /** Room for the read tool's own truncation note, which it writes after `maxBytes`. */
 const NOTE_ROOM = 256;
 const FILE_TOOLS: ReadonlySet<string> = new Set(["fs.read", "fs.write", "fs.edit"]);
