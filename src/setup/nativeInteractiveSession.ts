@@ -20,8 +20,7 @@ import { loadNativeExtensions, nativeExtensionRunArgv, type NativeExtensionManag
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
 import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
-import { describeTurnCheck, needsCheckWarning, projectTurnChecks } from "../agent/turnVerification.js";
-import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
+import { describeTurnCheck, needsCheckWarning } from "../agent/turnVerification.js";
 import { nativeRouteFor, paramsFor } from "../cli-agent-options.js";
 import { NATIVE_INTERACTIVE_COMMANDS, nativeInteractiveCompleter } from "./nativeInteractiveCommands.js";
 import { listNativeInteractiveSessions, renderNativeInteractiveSession, assertNativeInteractiveSelection, type NativeInteractiveSessionSummary } from "./nativeInteractiveNavigation.js";
@@ -748,7 +747,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       previousSummary = summary;
       const ending = freshEndings.at(-1);
       // HP-04: an unchecked or failed-check turn's status sits right under the reply, in plain words.
-      for (const row of projectTurnChecks(readNativeSessionEvents(cwd, sessionId))) if (row.turn === ending?.turn && needsCheckWarning(row)) io.log(chalk.yellow(describeTurnCheck(row)));
+      for (const row of summary.turnChecks ?? []) if (row.turn === ending?.turn && needsCheckWarning(row)) io.log(chalk.yellow(describeTurnCheck(row)));
       io.log(renderTurnFooter({ recorded: shownLive || fresh.length > 0, turn: ending?.turn, ending: ending?.reason, usage: summary.usage, context: chatDisplay.context() }));
       // The usage, diagnostics and validation blocks print for a turn that did not finish cleanly; otherwise /status has them.
       if (!(outcome.code === 0 && ending?.reason === "complete" && summary.driverStatus !== "failed")) for (const line of sessionDetailLines(summary)) io.log(line);

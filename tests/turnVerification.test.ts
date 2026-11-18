@@ -22,6 +22,7 @@ import { initToolsConfig, toolsConfigPath } from "../src/toolhub/toolhubValidato
 import { renderSessionTranscript } from "../src/session/sessionTranscript.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
 import { strictJsonNote } from "../src/tools/builtin/fsWritePrimitives.js";
+import { parseNativeChatResult } from "../src/setup/nativeChatResult.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { loopHarness, textStep, toolStep, LOOP_MODEL, LOOP_PROVIDER, type LoopHarness, type ScriptedStream } from "./helpers/agentLoopHarness.js";
 
@@ -234,5 +235,16 @@ describe("HP-15: strict JSON note after an edit", () => {
     expect(results[2]).toBe("created notes.txt");
     expect(strictJsonNote("x.JSON", Buffer.from("[1]"))).toBe("");
     expect(strictJsonNote("x.json", Buffer.from("// c\n{}"))).toContain("does not parse as strict JSON");
+  });
+});
+
+describe("chat reads the status from the child's summary", () => {
+  test("well-formed rows pass field by field; a malformed one is dropped, never shown as passed", () => {
+    const good = { turn: 1, status: "changed-unchecked", changes: 2, verifyOnStop: "no-checks", reason: "no-check", lastChangeEventId: "e1", checkEventId: null, eventId: "v1" };
+    const stdout = JSON.stringify({ sessionId: "s1", driverStatus: "idle", assistantText: ["Done."], endings: [{ reason: "complete", turn: 1 }],
+      turnChecks: [good, { ...good, status: "all-good" }, { ...good, eventId: 7 }] });
+    const result = parseNativeChatResult({ stdout, truncated: false, requestedSessionId: null, forkFrom: null });
+    expect(result.ok && result.summary.turnChecks).toEqual([good]);
+    expect(describeTurnCheck(good as never)).toBe("Turn 1 ran 2 actions that can change files; no check ran afterwards. Nothing in this record shows the result works.");
   });
 });

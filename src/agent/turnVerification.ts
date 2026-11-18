@@ -89,15 +89,22 @@ export function recordTurnVerification(session: SessionService, turn: number, ve
   return session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: { kind: TURN_VERIFICATION_KIND, version: 1, turn, ...verification, verifyOnStop } });
 }
 
+/** One row's fields, or null when malformed. Also admits the rows a child run's JSON summary carries to chat. */
+export function turnCheckFrom(value: unknown, eventId: unknown): TurnCheckRow | null {
+  const meta = value !== null && typeof value === "object" ? value as Record<string, unknown> : {};
+  if (!Number.isSafeInteger(meta.turn) || !STATUSES.has(String(meta.status)) || !SETTINGS.has(String(meta.verifyOnStop))
+    || !Number.isSafeInteger(meta.changes) || typeof eventId !== "string") return null;
+  const text = (field: unknown): string | null => typeof field === "string" ? field : null;
+  return { turn: meta.turn as number, status: meta.status as TurnVerificationStatus, changes: meta.changes as number, verifyOnStop: meta.verifyOnStop as VerifyOnStopSetting,
+    lastChangeEventId: text(meta.lastChangeEventId), checkEventId: text(meta.checkEventId), reason: text(meta.reason), eventId };
+}
+
 /** The recorded rows, as written. Malformed rows are left out here and caught by {@link turnVerificationErrors}. */
 export function projectTurnChecks(rows: readonly EvidenceEvent[]): TurnCheckRow[] {
   return rows.flatMap(row => {
     const meta = metaOf(row);
-    if (row.event_type !== "audit" || meta.kind !== TURN_VERIFICATION_KIND || typeof meta.turn !== "number" || !STATUSES.has(String(meta.status))
-      || !SETTINGS.has(String(meta.verifyOnStop)) || typeof meta.changes !== "number") return [];
-    return [{ turn: meta.turn, status: meta.status as TurnVerificationStatus, changes: meta.changes, verifyOnStop: meta.verifyOnStop as VerifyOnStopSetting,
-      lastChangeEventId: typeof meta.lastChangeEventId === "string" ? meta.lastChangeEventId : null,
-      checkEventId: typeof meta.checkEventId === "string" ? meta.checkEventId : null, reason: typeof meta.reason === "string" ? meta.reason : null, eventId: row.id }];
+    const parsed = row.event_type === "audit" && meta.kind === TURN_VERIFICATION_KIND ? turnCheckFrom(meta, row.id) : null;
+    return parsed === null ? [] : [parsed];
   });
 }
 
