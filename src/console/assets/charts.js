@@ -1,7 +1,7 @@
 // C-22: a chart with nothing to draw says so in words, and one whose values are all 0 says that, so a box is never blank.
 // The charts follow the console's theme (styles.css tokens): the well, the grid lines, the words and the accent.
 const BRAND_GREEN = "#4AEF79";
-function themed(canvas) {
+export function themed(canvas) {
   const style = typeof getComputedStyle === "function" ? getComputedStyle(canvas) : null;
   const token = (name, fallback) => style?.getPropertyValue(name).trim() || fallback;
   return { well: token("--surface-2", "#1F2B49"), grid: token("--line", "#2C3A5C"), words: token("--muted", "#A3B0C6"), accent: token("--accent", BRAND_GREEN) };

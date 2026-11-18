@@ -20,7 +20,7 @@ const CONSOLE_SECURITY_HEADERS: Readonly<Record<string, string>> = {
 
 /** The page for a console address that names no page: what happened and the way back, in the console's colours. */
 const NOT_FOUND_PAGE = `<!doctype html><html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Page not found · Compass Console</title><link rel="stylesheet" href="./assets/styles.css?v=20261118h" /></head>
+<title>Page not found · Compass Console</title><link rel="stylesheet" href="./assets/styles.css?v=20261119a" /></head>
 <body><main style="max-width:560px;margin:15vh auto;padding:0 16px"><section class="card"><h2>There is no page at this address</h2>
 <p>Check the address for a typing mistake, or go back to Home.</p><p><a class="button" href="./home">Go to Home</a></p></section></main></body></html>`;
 

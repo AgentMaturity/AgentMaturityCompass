@@ -36,10 +36,10 @@ describe("cross-surface AMC brand identity", () => {
     for (const token of ["#0a0a0a", "#4AEF79", "#a0a0a0", "Inter", "Space Mono"]) expect(identityTs).toContain(token);
     // The Compass Console (studio-ui redesign) has a light and a dark theme on system fonts, so it works offline under
     // its content security policy. Its dark theme keeps the brand green; the light theme uses a darker green that
-    // reads at 4.5:1 on white.
+    // reads at 4.5:1 on every light surface, the grey well included (tests/console/shell.test.ts computes each pair).
     const consoleStyles = read("src/console/assets/styles.css");
     expect(consoleStyles).toContain("--accent: #4AEF79;");
-    expect(consoleStyles).toContain("--accent: #15803D;");
+    expect(consoleStyles).toContain("--accent: #147A3B;");
     expect(consoleStyles).toContain('--sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;');
     for (const path of ["website/style.css", "website/docs/docs.css"]) {
       expect(read(path), path).not.toMatch(/letter-spacing:\s*-\.?\d/i);

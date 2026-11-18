@@ -54,13 +54,14 @@ export function claimLegendHtml() {
     .map(([term, text]) => `<li><strong>${esc(term)}</strong>: ${esc(text)}</li>`).join("")}</ul>`).join("\n");
 }
 
-/** Collapsed, so the strip stays a few lines above the page's own content. */
+/** Collapsed, so the strip stays a few lines long. */
 export function claimLegend() {
   return `<details id="claim-legend" class="claim-legend"><summary>How to read claim kinds</summary>${claimLegendHtml()}</details>`;
 }
 
 /**
- * Shows every claim the page's API calls returned above #app; `onClaims` is api.js's subscription. A page that reloads
+ * Shows every claim the page's API calls returned, under #app (the page's own heading comes first; one click from any
+ * result on the page); `onClaims` is api.js's subscription. A page that reloads
  * its results calls the returned reset() first, so a claim the server has since lowered does not stay on the strip.
  */
 export function installClaimStrip(page, onClaims) {
@@ -69,7 +70,7 @@ export function installClaimStrip(page, onClaims) {
   const strip = document.createElement("section");
   strip.id = "claimStrip";
   strip.className = "card claim-strip";
-  app.before(strip);
+  app.after(strip);
   // The legend renders once, so a reader who opened it keeps it open while more claims arrive.
   strip.innerHTML = `<h3>Claims on this page</h3><p></p>${claimLegend()}`;
   const badgeLine = strip.querySelector("p");

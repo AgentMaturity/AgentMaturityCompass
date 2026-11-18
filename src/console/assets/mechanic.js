@@ -1,7 +1,7 @@
 import { apiGet, showSignIn, whoami } from "./api.js";
 import { renderGapTable } from "./components/gapTable.js";
 import { renderHandholdingSteps } from "./components/handholdingSteps.js";
-import { recordRows } from "./pageKit.js";
+import { moreInfo, recordRows } from "./pageKit.js";
 import { plainErrorText } from "./plainError.js";
 
 function esc(value) {
@@ -28,9 +28,9 @@ function renderDimensionBars(rows) {
       return `
       <div class="card">
         <strong>${esc(row.dimensionId)}</strong>
-        <div class="bar"><span style="width:${measuredPct}; background:#4AEF79"></span></div>
+        <div class="bar"><span style="width:${measuredPct}; background:var(--accent)"></span></div>
         <small>Measured ${measured.toFixed(2)}</small>
-        <div class="bar"><span style="width:${targetPct}; background:#2563eb"></span></div>
+        <div class="bar"><span style="width:${targetPct}; background:var(--muted)"></span></div>
         <small>Target ${target.toFixed(2)} | Unknown ${Number(row.unknownCount || 0)}</small>
       </div>
     `;
@@ -68,10 +68,9 @@ async function main() {
     ${card(
       "Mechanic Workbench",
       `
-      <p class="muted">
-        Continuous recurrence uses recurring evidence checkpoints. This dashboard compares measured maturity vs desired targets,
-        then guides deterministic upgrades through instrumentation, governance, capabilities, and checkpointing.
-      </p>
+      <p class="muted">Measured levels next to the levels you want.</p>
+      ${moreInfo("How this page works", `<p>Continuous recurrence uses recurring evidence checkpoints. This dashboard compares measured maturity vs desired targets,
+        then guides deterministic upgrades through instrumentation, governance, capabilities, and checkpointing.</p>`)}
       <div class="grid">
         <div><div class="muted">Readiness</div><div class="tile-value">${esc(gap.readiness)}</div></div>
         <div><div class="muted">Integrity</div><div class="tile-value">${Number(gap.global?.integrityIndex || 0).toFixed(3)}</div></div>

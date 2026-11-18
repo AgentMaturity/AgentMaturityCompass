@@ -55,6 +55,42 @@ export const CANONICAL_NAV = [
 ];
 
 const pathOf = (href) => normalizeHref(String(href || "").split(/[?#]/)[0]);
+
+/**
+ * One name per page outside the canonical menu, in sentence case: a page's <title> starts with it (so the top bar shows
+ * it, tests/console/shell.test.ts) and "More pages" uses it, whatever words the page's own static menu has.
+ */
+export const PAGE_NAMES = {
+  advisories: "Advisories",
+  assurance: "Assurance",
+  assuranceCert: "Assurance certificate",
+  assuranceRun: "Assurance run",
+  audit: "Audit",
+  auditBinder: "Audit binder",
+  auditRequests: "Evidence requests",
+  benchCompare: "Compare benchmarks",
+  benchPortfolio: "Benchmark portfolio",
+  benchRegistry: "Benchmark registries",
+  compass: "Compass",
+  contextGraph: "Context graph",
+  diagnosticView: "Diagnostic",
+  evidenceDrilldown: "Evidence drilldown",
+  forecast: "Forecast",
+  forecastAgent: "Agent forecast",
+  forecastNode: "Team forecast",
+  mechanic: "Mechanic",
+  northstar: "Northstar prompts",
+  passport: "Passport",
+  plugins: "Plugins",
+  portfolioForecast: "Portfolio forecast",
+  simulator: "Simulator",
+  standard: "Open Standard",
+  trust: "Trust",
+  upgradeWizard: "Upgrade plan",
+  value: "Value",
+  valueAgent: "Agent value",
+  valueKpis: "Value KPIs"
+};
 const linkClass = ({ tab, divide, person }) => [tab && "nav-tab", divide && "nav-divide", person && "nav-person"].filter(Boolean).join(" ");
 const navLink = (link) => {
   const { href, label, id, hidden, desc } = link;
@@ -75,7 +111,8 @@ const railFootHtml = () => `<div class="rail-foot"><div class="theme-switch" rol
 /** The canonical menu, "More" with every other page, the page's own links it lacks under "More pages", and the rail's foot. */
 export function canonicalNavHtml(extra = []) {
   const seen = new Set(CANONICAL_NAV.map((link) => pathOf(link.href)));
-  const own = extra.filter((link) => !seen.has(pathOf(link.href)) && seen.add(pathOf(link.href)));
+  const own = extra.filter((link) => !seen.has(pathOf(link.href)) && seen.add(pathOf(link.href)))
+    .map((link) => ({ ...link, label: PAGE_NAMES[pathOf(link.href)] || link.label }));
   const features = CANONICAL_NAV.filter((link) => link.group === "features");
   const sections = [...new Set(features.map((link) => link.section))];
   const more = `<details class="nav-features nav-more"><summary>${icon("more")}<span class="nav-label">More</span></summary>`
@@ -149,8 +186,11 @@ export function renderNavSession(doc, me, onSignOut) {
   if (!link) return;
   const signedIn = Boolean(me) && me.userId !== "local-demo";
   const name = me?.username || me?.userId || "";
+  // The rail is the one place that says who is signed in (the pages' "Signed in as" status line is hidden, styles.css).
+  const roles = Array.isArray(me?.roles) ? me.roles : [];
+  const viewOnly = roles.length > 0 && roles.every((role) => role === "VIEWER") ? " (view only)" : "";
   link.innerHTML = signedIn
-    ? `<span class="nav-avatar" aria-hidden="true">${esc(name.slice(0, 1).toUpperCase() || "?")}</span><span class="nav-label">Sign out</span><small class="nav-desc">Signed in as ${esc(name)}</small>`
+    ? `<span class="nav-avatar" aria-hidden="true">${esc(name.slice(0, 1).toUpperCase() || "?")}</span><span class="nav-label">Sign out</span><small class="nav-desc">Signed in as ${esc(name)}${viewOnly}</small>`
     : `${icon("sign-in")}<span class="nav-label">Sign in</span>`;
   link.title = signedIn ? `Signed in as ${name}. Sign out of the Compass Console.` : "Sign in";
   link.onclick = signedIn ? (event) => { event.preventDefault(); onSignOut?.(); } : null;
@@ -327,7 +367,18 @@ function bindRail(doc) {
   if (banner && typeof MutationObserver === "function") {
     new MutationObserver(() => syncStatus(doc)).observe(banner, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden"] });
   }
+  // Every page script writes "Signed in as <name>" to #status; the rail already says it, so that one line is not shown
+  // twice (styles.css hides .status-session). Errors and "Done at" lines in #status still show.
+  const status = doc.getElementById("status");
+  if (status && typeof MutationObserver === "function") {
+    const mark = () => status.classList.toggle("status-session", isSessionLine(status.textContent));
+    new MutationObserver(mark).observe(status, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+    mark();
+  }
 }
+
+/** The status line that only says who is signed in (app.js, operator.js and the bench pages write it). */
+export const isSessionLine = (text) => /^Signed in as [^\n]*$/.test(String(text ?? "").trim());
 
 /**
  * Escape closes what is open around the focus (brief item 8): the innermost open disclosure, then the phone menu, and
@@ -376,6 +427,17 @@ if (typeof document !== "undefined") {
 }
 
 /**
+ * A request that got no answer at all. One lost request does not mean AMC stopped: the health read decides. When
+ * /healthz answers, the notice says only that one request failed; when it does not, "AMC is not running".
+ */
+export async function reportNoAnswer(doc = typeof document === "undefined" ? null : document, fetcher = globalThis.fetch) {
+  let running = false;
+  try { running = Boolean((await fetcher("/healthz", { cache: "no-store" }))?.ok); } catch { running = false; }
+  showShellNotice(running ? "requestFailed" : "offline", doc);
+  return running;
+}
+
+/**
  * One shared notice at the top of every page for the two states a page cannot fix itself (C-06, C-11): AMC stopped
  * answering, or the sign-in ended. "offline" checks /healthz every 5 s and says when AMC answers again; Retry reloads.
  * "signedOut" links to sign-in and returns here afterwards; the body's data-session="none" hides actions that need a
@@ -401,16 +463,24 @@ export function showShellNotice(kind, doc = typeof document === "undefined" ? nu
       <p><a class="button" href="./login?next=${encodeURIComponent(next)}">Sign in</a></p>`;
     return;
   }
+  if (kind === "requestFailed") {
+    notice.className = "card shell-notice";
+    notice.innerHTML = `<p><strong>One request got no answer.</strong> AMC is running, so try again. If it keeps happening, reload the page.</p>
+      <p class="row wrap"><button type="button" class="shell-retry">Reload the page</button><button type="button" class="secondary shell-close">Close</button></p>`;
+    notice.querySelector(".shell-retry").addEventListener("click", () => doc.defaultView?.location.reload());
+    notice.querySelector(".shell-close").addEventListener("click", () => notice.remove());
+    return;
+  }
   notice.innerHTML = `<p><strong>AMC is not running.</strong> This page cannot load or save anything until it is back.
     Start it again with <code>amc up</code> in the workspace folder (or open the AMC app).</p>
-    <p class="row wrap"><button type="button" data-shell-retry>Retry</button><span class="muted" data-shell-state>Checking every few seconds…</span></p>`;
-  notice.querySelector("[data-shell-retry]").addEventListener("click", () => doc.defaultView?.location.reload());
+    <p class="row wrap"><button type="button" class="shell-retry">Retry</button><span class="muted shell-state">Checking every few seconds…</span></p>`;
+  notice.querySelector(".shell-retry").addEventListener("click", () => doc.defaultView?.location.reload());
   const timer = setInterval(async () => {
     try {
       const reply = await fetch("/healthz", { cache: "no-store" });
       if (!reply.ok) return;
       clearInterval(timer);
-      notice.querySelector("[data-shell-state]").textContent = "AMC is running again. Press Retry to reload this page.";
+      notice.querySelector(".shell-state").textContent = "AMC is running again. Press Retry to reload this page.";
     } catch { /* still down */ }
   }, 5000);
 }

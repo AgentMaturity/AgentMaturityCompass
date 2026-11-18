@@ -1,7 +1,7 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
-import { renderNavSession, renderTopbar, setNavBadge, showShellNotice } from "./shell.js";
+import { renderNavSession, renderTopbar, reportNoAnswer, setNavBadge, showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
 import { trackRequest } from "./actionFeedback.js";
 import { plainErrorText } from "./plainError.js";
@@ -139,8 +139,9 @@ async function requestOnce(path, options) {
       body: options?.body ? JSON.stringify(options.body) : undefined
     });
   } catch (error) {
-    // No answer at all: AMC stopped or the network is gone. One shared notice says so (C-06); the caller still sees the error.
-    if (error?.name !== "AbortError") showShellNotice("offline");
+    // No answer at all. One shared notice (C-06) says what is true: the health read tells a lost request from AMC having
+    // stopped. The caller still sees the error.
+    if (error?.name !== "AbortError") void reportNoAnswer(document);
     throw error;
   }
   // A session that ended mid-visit: one sign-in prompt instead of each page's own error (C-11). /auth/me asks on purpose.

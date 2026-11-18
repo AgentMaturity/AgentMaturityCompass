@@ -14,9 +14,9 @@
   --muted: #56637A;
   --line: #D5DBE4;
   --line-strong: #7A879C;
-  --accent: #15803D;
+  --accent: #147A3B;
   --accent-ink: #FFFFFF;
-  --wait: #B45309;
+  --wait: #A84F08;
   --wait-ink: #FFFFFF;
   --stop: #B91C1C;
   --stop-ink: #FFFFFF;
@@ -458,7 +458,7 @@ nav a.nav-person .nav-desc {
 :root[data-rail="collapsed"] .theme-switch { flex-direction: column; border-radius: var(--radius); }
 :root[data-rail="collapsed"] .theme-option { border-radius: 8px; }
 :root[data-rail="collapsed"] nav a.nav-divide::before { left: 6px; right: 6px; }
-:root[data-rail="collapsed"] nav .nav-pages a { display: none; }
+:root[data-rail="collapsed"] nav .nav-pages a { justify-content: center; padding: 0; }
 
 :root[data-rail="collapsed"] .nav-badge {
   position: absolute;
@@ -614,7 +614,8 @@ body[data-status-pill] #ucBanner:not(.uc-pinned):not(.uc-open) {
 }
 
 /* The pages no longer ship static status text; an empty status line takes no room until a script writes it. */
-#status:empty {
+#status:empty,
+#status.status-session {
   display: none;
 }
 
@@ -705,6 +706,8 @@ textarea {
 textarea { min-height: 88px; }
 
 /* Radios and checkboxes keep their natural size; the full-width rule above is for text fields (A4-03, C-27). */
+input[type="range"] { accent-color: var(--accent); }
+
 input[type="radio"],
 input[type="checkbox"] {
   width: auto;
@@ -854,6 +857,12 @@ tr.selected > td { background: var(--accent-soft); }
 .table-wrap {
   max-width: 100%;
   overflow-x: auto;
+}
+
+/* On a phone and a tablet a column never gets narrower than a short word, so a table scrolls inside its card instead of
+   breaking ids and words into one letter per line. */
+@media (max-width: 900px) {
+  th, td { min-width: 10ch; }
 }
 
 /* On a phone a .stack-table shows each row as label and value lines instead of columns cut off at the edge. */

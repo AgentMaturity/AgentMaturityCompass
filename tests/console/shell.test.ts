@@ -5,7 +5,7 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { CANONICAL_NAV, canonicalNavHtml, decorateNav, initShell, renderCanonicalNav, renderTopbar, topbarHtml } from "../../src/console/assets/shell.js";
+import { CANONICAL_NAV, PAGE_NAMES, canonicalNavHtml, decorateNav, initShell, isSessionLine, renderCanonicalNav, renderNavSession, renderTopbar, reportNoAnswer, topbarHtml } from "../../src/console/assets/shell.js";
 import { FakeDocument, type FakeElement } from "./fakeDom.js";
 
 function pageWithNav(doc: FakeDocument, hrefs: string[], page = ""): FakeElement {
@@ -185,7 +185,9 @@ describe("canonical navigation", () => {
   test("a page's own links go under More pages, once each, never duplicating a canonical link", () => {
     const html = api.canonicalNavHtml?.([{ href: "./home", label: "Home" }, { href: "./assuranceRun", label: "Run Detail" },
       { href: "./assuranceRun.html", label: "Run Detail again" }, { href: "./evidence?agent=x", label: "Evidence" }]) ?? "";
-    expect(html).toMatch(/<details class="nav-features nav-pages" open><summary><svg [\s\S]*?<\/svg><span class="nav-label">More pages<\/span><\/summary><a href="\.\/assuranceRun" title="Run Detail">[\s\S]*?<span class="nav-label">Run Detail<\/span><\/a><\/details>/);
+    // studio-ui inherit slice: a page known to PAGE_NAMES is named as its own <title> names it, not by the static link's words.
+    expect(html).toMatch(/<details class="nav-features nav-pages" open><summary><svg [\s\S]*?<\/svg><span class="nav-label">More pages<\/span><\/summary><a href="\.\/assuranceRun" title="Assurance run">[\s\S]*?<span class="nav-label">Assurance run<\/span><\/a><\/details>/);
+    expect(canonicalNavHtml([{ href: "./not-a-page", label: "Own words" }])).toContain('<span class="nav-label">Own words</span>');
     expect(hrefs(html).filter((href) => href === "./home")).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./assuranceRun"))).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./evidence"))).toHaveLength(1);
@@ -355,6 +357,37 @@ describe("renderTopbar", () => {
     for (const theme of [light, dark]) for (const surface of ["bg", "surface", "surface-2"]) expect(ratio(theme["line-strong"]!, theme[surface]!)).toBeGreaterThanOrEqual(3);
   });
 
+  // Every text token on every background token, and each "-ink" on its own fill, reads at 4.5:1 or more in both themes
+  // (body text; large text and icons need only 3:1, so this covers them too).
+  test("every text and background token pair reaches 4.5:1 in both themes", () => {
+    const styles = readFileSync("src/console/assets/styles.css", "utf8");
+    const lum = (hex: string) => [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16) / 255)
+      .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)).reduce((sum, v, at) => sum + v * [0.2126, 0.7152, 0.0722][at]!, 0);
+    const ratio = (a: string, b: string) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+    const tokens = (block: string) => Object.fromEntries([...block.matchAll(/--([a-z0-9-]+): (#[0-9A-Fa-f]{6});/g)].map((m) => [m[1], m[2]]));
+    const themes = {
+      light: tokens(styles.slice(0, styles.indexOf("@media (prefers-color-scheme: dark)"))),
+      system: tokens(styles.slice(styles.indexOf("@media (prefers-color-scheme: dark)"), styles.indexOf(':root[data-theme="dark"]'))),
+      dark: tokens(styles.slice(styles.indexOf(':root[data-theme="dark"]')))
+    };
+    const pairs: string[] = [];
+    for (const [name, theme] of Object.entries(themes)) {
+      for (const text of ["ink", "muted", "accent", "wait", "stop"]) for (const ground of ["bg", "surface", "surface-2"]) pairs.push(`${name} ${text} on ${ground}`);
+      for (const fill of ["accent", "wait", "stop"]) pairs.push(`${name} ${fill}-ink on ${fill}`);
+    }
+    const below = pairs.filter((pair) => {
+      const [name, text, , ground] = pair.split(" ") as [keyof typeof themes, string, string, string];
+      const theme = themes[name];
+      expect(theme[text], pair).toMatch(/^#/);
+      expect(theme[ground], pair).toMatch(/^#/);
+      return ratio(theme[text]!, theme[ground]!) < 4.5;
+    });
+    expect(pairs).toHaveLength(54);
+    expect(below).toEqual([]);
+    // The system dark theme and the chosen dark theme are the same colours.
+    expect(themes.system).toEqual(themes.dark);
+  });
+
   test("draws nothing on a page without a menu, and api.js draws it whenever it learns who is signed in", () => {
     const doc = new FakeDocument();
     doc.body.appendChild(doc.el("main", {}, [doc.el("p", { id: "status" }, "")]));
@@ -363,5 +396,41 @@ describe("renderTopbar", () => {
     const api = readFileSync("src/console/assets/api.js", "utf8");
     const whoami = api.slice(api.indexOf("export async function whoami()"), api.indexOf("export async function apiGet"));
     expect(whoami).toContain('if (!document.querySelector("main .topbar")) renderTopbar(document, state.me, signOut);');
+  });
+});
+
+describe("studio-ui inherit slice: one name per page, one 'Signed in as', a true notice", () => {
+  test("every PAGE_NAMES entry is the start of that page's <title>, so the top bar and More pages agree", () => {
+    for (const [page, name] of Object.entries(PAGE_NAMES)) {
+      expect(readFileSync(`src/console/pages/${page}.html`, "utf8"), page).toContain(`<title>${name} · Compass Console</title>`);
+      expect(name, page).toMatch(/^[A-Z][^A-Z]*( [A-Z][A-Za-z]*)?$|KPIs|Open Standard/);
+    }
+  });
+
+  test("the pages' 'Signed in as' status line is marked so it shows once (the rail says it), other lines are not", () => {
+    expect(isSessionLine("Signed in as owner")).toBe(true);
+    expect(isSessionLine("Signed in as owner (view only)")).toBe(true);
+    expect(isSessionLine("Signed in as owner.")).toBe(true);
+    expect(isSessionLine("Done at 10:02")).toBe(false);
+    expect(isSessionLine("Full score failed: Signed in as owner")).toBe(false);
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/#status:empty,\n#status\.status-session \{\n  display: none;/);
+    const link = { innerHTML: "", title: "", onclick: null as unknown };
+    renderNavSession({ querySelector: () => link }, { userId: "u", username: "vic", roles: ["VIEWER"] });
+    expect(link.innerHTML).toContain("Signed in as vic (view only)");
+  });
+
+  test("a request with no answer says AMC is not running only when the health read fails too", async () => {
+    const notices: string[] = [];
+    const doc = new FakeDocument();
+    doc.body.appendChild(doc.el("main", {}, []));
+    const words = () => { const n = doc.getElementById("shellNotice"); notices.push(String(n?.dataset.kind)); return n?.textContent ?? ""; };
+    expect(await reportNoAnswer(doc as never, async () => ({ ok: true }) as Response)).toBe(true);
+    expect(words()).toContain("One request got no answer.");
+    expect(words()).not.toContain("AMC is not running");
+    const down = new FakeDocument();
+    down.body.appendChild(down.el("main", {}, []));
+    expect(await reportNoAnswer(down as never, async () => { throw new TypeError("Failed to fetch"); })).toBe(false);
+    expect(down.getElementById("shellNotice")?.textContent).toContain("AMC is not running.");
+    expect(notices[0]).toBe("requestFailed");
   });
 });
