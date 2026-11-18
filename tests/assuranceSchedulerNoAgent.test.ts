@@ -27,8 +27,33 @@ const auditRows = (dir: string): string[] => {
   }
 };
 
+function workspace(): string {
+  process.env["AMC_VAULT_PASSPHRASE"] ??= "assurance-no-agent";
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-assurance-no-agent-")));
+  dirs.push(dir);
+  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  initAssurancePolicy(dir);
+  assuranceSchedulerSetEnabled({ workspace: dir, enabled: true });
+  return dir;
+}
+
 describe("assurance scheduler with no agent to test", () => {
+  afterEach(() => { vi.unstubAllEnvs(); });
+
+  it("M6: a named agent that cannot be reached is a real failure: the run records its abort, the state a fixed code", async () => {
+    vi.stubEnv("AMC_ASSURANCE_MODEL", "model-under-test");
+    const dir = workspace();
+    await expect(assuranceSchedulerTick({ workspace: dir, workspaceReady: true })).rejects.toThrow();
+    expect(auditRows(dir)).toContain("ASSURANCE_RUN_ABORTED");
+    const state = assuranceSchedulerStatus(dir).state;
+    expect(state.lastOutcome).toEqual({ status: "ERROR", reason: "agent_unreachable" });
+    const served = JSON.stringify(assuranceSchedulerStatus(dir));
+    for (const leak of ["secret", "api_key", "user:", "host/path"]) expect(served).not.toContain(leak);
+    expect(state.nextRunTs).toBeGreaterThan(Date.now() + 60_000);
+  });
+
   it("records no run, skips with the reason in words, and waits a full cadence", async () => {
+    vi.stubEnv("AMC_ASSURANCE_MODEL", undefined);
     process.env["AMC_VAULT_PASSPHRASE"] ??= "assurance-no-agent";
     const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-assurance-no-agent-")));
     dirs.push(dir);
