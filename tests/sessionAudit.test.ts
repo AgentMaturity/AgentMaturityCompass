@@ -167,7 +167,7 @@ describe("session audit for the console", () => {
   it("security: a clean call is shown complete, the text after a separator included", () => {
     const raw = JSON.stringify({ command: "ls -la; echo done && rm -rf build" });
     chat(raw, "bash");
-    const shown = asked("bash", raw).call as { lines: string[]; complete: boolean; digest: string };
+    const shown = asked("bash", raw).call as unknown as { lines: string[]; complete: boolean; digest: string };
     expect(shown.lines.join("\n")).toContain("ls -la; echo done && rm -rf build");
     expect(shown.complete).toBe(true);
     expect(shown.digest).toMatch(/^[0-9a-f]{64}$/);
