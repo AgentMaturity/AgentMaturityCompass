@@ -188,8 +188,9 @@ describe("reactive compaction after a context-window overflow (HP-05 item 1)", (
   });
 
   it("MUTATION: when pruning removes nothing the turn ends with the overflow; no summary request is sent", async () => {
-    // Turn 1 completes with a large answer a summary could cover; in turn 2 nothing can be pruned.
-    const { h } = run([textStep("A".repeat(3000), { inputTokens: 100 })], [2], { compaction: { summarize: true } });
+    // Turn 1 completes with a large answer a summary could cover (one recent step kept, so turn 1 is eligible); in turn 2
+    // nothing can be pruned.
+    const { h } = run([textStep("A".repeat(3000), { inputTokens: 100 }), textStep("summary")], [2], { compaction: { summarize: true, keepRecentSteps: 1 } });
     await turn(h, "First question.");
     await turn(h, "Second question.");
     const rows = h.events();
@@ -420,13 +421,18 @@ describe("files read again after compaction (HP-05 item 4)", () => {
     expect(restoreCalls(calls)).toEqual(["small.txt"]); // asked through the seam, which refused it
   });
 
-  it("MUTATION: never restores a file the agent's own earlier read was refused for", async () => {
+  it("MUTATION: a refused read is not taken as the agent's last read of a file", async () => {
     const calls: ToolCallRequest[] = [];
-    const { h } = run([toolStep("r1", "fs.read", '{"path":"big.txt"}', { inputTokens: 100 }), toolStep("r2", "fs.read", '{"path":"small.txt"}', { inputTokens: 100 }),
-      textStep("done")], [3], { tools: realFiles({ path: "small.txt" }, calls), compaction: { pruneMinBytes: 1000 }, before });
+    const deny = { path: null as string | null };
+    // r2 reads small.txt; then the policy refuses r3's read of it; it is allowed again before the overflow (request 4).
+    const { h } = run([...scripts.slice(0, 2), toolStep("r3", "fs.read", '{"path":"small.txt"}', { inputTokens: 100 }), textStep("done")], [4],
+      { tools: realFiles(deny, calls), compaction: { pruneMinBytes: 1000 },
+        before: (request, dir) => { if (request === 1) setUp(dir); if (request === 3) deny.path = "small.txt"; if (request === 4) deny.path = null; } });
     await turn(h, "Read both files.");
-    expect(turnEnds(h.events())).toEqual(["complete"]);
-    expect(restoreCalls(calls)).toEqual([]);
+    const rows = h.events();
+    expect(turnEnds(rows)).toEqual(["complete"]);
+    // Compared with r2, the last read that succeeded: unchanged.
+    expect(restoredFiles(h, rows)).toEqual([[["small.txt", false]]]);
   });
 
   it("MUTATION: skips a file that is now a symlink, even one inside the workspace (no read through it)", async () => {

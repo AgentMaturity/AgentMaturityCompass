@@ -10,10 +10,11 @@
  * never touched: compaction changes what the model sees, not what was recorded.
  *
  * HP-05: the same routine runs once more, reactively, when a provider refuses a step's request as too large for the
- * context window (`recoverOverflow`): it prunes without keeping recent steps, and the turn asks once more only after
- * a signed receipt exists. Anything else (nothing to remove, a refused or failed summary, a run limit, a second
- * overflow in the turn) ends the turn with the provider's original error, as before. After a compaction that removed
- * a file's read from context, the most recent files are read again through the tool seam (`compactionFollowUp.ts`).
+ * context window (`recoverOverflow`): it prunes without keeping recent steps and drops earlier restored file text, and
+ * the turn asks once more only after a signed receipt exists (replay checks this: src/session/overflowRetryRule.ts).
+ * Anything else (nothing to remove, a run limit, a second overflow in the turn) ends the turn with the provider's
+ * original error, as before; no summary is requested on overflow. After a compaction that removed a file's read from
+ * context, recent files are read again through the tool seam (`compactionFollowUp.ts`).
  */
 import { DataFlowRefused } from "../../dataflow/purposePolicy.js";
 import type { SettledStream } from "../../llm/adapter/streamRecorder.js";
