@@ -162,7 +162,7 @@ export type TurnLimitCondition = "max-turns" | "max-tokens" | "deadline" | "max-
 const LIMIT_CONDITIONS: ReadonlySet<unknown> = new Set<TurnLimitCondition>(["max-turns", "max-tokens", "deadline", "max-cost-usd", "repeated-call", "malformed-responses", "denials"]);
 
 /** The tool names a limit cause may carry: at most 16, each 1-128 characters. */
-export function isLimitToolList(value: unknown): value is readonly string[] {
+function isLimitToolList(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.length >= 1 && value.length <= 16 && value.every(name => typeof name === "string" && name.length >= 1 && name.length <= 128);
 }
 
