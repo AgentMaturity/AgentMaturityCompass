@@ -60,6 +60,11 @@ import { activeFreezeStatus } from "../drift/freezeEngine.js";
  * which is precisely the laundering the monotonic guard type exists to
  * prevent. A guard denial is final and no approval reaches past it.
  *
+ * The guards also take an EARLY LOOK before any person is asked (UX-03, `denialBeforeApproval`): a call they would
+ * refuse is refused there, so nobody approves a call that cannot run and no approval is recorded for it. The early look
+ * only adds refusals; the full guard stage after the approval is unchanged. It is taken as SIMULATE, so a guard with a
+ * side effect on EXECUTE (the budget reservation) acts once, after the approval; such a guard refuses only then.
+ *
  * Post-execute filters may rewrite OUTPUT and nothing else. A filter that
  * could clear `denied` would be a seventh way to launder a denial.
  */
@@ -265,6 +270,36 @@ export class ToolPipeline {
       effectiveMode: this.entryMode(definition.name, definition.actionClass, input, true), arguments: input.arguments }, this.init.authorizationContext?.());
   }
 
+  /**
+   * The guards' early look at a call before anyone is asked about it (UX-03): the refusal, or null to ask. A call the
+   * route or schema refuses gets null (it is refused with its own reason when it runs). Adds refusals only.
+   */
+  async denialBeforeApproval(input: Pick<ToolCallInput, "name" | "agentId" | "arguments" | "requestedMode" | "parentToken" | "callId" | "signal">): Promise<ToolDenial | null> {
+    const definition = this.init.registry.visible(input.agentId).get(input.name);
+    if (!definition || this.init.registry.invocationDenial(input.name, input.agentId, (input.parentToken ?? null) !== null) !== undefined) return null;
+    const arguments_ = freezeToolArguments(input.arguments);
+    if (argumentSchemaError(definition.parameters, arguments_) !== null) return null;
+    const callId = input.callId ?? randomUUID();
+    return this.earlyGuardDenial({ token: `tok_${randomUUID()}`, callId, rootCallId: callId, name: definition.name, agentId: input.agentId,
+      workspace: this.init.workspace, actionClass: definition.actionClass, requestedMode: input.requestedMode, effectiveMode: input.requestedMode,
+      arguments: arguments_, parentToken: input.parentToken ?? null, ...(input.signal === undefined ? {} : { signal: input.signal }) });
+  }
+
+  /** The early look at one execution: entry refusals, then every guard, on a SIMULATE copy bound like the real call. */
+  private async earlyGuardDenial(execution: ToolExecution): Promise<ToolDenial | null> {
+    const draft: ToolExecution = { ...execution, effectiveMode: "SIMULATE" };
+    const entered = await this.enter(draft, undefined, undefined);
+    if (entered.refused !== null) return entered.refused;
+    const look = entered.bound?.ok ? boundExecution(draft, entered.bound) : draft;
+    try {
+      await this.init.prepareGuards?.(look);
+      const denied = this.init.registry.guardReason(look);
+      return denied ? { stage: "guard", reason: denied.reason, guardLabel: denied.label } : null;
+    } catch {
+      return null; // The full guard stage after the approval decides; an early look that cannot finish only asks.
+    }
+  }
+
   private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">, approved: boolean): ToolMode {
     return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE",
       approved: approved && this.authorizes(actionClass) }) === "SIMULATE" ? "SIMULATE" : input.requestedMode;
@@ -458,6 +493,9 @@ export class ToolPipeline {
     const authorizes = this.authorizes(draft.actionClass);
     let authority = supplied;
     if (gate !== undefined && draft.parentToken !== null) {
+      // UX-03: a sub-call the guards refuse is refused here, never put to a person.
+      const early = await this.earlyGuardDenial(draft);
+      if (early !== null) return { refused: early, context: null, bound: null, required: false };
       const intent = authorizes ? authorizationIntentFor(draft, this.init.authorizationContext?.()) : null;
       // An intent that cannot bind is not put to a human; the authorization stage denies it after the guards.
       const granted = intent?.ok === false ? undefined : await waitingOnApproval(draft, () => gate.ask(draft, intent)).catch((): null => null);
@@ -653,9 +691,9 @@ export class ToolPipeline {
       }
     }
     const bound = authorization.bound;
-    if (authorization.refused !== null) return deny(authorization.refused, "approval_denied");
+    if (authorization.refused !== null) return deny(authorization.refused, refusalCode(authorization.refused));
     const approval = await this.askApproval(execution);
-    if (approval?.denied) return deny(approval.denied, "approval_denied");
+    if (approval?.denied) return deny(approval.denied, refusalCode(approval.denied));
     await this.init.prepareGuards?.(execution);
     const guard = this.init.registry.guardReason(execution);
     if (guard) return deny({ stage: "guard", reason: guard.reason, guardLabel: guard.label }, `guard_denied:${guard.label}`);
@@ -755,6 +793,9 @@ export class ToolPipeline {
         guardLabel: null
       });
     }
+    // UX-03: nobody is asked about a call the guards refuse.
+    const early = await this.earlyGuardDenial(execution);
+    if (early !== null) return denialOutcome(early);
     const approve = this.init.approve;
     const answer = await waitingOnApproval(execution, () => approve(execution)).catch((): ToolApprovalAnswer => "unavailable");
     if (answer === "allow") return null;
@@ -764,6 +805,11 @@ export class ToolPipeline {
       guardLabel: null
     });
   }
+}
+
+/** The journal's reason code for a refusal before the guard stage: a guard's early look, or a person's answer. */
+function refusalCode(denied: ToolDenial): string {
+  return denied.stage === "guard" ? `guard_denied:${denied.guardLabel ?? "unlabelled"}` : "approval_denied";
 }
 
 /** A drift or integrity freeze holding this call's class, as ToolHub refuses it. A freeze that cannot be read denies. */

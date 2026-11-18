@@ -86,7 +86,9 @@ export function renderNativeInteractiveToolResults(workspace: string, sessionId:
       const simulated = text.indexOf(SIMULATED);
       if (outcome === "OK" && simulated >= 0) return `  ${chalk.yellow("○")} ${head} · simulated, not run: ${short(text.slice(simulated + SIMULATED.length), 240)}`;
       if (outcome === "OK") return `  ${chalk.green("✓")} ${head} · ${exit}${firstLine(text)}${spill}`;
-      const word = outcome === "DENIED" ? "denied" : outcome === "CANCELLED" ? "cancelled" : outcome === "ERROR" ? "failed" : "outcome unknown";
+      // A refusal is shown whole (UX-03): its reason, a hook's own words included, is what a person acts on.
+      if (outcome === "DENIED") return `  ${chalk.red("✗")} ${head} · denied: ${short(text.replace(/^\[amc\] /, ""), 2000)}`;
+      const word = outcome === "CANCELLED" ? "cancelled" : outcome === "ERROR" ? "failed" : "outcome unknown";
       return `  ${chalk.red("✗")} ${head} · ${word}: ${exit}${firstLine(text)}${spill}`;
     });
     if (results.length > MAX_RESULTS) lines.unshift(chalk.dim(`  (${results.length - MAX_RESULTS} earlier tool calls in this turn not shown; /inspect lists them)`));

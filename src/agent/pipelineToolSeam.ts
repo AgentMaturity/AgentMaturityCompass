@@ -101,6 +101,18 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
       return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE", parentToken: request.parentToken });
     },
 
+    async denialBeforeApproval(request: ToolCallRequest) {
+      let args: Record<string, unknown>;
+      try {
+        args = parseArguments(request.rawArguments);
+      } catch {
+        return null;
+      }
+      const denied = await init.pipeline.denialBeforeApproval({ name: request.toolName, agentId: init.agentId, arguments: args,
+        requestedMode: "EXECUTE", parentToken: request.parentToken, callId: request.callId, signal: request.signal });
+      return denied === null ? null : denied.reason;
+    },
+
     bindApprovalGate(gate) {
       init.pipeline.bindApprovalGate(gate);
     },

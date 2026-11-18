@@ -159,6 +159,7 @@ export function gateToolCallsOnApproval(
     ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),
     ...(inner.actionClassOf === undefined ? {} : { actionClassOf: (toolName: string) => inner.actionClassOf!(toolName) }),
+    ...(inner.denialBeforeApproval === undefined ? {} : { denialBeforeApproval: (request: ToolCallRequest) => inner.denialBeforeApproval!(request) }),
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>
       inner.executionMode(request),
@@ -168,6 +169,12 @@ export function gateToolCallsOnApproval(
       const intent = inner.authorizationIntent?.(request) ?? null;
       // A call whose intent cannot bind is not put to a human: the pipeline denies it with the reason.
       if (intent?.ok === false) return inner.execute(request);
+      // UX-03: a call the automatic checks refuse is not put to a person. It still goes through `execute`, which records
+      // the guards' refusal; its effect guard refuses too, so the call cannot run unasked if they change their answer.
+      const early = inner.supportsEffectGuard === true ? await inner.denialBeforeApproval?.(request) ?? null : null;
+      if (early !== null) {
+        return inner.execute({ ...request, beforeEffect: () => `not run: the automatic checks refused it before anyone was asked (${early})` });
+      }
       const decision = await ask(approval, options, { callId: request.callId, toolName: request.toolName, intent,
         where: `during turn ${request.turn}, step ${request.step}`, signal: request.signal,
         // Without an intent, the model's own arguments, verbatim.

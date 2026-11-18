@@ -100,6 +100,11 @@ export interface AgentToolSeam {
   execute(request: ToolCallRequest): Promise<ToolCallOutcome>;
   /** Pipeline-backed seams: the intent an approval for this call must bind, or null outside the authorized classes. */
   authorizationIntent?(request: ToolCallRequest): AuthorizationIntentResult | null;
+  /**
+   * Pipeline-backed seams: why the automatic checks (guards, hooks) would refuse this call, asked before a person is
+   * (UX-03); null to ask. A gate that skips the question still runs the call through `execute`, where they decide again.
+   */
+  denialBeforeApproval?(request: ToolCallRequest): Promise<string | null>;
   /** Pipeline-backed seams: a composed approval gate binds itself, so sub-calls are asked and approvals required. */
   bindApprovalGate?(gate: BoundApprovalGate): void;
   /** The signed action class of a visible tool, or null when the seam cannot name it (an approval mode then gates it). */
