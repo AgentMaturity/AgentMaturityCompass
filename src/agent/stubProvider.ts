@@ -135,7 +135,7 @@ export function stubProviderTransport(options: StubProviderOptions = {}): HttpTr
 /** The shape the anthropic encoder produces, read back defensively. */
 interface EchoedRequest {
   readonly messages: readonly { readonly role: string; readonly content: readonly Record<string, unknown>[] }[];
-  readonly tools: readonly { readonly name: string }[];
+  readonly tools: readonly { readonly name: string; readonly input_schema?: unknown }[];
 }
 
 /**
@@ -215,12 +215,30 @@ function pendingDirective(request: EchoedRequest): boolean {
 /** Zero, and true: no model ran, so nothing was consumed. See the module header. */
 const STUB_USAGE = Object.freeze({ inputTokens: 0, outputTokens: 0 });
 
+/**
+ * True when `{text}` can satisfy the tool's published schema: no schema was sent, or every required argument is `text`.
+ * fs.read needs a path; calling it with the sentence as `text` fails its schema, which reads as a product failure (UX-28).
+ */
+function takesText(tool: EchoedRequest["tools"][number]): boolean {
+  const required = (tool.input_schema as { required?: unknown } | undefined)?.required;
+  return !Array.isArray(required) || required.every((name) => name === "text");
+}
+
+/** Said when tools are offered but none takes a sentence: the stand-in cannot choose arguments, so it says how to ask. */
+function toolRequestHint(request: EchoedRequest): string {
+  const example = request.tools.some((tool) => tool.name === "fs.write")
+    ? '{"tool": "fs.write", "arguments": {"path": "hello.txt", "content": "hi"}}'
+    : `{"tool": "${request.tools[0]?.name ?? ""}", "arguments": {...}}`;
+  return ` The stand-in model only repeats what you type; it cannot choose a tool or its arguments. To see a tool call, type a tool request such as ${example}`;
+}
+
 function* stubChunks(request: EchoedRequest): Generator<StreamChunk> {
   const asked = lastUserText(request);
-  const tool = request.tools[0];
-  if (tool !== undefined && (!hasToolResult(request) || pendingDirective(request))) {
+  const directed = directedCall(request);
+  const tool = request.tools.find(takesText);
+  if ((directed !== null || tool !== undefined) && (!hasToolResult(request) || pendingDirective(request))) {
     const id = toolCallId(`stub-call-${request.messages.length}`);
-    const { name, args } = directedCall(request) ?? { name: tool.name, args: JSON.stringify({ text: asked }) };
+    const { name, args } = directed ?? { name: tool!.name, args: JSON.stringify({ text: asked }) };
     yield { type: "block-start", index: 0, blockKind: "tool_use" };
     yield { type: "tool-call-delta", index: 0, id, name, argumentsDelta: args };
     yield { type: "block-end", index: 0, block: { kind: "tool_use", id, name, arguments: args } };
@@ -228,7 +246,8 @@ function* stubChunks(request: EchoedRequest): Generator<StreamChunk> {
     yield { type: "finish", reason: { kind: "tool_calls" } };
     return;
   }
-  const text = `stub provider: ${request.messages.length} message(s) in view; you last said ${JSON.stringify(asked)}.`;
+  const unasked = request.tools.length > 0 && tool === undefined && !hasToolResult(request);
+  const text = `stub provider: ${request.messages.length} message(s) in view; you last said ${JSON.stringify(asked)}.${unasked ? toolRequestHint(request) : ""}`;
   yield { type: "block-start", index: 0, blockKind: "text" };
   yield { type: "text-delta", index: 0, text };
   yield { type: "block-end", index: 0, block: { kind: "text", text } };

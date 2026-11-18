@@ -155,7 +155,7 @@ changeset.
 | Config | `profile: dev` | `profile: prod`, `security.trustBoundaryMode: isolated` |
 | Users | signed `users.yaml` with you as the ACTIVE OWNER | the same |
 | Control plan | none | a Layer 0 plan compiled and signed from `amc-control-plans/regulated-starter/deployment-profile.json`, not activated |
-| Next command | `amc agent-loop run "..." --provider stub --tools workspace` | `amc agent-loop run "..." --provider stub --tools workspace --preset regulated` |
+| Next command | `amc agent-loop chat --provider stub --tools workspace --approval-mode default` | `amc agent-loop run '{"tool":"fs.write","arguments":{"path":"hello.txt","content":"hi"}}' --provider stub --tools workspace --preset regulated` (the stand-in model calls a tool only when the prompt is a tool request) |
 
 Both refuse `--minimal`, `--skip-vault`, `--trust-boundary` and each other, and both refuse a directory that already
 has `.amc` (`--force` deletes it first). Budgets are the signed defaults.

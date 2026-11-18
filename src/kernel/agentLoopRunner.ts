@@ -445,7 +445,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let parent: SessionLineage | null = null;
   if (options.resume !== undefined) {
     if (options.sessionId === undefined) throw new Error("runComposedTurn: resume requires sessionId");
-    const opened = resumeSession({ workspace: options.workspace, sessionId: options.sessionId, ...options.resume, ...identity });
+    const opened = resumeSession({ workspace: options.workspace, sessionId: options.sessionId, ...options.resume, ...identity, legacyCompositionDigest: (skills) => compositionDigestOf(options, profile, skills) });
     session = opened.service;
     resumed = opened.report;
   } else if (options.forkFrom !== undefined) {

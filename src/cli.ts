@@ -2116,7 +2116,7 @@ function existingVaultLeftAlone(workspace: string): boolean {
   if (!vaultStatusNow(workspace).exists || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0) return false;
   console.log(chalk.yellow("This folder already has an AMC vault, so it is already set up. Nothing was changed."));
   console.log(chalk.gray(`  Commands that sign need that vault's passphrase: ${VAULT_UNLOCK_PATHS}.`));
-  console.log(chalk.gray("  To start over instead (this discards the vault and every record in .amc): amc init --force"));
+  console.log(chalk.gray("  For an agent that edits files and runs commands after you approve each one: amc init --coding"));
   return true;
 }
 
@@ -2181,17 +2181,17 @@ program
   .description("Initialize .amc workspace")
   .option("--trust-boundary <mode>", "isolated|shared (default isolated, as amc up writes; shared marks every run INVALID)")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
-  .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
+  .option("--force", "Force re-initialization, delete the existing .amc directory (refused where this computer created its keys)", false)
   .option("--skip-vault", "Skip the vault prompt: a random passphrase is generated and remembered for your user (CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
   .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
   .option("--web-allow-host <host>", "--coding only: also grant web_fetch and web_search this exact host or origin in the signed tools policy; repeatable (P2-13)", (v: string, p: string[] = []) => [...p, v])
   .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
-    const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
+    const { starterProfileFlag, runStarterInit, refuseForceOverCommittedKeys } = await import("./setup/starterProfiles.js");
     try {
       adoptVaultPassphraseFile(); // AMC_VAULT_PASSPHRASE_FILE seals the new vault as AMC_VAULT_PASSPHRASE does
-      const starter = starterProfileFlag(opts);
+      const starter = starterProfileFlag(opts); if (opts.force) refuseForceOverCommittedKeys(process.cwd()); // UX-29: before .amc is deleted
       if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     const skip = opts.skipVault && !opts.minimal ? skipVaultPassphrase() : { generated: null }; // LIVE-VAULT-04: refused before any write

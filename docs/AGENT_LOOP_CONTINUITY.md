@@ -19,6 +19,7 @@ A session is eligible when it is native (not imported), recorded for this agent,
 Limits, stated:
 
 - The original run's flags are required. Resume refuses a session whose composition or policy digest differs from `session/open` (provider, model, tools, approval gate, max-steps, compaction). `--continue` reports this as `CONTINUE_CONFIGURATION_MISMATCH: session <id> …` naming the session it chose, so you can restore the flags or pick another id. It does not search for an older session that would match.
+- A `/skill` loads for one turn and is not part of that digest, so one session can mix skill turns and plain turns, and a resumed session accepts a different skill, or a skill whose text changed: each turn's signed composition record names the skill it loaded with the sha256 of its content. A session that a skill turn opened before this rule still resumes: its digest is checked in the earlier form, with the skills its signed first turn names.
 - Nothing eligible is `NO_SESSION_TO_CONTINUE` (exit 1) with the recent sessions it passed over and why. A new session is never started silently.
 - Two sessions updated in the same millisecond are ordered by session id.
 

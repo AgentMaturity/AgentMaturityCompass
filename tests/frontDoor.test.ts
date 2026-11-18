@@ -168,6 +168,26 @@ function fake(picks: FrontDoorChoice[], over: Partial<FrontDoorIo> & { states?: 
   return f;
 }
 
+describe("the coding setup in the menu (UX-01)", () => {
+  it("offers the setup for a menu workspace, never pre-selected, and the coding chat once it is set up", () => {
+    const fresh = state({ coding: "can-set-up" });
+    expect(menuOptions(fresh)).toContainEqual({ value: "coding-setup", name: "Set up an agent that edits files and runs commands here (asks you first)" });
+    expect(defaultChoice(fresh)).toBe("demo-chat");
+    expect(defaultChoice(state({ coding: "can-set-up", lastChoice: "coding-setup" })), "a remembered setup is not pre-selected").toBe("demo-chat");
+    const ready = state({ coding: "ready" });
+    expect(values(ready)).toEqual(["coding-chat", "demo-chat", "build", "console", "score"]);
+    expect(defaultChoice(ready)).toBe("coding-chat");
+    expect(values(state())).not.toContain("coding-setup");
+  });
+
+  it("runs init --coding, comes back to the menu, then starts the coding chat that asks before each edit or command", async () => {
+    const f = fake(["coding-setup", "coding-chat"], { states: [state({ coding: "can-set-up" }), state({ coding: "ready" })] });
+    await runFrontDoor(f.io);
+    expect(f.amc).toEqual([["(chat env)", "init", "--coding"],
+      ["agent-loop", "chat", "--provider", "stub", "--tools", "workspace", "--approval-mode", "default"]]);
+  });
+});
+
 describe("runFrontDoor", () => {
   // 2026-11-14: AMC's default gateway port is one per machine and a busy one is refused, so a second folder could not start.
   it("when another AMC folder holds the default ports, asks before starting this folder on its own, and names the port", async () => {
