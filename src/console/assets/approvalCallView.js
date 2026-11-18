@@ -24,6 +24,8 @@ export function approvalCallHtml(row) {
   return `<section class="card approval-call"><h3>What you are approving: ${esc(call.title)}</h3>${head}
     <p><strong>Working folder:</strong> ${call.folder === "." ? "this workspace (the folder AMC runs in); paths below are inside it" : esc(call.folder)}</p>
     ${linesHtml(Array.isArray(call.lines) ? call.lines : [])}
+    ${Array.isArray(call.hidden) && call.hidden.length > 0 ? `<p class="status-warn"><strong>Hidden from this view:</strong> ${esc(call.hidden.join(", "))}. Only secret-shaped text is hidden; every command and path is shown.</p>` : ""}
+    <p class="muted">Approving covers the exact call the agent made (arguments digest ${esc(String(call.digest || "").slice(0, 16))}…), not this rendering of it.</p>
     ${call.complete ? `<p class="muted">This is the whole call, checked against the signed request.</p>`
       : `<p class="status-bad">Part of this call could not be shown in full (long, hidden or unreadable characters). Read it with care.</p>`}
   </section>`;

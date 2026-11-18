@@ -16,6 +16,7 @@ import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { summarizeNativeSessions } from "../session/latestSession.js";
 import { callMatchesRequest, describeReportedCall } from "../setup/nativeApprovalPreview.js";
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
+import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -135,32 +136,31 @@ export function approvalCallFor(workspace: string, request: ApprovalRequestRecor
     // (a private key body) or one a cut would split is never partly shown.
     const redacted = redactArguments(call.rawArguments);
     const shown = shareable(workspace, describeReportedCall(workspace, redacted.call === null ? call : { toolName: call.toolName, arguments: redacted.call }));
-    return redacted.count > 0 || redacted.call === null ? { ...shown, complete: false } : shown;
+    const digest = typeof request.authorizationIntent?.argumentsDigest === "string" ? request.authorizationIntent.argumentsDigest : request.boundHashes.intentHash;
+    const hidden = [...redacted.hidden].map(([type, count]) => `${count} ${type.replaceAll("_", " ")}${count === 1 ? "" : "s"}`);
+    return { ...shown, hidden, digest, complete: shown.complete && hidden.length === 0 && redacted.call !== null };
   } catch (error) {
     return { unavailable: `the call could not be shown: ${error instanceof Error ? error.message : String(error)}` };
   }
 }
 
-type ShownCall = { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean; readonly folder: string };
+type ShownCall = { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean; readonly folder: string;
+  /** What was hidden from this rendering, by kind ("1 private key"); the approval still covers the exact call. */
+  readonly hidden?: readonly string[];
+  /** The digest of the exact arguments the signed request binds: what the approval covers, not this rendering. */
+  readonly digest?: string };
 
 /**
  * The call as it may leave this machine's process for a browser: host paths (the workspace, the home folder) written
- * relative, and secrets redacted as `amc session export` redacts them; anything redacted marks the call incomplete.
+ * relative. Secrets were redacted in the arguments before they were split into lines (`redactArguments`); nothing here
+ * hides more, so no command text is hidden from the person deciding.
  */
 function shareable(workspace: string, call: { title: string; lines: readonly string[]; complete: boolean }): ShownCall {
   let real = workspace;
   try { real = realpathSync(workspace); } catch { /* the given path is all there is */ }
   const hosts: Array<[string, string]> = [[real, "."], [workspace, "."], [homedir(), "~"]];
-  let redactions = 0;
-  const clean = (text: string): string => {
-    let out = text;
-    for (const [host, shown] of hosts) if (host.length > 1) out = out.split(host).join(shown);
-    const redacted = redactSecrets(out, (type) => `[REDACTED:${type}]`);
-    redactions += redacted.findings.length;
-    return redacted.redacted;
-  };
-  const lines = call.lines.map(clean);
-  return { title: clean(call.title), lines, complete: call.complete && redactions === 0, folder: "." };
+  const clean = (text: string): string => hosts.reduce((out, [host, shown]) => (host.length > 1 ? out.split(host).join(shown) : out), text);
+  return { title: clean(call.title), lines: call.lines.map(clean), complete: call.complete, folder: "." };
 }
 
 /** Roles that record approval decisions at all (Studio's decide route), before the request's own rolesAllowed. */
@@ -178,21 +178,44 @@ export function approvalCallField(workspace: string, request: ApprovalRequestRec
   return decides || raised ? { call: approvalCallFor(workspace, request, status) } : {};
 }
 
-/** Each string in the parsed arguments, redacted whole; null (shown as unreadable) when they are not a JSON object. */
-function redactArguments(raw: string): { readonly call: Record<string, unknown> | null; readonly count: number } {
+/** Arguments that run or choose a target: only shape-limited redaction, and never across a command separator. */
+const EXECUTED = new Set(["command", "find", "replace", "patch", "path", "url", "argv", "args", "edits", "workdir", "cwd"]);
+const SEPARATOR = /[;&|`$()<>]/;
+
+/** Token- and key-shaped secrets only; a match holding a separator (or a line break outside a key body) stays visible. */
+function shapeRedact(text: string, hidden: Map<string, number>): string {
+  let out = text;
+  for (const entry of SECRET_PATTERNS) {
+    if (entry.type === "connection_string") continue; // its character class runs across shell separators
+    out = out.replace(new RegExp(entry.pattern.source, `${entry.pattern.flags.replace("g", "")}g`), (match) => {
+      if (SEPARATOR.test(match) || (entry.type !== "private_key" && /[\r\n]/.test(match))) return match;
+      hidden.set(entry.type, (hidden.get(entry.type) ?? 0) + 1);
+      return `[REDACTED:${entry.type}]`;
+    });
+  }
+  return out;
+}
+
+/**
+ * Each string in the parsed arguments, redacted whole before anything splits or cuts it: arguments that run or choose a
+ * target get only shape-limited redaction (`shapeRedact`), others (file content) the full export redactor. Null (shown
+ * as unreadable) when they are not a JSON object.
+ */
+function redactArguments(raw: string): { readonly call: Record<string, unknown> | null; readonly hidden: Map<string, number> } {
+  const hidden = new Map<string, number>();
   let parsed: unknown;
-  try { parsed = JSON.parse(raw === "" ? "{}" : raw); } catch { return { call: null, count: 0 }; }
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { call: null, count: 0 };
-  let count = 0;
-  const walk = (value: unknown): unknown => {
+  try { parsed = JSON.parse(raw === "" ? "{}" : raw); } catch { return { call: null, hidden }; }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { call: null, hidden };
+  const walk = (value: unknown, executed: boolean): unknown => {
     if (typeof value === "string") {
+      if (executed) return shapeRedact(value, hidden);
       const result = redactSecrets(value, (type) => `[REDACTED:${type}]`);
-      count += result.findings.length;
+      for (const finding of result.findings) hidden.set(finding.type, (hidden.get(finding.type) ?? 0) + 1);
       return result.redacted;
     }
-    if (Array.isArray(value)) return value.map(walk);
-    if (value !== null && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item)]));
+    if (Array.isArray(value)) return value.map((item) => walk(item, executed));
+    if (value !== null && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item, executed)]));
     return value;
   };
-  return { call: walk(parsed) as Record<string, unknown>, count };
+  return { call: Object.fromEntries(Object.entries(parsed).map(([key, value]) => [key, walk(value, EXECUTED.has(key))])), hidden };
 }
