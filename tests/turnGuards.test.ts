@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { canonicalArguments, describeTurnStop, firstStop, projectTurnStops, TurnGuards, TURN_GUARD_DEFAULTS, turnPolicies } from "../src/agent/turnGuards.js";
 import { describeRunLimit, parseRunLimits, RunLimitTracker } from "../src/agent/runLimits.js";
 import { isTurnCancelCause } from "../src/session/sessionTypes.js";
+import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { canonicalTurnCancelCause, readTurnEndMeta } from "../src/session/turnLifecycleMeta.js";
 import type { ToolCallOutcome } from "../src/agent/toolSeam.js";
 import type { ActionClass, EvidenceEvent } from "../src/types.js";
@@ -174,6 +175,9 @@ describe("turn guards in the driver", () => {
     expect(harness.driver.runLimitEnding).toBeNull();
     expect(projectTurnStops(events, harness.sessionId)).toEqual([expect.objectContaining({ turn: 1, condition: "repeated-call",
       text: 'The agent made the same tool call 5 times in a row ("spin"), so AMC ended the turn.' })]);
+    harness.finish();
+    const verdict = await verifyLedgerIntegrity(harness.dir);
+    expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
   });
 
   it("a guard stop ends only the turn: the next turn starts fresh and runs the same call", async () => {

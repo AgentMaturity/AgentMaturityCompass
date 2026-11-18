@@ -288,6 +288,9 @@ describe("runExitCode — derived from the execution phases", () => {
     expect(code("complete")).toBe(0);
     expect(code("complete", ["completed"])).toBe(0);
     expect(code("cancelled")).toBe(3); expect(code("interrupted")).toBe(3);
+    // A turn guard ends the turn as a signed cancel; the run reports it as bounded, like the step cap.
+    expect(runExitCode({ summary: summary(), execution: execution("cancelled"), ending: { turn: 1, reason: "cancelled", cancelCause: "limit", interrupted: false },
+      validationRequested: false, guardStop: { kind: "limit", condition: "repeated-call", bound: 5, tools: ["read"] } })).toBe(4);
     expect(code("max_steps")).toBe(4); expect(code("max_tokens")).toBe(4);
     expect(code("blocked")).toBe(5);
     expect(code("complete", ["outcome_unknown"])).toBe(6);
