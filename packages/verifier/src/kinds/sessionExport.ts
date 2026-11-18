@@ -24,6 +24,8 @@ import { refused } from "./common.js";
 const BUNDLE_KIND = "amc.session-export";
 const VIEWER_SCHEMA = "amc.session-export/v1";
 const GENESIS = "SESSION_GENESIS";
+const BUNDLE_KEYS = ["v", "kind", "sessionId", "exportedTs", "descriptor", "record", "rows", "monitorPublicKeys"];
+const VIEWER_KEYS = ["schema", "exportedAt", "sessionId", "monitorPublicKeyPem", "monitorKeyFingerprint", "record", "rows", "content", "usage"];
 const HEX64 = /^[0-9a-f]{64}$/;
 const CONTENT_EVENT_TYPES = new Set(["system/prompt", "user/message", "assistant/block", "tool/call", "tool/result"]);
 
@@ -247,6 +249,11 @@ function checkContent(parsed: Parsed, integrity: Finding<"integrity">[]): string
 export function evaluateSessionExport(value: Record<string, unknown>, env: Env, fromHtml: boolean): Evaluation {
   const supported = (value.kind === BUNDLE_KIND && value.v === 1) || value.schema === VIEWER_SCHEMA;
   if (!supported) return refused("session-export", { code: "UNSUPPORTED_VERSION", detail: "a session export version this verifier does not know" });
+  // Exactly the exporter's top-level fields, as AMC's own verifiers require: a page could show text nothing checked.
+  const keys = value.kind === BUNDLE_KIND ? BUNDLE_KEYS : VIEWER_KEYS;
+  const unknown = Object.keys(value).filter((key) => !keys.includes(key));
+  if (unknown.length > 0) return refused("session-export", { code: "UNKNOWN_FIELD", detail: `unknown top-level field(s): ${unknown.slice(0, 5).join(", ")}` });
+  if (value.kind === BUNDLE_KIND && !isRecord(value.descriptor)) return refused("session-export", { code: "MALFORMED", detail: "a sealed bundle must carry its descriptor" });
   let parsed: Parsed;
   try {
     parsed = parse(value);

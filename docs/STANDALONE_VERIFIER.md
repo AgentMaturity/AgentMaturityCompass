@@ -49,7 +49,7 @@ amc-verify verify attestation.json \
 
 Exit codes: **0** every dimension passes; **1** any dimension fails; **3** none fails but at least one is not
 evaluated; **64** usage error (unreadable file, bad flag). A CI wrapper must not treat exit 3 as success: it means
-something was not checked.
+something was not checked. For a session export only, **4** means everything that can be checked passed (unchanged, signed by a key your trust list admits, sealed and complete) and only what cannot be checked is open (whether the work was right; scope when no `--expect-*` was given); its result line ends without "Not a pass". A session export that is not sealed, or whose shown text or page was not checked, exits **3** and its result line says "Not a pass: …"; a changed or doctored export exits **1**.
 
 Library: `verifyArtifact(bytes, { trustLists, trustRoots, asOf, expectScope, knownSequences, evidence })` returns the
 same report. It does no I/O. Bad options (a root that is not 64 hex, an invalid date) throw `TypeError`.
