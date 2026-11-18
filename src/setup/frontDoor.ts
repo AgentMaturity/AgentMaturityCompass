@@ -19,6 +19,7 @@ import { defaultPortOrFree } from "../studio/studioLifecycle.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { inspectSignIn, type SignInReport } from "./agentSignIn.js";
 import { codingAdoptionBlockers } from "./codingAdoption.js";
+import { vaultExists, vaultOpensWith } from "../vault/vault.js";
 import { NATIVE_FIRST_USE_PROVIDERS } from "./nativeFirstUseGuide.js";
 import { detectProviderKeys, type DetectedProviderKey } from "./quickSetup.js";
 
@@ -309,7 +310,13 @@ export function terminalFrontDoorIo(params: { workspace: string; agentId: string
     select: async (message, options, selected) => (await inquirer.prompt<{ choice: FrontDoorChoice }>([{ type: "select", name: "choice", message,
       choices: options.map((option) => ({ name: option.name, value: option.value })), default: selected }])).choice,
     confirm: async (message) => (await inquirer.prompt<{ yes: boolean }>([{ type: "confirm", name: "yes", message, default: true }])).yes,
-    runAmc: (args, chat, extraEnv) => attached(process.execPath, [entry, ...args], workspace, { ...(chat === true ? process.env : operatorEnv), ...extraEnv }),
+    runAmc: (args, chat, extraEnv) => {
+      const code = attached(process.execPath, [entry, ...args], workspace, { ...(chat === true ? process.env : operatorEnv), ...extraEnv });
+      // A child can change the vault passphrase (the coding setup does): one that no longer opens the vault is not passed on.
+      const held = process.env.AMC_VAULT_PASSPHRASE;
+      if (held && vaultExists(workspace) && !vaultOpensWith(workspace, held)) delete process.env.AMC_VAULT_PASSPHRASE;
+      return code;
+    },
     portsIfDefaultBusy: async () => {
       if ((operatorEnv.AMC_GATEWAY_PORT ?? "").length > 0) return null;
       const gateway = await defaultPortOrFree("127.0.0.1", DEFAULT_GATEWAY_PORT);

@@ -332,7 +332,7 @@ export async function runStarterInit(workspace: string, kind: StarterProfileKind
     console.log("Removed existing .amc directory (--force mode)");
   }
   if (pathExists(amcDir)) {
-    throw new Error(`${workspace} already has an .amc directory; a starter profile initializes a new workspace (--force deletes .amc first).`);
+    throw new Error(`${workspace} already has an .amc directory; a starter profile initializes a new workspace. Use a new folder.`);
   }
   let initialized = false;
   try {

@@ -8,7 +8,9 @@
  * the person approves that one call. This adds no other way for an action to run. It refuses, changing nothing, when:
  * - the process is not a person at a terminal (an agent marker, agent mode, or no terminal: interactiveOperator);
  * - the workspace has accounts, an approval policy, or tools, action-policy or config files that differ from what the
- *   menu wrote (moving them to the coding setup would replace someone's choices);
+ *   menu wrote (moving them to the coding setup would replace someone's choices), or this computer did not create its
+ *   keys (a clone or a copy);
+ * - the vault passphrase does not open the vault;
  * - the person does not say yes.
  * A vault whose passphrase AMC generated (the menu's `.amc/local-vault-passphrase`) gets a passphrase the person types,
  * as `init --coding` requires, through `amc vault passphrase`'s own change (same keys). An existing firewall policy is
@@ -31,6 +33,7 @@ import { canonicalize } from "../utils/json.js";
 import { changeVaultPassphrase } from "../vault/vaultCli.js";
 import { loadLocalVaultPassphrase, localVaultPassphrasePath } from "../vault/localPassphrase.js";
 import { interactiveOperator, operatorRefusalText } from "../vault/operatorContext.js";
+import { vaultOpensWith } from "../vault/vault.js";
 import { loadAMCConfig } from "../workspace.js";
 
 /** What the coding setup allows and what it does not, in the words the menu and `init --coding` show before asking. */
@@ -46,6 +49,8 @@ const parsedYaml = (path: string): unknown => YAML.parse(readFileSync(path, "utf
 /** Each file the move would replace that is not as the menu wrote it, in words; empty when the move may go ahead. */
 export function codingAdoptionBlockers(workspace: string): string[] {
   if (!existsSync(join(workspace, ".amc", "amc.config.yaml"))) return ["its .amc folder is not a complete AMC workspace"];
+  // As for .amc/local-vault-passphrase: only a workspace whose keys this computer created, never a clone or a copy.
+  if (keysetAnchoring(workspace).state !== "committed") return ["this computer did not create its keys (a copy or a clone)"];
   const blockers: string[] = [];
   if (existsSync(usersConfigPath(workspace))) blockers.push("it already has accounts (.amc/users.yaml)");
   if (existsSync(approvalPolicyPath(workspace))) blockers.push("it already has an approval policy (.amc/approval-policy.yaml)");
@@ -94,6 +99,8 @@ async function adoptionPassphrases(workspace: string, io: CodingAdoptionIo): Pro
   const generated = existsSync(localVaultPassphrasePath(workspace));
   if (!process.env.AMC_VAULT_PASSPHRASE) loadLocalVaultPassphrase(workspace);
   const current = process.env.AMC_VAULT_PASSPHRASE || await io.secret("Vault passphrase");
+  // Checked before anything is written: a wrong one would fail half way, after tools.yaml was rewritten.
+  if (!vaultOpensWith(workspace, current)) throw new Error("That passphrase does not open this folder's vault. Nothing was changed.");
   if (!generated) return { current, next: null };
   io.log("Choose a vault passphrase. You type it to start a chat here.");
   const next = await io.newSecret("New vault passphrase");
@@ -109,7 +116,7 @@ export interface CodingAdoption {
 
 /**
  * The person's gate, the checks and the yes, then the passphrase answers. Returns null when the person said no.
- * Writes nothing: the caller collects the owner's login next and then calls completeCodingAdoption.
+ * Writes nothing: the caller collects the owner's login next, then seals the passphrase and applies the setup.
  */
 export async function prepareCodingAdoption(workspace: string, io: CodingAdoptionIo = terminalAdoptionIo): Promise<CodingAdoption | null> {
   assertPersonAdopts(workspace);

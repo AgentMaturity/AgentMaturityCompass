@@ -73,6 +73,25 @@ describe("the front door's terminal I/O", () => {
     expect(process.listenerCount("SIGINT")).toBe(sigintListeners);
   });
 
+  it("after a child changed the vault passphrase (the coding setup), the old one is not passed to the next child (UX-01)", async () => {
+    const { initWorkspace } = await import("../src/workspace.js");
+    const { lockVault } = await import("../src/vault/vault.js");
+    vi.stubEnv("AMC_HOME", join(workspace, "amc-home"));
+    vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(workspace, "checkpoints"));
+    const root = join(workspace, "ws");
+    mkdirSync(root);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "the passphrase that opens it");
+    initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+    lockVault(root);
+    const terminal = terminalFrontDoorIo({ workspace: root, agentId: "default", operatorEnv: {}, openUrl: () => true, showScore: async () => undefined });
+    terminal.runAmc(["agent-loop", "chat"], true);
+    expect(process.env.AMC_VAULT_PASSPHRASE, "one that opens the vault is kept").toBe("the passphrase that opens it");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "a passphrase the setup replaced");
+    terminal.runAmc(["init", "--coding"], true);
+    expect(process.env.AMC_VAULT_PASSPHRASE).toBeUndefined();
+    vi.unstubAllEnvs();
+  }, 60_000);
+
   it("offers other ports only when the default gateway port is busy and none is configured", async () => {
     await expect(make().portsIfDefaultBusy()).resolves.toBeNull();
     io.port.mockImplementation(async (_host, port) => port + 1000);

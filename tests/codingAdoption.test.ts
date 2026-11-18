@@ -16,6 +16,7 @@ import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { appendOpsAuditEvent } from "../src/ops/audit.js";
 import { assertPersonAdopts, codingAdoptionBlockers } from "../src/setup/codingAdoption.js";
 import { refuseForceOverCommittedKeys, runStarterInit } from "../src/setup/starterProfiles.js";
+import { loadRuntimeFirewallPolicy, writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { toolsConfigPath } from "../src/toolhub/toolhubValidators.js";
 import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 import { localVaultPassphrasePath } from "../src/vault/localPassphrase.js";
@@ -99,6 +100,39 @@ describe("moving a menu workspace to the coding setup (UX-01)", () => {
     expect(await runStarterInit(dir, "coding")).toBeNull();
     expect(existsSync(usersConfigPath(dir))).toBe(false);
     expect(existsSync(localVaultPassphrasePath(dir))).toBe(true);
+  });
+
+  it("keeps a firewall policy the folder already had", async () => {
+    const dir = menuWorkspace();
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", readFileSync(localVaultPassphrasePath(dir), "utf8").trim());
+    writeRuntimeFirewallPolicy({ workspace: dir, mode: "block" });
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    const report = await runStarterInit(dir, "coding");
+    expect(report?.firewallMode).toBe("block");
+    expect(loadRuntimeFirewallPolicy(dir)?.mode).toBe("block");
+  });
+
+  it("with the person's own passphrase: a wrong one is refused before anything is written; the right one is kept", async () => {
+    const dir = temp("amc-adopt-own-");
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "the person's own passphrase");
+    initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+    lockVault(dir);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    const tools = readFileSync(toolsConfigPath(dir), "utf8");
+    await expect(runStarterInit(dir, "coding")).rejects.toThrow("That passphrase does not open this folder's vault. Nothing was changed.");
+    expect(readFileSync(toolsConfigPath(dir), "utf8")).toBe(tools);
+    expect(existsSync(usersConfigPath(dir))).toBe(false);
+    answers.passphrase = "the person's own passphrase";
+    try {
+      expect((await runStarterInit(dir, "coding"))?.readiness.ready).toBe(true);
+      expect(vaultOpensWith(dir, "the person's own passphrase")).toBe(true);
+    } finally { answers.passphrase = "my own vault passphrase"; }
+  });
+
+  it("refuses a copy whose keys another computer created", async () => {
+    const dir = menuWorkspace();
+    vi.stubEnv("AMC_HOME", temp("amc-adopt-other-machine-"));
+    expect(codingAdoptionBlockers(dir)).toEqual(["this computer did not create its keys (a copy or a clone)"]);
   });
 
   it("refuses a workspace someone already changed, naming what, and changes nothing", async () => {

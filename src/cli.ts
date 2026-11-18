@@ -2181,7 +2181,7 @@ program
   .description("Initialize .amc workspace")
   .option("--trust-boundary <mode>", "isolated|shared (default isolated, as amc up writes; shared marks every run INVALID)")
   .option("--profile <name>", "workspace config profile: dev|ci|prod", "dev")
-  .option("--force", "Force re-initialization, overwrite existing .amc directory", false)
+  .option("--force", "Force re-initialization, delete the existing .amc directory (refused where this computer created its keys)", false)
   .option("--skip-vault", "Skip the vault prompt: a random passphrase is generated and remembered for your user (CI/headless init)", false)
   .option("--minimal", "Startup-friendly setup without vault prompt or immediate full score", false)
   .option("--coding", "Starter profile: signed coding tools, a contained shell without network, firewall warn (P1-40)")
