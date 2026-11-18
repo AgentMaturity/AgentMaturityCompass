@@ -46,11 +46,14 @@ preview is on; A4 is reached from Home. On a phone, the menu button at the top o
 - `Home`: service health, fleet summary, trust/integrity tiles.
 - `Sign in`: one card with the logo, user name, password and **Sign in**; a failed sign-in says why under the card. The pairing code, "No account yet?", the emergency admin token and pairing another device sit in closed sections.
 - `Run a task`: asks "What should your agent do?" with one box, a model and tools picker, and three ideas that only fill the box. A task is drawn as a route (your task, working, answer, checked; a request waiting for approval shows as waiting, a task that did not finish as stopped), the conversation as tiles, and an answer with two chips that open their full notices ("Stand-in model", "Correctness not checked"); Answer is ticked only after a turn that completed, and Checked only after a full verification (a partial one reads "Partly checked"). The task's buttons stay in sight; task details, evidence, tool activity, the agent's plan, checks, usage, task settings and your earlier tasks are one click away.
-- `Agent`: score, radar, heatmap, provider/model last-seen, evidence coverage.
+- `My agent`: "How your agent is doing": the overall level as a dial out of 5 drawn in ink with its trust label and evidence label beside it (never a tick or a badge), integrity, evidence coverage and whether claims are allowed, each area as an ink bar, and the first three things to improve with their levels (all suggestions one click away). A run that fails its seal shows no score. Under it the agent's state (proposed, approved, active) as a route; its transitions, reassessments and the owner's change form are one click away.
 - `Equalizer`: one slider per active diagnostic question with deterministic what-if preview and signed apply.
 - `Governor`: action-class allow/deny matrix with reasons.
 - `ToolHub`: allowed tools, recent executions, denials, receipt verify actions.
-- `Approvals`: quorum progress, dual-control decisions, single-shot consumption.
+- `Approvals`: each request as a card: what it is, its path (asked, then its decision in words, then used), the people who decided as initials with their decision, the places still open, who may decide, and Approve, Dry run only and Deny where you may decide (unchanged). **Waiting** and **All** switch the list; search and filters, and each request's details, are one click away.
+- `Records`: what AMC recorded about the agent: **Run the full score**, counts, the eight parts as tiles with their state in words, and every kind of record (with its count) one click away. The "Signature limits" chip says what a signature shows.
+- `Industry Packs`: "Pick your field": the seven stations as tiles that narrow the packs, each pack as a card with Open; the "AI-drafted, not legal advice" chip opens the full notice. An open pack asks one question at a time with **Score** always in reach; what the pack is for, its rules and how scoring works are one click away.
+- `Live runs`: runs of connected agents as cards with their state in words; tool-call numbers, latest events, the table and recording a run by hand are one click away.
 - `Users`: owner-managed user/role administration.
 - `Leases`: active lease metadata (no token disclosure), expiry, revoke.
 - `Budgets`: usage vs limits, consequences, signed update path.
