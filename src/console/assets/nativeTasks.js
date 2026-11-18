@@ -2,7 +2,7 @@ import { apiNativeRequest, getAdminToken } from "./api.js";
 import { nativeTasksShell, providerLabel, renderTaskScope, renderTaskIdentity, renderTaskApprovals,
   renderTaskVerification, renderTaskValidationSetup, renderTaskValidation, renderTaskList, taskStateLabel, appendTaskEvent,
   renderTaskAttachments, collectNativeTaskTools, renderTaskToolStatus, renderTaskUsage, renderTaskPlans, nativeTaskErrorText,
-  renderTaskRoute, renderOutcomeChips } from "./nativeTasksView.js";
+  renderTaskRoute, renderOutcomeChips, answerShown } from "./nativeTasksView.js";
 import { captureNativeSubmission, nativeSubmissionScopeMatches, nativeSubmissionAcknowledged,
   definiteNativeSubmissionRefusal, nativeSubmissionDraftMatches, readNativeTextAttachment,
   composeNativeTaskInput, nativeTaskMediaCapabilities, readNativeMediaAttachment,
@@ -324,20 +324,22 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
   /** One plain line next to Run task: the result, why it failed, or that the record could not be checked. */
   function renderOutcome() {
     const node = el("nativeTaskOutcome");
-    const finished = task && !stale && !readPaused && task.state === "idle" && task.history.status === "authenticated"
-      && task.turnEndReason && !["error","interrupted"].includes(task.turnEndReason);
+    const answered = task && !stale && !readPaused && task.history.status === "authenticated" && answerShown(task);
+    const finished = answered && task.state === "idle";
+    // The notices stay under an answer in every state (closed and released too); re-rendered only when they change.
+    const chips = answered ? renderOutcomeChips(task) : "", chipNode = el("nativeTaskOutcomeChips");
+    if (chipNode.dataset.rendered !== chips) { chipNode.innerHTML = chips; chipNode.dataset.rendered = chips; }
     const key = readFailed ? "read-failed" : !task || stale || mutation || pending ? "" : task.state === "failed" ? `failed:${task.error || ""}`
       : finished ? `finished:${task.taskId}:${task.agentId}` : "";
+    el("nativeTaskResult").hidden = !key && !chips;
     if (node.dataset.key === key) return;
     node.dataset.key = key; node.replaceChildren(); node.hidden = !key; node.classList.toggle("status-bad", key !== "" && !finished);
-    el("nativeTaskResult").hidden = !key;
-    el("nativeTaskOutcomeChips").innerHTML = finished ? renderOutcomeChips(task) : "";
     if (readFailed) node.textContent = NATIVE_TASK_READ_FAILED;
     else if (key.startsWith("failed:")) node.textContent = `This task did not finish. ${task.error || "Studio recorded no reason."}`;
     else if (finished) {
       const link = document.createElement("a");
       link.href = "#nativeTaskRecord"; link.textContent = "See what AMC recorded";
-      node.append(`Task finished${config?.demo ? " (local demonstration, not a model answer)" : ""}. The answer is above. `, link);
+      node.append(`Task finished${config?.demo ? " with the stand-in model, not a real model answer" : ""}. The answer is above. `, link);
     }
   }
   function project() {

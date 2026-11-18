@@ -1,7 +1,7 @@
 // Run a task (studio-ui "run" slice): the task's route comes from the task's own fields only, and the result's chips
 // open the full notices.
 import { describe, expect, test } from "vitest";
-import { taskRouteSteps, renderTaskRoute, renderOutcomeChips, nativeTasksShell, providerLabel, RUN_SUGGESTIONS,
+import { taskRouteSteps, renderTaskRoute, answerShown, renderOutcomeChips, nativeTasksShell, providerLabel, RUN_SUGGESTIONS,
   STAND_IN_NOTICE, CORRECTNESS_NOTICE } from "../../src/console/assets/nativeTasksView.js";
 
 const base = { state: "idle", turnEndReason: "complete", approvals: [], history: { status: "authenticated" }, verification: "not-verified" };
@@ -26,6 +26,35 @@ describe("taskRouteSteps", () => {
     expect(states({ ...base, state: "cancel-requested" })).toEqual(["done", "stop", "todo", "todo"]);
     expect(states({ ...base, turnEndReason: "error" })).toEqual(["done", "done", "stop", "todo"]);
     expect(taskRouteSteps({ ...base, state: "closed", verification: "failed" })[3]).toEqual({ label: "Check failed", state: "stop" });
+  });
+
+  test("Checked is done only for a full verification verdict", () => {
+    const closed = { ...base, state: "closed" };
+    expect(taskRouteSteps(closed)[3]).toMatchObject({ label: "Checked", state: "todo", hint: "Not checked yet" });
+    expect(taskRouteSteps({ ...base, state: "released" })[3].state).toBe("todo");
+    expect(taskRouteSteps({ ...closed, verification: "externally-anchored" })[3]).toMatchObject({ label: "Checked", state: "done" });
+    expect(taskRouteSteps({ ...closed, verification: "anchored-prefix" })[3]).toMatchObject({ label: "Partly checked", state: "done" });
+    expect(taskRouteSteps({ ...closed, verification: "something-new" })[3].state).toBe("todo");
+  });
+
+  test("Answer is done only when the turn ended normally", () => {
+    for (const reason of ["error", "interrupted", "cancelled", "blocked", "max_tokens", "max_steps", "unknown-reason"]) {
+      for (const state of ["idle", "closed", "verifying", "released"]) {
+        expect(taskRouteSteps({ ...base, state, turnEndReason: reason })[2].state, `${state} after ${reason}`).toBe("stop");
+      }
+    }
+    expect(taskRouteSteps({ ...base, state: "closed", turnEndReason: "error", verification: "workspace-key-consistency" })
+      .map(step => step.state)).toEqual(["done", "done", "stop", "done"]);
+    expect(answerShown({ ...base, turnEndReason: "cancelled" })).toBe(false);
+    expect(answerShown(base)).toBe(true);
+  });
+
+  test("an idle task with no turn ending yet is not shown as stopped", () => {
+    expect(states({ ...base, turnEndReason: null })).toEqual(["done", "todo", "todo", "todo"]);
+  });
+
+  test("unreadable approvals wait for a person instead of showing Working", () => {
+    expect(taskRouteSteps({ ...base, state: "running", turnEndReason: null, approvalError: "Could not read." })[1].state).toBe("wait");
   });
 
   test("an unconfirmed read or unauthenticated history shows nothing as done", () => {

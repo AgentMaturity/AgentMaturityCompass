@@ -17,26 +17,38 @@ export const RUN_SUGGESTIONS = [
   ["Draft an update", "Draft a short status update for my team about this week."]
 ];
 
+/** True only when the last turn ended normally ("complete"); every other or unknown ending is not an answer. */
+export const answerShown = task => task?.turnEndReason === "complete";
+/** How a turn that did not complete is named on the route (at most two words); unknown endings read "No answer". */
+const ENDING_STEPS = { cancelled: "Stopped", blocked: "Blocked", max_tokens: "Cut short", max_steps: "Cut short" };
+/** Only these two verdicts check the whole record; the prefix verdict checks part of it. */
+const CHECK_STEPS = { "workspace-key-consistency": { label: "Checked", state: "done" }, "externally-anchored": { label: "Checked", state: "done" },
+  "anchored-prefix": { label: "Partly checked", state: "done", hint: "Only the first part of the record was checked" },
+  failed: { label: "Check failed", state: "stop" } };
+
 /**
  * The task as a route of four waypoints, from the task's own fields only. A read that is not confirmed (stale, or
- * history AMC could not authenticate) shows nothing as done; pending approvals wait; a failed or stopping task stops.
+ * history AMC could not authenticate) shows nothing as done; pending or unreadable approvals wait; a failed or
+ * stopping task stops; Answer is done only after a complete turn and Checked only after a full verification verdict.
  */
 export function taskRouteSteps(task, { stale = false } = {}) {
   const steps = [{ label: "Your task", state: "now" }, { label: "Working", state: "todo" }, { label: "Answer", state: "todo" }, { label: "Checked", state: "todo" }];
   if (!task) return steps;
   if (stale || task.history?.status === "unavailable") return steps.map(step => ({ ...step, state: "todo" }));
   steps[0].state = "done";
-  const state = task.state, ended = task.turnEndReason && !["error", "interrupted"].includes(task.turnEndReason);
+  const state = task.state, ending = task.turnEndReason;
   if (task.approvals?.length) steps[1] = { label: "Needs approval", state: "wait", hint: "A person must review a request in Approvals" };
+  else if (task.approvalError) steps[1] = { label: "Check approvals", state: "wait", hint: "Pending approvals could not be read. Refresh status." };
   else if (["starting", "running"].includes(state)) steps[1].state = "now";
   else if (state === "cancel-requested") steps[1] = { label: "Stopping", state: "stop" };
   else if (state === "failed") steps[1] = { label: "Did not finish", state: "stop" };
-  else steps[1].state = "done";
+  else if (ending) steps[1].state = "done";
   if (steps[1].state !== "done") return steps;
-  if (state === "idle") steps[2] = ended ? { label: "Answer", state: "now", hint: "Read it, send a follow-up, or close and check" } : { label: "No answer", state: "stop" };
-  else steps[2].state = "done";
+  if (!answerShown(task)) steps[2] = { label: ENDING_STEPS[ending] || "No answer", state: "stop" };
+  else steps[2] = state === "idle" ? { label: "Answer", state: "now", hint: "Read it, send a follow-up, or close and check" } : { ...steps[2], state: "done" };
   if (state === "verifying") steps[3].state = "now";
-  else if (state === "closed") steps[3] = task.verification === "failed" ? { label: "Check failed", state: "stop" } : { ...steps[3], state: "done" };
+  else if (CHECK_STEPS[task.verification]) steps[3] = { ...CHECK_STEPS[task.verification] };
+  else if (["closed", "released"].includes(state)) steps[3].hint = "Not checked yet";
   return steps;
 }
 
