@@ -27,6 +27,8 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
       await ui.open(f.identities.owner);
       await page.locator("#nativeTaskProvider").selectOption("stub");
       await page.locator("#nativeTaskTools").selectOption("workspace");
+      await page.locator("#nativeTaskSettingsMore > summary").click();
+      await page.locator("#nativeTaskValidationMore > summary").click();
       await page.locator('[data-native-validation-id="public"]').check();
       await page.locator("#nativeTaskPrompt").fill(`Automated public ${mode} validation task.`);
       const response = page.waitForResponse(r => r.request().method() === "POST" && new URL(r.url()).pathname === "/api/v1/native-tasks");

@@ -1,7 +1,7 @@
 // Run a task (studio-ui "run" slice): the task's route comes from the task's own fields only, and the result's chips
 // open the full notices.
 import { describe, expect, test } from "vitest";
-import { taskRouteSteps, renderTaskRoute, answerShown, renderOutcomeChips, nativeTasksShell, providerLabel, RUN_SUGGESTIONS,
+import { taskRouteSteps, renderTaskRoute, answerShown, turnEndingWords, renderTaskRecovery, renderTaskIdentity, renderOutcomeChips, nativeTasksShell, providerLabel, RUN_SUGGESTIONS,
   STAND_IN_NOTICE, CORRECTNESS_NOTICE } from "../../src/console/assets/nativeTasksView.js";
 
 const base = { state: "idle", turnEndReason: "complete", approvals: [], history: { status: "authenticated" }, verification: "not-verified" };
@@ -86,4 +86,25 @@ describe("result chips and the page", () => {
     expect(html.indexOf('id="nativeTasksTitle"')).toBeLessThan(html.indexOf('id="nativeTaskTranscript"'));
     expect(html.indexOf('id="nativeTaskTranscript"')).toBeLessThan(html.indexOf('id="nativeTaskPrompt"'));
   });
+
+  test("the next step and the recovery line sit outside every closed section", () => {
+    const html = nativeTasksShell("default");
+    const outside = (id: string) => {
+      const at = html.indexOf(`id="${id}"`), before = html.slice(0, at);
+      return at > 0 && before.split("<details").length === before.split("</details>").length;
+    };
+    expect(outside("nativeTaskActionHelp")).toBe(true);
+    expect(outside("nativeTaskRecovery")).toBe(true);
+    const task = { taskId: "t", agentId: "a", provider: "stub", tools: "none", recovery: { state: "ready", message: "Ready." } };
+    expect(renderTaskRecovery(task)).toContain('data-native-recovery-state="ready"');
+    expect(renderTaskIdentity(task)).not.toContain("data-native-recovery-state");
+  });
+
+  test("a turn ending is said in words, never as a raw code", () => {
+    expect(turnEndingWords("complete")).toBe("");
+    for (const reason of ["cancelled", "blocked", "max_tokens", "max_steps", "error", "interrupted", "made_up"]) {
+      expect(turnEndingWords(reason)).not.toMatch(/·|_|made/);
+    }
+  });
 });
+

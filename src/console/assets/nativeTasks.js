@@ -2,7 +2,7 @@ import { apiNativeRequest, getAdminToken } from "./api.js";
 import { nativeTasksShell, providerLabel, renderTaskScope, renderTaskIdentity, renderTaskApprovals,
   renderTaskVerification, renderTaskValidationSetup, renderTaskValidation, renderTaskList, taskStateLabel, appendTaskEvent,
   renderTaskAttachments, collectNativeTaskTools, renderTaskToolStatus, renderTaskUsage, renderTaskPlans, nativeTaskErrorText,
-  renderTaskRoute, renderOutcomeChips, answerShown } from "./nativeTasksView.js";
+  renderTaskRoute, renderOutcomeChips, renderTaskRecovery, answerShown, turnEndingWords } from "./nativeTasksView.js";
 import { captureNativeSubmission, nativeSubmissionScopeMatches, nativeSubmissionAcknowledged,
   definiteNativeSubmissionRefusal, nativeSubmissionDraftMatches, readNativeTextAttachment,
   composeNativeTaskInput, nativeTaskMediaCapabilities, readNativeMediaAttachment,
@@ -224,7 +224,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if (!config) return;
     const chosen = provider();
     const ready = chosen && (chosen.local || chosen.credential?.configured === true);
-    el("nativeTaskCredential").textContent = !chosen ? "Pick a model to start. Nothing runs until you press Run task."
+    el("nativeTaskCredential").textContent = !chosen ? "Pick a model to start."
       : chosen.local ? (chosen.model === "fixed" ? "Stand-in model: canned replies, no outside model or key is used."
         : "Local model server on the Studio host; no credential is used. Start the server and pull the named model before running; access is not probed here.")
       : ready ? `Credential ${chosen.credential.ref} is configured (${chosen.credential.source || "configured source"}). Provider access has not been tested by setup inspection.`
@@ -310,7 +310,9 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       : task?.state === "released" ? "The writer is released. Review recovery eligibility before continuing; no replacement session is created automatically."
       : task?.state === "closed" ? "This session is closed and read-only. New task starts a separate session."
       : task?.state === "failed" ? "The task did not finish cleanly. Inspect the recorded error and evidence before choosing recovery or a new task."
-      : "Stop requests cancellation of the active turn. Release for later preserves an eligible session; Close and verify ends it.";
+      : "";
+    // What to do next stays in sight whenever it is not the everyday case (the everyday sentence sits in Live status).
+    el("nativeTaskActionHelp").hidden = !el("nativeTaskActionHelp").textContent;
     renderOutcome();
     // "empty" (the greeting only) means no task AND nothing to recover: an unconfirmed submission, a paused or stale
     // read, or a failed setup read keeps Refresh status and Reconnect in sight. A closed task, or one waiting for
@@ -344,6 +346,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     else if (finished) {
       const link = document.createElement("a");
       link.href = "#nativeTaskRecord"; link.textContent = "See what AMC recorded";
+      link.addEventListener("click", () => { el("nativeTaskRecordedMore").open = true; });
       node.append(`Task finished${config?.demo ? " with the stand-in model, not a real model answer" : ""}. The answer is above. `, link);
     }
   }
@@ -352,7 +355,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     // Preserve keyboard focus and expanded details when a poll has no visible change.
     for (const [id,html] of [["nativeTaskIdentity",renderTaskIdentity(task)], ["nativeTaskApprovals",renderTaskApprovals(task)],
       ["nativeTaskVerification",renderTaskVerification(task)], ["nativeTaskValidation",renderTaskValidation(task)], ["nativeTaskList",renderTaskList(tasks, task?.taskId)],
-      ["nativeTaskUsage",renderTaskUsage(task)], ["nativeTaskPlans",renderTaskPlans(task)], ["nativeTaskToolStatus",renderTaskToolStatus(observedTools, !stale && task?.history.status === "authenticated")]]) {
+      ["nativeTaskUsage",renderTaskUsage(task)], ["nativeTaskPlans",renderTaskPlans(task)], ["nativeTaskRecovery",renderTaskRecovery(stale ? null : task)], ["nativeTaskToolStatus",renderTaskToolStatus(observedTools, !stale && task?.history.status === "authenticated")]]) {
       const node=el(id); if(node.dataset.rendered !== html) { node.innerHTML=html; node.dataset.rendered=html; }
     }
     if (stale) for (const id of ["nativeTaskVerification", "nativeTaskValidation", "nativeTaskApprovals", "nativeTaskUsage", "nativeTaskPlans"]) {
@@ -438,7 +441,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         while (transcript.children.length > limit) transcript.firstElementChild.remove();
         receive(view);
         if (!pending) tell(task.approvals.length ? `${task.approvals.length} signed approval request(s) require review. A vote is not tool execution.`
-          : `${taskStateLabel(task)}${!ACTIVE.has(task.state) && task.turnEndReason ? ` · ${task.turnEndReason}` : ""}.`);
+          : `${taskStateLabel(task)}.${!ACTIVE.has(task.state) && task.turnEndReason ? turnEndingWords(task.turnEndReason) : ""}`);
         if (value.events.length) {
           if (nearBottom) transcript.lastElementChild?.scrollIntoView({ block: "nearest" });
           else if (!transcriptEndInView()) el("nativeTaskNewMessages").hidden = false;
