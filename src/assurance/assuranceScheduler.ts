@@ -7,6 +7,8 @@ import {
 } from "./assurancePolicyStore.js";
 import { issueAssuranceCertificate } from "./assuranceCertificates.js";
 import { runAssurance } from "./assuranceRunner.js";
+import { AgentResponderUnavailableError, resolveAgentResponder } from "./agentResponder.js";
+import { resolveAgentId } from "../fleet/paths.js";
 import type { AssuranceSchedulerState } from "./assuranceSchema.js";
 import { includes } from "../utils/typeGuards.js";
 import { assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
@@ -129,7 +131,7 @@ export async function assuranceSchedulerRunNow(input: {
 }
 
 export async function assuranceSchedulerTick(input: { workspace: string; workspaceReady: boolean; eventType?: string }, options: OrgPairsOptions = {}): Promise<
-  | { ran: false; reason: "disabled" | "workspace_not_ready" | "policy_untrusted" | "not_due" }
+  | { ran: false; reason: "disabled" | "workspace_not_ready" | "policy_untrusted" | "not_due" | "no_agent" }
   | { ran: true; runId: string; certIssued: boolean; certificateFailure: ReturnType<typeof failureDetails> | null }
 > {
   const params = { ...input }; options = { ...options }; const actor = options.beforePublish; actor?.();
@@ -149,6 +151,15 @@ export async function assuranceSchedulerTick(input: { workspace: string; workspa
   const policy = policyInput.parsePolicy()!, nowTs = Date.now();
   const eventTriggered = Boolean(params.eventType && includes(policy.assurancePolicy.cadence.runAfterEvents, params.eventType)), due = !state.nextRunTs || state.nextRunTs <= nowTs;
   if (!eventTriggered && !due) return { ran: false, reason: "not_due" };
+  // UX-30: with no agent to test, a scheduled run never starts. It writes no ledger rows (an idle Studio used to record a HIGH
+  // "run aborted" every minute) and waits a full cadence before it asks again; a run that starts and then fails still records.
+  const noAgent = await resolveAgentResponder({ workspace: params.workspace, agentId: resolveAgentId(params.workspace, undefined) })
+    .then(() => null, (error: unknown) => (error instanceof AgentResponderUnavailableError ? error.message : null));
+  if (noAgent !== null) {
+    await save({ ...state, nextRunTs: nextRunTs(nowTs, policy.assurancePolicy.cadence.defaultRunHours),
+      lastOutcome: { status: "SKIPPED", reason: `no agent to test: ${noAgent}` } }, policyCurrent);
+    return { ran: false, reason: "no_agent" };
+  }
   // Retain the actual tick decision state through child preparation; own final state publication drops this old-target gate.
   const beforePublish = () => { actor?.(); policyCurrent(); };
   assertOrgPairsCurrent(current.snapshot);
