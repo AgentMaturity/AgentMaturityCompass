@@ -155,6 +155,38 @@ The text enters as file data from a tool, inside AMC's fence for untrusted tool 
 
 `amc session show <id>` prints all of this in plain words, one line per turn.
 
+## Checks after a turn that changed files
+
+**What is always recorded.** At the end of every turn AMC writes one signed record that says whether the turn ran any action that can change files, and whether a check ran after the last of them. It is one of four states: the turn changed nothing; it changed files and a check ran afterwards and passed; it changed files and a check ran afterwards and failed; or it changed files and no check ran afterwards. `amc session show` prints the last two right under the agent's reply for that turn, for example "Turn 3 ran 2 actions that can change files; no check ran afterwards." `amc agent-loop run` and chat print the same line next to the reply. AMC does not try to read what the agent claims; it puts the record beside the claim.
+
+**What counts as a change.** Writing or editing a file, applying a patch, and every action whose effect AMC cannot see from the record: a shell command, a terminal or background job, a delegated child agent, a workflow and every tool from an MCP server. AMC does not guess from a command's text whether it wrote anything, so a shell command always counts as "may have changed files". A call that was refused before it ran does not count. Reading, searching and listing never count. The count is of actions, not of files.
+
+**What counts as a check.** Only a check AMC itself ran: a check you chose with `--validate`, or one set up for the workspace (below). If the agent runs your test command by itself, that is not counted, because the command it ran is only in the call's stored content, which a verifier may not be able to read. A check that ran before the last change does not count. A check that was refused, needed an approval nobody gave, or ran out of time leaves the turn "changed, no check ran afterwards", with the reason.
+
+**Setting up checks for a workspace.** Add the commands to `.amc/tools.yaml` under `tools`, then sign the file again with `amc tools sign`:
+
+```yaml
+tools:
+  afterEdits:
+    checks:
+      - id: tests
+        title: Unit tests
+        command: npm test
+        timeoutMs: 120000
+```
+
+One to eight checks; `timeoutMs` is optional (two minutes when left out). AMC never takes a check command from the agent or from a file in the project (such as `package.json` or `AGENTS.md`): that would let the project's own content choose commands AMC runs. Only a person who can sign `.amc/tools.yaml` sets them. An unsigned or changed file is not used.
+
+**When AMC continues a turn.** When checks are set up, and a turn would end after changing files with no check afterwards, AMC does not accept the agent's final answer yet. It runs the checks itself, through the same path as `--validate`: the same shell tool, the same sandbox, the same approval rules and time limits. AMC never approves a check for you; if the check needs your approval, you are asked, and if nobody approves it the turn ends as "no check ran afterwards". If a check fails, AMC sends its output back to the agent once, marked as data and not instructions, and the turn continues. If the agent changes files again, the checks run once more and the turn ends as passed or failed. There is at most one such continuation per turn, and it counts toward the turn's step limit and the run's limits like any other step. With `--validate`, those checks run instead and nothing more is added. With no checks set up, nothing runs; the record still says whether the turn was checked.
+
+**Turning it off for one run.** `amc agent-loop run --no-verify-on-stop` and `amc agent-loop chat --no-verify-on-stop` skip the workspace checks for that run. Each turn's record says that checks were off.
+
+**On by default where.** The switch is the signed list itself: AMC runs the checks in every workspace that has them in `.amc/tools.yaml`. `amc init --coding` and `amc init --regulated` do not add any, because AMC cannot know a project's test command; until a person adds them, those workspaces record each turn's status and run nothing.
+
+**Verification.** `amc agent-loop verify` works out each turn's status again from the turn's own records and fails the session when the recorded status does not match.
+
+**After an edit to a JSON file.** When `fs.write`, `fs.edit` or `apply_patch` leaves a `.json` file that does not parse as strict JSON, the tool result gets one extra line saying so. This is the only check of its kind: it needs nothing installed and runs no project code. Files that allow comments, like `tsconfig.json`, may ignore it. There is no other syntax check, linter or language server after edits.
+
 ## Not in this slice
 
 - Rewind of files and conversation (`amc session rewind`) is deferred: it needs a checkpoint store that works without vault-backed blob keys, a conflict check against the last recorded `afterSha256` of each file, a live-writer fence on fork, and a composed path that gives the child a truthful identity. Conversation-only rewind remains available as `--fork-from <id>` at the latest sealed turn.
