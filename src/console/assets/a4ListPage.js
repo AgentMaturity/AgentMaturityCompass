@@ -5,6 +5,7 @@ import * as view from "./a4View.js";
 import * as start from "./a4Start.js";
 import * as packs from "./a4Pack.js";
 import { canCreate, isOwner } from "./a4Who.js";
+import { bindQuestions } from "./a4Journey.js";
 import { API, claimSink, guarded, listOf, me, notice, one, params, root, send, setClaimSink, showClaims, showError, storePack, uuid } from "./a4Send.js";
 
 /**
@@ -100,8 +101,9 @@ export async function renderListPage(options) {
   const catalog = canCreate(me, options) ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
   const creating = params.has("new") || projects.length === 0;
   root.innerHTML = `${start.renderIntro({ creating, canAdd: isOwner(me) })}${canCreate(me, options) ? view.renderCreateForm(creating,
-    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack"))), { start: options?.workspace?.start ?? null })
+    packs.packSelectHtml(catalog, packs.packIdOf(params.get("pack")), { fold: true, cards: true }), { start: options?.workspace?.start ?? null })
     : `<p class="muted">${view.CREATE_NEEDS}.</p>`}${view.renderProjectList(projects)}`;
+  if (root.querySelector("#a4CreateForm")) bindQuestions(root.querySelector("#a4CreateForm"));
   bindCreateForm(root.querySelector("#a4CreateForm"));
   bindAddPerson(root.querySelector("#a4AddPerson"), root.querySelector("[data-a4-add-person]"));
   root.querySelector("[data-a4-show-create]")?.addEventListener("click", () => {

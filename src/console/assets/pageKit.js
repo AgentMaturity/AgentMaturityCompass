@@ -147,7 +147,7 @@ const ROUTE_ICONS = { done: "check", wait: "wait", stop: "refused" };
 /**
  * The route: waypoints on a line, one per step `{ label, state: "done"|"now"|"wait"|"stop"|"todo", hint? }`. An ordered
  * list for assistive technology; the current step (the first "now", else the first "wait" or "stop") carries
- * aria-current="step", and each state is said in hidden words. Labels are at most two words; a hint is the tooltip.
+ * aria-current="step", and each state is said in hidden words. Labels are at most two words; a hint is the tooltip; `href` makes the label a link.
  * `diagram: true` draws an explanation, not progress: no state words are said.
  */
 export function routeTrack(steps, { label = "Progress", className = "", diagram = false } = {}) {
@@ -158,7 +158,8 @@ export function routeTrack(steps, { label = "Progress", className = "", diagram 
     const state = states[at];
     const mark = ROUTE_ICONS[state] ? icon(ROUTE_ICONS[state], { size: 14 }) : "";
     return `<li class="route-step is-${state}"${at === current ? ' aria-current="step"' : ""}${step.hint ? ` title="${esc(step.hint)}"` : ""}>`
-      + `<span class="route-dot" aria-hidden="true">${mark}</span><span class="route-label">${esc(step.label)}</span>`
+      + `<span class="route-dot" aria-hidden="true">${mark}</span>${step.href ? `<a class="route-label route-link" href="${esc(step.href)}">${esc(step.label)}</a>`
+        : `<span class="route-label">${esc(step.label)}</span>`}`
       + (diagram ? "" : `<span class="visually-hidden">: ${ROUTE_WORDS[state]}${step.hint ? `. ${esc(step.hint)}` : ""}</span>`) + "</li>";
   }).join("");
   return `<ol class="route${className ? ` ${esc(className)}` : ""}" aria-label="${esc(label)}">${items}</ol>`;

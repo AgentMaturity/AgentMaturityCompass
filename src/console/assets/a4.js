@@ -259,11 +259,12 @@ function mountProject(projectId, options) {
       questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id),
         ...(stage === "adapt" && Array.isArray(state.options?.catalogTerms?.[question.id]) ? { terms: state.options.catalogTerms[question.id] } : {}) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
-    root.innerHTML = `${view.holdBanner(project)}${view.practiceBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
-      <section class="card"><h3 class="a4-project-name">${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
+    // The panel carries the project's name, notices and route; who the project is, its version and its stage links
+    // sit one click away under "About this project", with the eight steps in a list.
+    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${conflict ? view.renderConflict(conflict) : ""}
+      <details class="card more-info a4-about" data-a4-open="about"><summary>About this project</summary><div class="more-info-body"><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         <span title="revision ${view.esc(project.revisionNo)}, head ${view.esc(project.headSeq)}">version ${view.esc(project.revisionNo)}</span></p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
-        <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
-      <details class="card" data-a4-open="steps"><summary>The eight steps of a stage</summary><div id="a4Steps"></div></details>
+        <p class="muted">${view.esc(readiness.claimBoundary)}</p><h4>The eight steps of a stage</h4><div id="a4Steps"></div></div></details>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>What changed since the last version</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
@@ -293,19 +294,19 @@ function mountProject(projectId, options) {
     const sections = [...root.querySelectorAll(":scope > .a4-cards > .a4-card, :scope > .a4-cards ~ :is(section, details, .a4-lanes)")];
     // A step that needs a second section too (acknowledging an item listed under Missing requirements) names it in data-a4-also.
     const also = go?.dataset.a4Also ?? null;
-    // Never folded (A4-08): the members, the answers while the step asks for them, the specification while it is under
-    // review, and the build card (its Native Tasks link) from Build to Review.
+    // Kept in sight (A4-08): the answers while the step asks for them, the specification and the Approvals card while an
+    // approval is under way, and the build card (its Run a task link) from Build to Review. The panel's own target is
+    // kept wherever it is; Members and the rest fold, and the panel's go-to opens a fold when it points into one.
     const step = state.project.stage === stage ? state.project.step : null;
-    const keep = [".a4-members", ...(step === "asked" ? ['[data-card="conversation"]'] : []),
-      ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]'] : []),
+    const keep = [...(step === "asked" ? ['[data-card="conversation"]'] : []),
+      ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]', ".a4-approvals"] : []),
       ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");
-    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !section.matches(keep)
-      && !(also && section.matches(also)));
+    const rest = sections.filter((section) => !section.contains(target) && !(keep && section.matches(keep)) && !(also && section.matches(also)));
     if (rest.length === 0) return;
     const more = document.createElement("details");
-    more.className = "card a4-more";
     more.dataset.a4Open = "more";
-    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records and requirements)</summary>
+    more.className = "card more-info a4-more";
+    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections)</summary>
       <p class="muted">Nothing here is needed for the step above. It is all still recorded and readable.</p>`;
     root.append(more);
     more.append(...rest);
@@ -751,6 +752,8 @@ async function main() {
   // stays off the strip rather than being shown with a result word the page would have to supply.
   let deliver = null;
   const strip = installClaimStrip(page, (listener) => { deliver = listener; });
+  // On a project page the route and the step come first; the claims strip follows the page (the panel carries its chip).
+  if (page === "a4Project") root.after(document.getElementById("claimStrip") ?? document.createComment(""));
   onClaims((claims) => claimSink?.push(...claims.filter((claim) => typeof claim?.claimLabel === "string")));
   setShowClaims((claims) => {
     strip?.reset();

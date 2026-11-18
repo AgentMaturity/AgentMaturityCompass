@@ -71,11 +71,15 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    and AI-drafted until a named expert signs it, and starting from a pack does not show the agent meets any rule. The
    `amc` menu's "Build an agent for my industry (A4 Forge preview)" line starts AMC with the flag set and opens this form.
 
-   **One section at a time.** The project page keeps open only the section the next step needs, plus the Approvals card.
-   Every other section of the stage is under "Everything else in this stage", unchanged.
+   **One section at a time.** The project page keeps open only the section the next step needs, and the Approvals card
+   while an approval is under way. Every other section of the stage, Members included, is under "Everything else in this
+   stage", unchanged; who the project is and its version are under "About this project".
 
-   Each project page opens with a **What to do now** panel: what a project is, the four stages as a stepper (done,
-   current, later), the current step ("step 1 of 8"), one sentence that says what is needed now, and one primary button.
+   Each project page opens with the project's name, its notices as small chips (practice, preview, self-reported), the
+   four stages drawn as a route (done, current, waiting for a person, later), and a **What to do now** panel: the stage's
+   eight steps as a smaller route, one sentence that says what is needed now, the people an open approval waits for
+   (initials, and whether each has decided), and one primary button. What a project is and "part 1 of 8" sit under a
+   small "What is a project?" fold.
    The button only moves to, or presses, the page's own control for that step; Studio checks every action again. When a
    step is not yours to take (an approver at Build, say), the panel says so instead. Errors are shown as sentences with
    the next step, and the code in small print.

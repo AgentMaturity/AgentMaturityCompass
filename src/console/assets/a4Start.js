@@ -5,8 +5,10 @@
 import { QUESTION_LABELS } from "./a4Questions.js";
 import { SELF_APPROVE, decidedByMe, selfApproves, selfCountsOnce } from "./a4Who.js";
 import { STAGE_SHORT, itemTitle } from "./a4Plain.js";
+import { approvalPeople, moveState, stageRoute, stepRoute } from "./a4Journey.js";
 import { moreInfo, noticeChip, routeTrack } from "./pageKit.js";
 import { icon } from "./iconSet.js";
+import { practiceBanner, stageBanner } from "./a4View.js";
 import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -30,19 +32,6 @@ function roleFor(rolesAllowed) {
 }
 const addUserCommand = (role = "APPROVER") => `amc user add --username <name> --role ${role}`;
 const code = (text) => `<code>${esc(text)}</code>`;
-
-/** The four stages as a stepper: earlier stages done, the project's stage current, the viewed one marked. */
-function renderStepper(project, stage) {
-  const at = STAGES.indexOf(project.stage);
-  const id = encodeURIComponent(project.projectId ?? "");
-  return `<ol class="a4-stepper" aria-label="Stages">${STAGES.map((name, index) => {
-    const state = at < 0 ? "" : index < at ? "done" : index === at ? "current" : "later";
-    const words = state === "done" ? "done" : state === "current" ? "current stage" : state === "later" ? "later" : "";
-    return `<li class="a4-stepper-${state}"${name === project.stage ? ' aria-current="step"' : ""}><a href="./a4Project?project=${id}&stage=${name}"${
-      name === stage ? ' data-viewing="true"' : ""}><strong>${index + 1}. ${esc(STAGE_PLAIN[name])}</strong> <small class="muted">${title(name)}</small>
-      <span class="a4-stepper-state">${esc(words)}${name === stage && name !== project.stage ? " · you are viewing it" : ""}</span></a></li>`;
-  }).join("")}</ol>`;
-}
 
 const itemOf = (readiness, id) => list(readiness?.items).find((item) => item.id === id) ?? null;
 const codesOf = (readiness, id) => list(itemOf(readiness, id)?.reasonCodes);
@@ -402,7 +391,11 @@ export function renderWhoApproves(ctx, gate, formShown = false) {
     request, so request it again afterwards. ${NOT_INDEPENDENT}.</p>`}</div>`;
 }
 
-/** The "start here" panel at the top of a project page. */
+/**
+ * The "start here" panel at the top of a project page: the project's name and its notices as chips, the four stages as a
+ * route, the viewed stage's eight steps as a route, then the one step a person is on: what it needs, the people an open
+ * approval waits for, and one primary action. Every explanation it carried before is one click away.
+ */
 export function renderStartHere(ctx) {
   const { project, stage } = ctx;
   const move = nextMove(ctx);
@@ -410,47 +403,64 @@ export function renderStartHere(ctx) {
   const kind = project.step === "reviewed" ? "completion" : project.step === "proposed" ? "direction" : null;
   const gate = stage === project.stage && kind ? liveGate(ctx, kind) : null;
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
-  return `<section class="card a4-start" aria-labelledby="a4StartTitle"><h3 id="a4StartTitle">What to do now</h3>
-    <p class="muted">${esc(project.practiceActive === true ? PRACTICE_IS : WHAT_IS_A_PROJECT)}</p>${renderStepper(project, stage)}
-    ${stage === project.stage && at >= 0 ? `<p>${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
-      <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : ""}
-    <p class="a4-now"><strong>${esc(move.now)}</strong></p>${move.why ? `<p class="muted">${esc(move.why)}</p>` : ""}
-    ${live && !move.effect ? renderWhoApproves(ctx, live, move.people === true) : ""}
-    <div class="row wrap">${primary(move.act, move.also)}</div>${move.people ? peopleFormHtml(ctx) : ""}
-    <p class="muted">${esc(TRUTH.signatures)}. Every A4 record is self-reported; nothing here says the agent is safe, correct or lawful.</p></section>`;
+  const state = moveState(project, move);
+  const here = stage === project.stage;
+  const names = new Map([...list(project.members), ...list(ctx.members?.candidates)].map((row) => [row.principalKey, row.username]));
+  const heading = project.stage === "retired" ? "Retired" : !here ? `Viewing ${STAGE_PLAIN[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
+  const part = here && at >= 0 ? `<p class="muted">${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
+      <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : "";
+  const fold = (summary, html, key) => moreInfo(summary, html).replace('<details class="more-info"', `<details class="more-info" data-a4-open="start:${key}"`);
+  return `<section class="card a4-start" aria-labelledby="a4StartTitle">
+    <div class="a4-head"><h2 class="a4-project-name">${esc(project.name ?? "Agent project")}</h2><div class="a4-chips">${practiceBanner(project)}${stageBanner(stage)}${
+      noticeChip("Preview", "A4 Forge is a preview.").replace('<details class="notice-chip"', '<details class="notice-chip" data-a4-open="start:preview"')}${
+      noticeChip("Self-reported", `${TRUTH.signatures}. Every A4 record is self-reported; nothing here says the agent is safe, correct or lawful.`)
+        .replace('<details class="notice-chip"', '<details class="notice-chip" data-a4-open="start:self"')}</div></div>
+    ${stageRoute(project, stage, state)}
+    <div class="a4-step-panel" data-state="${here ? state : "todo"}">
+      <h3 id="a4StartTitle"><span class="a4-step-label">What to do now</span>${esc(heading)}</h3>
+      ${stepRoute(project, stage, state)}
+      <p class="a4-now"><strong>${esc(move.now)}</strong></p>
+      ${live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : ""}
+      <div class="row wrap">${primary(move.act, move.also)}</div>${move.people ? peopleFormHtml(ctx) : ""}
+      ${move.why ? fold("Tell me more", `<p class="muted">${esc(move.why)}</p>`, "why") : ""}
+      ${live && !move.effect ? fold("Who must approve?", renderWhoApproves(ctx, live, move.people === true), "who") : ""}
+      ${fold(project.practiceActive === true ? "What is a practice project?" : "What is a project?", `${part}<p class="muted">${esc(project.practiceActive === true ? PRACTICE_IS : WHAT_IS_A_PROJECT)}</p>`, "what")}
+    </div></section>`;
 }
 
-/** The four stages as a horizontal stepper in human words, the A4 name small beneath each. */
+/** The four stages as a route drawn for explanation (no progress), each the plain name with the A4 name in its hint. */
 function introStepperHtml() {
-  return `<ol class="a4-stepper a4-stepper-intro" aria-label="The four steps">${STAGES.map((name, index) =>
-    `<li><strong>${index + 1}. ${esc(STAGE_PLAIN[name])}</strong><small class="muted">${esc(title(name))}</small></li>`).join("")}</ol>`;
+  return routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: `${index + 1}. ${STAGE_PLAIN[name]} (${title(name)})` })),
+    { label: "The four steps", className: "a4-intro-route", diagram: true });
 }
 
 /**
- * The list page's introduction: a short heading, one sentence, the stepper, and the approver notice. The terminal commands
- * sit under "Use the terminal instead"; an OWNER (`canAdd`) gets an inline form that adds a person through Studio.
+ * The list page's introduction: a short heading, one sentence and the four steps as a route. Who approves, the Add a
+ * person form (OWNER, `canAdd`), Users and the terminal commands sit one click away under "Who approves?".
  */
 export function renderIntro({ creating = true, canAdd = false } = {}) {
-  return `<section class="card a4-start a4-intro"><h2>Build an agent</h2>
-    <p class="first-use-lead">Say what the agent is for and AMC drafts it with you in four steps. A second person approves each step before it moves on.</p>
+  const steps = STAGES.map((name, index) => `<li><strong>${index + 1}. ${esc(STAGE_PLAIN[name])}</strong><small class="muted">${esc(title(name))}</small></li>`).join("");
+  return `<section class="card a4-intro"><h2>Build an agent</h2>
+    <p class="first-use-lead">Say what the agent is for and AMC drafts it with you in four steps.</p>
     ${introStepperHtml()}
-    <div class="a4-approver-note"><p><strong>A second person has to approve each step.</strong> Add them now or later.</p>
-      <div class="row wrap">${canAdd ? '<button type="button" class="secondary" data-a4-add-person aria-expanded="false" aria-controls="a4AddPerson">Add a person</button>' : ""}
-        <a class="button secondary" href="./users">Open Users</a>
-        ${creating ? "" : '<button type="button" class="secondary" data-a4-show-create>Start another project</button>'}</div>
-      ${canAdd ? `<form id="a4AddPerson" class="a4-form a4-add-person" hidden novalidate>
-        <label>Their user name <input name="username" autocomplete="off" required maxlength="64" /></label>
-        <p class="muted">AMC makes a first password for them and shows it here once. Give it to them yourself.</p>
-        <label>What they may do <select name="roles"><option value="APPROVER">Approve steps (APPROVER)</option>
-          <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR)</option></select></label>
-        <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner, so give the audit role to at least two people.</p>
-        <p class="a4-form-error status-bad" role="alert" hidden></p>
-        <p class="muted" role="status" data-a4-add-status></p>
-        <button type="submit" class="secondary">Add this person</button></form>` : ""}
+    <div class="row wrap">${canAdd ? '<button type="button" class="secondary" data-a4-add-person aria-expanded="false" aria-controls="a4AddPerson">Add a person</button>' : ""}
+      ${creating ? "" : '<button type="button" class="secondary" data-a4-show-create>Start another project</button>'}</div>
+    ${canAdd ? `<form id="a4AddPerson" class="a4-form a4-add-person" hidden novalidate>
+      <label>Their user name <input name="username" autocomplete="off" required maxlength="64" /></label>
+      <p class="muted">AMC makes a first password for them and shows it here once. Give it to them yourself.</p>
+      <label>What they may do <select name="roles"><option value="APPROVER">Approve steps (APPROVER)</option>
+        <option value="APPROVER,AUDITOR">Approve steps and audit (APPROVER, AUDITOR)</option></select></label>
+      <p class="muted">Fit it to your rules (Adapt) needs two people besides the one who asks, each an auditor or a workspace owner, so give the audit role to at least two people.</p>
+      <p class="a4-form-error status-bad" role="alert" hidden></p>
+      <p class="muted" role="status" data-a4-add-status></p>
+      <button type="submit" class="secondary">Add this person</button></form>` : ""}
+    ${moreInfo("Who approves?", `<ol class="a4-intro-steps">${steps}</ol>
+      <div class="a4-approver-note"><p><strong>A second person has to approve each step.</strong> Add them now or later.</p>
+      <p><a class="button secondary" href="./users">Open Users</a></p>
       <details class="a4-terminal"><summary>Use the terminal instead</summary>
         <p class="muted">In the workspace folder run ${code(addUserCommand())}. Later steps need two approvers, and Fit it to your rules (Adapt)
         needs two besides the one who asks who hold AUDITOR or OWNER (${code("--role APPROVER,AUDITOR")}).</p></details>
-      <p class="muted">${esc(SOD)}. ${esc(NOT_INDEPENDENT)}.</p></div></section>`;
+      <p class="muted">${esc(SOD)}. ${esc(NOT_INDEPENDENT)}.</p></div>`)}</section>`;
 }
 
 /** What the Add a person form shows after Studio answers: the first password (once) and the notes, in words. */
@@ -575,6 +585,10 @@ export function releaseNext(project, readiness) {
   return null;
 }
 
+/** Home's "Next:" at an approval one person on a practice project gives alone (the same steps the route draws as "now"). */
+const SELF_NEXT = { proposed: "Next: you approve the plan yourself; it is recorded as self-approved.",
+  reviewed: "Next: you give the final approval yourself; it is recorded as self-approved." };
+
 /** The project Home continues: the most recently changed one that is not retired, else null. */
 export function latestProject(projects) {
   const open = list(projects).filter((project) => isObject(project) && project.stage !== "retired");
@@ -616,7 +630,7 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
     return `<h2 id="a4HomeTitle">Continue ${esc(project.name)}</h2>
       ${route}
       <p class="first-use-lead">${esc(project.hold ? "This project is on hold until a project owner resumes it." : releaseNext(project, latestReadiness)
-        ?? STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
+        ?? (selfApproves ? SELF_NEXT[project.step] : null) ?? STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
       <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(project.projectId ?? "")}">Continue</a>
       <a href="./a4?new=1">Start another</a></div>
       ${where ? moreInfo("Which part?", `<p class="muted">${esc(where)}</p>`) : ""}`;
