@@ -53,7 +53,12 @@ async function showHomeEntry() {
     const latest = waiting ? null : start.latestProject(projects);
     const latestReadiness = latest?.stage === "activate"
       ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}/readiness`).then((reply) => reply?.readiness ?? reply, () => null) : null;
-    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null, latestReadiness });
+    // The route draws an approval step as "waiting for a person" unless the person approves it alone (a practice
+    // project); only the project's own read says whether it still is one.
+    const detail = latest && ["proposed", "reviewed"].includes(latest.step)
+      ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}`).then((reply) => one(reply, "project"), () => null) : null;
+    const rows = detail ? projects.map((row) => (row === latest ? { ...row, practiceActive: detail.practiceActive === true } : row)) : projects;
+    card.innerHTML = start.homeCardHtml({ projects: rows, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null, latestReadiness });
     bindCreateForm(card.querySelector("#a4HomeForm"));
     placeHomeCard(card, { waiting: Boolean(waiting), empty: projects.length === 0 });
   } catch {

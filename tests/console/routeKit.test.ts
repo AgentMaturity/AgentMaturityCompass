@@ -6,7 +6,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { emptyState, moreInfo, noticeChip, pictureCard, routeTrack } from "../../src/console/assets/pageKit.js";
 import { ICON_NAMES, icon, picture } from "../../src/console/assets/iconSet.js";
-import { activationRouteHtml, approvalsTileHtml, homeStartHtml } from "../../src/console/assets/homeView.js";
+import { activationRouteHtml, approvalsTileHtml, firstStepActionHtml, homeStartHtml } from "../../src/console/assets/homeView.js";
 
 describe("routeTrack", () => {
   test("an ordered list; the first step in progress is the current one; each state is said in words", () => {
@@ -90,5 +90,17 @@ describe("Home's pieces", () => {
     expect(approvalsTileHtml(1)).toContain("1 approval request is open");
     expect(approvalsTileHtml(3)).toContain("3 approval requests are open");
     expect(approvalsTileHtml(3)).toContain('href="./approvals"');
+    // Each inbox read stops at 50, so 50 or more is never shown as an exact number.
+    expect(approvalsTileHtml(50)).toContain("50+ approval requests are open");
+    expect(approvalsTileHtml(57)).toContain("50+ approval requests are open");
+  });
+
+  test("the first steps carry one action for the current waypoint, and none once all four are done", () => {
+    const rows = (statuses: string[]) => ["connected_agent", "observed_action", "control_decision", "signed_proof"].map((id, at) => ({ id, status: statuses[at] }));
+    expect(firstStepActionHtml(null)).toContain('data-next="connect">Connect an agent</button>');
+    expect(firstStepActionHtml({ milestones: rows(["WAITING", "WAITING", "WAITING", "WAITING"]) })).toContain("Connect an agent");
+    expect(firstStepActionHtml({ milestones: rows(["COMPLETE", "WAITING", "WAITING", "WAITING"]) })).toContain('data-next="steps">See the next step</button>');
+    expect(firstStepActionHtml({ milestones: rows(["COMPLETE", "COMPLETE", "COMPLETE", "COMPLETE"]) })).toBe("");
+    expect(readFileSync("src/console/assets/app.js", "utf8")).toContain("${firstStepActionHtml(onboarding?.activation)}");
   });
 });

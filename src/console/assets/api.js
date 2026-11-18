@@ -237,12 +237,14 @@ export async function whoami() {
 }
 
 const APPROVER_ROLES = ["APPROVER", "OWNER", "AUDITOR"];
+const OPEN_LIMIT = 50; // shell.js and homeView.js show a count of 50 or more as "50+"
 const PENDING_KEY = "amc-pending-approvals";
 let pending = null;
 
 /**
  * How many approval requests are open (PENDING) for the current agent and the A4 projects' agents, the requests the
- * Approvals inbox lists by default. Null when this person cannot decide approvals, the current agent's approval log does
+ * Approvals inbox lists by default; not only those this person may decide. Each read stops at OPEN_LIMIT, so a count of
+ * OPEN_LIMIT or more is shown as "50+". Null when this person cannot decide approvals, the current agent's approval log does
  * not verify, or AMC could not tell: then nothing is shown. Kept for a minute in this tab, so moving between pages does
  * not ask again. Reads only.
  */
@@ -269,9 +271,10 @@ function forgetPendingCount() {
 async function countPending(agent) {
   const projects = await apiNativeRequest("/api/v1/a4/projects").catch(() => null);
   const rows = Array.isArray(projects?.projects) ? projects.projects : Array.isArray(projects) ? projects : [];
-  const others = [...new Set(rows.map((row) => row?.agentId).filter((id) => typeof id === "string" && id && id !== agent))].slice(0, 10);
+  // ponytail: one read per project agent, kept a minute; batch them in one route if workspaces grow to many projects.
+  const others = [...new Set(rows.map((row) => row?.agentId).filter((id) => typeof id === "string" && id && id !== agent))];
   const open = (found) => (found?.requests || []).filter((row) => row?.status === "PENDING").length;
-  const query = (id) => apiGet(`/approvals/requests?agentId=${encodeURIComponent(id)}&status=PENDING&limit=50`);
+  const query = (id) => apiGet(`/approvals/requests?agentId=${encodeURIComponent(id)}&status=PENDING&limit=${OPEN_LIMIT}`);
   const own = await query(agent);
   if (own?.integrity?.valid !== true) return null;
   // As in the inbox, another agent's requests count only where its approval log verifies.

@@ -92,7 +92,7 @@ export function bannerHelpHtml() {
 /** What each activation milestone means and, until it is complete, what to do next. */
 export const ACTIVATION_HELP = {
   connected_agent: ["AMC knows your agent and can see what it does.",
-    (agent) => `Use "Connect my agent" above, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
+    (agent) => `On Home, press "Connect an agent" under First steps, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
   observed_action: ["AMC has recorded at least one real action by your agent.",
     (agent) => `Run one task with a real model: open <a href="./native-tasks?agent=${encodeURIComponent(agent)}">Native Tasks</a>, or use your connected agent once. Only actions AMC records with a signed receipt count, so a task on the stand-in model does not.`],
   control_decision: ["An AMC guardrail has checked one of your agent's actions and allowed or stopped it.",

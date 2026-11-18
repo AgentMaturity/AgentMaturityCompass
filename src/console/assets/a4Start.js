@@ -597,17 +597,20 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
     const asks = kind === "effect"
       ? `needs your approval on a second request, which ${row.stage === "adapt" ? "activates the plan" : "applies what was built"}`
       : kind === "release" ? "needs your approval on its release request, a second request on the approved plan that releases it" : `asks for its ${esc(kind)} approval`;
-    return `<div class="wait-tile">${icon("wait", { size: 24 })}<div class="wait-tile-words"><h2 id="a4HomeTitle" class="wait-title">An approval waits for you</h2>
-      <span>${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))}</span></div>
-      <a class="button" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>
-      ${moreInfo("What is asked?", `<p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${asks}. Open it, read what it asks for, then approve it or request changes.</p>`)}`;
+    // Drawn like the approvals tile beside it: a strong line, not a heading, and its fold inside the tile.
+    return `<div class="wait-tile">${icon("wait", { size: 24 })}<div class="wait-tile-words"><strong id="a4HomeTitle" class="wait-title">An approval waits for you</strong>
+      <span>${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))}</span>
+      ${moreInfo("What is asked?", `<p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${asks}. Open it, read what it asks for, then approve it or request changes.</p>`)}</div>
+      <a class="button secondary" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>`;
   }
   const project = latestProject(projects);
   if (project) {
     const at = STAGES.indexOf(project.stage);
     const where = at >= 0 ? `Step ${at + 1} of 4: ${STAGE_PLAIN[project.stage]} (${title(project.stage)}). Part: ${STEP_PLAIN[project.step] ?? project.step}.` : "";
-    // The stage waits for a person while it is on hold or asks a second person to approve.
-    const waits = project.hold || ["proposed", "reviewed"].includes(project.step);
+    // The stage waits for a person while it is on hold or asks a second person to approve. Alone on a practice project
+    // the person approves Aspire and Assemble's first approval themselves (docs/A4_FORGE.md), so those are "now".
+    const selfApproves = project.practiceActive === true && (project.stage === "aspire" || (project.stage === "assemble" && project.step === "proposed"));
+    const waits = project.hold || (["proposed", "reviewed"].includes(project.step) && !selfApproves);
     const route = at >= 0 ? routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: `${STAGE_PLAIN[name]} (${title(name)})`,
       state: index < at ? "done" : index > at ? "todo" : waits ? "wait" : "now" })), { label: `Where ${project.name} is` }) : "";
     return `<h2 id="a4HomeTitle">Continue ${esc(project.name)}</h2>

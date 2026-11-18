@@ -1,7 +1,7 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, moreInfo, recordDetails, recordRows, showResult } from "./pageKit.js";
-import { activationRouteHtml, approvalsTileHtml, homeStartHtml, syncWaiting } from "./homeView.js";
+import { activationRouteHtml, approvalsTileHtml, firstStepActionHtml, homeStartHtml, syncWaiting } from "./homeView.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { toolRatesHtml } from "./runtimeRates.js";
 import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
@@ -236,6 +236,16 @@ function bindFirstUse() {
   };
   bindCopy("copyNativeGuide", "nativeGuideCommand", "nativeCopyStatus");
   bindCopy("copyConnectCommand", "connectCommand", "connectCopyStatus");
+  // The first steps' action: open what the current waypoint needs, wherever it is folded.
+  onAction(document.getElementById("homeNextStep"), "click", (event) => {
+    const connect = event.currentTarget.dataset.next === "connect";
+    const target = document.getElementById(connect ? "firstUseConnectButton" : "activationSteps");
+    for (let details = target?.closest("details"); details; details = details.parentElement?.closest("details")) details.open = true;
+    if (connect && target?.getAttribute("aria-expanded") !== "true") target.click();
+    const focus = connect ? target : target?.querySelector("summary");
+    focus?.scrollIntoView({ block: "center" });
+    focus?.focus({ preventScroll: true });
+  });
   onAction(document.getElementById("firstUseBaselineContinue"), "click", (event) => {
     event.preventDefault();
     const button = document.getElementById("studioRunOnboarding");
@@ -1431,6 +1441,7 @@ async function renderHome() {
     <section class="home-progress" aria-labelledby="homeProgressTitle">
       <h2 id="homeProgressTitle" class="section-title">First steps</h2>
       ${activationRouteHtml(onboarding?.activation)}
+      ${firstStepActionHtml(onboarding?.activation)}
       <details id="activationSteps" class="more-info">
       <summary>Show all steps</summary>
       <div class="more-info-body">
@@ -1553,7 +1564,7 @@ async function renderHome() {
   // No run yet: no charts at all, rather than blank skeletons.
   if (latestRun) {
     renderLine(document.getElementById("overallTrend"), [latestRun.integrityIndex, latestRun.integrityIndex]);
-    renderLine(document.getElementById("integrityTrend"), [latestRun.integrityIndex, latestRun.integrityIndex], "#7c3aed");
+    renderLine(document.getElementById("integrityTrend"), [latestRun.integrityIndex, latestRun.integrityIndex]);
   }
   onAction(document.getElementById("studioRunFullScore"), "click", async (event) => {
     const button = event.currentTarget;

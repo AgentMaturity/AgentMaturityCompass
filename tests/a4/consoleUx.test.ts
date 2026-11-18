@@ -67,6 +67,16 @@ describe("Home's build card", () => {
     expect(html.match(/class="button"/g) ?? []).toHaveLength(1);
   });
 
+  test("the route draws an approval as waiting for a person, except one a practice project's person gives alone", () => {
+    const route = (row: Record<string, unknown>) => start.homeCardHtml({ projects: [{ projectId: "a4p_1", name: "P", updatedTs: "2026-11-14T00:00:00Z", ...row }] as never });
+    expect(route({ stage: "aspire", step: "proposed" })).toContain("is-wait");
+    expect(route({ stage: "aspire", step: "proposed", practiceActive: true })).not.toContain("is-wait");
+    expect(route({ stage: "assemble", step: "proposed", practiceActive: true })).not.toContain("is-wait");
+    // Assemble's final approval needs two other people even on a practice project.
+    expect(route({ stage: "assemble", step: "reviewed", practiceActive: true })).toContain("is-wait");
+    expect(route({ stage: "adapt", step: "proposed", practiceActive: true })).toContain("is-wait");
+  });
+
   test("the demo workspace says it cannot hold projects instead of offering the form", () => {
     const html = start.homeCardHtml({ demo: true });
     expect(html).toContain("cannot hold agent projects");
@@ -76,7 +86,7 @@ describe("Home's build card", () => {
   test("home.html carries the card before the rest of Home, and a4.js fills it", () => {
     const home = readFileSync("src/console/pages/home.html", "utf8");
     expect(home.indexOf('id="a4HomeCard"')).toBeLessThan(home.indexOf('id="app"'));
-    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.homeCardHtml({ projects, waiting, industryHtml");
+    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.homeCardHtml({ projects: rows, waiting, industryHtml");
   });
 });
 

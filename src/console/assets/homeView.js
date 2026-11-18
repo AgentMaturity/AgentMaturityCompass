@@ -23,7 +23,9 @@ export function homeStartHtml({ agentId = "default", demoMode = false } = {}) {
 export function approvalsTileHtml(count) {
   if (count === null || count === undefined) return "";
   if (count === 0) return emptyState({ line: "No approval requests are open." });
-  return `<div class="wait-tile">${icon("approvals", { size: 24 })}<div class="wait-tile-words"><strong>${count === 1 ? "1 approval request is open" : `${esc(count)} approval requests are open`}</strong>`
+  // The inbox reads stop at 50 requests (api.js), so a count that reached it is "50+", never a number that may be short.
+  const shown = count >= 50 ? "50+" : String(count);
+  return `<div class="wait-tile">${icon("approvals", { size: 24 })}<div class="wait-tile-words"><strong>${count === 1 ? "1 approval request is open" : `${esc(shown)} approval requests are open`}</strong>`
     + `<span>Someone must approve or decline before the work goes on.</span></div><a class="button secondary" href="./approvals">Open approvals</a></div>`;
 }
 
@@ -34,6 +36,20 @@ export function syncWaiting(doc = document) {
   const tiles = section.querySelectorAll(".wait-tile").length;
   if (tiles > 0) for (const empty of section.querySelectorAll(".empty-state")) empty.remove();
   section.hidden = tiles === 0 && section.querySelectorAll(".empty-state").length === 0;
+}
+
+/**
+ * One action beside the first steps' current waypoint: "Connect an agent" while connecting is next (it opens the connect
+ * command under "Other ways in"), otherwise "See the next step" (it opens "Show all steps", which names it). None once all
+ * four are done.
+ */
+export function firstStepActionHtml(activation) {
+  const rows = Array.isArray(activation?.milestones) && activation.milestones.length > 0 ? activation.milestones : [{ id: "connected_agent" }];
+  const next = rows.find((row) => row?.status !== "COMPLETE");
+  if (!next) return "";
+  const connect = next.id === "connected_agent";
+  return `<p class="route-action"><button type="button" id="homeNextStep" class="secondary" data-next="${connect ? "connect" : "steps"}">`
+    + `${connect ? "Connect an agent" : "See the next step"}</button></p>`;
 }
 
 const MILESTONE_LABELS = { connected_agent: "Connect", observed_action: "First action", control_decision: "Control on", signed_proof: "Signed record" };
