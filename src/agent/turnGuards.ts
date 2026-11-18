@@ -172,7 +172,8 @@ export function firstStop(policies: readonly TurnPolicy[]): TurnStop | null {
 }
 
 /** A limit stop in plain words, for `amc session show` and the run report. */
-export function describeTurnStop(cause: { readonly condition: string; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[] }): string {
+export function describeTurnStop(cause: { readonly condition: string; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[];
+  readonly unmeasuredBy?: string }): string {
   const tools = cause.tools === undefined || cause.tools.length === 0 ? "" : ` (${cause.tools.map(name => JSON.stringify(name)).join(", ")})`;
   switch (cause.condition) {
     case "repeated-call": return `The agent made the same tool call ${cause.bound} times in one turn${tools}, so AMC ended the turn.`;
@@ -182,7 +183,9 @@ export function describeTurnStop(cause: { readonly condition: string; readonly b
       ? `The run stopped: a cost limit of $${cause.bound} was set, and a model request had no known cost, so AMC could not keep the limit.`
       : `The run stopped: its indicative cost passed the limit of $${cause.bound}. This is an estimate, not a bill.`;
     case "max-tokens": return cause.unmeasured === true
-      ? `The run stopped: a token limit of ${cause.bound} was set, and a step reported no token usage, so AMC could not keep the limit.`
+      ? cause.unmeasuredBy === "compaction-summary"
+        ? `The run stopped: a token limit of ${cause.bound} was set, and the token usage of a request asking the model to summarize earlier work was unknown (it was refused or failed), so AMC could not keep the limit.`
+        : `The run stopped: a token limit of ${cause.bound} was set, and a step reported no token usage, so AMC could not keep the limit.`
       : `The run stopped: it used more than its limit of ${cause.bound} tokens.`;
     case "max-turns": return `The run stopped: it reached its limit of ${cause.bound} turns.`;
     case "deadline": return `The run stopped: it reached its time limit of ${cause.bound} ms.`;

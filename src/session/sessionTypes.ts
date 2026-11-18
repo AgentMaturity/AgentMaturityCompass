@@ -155,7 +155,9 @@ export type TurnCancelCause =
    * An operator run limit (SH-LOOP-06, src/agent/runLimits.ts) or a turn guard (src/agent/turnGuards.ts) the driver
    * enforced. `tools` names the refused or repeated tools of a guard stop, sorted.
    */
-  | { readonly kind: "limit"; readonly condition: TurnLimitCondition; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[] };
+  | { readonly kind: "limit"; readonly condition: TurnLimitCondition; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[];
+    /** With `unmeasured`: the request whose usage was unknown, when it was not a model step (HP-05). */
+    readonly unmeasuredBy?: "compaction-summary" };
 
 /** What a `limit` cause stopped on. `max-cost-usd` is the only one whose bound may be a fraction (US dollars). */
 export type TurnLimitCondition = "max-turns" | "max-tokens" | "deadline" | "max-cost-usd" | "repeated-call" | "malformed-responses" | "denials";
@@ -188,6 +190,7 @@ export function isTurnCancelCause(value: unknown): value is TurnCancelCause {
       return LIMIT_CONDITIONS.has(candidate.condition) && typeof candidate.bound === "number"
         && (candidate.condition === "max-cost-usd" ? Number.isFinite(candidate.bound) && candidate.bound > 0 : Number.isSafeInteger(candidate.bound) && candidate.bound >= 0)
         && (candidate.unmeasured === undefined || candidate.unmeasured === true)
+        && (candidate.unmeasuredBy === undefined || (candidate.unmeasured === true && candidate.unmeasuredBy === "compaction-summary"))
         && (candidate.tools === undefined || isLimitToolList(candidate.tools));
     default:
       return false;

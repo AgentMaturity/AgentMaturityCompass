@@ -31,7 +31,7 @@ import type { CompactionConfig } from "../loopTypes.js";
 import { liveNativeFailureGuidance } from "../nativeFailureGuidance.js";
 import { dispatchStepRequest } from "../requestRetry.js";
 import { stepUsage, type StepRunnerInit } from "../stepRunner.js";
-import { recordOverflowDecision, restoreFilesAfterCompaction } from "./compactionFollowUp.js";
+import { dropRestoredContext, recordOverflowDecision, restoreFilesAfterCompaction } from "./compactionFollowUp.js";
 import { measurePromptPressure } from "./promptPressure.js";
 import { COMPACTION_SUMMARY_STEP, SUMMARY_PROMPT_VERSION, summaryPrompt } from "./summaryPrompt.js";
 
@@ -141,11 +141,12 @@ export class AutoCompactor {
   }
 
   /**
-   * After step `step` of `turn` failed with a context-window refusal and its `step/end` committed: compact with no
-   * recent steps kept, restore files, and return the summary steps taken so the caller asks once more. Throws `error`
-   * (the provider's own) whenever no retry may follow; `admit(stepsTaken)` is the caller's limits and step budget.
+   * After step `step` of `turn` failed with a context-window refusal and its `step/end` committed: prune tool outputs
+   * with no recent steps kept and drop earlier restored file text, then restore files so the caller asks once more.
+   * No summary request is sent here: it would carry the whole context that just overflowed (review M1). Throws `error`
+   * (the provider's own) whenever no retry may follow; `admit()` is the caller's run limits and step budget.
    */
-  async recoverOverflow(turn: number, step: number, error: unknown, signal: AbortSignal, admit: (stepsTaken: number) => boolean): Promise<number> {
+  async recoverOverflow(turn: number, step: number, error: unknown, signal: AbortSignal, admit: () => boolean): Promise<void> {
     this.overflowTurn = turn;
     if (turn !== this.turn) { this.turn = turn; this.count = 0; }
     const { session } = this.init, at = positions(session.readEvents());
@@ -161,27 +162,17 @@ export class AutoCompactor {
     if (this.count >= this.config.maxPerTurn) end(`this turn already compacted ${this.count} time(s), so the turn ends`);
     const trigger: Trigger = { kind: "overflow", contextWindowTokens: this.config.contextWindowTokens, failureEventId: failure!.id,
       failureCode: LLM_FAILURE_CODE.CONTEXT_WINDOW_EXCEEDED };
-    const pruned = this.prune(trigger, 0);
-    let summarized = NOTHING;
-    if (pruned.length === 0 && this.config.summarize) {
-      try { summarized = await this.summarize(turn, trigger, signal, notify, 0); }
-      catch (summaryError: unknown) {
-        // A budget or residency refusal of the summary request (an AMC_ code) ends the turn like any other refusal.
-        if (signal.aborted || !isLlmError(summaryError)) throw summaryError;
-        end("the summary request was refused, so the turn ends");
-      }
-    }
-    const eventIds = [...pruned, ...summarized.eventIds];
-    if (pruned.length === 0 && summarized.freed.length === 0) end("compaction found nothing it could remove, so the turn ends", eventIds);
+    const pruned = this.prune(trigger, 0), dropped = dropRestoredContext(session, trigger);
+    const eventIds = [...pruned, ...dropped];
+    if (eventIds.length === 0) end("compaction found nothing it could remove, so the turn ends");
     this.count += 1;
-    if (!admit(summarized.steps)) end("a run limit or the step limit leaves no room to ask again, so the turn ends", eventIds);
-    const restored = await restoreFilesAfterCompaction(this.init, turn, step, [...pruned, ...summarized.freed], signal);
+    if (!admit()) end("a run limit or the step limit leaves no room to ask again, so the turn ends", eventIds);
+    const restored = await restoreFilesAfterCompaction(this.init, turn, step, pruned, signal);
     recordOverflowDecision(session, { turn, step, failureEventId: failure!.id, decision: "retry", compactionEventIds: eventIds,
       reason: "the request was too large for the model's context window; AMC compacted the context and asks once more",
       restoredFilesEventId: restored });
     notify(`the request was too large for the model's context window; ${pruned.length} tool output(s) pruned, `
-      + `${summarized.eventIds.length} summary-step receipt(s); asking once more`, eventIds);
-    return summarized.steps;
+      + `${dropped.length} earlier restored file text(s) removed; asking once more`, eventIds);
   }
 
   /**
@@ -217,7 +208,7 @@ export class AutoCompactor {
       ...(reserve == null ? {} : { reserveTokens: reserve }) };
     const keep = this.config.keepRecentSteps, pruned = this.prune(trigger, keep);
     // Summarize when pruning found nothing, or when an earlier boundary of this turn already compacted and pressure is still high.
-    const summarized = this.config.summarize && (pruned.length === 0 || this.count > 0) ? await this.summarize(turn, trigger, signal, notify, keep) : NOTHING;
+    const summarized = this.config.summarize && (pruned.length === 0 || this.count > 0) ? await this.summarize(turn, trigger, signal, notify) : NOTHING;
     const eventIds = [...pruned, ...summarized.eventIds];
     if (eventIds.length === 0) {
       notify(`${measured}; nothing was eligible for automatic compaction`);
@@ -226,7 +217,10 @@ export class AutoCompactor {
     this.count += 1;
     this.pending = { eventIds, promptTokens: pressure.promptTokens };
     notify(`${measured}; ${pruned.length} tool output(s) pruned, ${summarized.eventIds.length} summary-step receipt(s)`, eventIds);
-    if (continues) await restoreFilesAfterCompaction(this.init, turn, step, [...pruned, ...summarized.freed], signal);
+    if (continues) {
+      dropRestoredContext(session, trigger);
+      await restoreFilesAfterCompaction(this.init, turn, step, [...pruned, ...summarized.freed], signal);
+    }
     return summarized.steps;
   }
 
@@ -241,17 +235,20 @@ export class AutoCompactor {
       if (entry.kind !== "tool_result" || entry.sourceEventId !== entry.originEventId || entry.bytes === null
         || entry.bytes < this.config.pruneMinBytes || !uses.has(`tool_use:${entry.slot.slice("tool_result:".length)}`)
         || recent.some(kept => kept.turn === position?.turn && kept.step === position?.step)) return [];
-      const replacement = `[amc: tool output removed from context by automatic compaction; ${entry.bytes} bytes; sha256 ${entry.sha256}; source event ${entry.sourceEventId}]`;
+      const replacement = trigger.kind === "overflow"
+        ? `[amc: tool output removed from context because the request was too large for the model's context window; ${entry.bytes} bytes; `
+          + `sha256 ${entry.sha256}; source event ${entry.sourceEventId}. Do not repeat the same call unchanged: ask for a smaller part, such as a line range]`
+        : `[amc: tool output removed from context by automatic compaction; ${entry.bytes} bytes; sha256 ${entry.sha256}; source event ${entry.sourceEventId}]`;
       return Buffer.byteLength(replacement, "utf8") < entry.bytes ? [{ entry, bytes: entry.bytes, replacement }] : [];
     }).sort((a, b) => b.bytes - a.bytes); // stable, so equal sizes keep origin order
     return candidates.map(({ entry, replacement }) => session.compactSurfaceEntry({ originEventId: entry.originEventId, replacement,
       reason: "automatic compaction: deterministic tool-output prune; the original result row and any spill object are retained", automatic: { trigger } }).eventId);
   }
 
-  private async summarize(turn: number, trigger: Trigger, signal: AbortSignal, notify: Notify, keep: number): Promise<Outcome> {
+  private async summarize(turn: number, trigger: Trigger, signal: AbortSignal, notify: Notify): Promise<Outcome> {
     const { session } = this.init, events = session.readEvents();
     const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) }), at = positions(events);
-    const cutoff = Math.min(turn, ...recentSteps(events, keep).map(kept => kept.turn ?? turn));
+    const cutoff = Math.min(turn, ...recentSteps(events, this.config.keepRecentSteps).map(kept => kept.turn ?? turn));
     const range = oldestCompletedTurns(live, at, cutoff), runs = summarizableRuns(range);
     const ids = (run: readonly LiveSurfaceEntry[]): readonly string[] => run.map(entry => entry.originEventId);
     const skip = (why: string): Outcome => { notify(`no summary: ${why}`); return NOTHING; };

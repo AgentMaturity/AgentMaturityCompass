@@ -97,7 +97,9 @@ export function executionIdsForCalls(workspace: string, sessionId: string): Read
 
 /**
  * Failure row 7: the loop gave up on a model request (a final `request/failure`) in a session that journaled actions.
- * One signed incident per agent with executions in that session. The turn ends there, so no `started` follows.
+ * One signed incident per agent with executions in that session. The turn ends there, so no `started` follows: a
+ * context-window overflow is recorded here only when the turn ends on it, never when it was compacted and asked once
+ * more (HP-05, src/agent/requestRetry.ts noteOverflowOutage).
  * Returns the incident ids; none when the session journaled nothing.
  */
 export function recordProviderOutage(input: { readonly workspace: string; readonly sessionId: string;

@@ -6,13 +6,35 @@ import { randomBytes } from "node:crypto";
 import { isTurnCancelCause, type TokenUsage, type TurnCancelCause, type TurnTrigger } from "../session/sessionTypes.js";
 import { promptTokensFor } from "../session/surfaceCompactionValidation.js";
 import type { InboxTarget, LoopNotification } from "./loopTypes.js";
-import type { ToolCallOutcome } from "./toolSeam.js";
+import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
+import type { AgentToolSeam, ToolCallOutcome } from "./toolSeam.js";
 import { sha256Hex } from "../utils/hash.js";
 
 /** A settled tool call for observers: outcome, digest and size, never the content (SH-EXT-01). */
 export function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
   const content = typeof outcome.content === "string" ? Buffer.from(outcome.content, "utf8") : outcome.content;
   return { ok: outcome.outcome === "OK" && !outcome.denied, outputSha256: sha256Hex(content), outputBytes: content.length };
+}
+
+/**
+ * The seam with each call reported to the extension observers (tool-start, then tool-end with the result's digest and
+ * size, never its text: SH-EXT-01 PostToolUse). Every optional member is carried over, so wrapping removes no capability.
+ */
+export function observedToolSeam(tools: AgentToolSeam, observe: (event: NativeExtensionHookEvent, signal: AbortSignal) => Promise<void>): AgentToolSeam {
+  return { ...tools,
+    // Keep the WP31 effect-guard capability: a spread alone drops class-defined members.
+    ...(tools.supportsEffectGuard ? { supportsEffectGuard: true as const } : {}),
+    schemas: () => tools.schemas(), executionMode: request => tools.executionMode(request),
+    prepareStep: tools.prepareStep?.bind(tools), authorizationIntent: tools.authorizationIntent?.bind(tools),
+    bindApprovalGate: tools.bindApprovalGate?.bind(tools), denialBeforeApproval: tools.denialBeforeApproval?.bind(tools),
+    asksBeforeRunning: tools.asksBeforeRunning?.bind(tools),
+    execute: async request => {
+      await observe({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
+      let settled: { ok: boolean; outputSha256: string; outputBytes: number } | undefined;
+      try { const outcome = await tools.execute(request); settled = describeToolOutcome(outcome); return outcome; }
+      finally { await observe({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName, callId: request.callId, ...settled }, request.signal); }
+    }
+  };
 }
 
 /** The live context-occupancy line after a step (SH-LOOP-07). Nulls stay null. */
