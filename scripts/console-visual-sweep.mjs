@@ -49,7 +49,13 @@ async function signIn(browser, width, colorScheme) {
 async function sweep(browser, width, scheme) {
   const { context, page } = await signIn(browser, width, scheme);
   let found = [];
-  page.on("console", (message) => { if (message.type() === "error") found.push(`console error: ${message.text().slice(0, 200)}`); });
+  // A failed request's console line names no address; its location does (an API read that answers 404 "No score yet"
+  // is told apart from a broken page that way).
+  page.on("console", (message) => {
+    if (message.type() !== "error") return;
+    const where = message.location()?.url ? ` (${message.location().url.replace(base, "")})` : "";
+    found.push(`console error: ${message.text().slice(0, 200)}${where}`);
+  });
   page.on("pageerror", (error) => found.push(`page error: ${String(error).slice(0, 200)}`));
   page.on("requestfailed", (request) => { if (request.url().includes("/assets/")) found.push(`asset failed: ${request.url()}`); });
   page.on("response", (response) => { if (response.url().includes("/assets/") && response.status() >= 400) found.push(`asset ${response.status()}: ${response.url()}`); });

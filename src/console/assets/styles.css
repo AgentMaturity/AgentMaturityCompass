@@ -629,6 +629,13 @@ body[data-status-pill] #ucBanner:not(.uc-pinned):not(.uc-open) {
   margin-bottom: 16px;
   position: relative;
   min-width: 0;
+  /* A wide table scrolls inside its card instead of pushing the page sideways on a phone. */
+  overflow-x: auto;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto;
 }
 
 .card h2 { font-size: 22px; line-height: 1.25; margin: 0 0 10px; }
@@ -849,6 +856,7 @@ tr.selected > td { background: var(--accent-soft); }
 }
 
 code {
+  overflow-wrap: anywhere;
   background: var(--surface-2);
   color: var(--ink);
   padding: 1px 6px;
@@ -1345,6 +1353,30 @@ label.picture-card:has(input:checked) {
 
 .advanced-section {
   margin-bottom: 16px;
+}
+
+.home-more > summary,
+.advanced-section > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-more > summary::before,
+.advanced-section > summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin: 0 4px;
+  border-right: 1.75px solid currentColor;
+  border-bottom: 1.75px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.home-more[open] > summary::before,
+.advanced-section[open] > summary::before {
+  transform: rotate(45deg);
 }
 
 .advanced-section[open] > summary,

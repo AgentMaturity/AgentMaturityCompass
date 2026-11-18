@@ -122,6 +122,8 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       await page.locator("#nativeTaskProvider").focus(); await page.keyboard.press("Tab");
       assert.equal(await page.locator("#nativeTaskModel").evaluate(node => node === document.activeElement), true);
       await page.goto(ui.url("home"));
+      // Home keeps these ways in folded under "Other ways in" (studio-ui redesign).
+      await page.locator("summary", { hasText: "Other ways in" }).click();
       await page.locator("#firstUseConnectButton").click();
       await expect(page.locator("#nativeGuideCommand")).toContainText(`--agent='${fixture.agentId}'`);
       await page.locator("#copyNativeGuide").click();

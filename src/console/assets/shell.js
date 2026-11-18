@@ -20,7 +20,7 @@ const esc = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("
 export const CANONICAL_NAV = [
   { href: "./home", label: "Home", icon: "home", tab: true },
   { href: "./a4", label: "Build an agent", id: "a4NavLink", icon: "build", tab: true, short: "Build" },
-  { href: "./native-tasks", label: "Run a task", icon: "run", tab: true },
+  { href: "./native-tasks", label: "Run a task", icon: "run", tab: true, short: "Run" },
   { href: "./agent", label: "My agent", icon: "agent", tab: true },
   { href: "./approvals", label: "Approvals", icon: "approvals", tab: true },
   { href: "./evidence", label: "Records", icon: "records" },
