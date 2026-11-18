@@ -42,6 +42,7 @@ import type { AgentLoopConfig, LoopNotification, LoopRetryRuntime, TurnEnding } 
 import { dispatchStepRequest } from "./requestRetry.js";
 import { runToolCalls } from "./toolCalls.js";
 import type { AgentToolSeam } from "./toolSeam.js";
+import type { TurnGuards } from "./turnGuards.js";
 
 /**
  * The one thing the loop needs from the model seam.
@@ -87,6 +88,8 @@ export interface StepRunnerInit {
   readonly acceptContext: (text: string) => void;
   /** Live-only mirror of what the step is doing. Never load-bearing for the log. */
   readonly notify: (notification: LoopNotification) => void;
+  /** The driver's per-turn guards over model-requested calls; validation checks never pass through them. */
+  readonly guards?: TurnGuards;
 }
 
 export interface StepResult {
@@ -207,8 +210,10 @@ export async function runStep(
       // parent token to carry here and none is guessed.
       parentToken: null,
       acceptContext: init.acceptContext,
-      calls
+      calls,
+      ...(init.guards === undefined ? {} : { guards: init.guards })
     });
+    init.guards?.endStep();
 
     // A cancelled tool run leaves the step's ending to the turn machine: the abort
     // it observed is the same signal the turn is about to see.

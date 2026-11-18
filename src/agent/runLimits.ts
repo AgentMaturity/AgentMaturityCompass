@@ -29,9 +29,8 @@
  * is signed into delegation packets children enforce, and widening it would sign
  * a `max-tokens` claim no child enforces.
  */
-import type { TokenUsage } from "../session/sessionTypes.js";
-
-type RunLimitCondition = "max-turns" | "max-tokens" | "deadline";
+import type { TokenUsage, TurnLimitCondition } from "../session/sessionTypes.js";
+import { TURN_GUARD_DEFAULTS } from "./turnGuards.js";
 
 export interface RunLimits {
   /** The highest session turn number that may open. */
@@ -40,14 +39,26 @@ export interface RunLimits {
   readonly maxTotalTokens?: number;
   /** Wall-clock milliseconds from the driver's construction. */
   readonly deadlineMs?: number;
+  /** US dollars of attributed (provider-reported or complete catalog-estimate) cost over the session; indicative. */
+  readonly maxCostUsd?: number;
+  /** Turn guards (src/agent/turnGuards.ts), only ever stricter than {@link TURN_GUARD_DEFAULTS}. */
+  readonly repeatedCalls?: number;
+  readonly malformedResponses?: number;
+  readonly denials?: number;
 }
+
+/** `--stop` names of the turn guards, the RunLimits key each sets, and the default each may only tighten. */
+const GUARD_FORMS = { "repeated-calls": ["repeatedCalls", TURN_GUARD_DEFAULTS.repeatedCalls, 2],
+  "malformed-responses": ["malformedResponses", TURN_GUARD_DEFAULTS.malformedResponses, 1],
+  "denials": ["denials", TURN_GUARD_DEFAULTS.denials, 1] } as const;
 
 /** The cause a limit records. `bound` is the operator's number; `unmeasured` marks a fail-closed stop. */
 export interface RunLimitBreach {
   readonly kind: "limit";
-  readonly condition: RunLimitCondition;
+  readonly condition: TurnLimitCondition;
   readonly bound: number;
   readonly unmeasured?: true;
+  readonly tools?: readonly string[];
 }
 
 /** Node timers cannot represent a larger delay without overflowing to 1ms. */
@@ -60,11 +71,14 @@ export type RunLimitsParse =
 /** Parse the exact `--stop` strings. No prose, no defaults: an unknown form is refused, never ignored. */
 export function parseRunLimits(conditions: readonly string[] | undefined): RunLimitsParse {
   const snapshot = [...(conditions ?? [])];
-  const limits: { maxTurns?: number; maxTotalTokens?: number; deadlineMs?: number } = {};
+  const limits: { -readonly [K in keyof RunLimits]: RunLimits[K] } = {};
   for (const condition of snapshot) {
+    const special = typeof condition === "string" ? parseSpecialLimit(condition, limits) : null;
+    if (special === "ok") continue;
+    if (special !== null) return { ok: false, reason: special };
     const match = typeof condition === "string" ? /^(max-turns|max-tokens|timeout-ms):([1-9][0-9]*)$/.exec(condition) : null;
     if (match === null || match[0] !== condition) {
-      return { ok: false, reason: "invalid stop condition; expected max-turns:N, max-tokens:N or timeout-ms:N with a positive canonical decimal integer" };
+      return { ok: false, reason: "invalid stop condition; expected max-turns:N, max-tokens:N, timeout-ms:N, max-cost-usd:D, repeated-calls:N, malformed-responses:N or denials:N with a positive canonical number" };
     }
     const value = Number(match[2]);
     if (!Number.isSafeInteger(value)) return { ok: false, reason: `invalid ${match[1]} stop condition: value must be a positive safe integer` };
@@ -76,10 +90,40 @@ export function parseRunLimits(conditions: readonly string[] | undefined): RunLi
   return { ok: true, limits: Object.freeze({ ...limits }), conditions: Object.freeze(snapshot) };
 }
 
+/** `max-cost-usd:D` and the stricter-only guard forms; null when `condition` is none of them. Mutates `limits` on "ok". */
+function parseSpecialLimit(condition: string, limits: { -readonly [K in keyof RunLimits]: RunLimits[K] }): "ok" | string | null {
+  const cost = /^max-cost-usd:((?:0|[1-9][0-9]{0,5})(?:\.[0-9]{1,6})?)$/.exec(condition);
+  if (cost !== null) {
+    const value = Number(cost[1]);
+    if (!(value > 0)) return "invalid max-cost-usd stop condition: give a dollar amount above 0, such as max-cost-usd:0.50";
+    if (limits.maxCostUsd !== undefined) return "duplicate max-cost-usd stop condition";
+    limits.maxCostUsd = value;
+    return "ok";
+  }
+  const guard = /^(repeated-calls|malformed-responses|denials):([1-9][0-9]*)$/.exec(condition);
+  if (guard === null) return null;
+  const [key, ceiling, floor] = GUARD_FORMS[guard[1] as keyof typeof GUARD_FORMS];
+  const value = Number(guard[2]);
+  if (value > ceiling || value < floor) return `${guard[1]} can only be made stricter than the default of ${ceiling}: give a number from ${floor} to ${ceiling}`;
+  if (limits[key] !== undefined) return `duplicate ${guard[1]} stop condition`;
+  limits[key] = value;
+  return "ok";
+}
+
 /** A breach in the `--stop` syntax the operator gave it, for the run report. */
 export function describeRunLimit(breach: RunLimitBreach): string {
   const condition = breach.condition === "deadline" ? "timeout-ms" : breach.condition;
-  return `${condition}:${breach.bound}${breach.unmeasured === true ? " (a step reported no usage, so the token budget could not see it)" : ""}`;
+  const unmeasured = breach.condition === "max-cost-usd" ? " (a model request has no known cost, so the cost limit could not see it)"
+    : " (a step reported no usage, so the token budget could not see it)";
+  return `${condition}:${breach.bound}${breach.unmeasured === true ? unmeasured : ""}`;
+}
+
+/** The part of a native cost projection (src/budgets/nativeCostProjection.ts) the cost limit reads. */
+export interface RunCostView {
+  readonly status: "complete" | "partial" | "unavailable" | "invalid";
+  readonly attributedSubtotalUsd: number | null;
+  readonly partialRequests: number;
+  readonly unknownRequests: number;
 }
 
 /** What a session's earlier steps reported, for seeding a resumed run's token budget. */
@@ -117,6 +161,21 @@ export class RunLimitTracker {
   get breach(): RunLimitBreach | null { return this.breached; }
 
   get deadlineMs(): number | undefined { return this.limits.deadlineMs; }
+
+  /**
+   * Account the session's cost after a step. Fails closed: any request without an attributed cost (no price, no reported
+   * usage, a stub route, a failed attempt) is a cost the bound cannot see, so the run stops as unmeasured. `cost` is a thunk
+   * so the projection is only read when a cost limit is set.
+   */
+  recordCost(cost: () => RunCostView): RunLimitBreach | null {
+    if (this.breached !== null || this.limits.maxCostUsd === undefined) return this.breached;
+    const view = cost();
+    const bound = this.limits.maxCostUsd;
+    const seen = view.status === "complete" || (view.status === "unavailable" && view.partialRequests + view.unknownRequests === 0);
+    if (!seen) this.breached = { kind: "limit", condition: "max-cost-usd", bound, unmeasured: true };
+    else if ((view.attributedSubtotalUsd ?? 0) > bound) this.breached = { kind: "limit", condition: "max-cost-usd", bound };
+    return this.breached;
+  }
 
   /** Whether session turn `turn` may open. */
   turnAllowed(turn: number): RunLimitBreach | null {

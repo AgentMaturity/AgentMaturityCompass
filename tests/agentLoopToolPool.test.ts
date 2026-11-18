@@ -170,7 +170,8 @@ describe("P3.2 — the bounded tool pool and cancellation", () => {
         return ok("done");
       }
     });
-    const calls = [1, 2, 3, 4, 5, 6].map((n) => ({ id: `call-${n}`, name: "work", args: "{}" }));
+    // Distinct arguments: six identical calls in a row would meet the repeated-call guard (src/agent/turnGuards.ts).
+    const calls = [1, 2, 3, 4, 5, 6].map((n) => ({ id: `call-${n}`, name: "work", args: `{"n":${n}}` }));
     const harness = harnessFor({
       scripts: [toolStepMulti(calls), textStep("all six ran.")],
       tools,

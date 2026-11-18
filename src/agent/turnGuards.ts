@@ -1,0 +1,180 @@
+/**
+ * Cheap loop guards (HP-01, HP-23) and the ordered turn-policy list (HP-03).
+ *
+ * Three per-turn guards, each a count the driver checks after `step/end`:
+ *   - repeated call: the same tool with the same arguments (keys sorted) called again and again in a row. From the
+ *     `refuseAt`-th identical call the call is NOT run and the model is told why; at `stopAt` the turn ends.
+ *     A write-class call that succeeds clears the streak (the workspace changed, so the next call is a new question).
+ *   - malformed responses: consecutive steps whose tool calls could not be used (arguments that are not a JSON
+ *     object, or a tool the request never offered). A step whose calls are all well formed clears the streak.
+ *   - denials: calls refused by a guard, a policy or an approver in one turn. The loop's own refusals (unoffered
+ *     names, repeated calls) are not counted here: they are counted above.
+ * A stop is a signed `loop/cancel` with a `limit` cause that names the condition and the tools; the turn's `turn/end`
+ * carries the same cause. Nothing here runs a call the seam would refuse, approves anything, or changes a mode.
+ *
+ * State is per driver and reset at each turn start, so a delegated child (its own driver) starts fresh.
+ */
+import { canonicalize } from "../utils/json.js";
+import { sha256Hex } from "../utils/hash.js";
+import type { ActionClass, EvidenceEvent } from "../types.js";
+import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
+import type { RunLimitBreach, RunLimits, RunLimitTracker, RunCostView } from "./runLimits.js";
+import type { ToolCallOutcome } from "./toolSeam.js";
+
+/** The defaults. `--stop` may only lower them (src/agent/runLimits.ts). */
+export const TURN_GUARD_DEFAULTS = Object.freeze({ repeatRefuseAt: 3, repeatedCalls: 5, malformedResponses: 3, denials: 5 });
+
+const MAX_NAME = 128;
+
+/** One call as the model produced it. */
+export interface GuardedCall {
+  readonly name: string;
+  readonly arguments: string;
+  readonly unoffered?: true;
+}
+
+/** The arguments' canonical form (keys sorted), or null when they are not a JSON object. `""` reads as `{}`, as the pipeline reads it. */
+export function canonicalArguments(raw: string): string | null {
+  try {
+    const parsed: unknown = JSON.parse(raw === "" ? "{}" : raw);
+    return typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) ? canonicalize(parsed) : null;
+  } catch {
+    return null;
+  }
+}
+
+export class TurnGuards {
+  private readonly refuseAt: number;
+  private readonly stopAt: number;
+  private readonly malformedAt: number;
+  private readonly denialsAt: number;
+  private signature: string | null = null;
+  private streak = 0;
+  private stepMalformed = false;
+  private malformedSteps = 0;
+  private readonly denied: string[] = [];
+  private tripped: RunLimitBreach | null = null;
+  private last: RunLimitBreach | null = null;
+
+  constructor(limits: RunLimits = {}) {
+    this.stopAt = limits.repeatedCalls ?? TURN_GUARD_DEFAULTS.repeatedCalls;
+    this.refuseAt = Math.min(TURN_GUARD_DEFAULTS.repeatRefuseAt, this.stopAt);
+    this.malformedAt = limits.malformedResponses ?? TURN_GUARD_DEFAULTS.malformedResponses;
+    this.denialsAt = limits.denials ?? TURN_GUARD_DEFAULTS.denials;
+  }
+
+  /** At each turn start. The malformed streak counts steps of one turn, like the others. */
+  reset(): void {
+    this.signature = null;
+    this.streak = 0;
+    this.stepMalformed = false;
+    this.malformedSteps = 0;
+    this.denied.length = 0;
+    this.tripped = null;
+  }
+
+  /** The stop this turn owes, if any. */
+  get trip(): RunLimitBreach | null { return this.tripped; }
+
+  /** The last guard stop of this driver, kept across turns for the run report. */
+  get lastTrip(): RunLimitBreach | null { return this.last; }
+
+  /** In model order, before dispatch: the loop's own answer to a repeated call, or null to dispatch as usual. */
+  beforeCall(call: GuardedCall): ToolCallOutcome | null {
+    const args = call.unoffered === true ? null : canonicalArguments(call.arguments);
+    if (args === null) { this.stepMalformed = true; return null; }
+    const signature = sha256Hex(canonicalize([call.name, args]));
+    this.streak = signature === this.signature ? this.streak + 1 : 1;
+    this.signature = signature;
+    if (this.streak < this.refuseAt) return null;
+    if (this.streak >= this.stopAt) this.stop({ kind: "limit", condition: "repeated-call", bound: this.stopAt, tools: [call.name.slice(0, MAX_NAME)] });
+    return { outcome: "DENIED", denied: true, exitCode: null, timedOut: false,
+      content: `[amc] You made this exact call (same tool, same arguments) ${this.streak} times in a row, so it was not run. `
+        + (this.tripped === null ? "Change the arguments, try a different approach, or stop and say what is blocking you."
+          : "The turn is ending; say what is blocking you.") };
+  }
+
+  /** After a dispatched call settles. `actionClass` null (unknown) never clears the streak: unknown is not a write. */
+  afterCall(name: string, outcome: ToolCallOutcome, actionClass: ActionClass | null): void {
+    if (outcome.denied) {
+      this.denied.push(name.slice(0, MAX_NAME));
+      if (this.denied.length >= this.denialsAt) this.stop({ kind: "limit", condition: "denials", bound: this.denialsAt, tools: this.denied });
+    } else if (outcome.outcome === "OK" && actionClass !== null && actionClass !== "READ_ONLY") {
+      this.signature = null;
+      this.streak = 0;
+    }
+  }
+
+  /** After a step's calls have all been answered. */
+  endStep(): void {
+    this.malformedSteps = this.stepMalformed ? this.malformedSteps + 1 : 0;
+    this.stepMalformed = false;
+    if (this.malformedSteps >= this.malformedAt) this.stop({ kind: "limit", condition: "malformed-responses", bound: this.malformedAt });
+  }
+
+  private stop(breach: RunLimitBreach): void {
+    if (this.tripped !== null) return;
+    const tools = breach.tools === undefined ? undefined : [...new Set(breach.tools)].sort().slice(0, 16);
+    this.tripped = Object.freeze({ ...breach, ...(tools === undefined ? {} : { tools }) });
+    this.last = this.tripped;
+  }
+}
+
+/** A stop and how far it reaches: `run` closes admission (a run limit), `turn` ends only this turn (a guard). */
+export interface TurnStop { readonly cause: RunLimitBreach; readonly scope: "run" | "turn" }
+export type TurnPolicy = () => TurnStop | null;
+
+/**
+ * The checks the driver runs after each `step/end`, in order; the first stop wins. Token and cost limits come first,
+ * so a run that is over budget is reported as over budget, not as stuck.
+ */
+export function turnPolicies(limits: RunLimitTracker | null, guards: TurnGuards, cost: () => RunCostView): readonly TurnPolicy[] {
+  const run = (cause: RunLimitBreach | null): TurnStop | null => cause === null ? null : { cause, scope: "run" };
+  return [
+    () => run(limits?.breach ?? null),
+    () => run(limits?.recordCost(cost) ?? null),
+    () => guards.trip === null ? null : { cause: guards.trip, scope: "turn" }
+  ];
+}
+
+export function firstStop(policies: readonly TurnPolicy[]): TurnStop | null {
+  for (const policy of policies) {
+    const stop = policy();
+    if (stop !== null) return stop;
+  }
+  return null;
+}
+
+/** A limit stop in plain words, for `amc session show` and the run report. */
+export function describeTurnStop(cause: { readonly condition: string; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[] }): string {
+  const tools = cause.tools === undefined || cause.tools.length === 0 ? "" : ` (${cause.tools.map(name => JSON.stringify(name)).join(", ")})`;
+  switch (cause.condition) {
+    case "repeated-call": return `The agent made the same tool call ${cause.bound} times in a row${tools}, so AMC ended the turn.`;
+    case "malformed-responses": return `The model sent ${cause.bound} responses in a row whose tool calls AMC could not use, so AMC ended the turn.`;
+    case "denials": return `${cause.bound} tool calls were refused in one turn${tools}, so AMC ended the turn. Nothing refused was run.`;
+    case "max-cost-usd": return cause.unmeasured === true
+      ? `The run stopped: a cost limit of $${cause.bound} was set, and a model request had no known cost, so AMC could not keep the limit.`
+      : `The run stopped: its indicative cost passed the limit of $${cause.bound}. This is an estimate, not a bill.`;
+    case "max-tokens": return cause.unmeasured === true
+      ? `The run stopped: a token limit of ${cause.bound} was set, and a step reported no token usage, so AMC could not keep the limit.`
+      : `The run stopped: it used more than its limit of ${cause.bound} tokens.`;
+    case "max-turns": return `The run stopped: it reached its limit of ${cause.bound} turns.`;
+    case "deadline": return `The run stopped: it reached its time limit of ${cause.bound} ms.`;
+    default: return "The run stopped at a limit this version of AMC does not know.";
+  }
+}
+
+/** One turn that ended at a limit or a guard, read back from its signed `turn/end`. */
+export interface TurnStopRow { readonly eventId: string; readonly turn: number; readonly condition: string; readonly text: string }
+
+/** Every turn of `sessionId` whose signed `turn/end` names a `limit` cause, in plain words. */
+export function projectTurnStops(events: readonly EvidenceEvent[], sessionId: string): TurnStopRow[] {
+  const stops: TurnStopRow[] = [];
+  for (const event of events) {
+    if (event.session_id !== sessionId || event.event_type !== "turn/end") continue;
+    const cause = readTurnEndMeta(event.meta_json)?.cancelCause;
+    if (cause?.kind !== "limit") continue;
+    stops.push({ eventId: event.id, turn: readTurnEndMeta(event.meta_json)!.turn, condition: cause.condition, text: describeTurnStop(cause) });
+  }
+  return stops;
+}
