@@ -8,7 +8,7 @@
  */
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
-import type { ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
+import { listApprovalDecisions, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { buildSessionExport } from "../observability/sessionExport.js";
 import { renderSessionExportHtml } from "../observability/sessionExportHtml.js";
 import { readEventPayload } from "../session/eventPayload.js";
@@ -52,8 +52,19 @@ function meta(row: EvidenceEvent): Record<string, unknown> {
 }
 const text = (value: unknown): string | null => (typeof value === "string" && value.length > 0 ? value : null);
 
+/** Who decided an approval, from the signed approvals record it names (the session row says only which engine answered). */
+function approverOf(workspace: string, agentId: string | null, approvalRequestId: string | null): string | null {
+  if (approvalRequestId === null) return null;
+  try {
+    const names = listApprovalDecisions({ workspace, agentId: agentId ?? undefined, approvalRequestId }).filter((d) => d.decision !== "DENY").map((d) => d.username);
+    return names.length === 0 ? null : [...new Set(names)].join(", ");
+  } catch {
+    return null;
+  }
+}
+
 /** Each tool call of one session, in order, with its recorded outcome and who approved it (when a person did). */
-function actionsOf(rows: readonly EvidenceEvent[]): AuditAction[] {
+function actionsOf(workspace: string, agentId: string | null, rows: readonly EvidenceEvent[]): AuditAction[] {
   const answers = new Map<string, string>();
   const asked = new Map<string, string>();
   for (const row of rows) {
@@ -61,7 +72,7 @@ function actionsOf(rows: readonly EvidenceEvent[]): AuditAction[] {
     if (row.event_type === "approval/request" && text(m.approvalId) && text(m.toolCallId)) asked.set(m.approvalId as string, m.toolCallId as string);
     if (row.event_type === "approval/answer" && m.answer === "allow" && text(m.approvalId)) {
       const call = asked.get(m.approvalId as string);
-      if (call !== undefined) answers.set(call, text(m.answeredBy) ?? "a person");
+      if (call !== undefined) answers.set(call, approverOf(workspace, agentId, text(m.approvalRequestId)) ?? text(m.answeredBy) ?? "a person");
     }
   }
   const calls = new Map<string, AuditAction>();
@@ -83,7 +94,7 @@ export function listAuditSessions(workspace: string, agentId = "default"): { rea
   const native = summarizeNativeSessions(workspace, agentId, history).filter((summary) => summary.source === "native");
   return { total: native.length, sessions: native.slice(0, MAX_SESSIONS).map((summary) => {
     const rows = rowsBy.get(summary.sessionId) ?? [];
-    const actions = actionsOf(rows);
+    const actions = actionsOf(workspace, summary.agentId, rows);
     return { sessionId: summary.sessionId, agentId: summary.agentId, sealed: summary.state === "sealed", startedAt: rows[0]?.ts ?? summary.updatedAt,
       updatedAt: summary.updatedAt, turns: summary.turns, actions: actions.slice(-MAX_ACTIONS), moreActions: Math.max(0, actions.length - MAX_ACTIONS) };
   }) };
