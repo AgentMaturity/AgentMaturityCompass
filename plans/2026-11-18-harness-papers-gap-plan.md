@@ -69,6 +69,12 @@ Keys are stable; lanes cite them.
 - HP-23 No denial tracking per agent.
 - HP-24 No LLM approval reviewer. Kept out on purpose as an approver; see "Not building".
 
+- HP-49 Person-presence: AMC recognises an agent by markers and a terminal check. A program running
+  as the same user that hides the markers and drives a pseudo-terminal passes as a person for every
+  owner-only action (shown in a sandbox on 2026-11-18: it made itself owner of a coding setup and
+  approved its own command). Needs a lane: a parent-process or OS-level presence check, or an
+  approval factor a same-user process cannot hold (hardware key, second device, second person).
+
 ### Orchestration and protocols (D6, R12, R13)
 - HP-25 Sub-agent definitions lack model, permission-mode and skills fields, scopes and fork modes.
 - HP-26 No ACP client/host role; only `claude-cli` as a foreign delegate; no cross-vendor review rule.
@@ -155,6 +161,7 @@ auditor cannot export and verify unaided.
 0a. `first-run` HP-46, UX-01 UX-28 UX-29 UX-02: bare `amc` leads to a workspace that can really act;
     a plain sentence works in chat; a folder whose `.amc` was removed can start fresh; a skill turn
     does not end the chat.
+0a merged 2026-11-18 (`4dc58dd42`); UX-29 kept as is (anti-rollback), a start-fresh command is Sid's call.
 0b. `auditor-path` UX-03 UX-04 UX-05 UX-06 UX-30: hook decision before the person's approval; chat
     actions and approval content visible in the console; export of a session closed with `/exit`;
     `amc-verify` reads the session export; one truthful verification result; Governor page states
