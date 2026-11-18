@@ -297,7 +297,8 @@ function mountProject(projectId, options) {
     // Kept in sight (A4-08): the answers while the step asks for them, the specification and the Approvals card while an
     // approval is under way, and the build card (its Run a task link) from Build to Review. The panel's own target is
     // kept wherever it is; Members and the rest fold, and the panel's go-to opens a fold when it points into one.
-    const step = state.project.stage === stage ? state.project.step : null;
+    // A stopped step (the release this Studio cannot make, a hold) has nothing to fill in: every section folds.
+    const step = state.project.stage === stage && !root.querySelector('.a4-step-panel[data-state="stop"]') ? state.project.step : null;
     const keep = [...(step === "asked" ? ['[data-card="conversation"]'] : []),
       ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]', ".a4-approvals"] : []),
       ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");

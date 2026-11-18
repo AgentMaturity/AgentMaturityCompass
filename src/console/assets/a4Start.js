@@ -406,7 +406,7 @@ export function renderStartHere(ctx) {
   const state = moveState(project, move);
   const here = stage === project.stage;
   const names = new Map([...list(project.members), ...list(ctx.members?.candidates)].map((row) => [row.principalKey, row.username]));
-  const heading = project.stage === "retired" ? "Retired" : !here ? `Viewing ${STAGE_PLAIN[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
+  const heading = project.stage === "retired" ? "Retired" : project.hold ? "On hold" : here && state === "stop" ? "Stopped here" : !here ? `Viewing ${STAGE_PLAIN[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
   const part = here && at >= 0 ? `<p class="muted">${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
       <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : "";
   const fold = (summary, html, key) => moreInfo(summary, html).replace('<details class="more-info"', `<details class="more-info" data-a4-open="start:${key}"`);

@@ -268,9 +268,10 @@ function renderEffect(ctx) {
   const [[requestState] = []] = coded(item, "APPROVAL_STATUS");
   const completion = ctx.readiness?.gates?.completion;
   const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The final approval does not have enough approvals yet");
-  return `<p class="muted">Completing Assemble applies the reviewed Enforce resources as the agent's active manifest (signed receipt). It is a
+  return `<p>Applying what was built is a second request: an owner opens it, then the project's approvers approve it here.</p>
+    <details class="more-info" data-a4-open="effect:how"><summary>What does it apply?</summary><div class="more-info-body"><p class="muted">Completing Assemble applies the reviewed Enforce resources as the agent's active manifest (signed receipt). It is a
     second, separately decided request: an owner opens it, project approvers decide it (two distinct people when regulated), then the owner completes
-    the stage. A failed apply leaves the gate consumed and offers one owner retry.</p>${status(ctx, "effect_gate")}
+    the stage. A failed apply leaves the gate consumed and offers one owner retry.</p></div></details>${status(ctx, "effect_gate")}
     <div class="row wrap">${view.actionButton(request ? "Ask again for the second approval that applies the build" : "Ask for the second approval that applies the build", "open-effect", openable,
       `data-gate="${esc(completion?.gateId ?? "")}"`)}</div>
     ${request ? `<p class="muted">Engine request <code>${esc(request[0])}</code> (<code>${esc(requestState ?? "unknown")}</code>)</p>${requestState === "PENDING" || requestState === "QUORUM_MET"

@@ -364,12 +364,12 @@ export function renderConversation(ctx) {
   return `${staleBanner}<h4>Ask</h4>
     ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
       ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
-    <form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
+    <form class="a4-form" data-a4-answers>${open.filter((question) => question.required !== false).map(field).join("")}${open.some((question) => question.required === false)
+      ? `<details class="more-info" data-a4-open="optional"><summary>Optional questions (${open.filter((question) => question.required === false).length})</summary>${open.filter((question) => question.required === false).map(field).join("")}</details>` : ""}${change.length
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
       ${answerDrift ? `<p class="status-bad">${ANSWER_CHANGED}.</p>` : ""}
-      <p class="muted">${RESTARTS} ${IN_RECORD}</p>
-      ${ctx.exampleOffered && open.length ? `<p class="muted">Not sure what to write? Each empty field shows an example. Use an example fills the empty
-        fields with sample answers marked (sample), which you can change before saving.</p>` : ""}
+      <details class="more-info" data-a4-open="saving"><summary>What happens when I save?</summary><p class="muted">${RESTARTS} ${IN_RECORD}</p>${ctx.exampleOffered && open.length
+        ? "<p class=\"muted\">Not sure what to write? Each empty field shows an example. Use an example fills the empty fields with sample answers marked (sample), which you can change before saving.</p>" : ""}</details>
       <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${ctx.exampleOffered && open.length
         ? ' <button type="button" class="secondary" data-a4-action="use-example">Use an example</button>' : ""}${answerDrift
         ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>
