@@ -6,7 +6,7 @@
  *
  * Every row's `event_hash` is recomputed from its pre-image (AMC's `canonicalMetadataForHash`), its `writer_sig` is
  * Ed25519 over the 32 hash bytes, and the rows must form one per-session chain (envelope `seq` 0, 1, … and
- * `prevSessionEventHash` from `SESSION_GENESIS`). The signer is looked up among the supplied trust lists' keys and must
+ * `prevSessionEventHash` starting at the genesis value `SESSION_GENESIS`). The signer is looked up among the supplied trust lists' keys and must
  * be admitted for `ledger-row`; a key the export carries only tells the verifier which key to look for. A sealed
  * session's seal must name the last row and verify; an unsealed one (a chat left open to be continued) is said to be
  * unsealed, and its completeness is not evaluated, because a cut-off tail cannot be detected.

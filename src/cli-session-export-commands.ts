@@ -110,7 +110,7 @@ async function checkSessionExport(path: string, extracted: ExtractedSessionExpor
 }
 
 /** UX-05: one plain line on what a passing check covered and what it did not. */
-export function sessionExportCheckedLine(rows: number, sealed: boolean): string {
+function sessionExportCheckedLine(rows: number, sealed: boolean): string {
   return `Session export checked: ${rows} recorded events are unchanged and signed by the monitor key you pinned; `
     + (sealed ? "the session is sealed, so none is missing at the end. " : "the session is NOT sealed, so events after the last one shown would not be noticed. ")
     + "Not checked: a public log anchor, and whether what the records say is true.";
