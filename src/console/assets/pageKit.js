@@ -1,6 +1,7 @@
 // Small pieces the console's secondary pages share (C-09, C-16, C-18): records as readable rows with the raw record under
 // "Show the record", an inline question instead of a browser prompt, and a second press to confirm a change that cannot be
 // taken back. Everything that came from Studio, a file or an agent is escaped here.
+import { icon, picture } from "./iconSet.js";
 
 export function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
@@ -135,4 +136,56 @@ export function showResult(target, value, words = `Done at ${new Date().toLocale
     el = div;
   }
   el.innerHTML = `<p class="status-ok">${esc(words)}</p>${recordRows(value)}`;
+}
+
+// The redesign's shared pieces (studio-ui lane): the route, picture cards, notice chips, "more info" and empty states.
+// Every one is plain markup styled by styles.css; words passed in are escaped, `html` arguments are the console's own.
+
+const ROUTE_WORDS = { done: "done", now: "you are here", wait: "waiting for a person", stop: "stopped", todo: "not started" };
+const ROUTE_ICONS = { done: "check", wait: "wait", stop: "refused" };
+
+/**
+ * The route: waypoints on a line, one per step `{ label, state: "done"|"now"|"wait"|"stop"|"todo", hint? }`. An ordered
+ * list for assistive technology; the current step (the first "now", else the first "wait" or "stop") carries
+ * aria-current="step", and each state is said in hidden words. Labels are at most two words; a hint is the tooltip.
+ */
+export function routeTrack(steps, { label = "Progress", className = "" } = {}) {
+  const list = Array.isArray(steps) ? steps : [];
+  const states = list.map((step) => (Object.hasOwn(ROUTE_WORDS, step?.state) ? step.state : "todo"));
+  const current = ["now", "wait", "stop"].map((state) => states.indexOf(state)).find((at) => at >= 0) ?? -1;
+  const items = list.map((step, at) => {
+    const state = states[at];
+    const mark = ROUTE_ICONS[state] ? icon(ROUTE_ICONS[state], { size: 14 }) : "";
+    return `<li class="route-step is-${state}"${at === current ? ' aria-current="step"' : ""}${step.hint ? ` title="${esc(step.hint)}"` : ""}>`
+      + `<span class="route-dot" aria-hidden="true">${mark}</span><span class="route-label">${esc(step.label)}</span>`
+      + `<span class="visually-hidden">: ${ROUTE_WORDS[state]}${step.hint ? `. ${esc(step.hint)}` : ""}</span></li>`;
+  }).join("");
+  return `<ol class="route${className ? ` ${esc(className)}` : ""}" aria-label="${esc(label)}">${items}</ol>`;
+}
+
+/**
+ * A choice or a way in, drawn as a card: a picture (or a large icon), a 2-4 word title and one line. With `href` it is a
+ * link; with `input` (a real radio or checkbox, same name and value as before) it is that input's label; else a button.
+ */
+export function pictureCard({ title, line = "", href = "", input = "", pictureName = "", iconName = "", id = "", className = "" }) {
+  const art = (pictureName && picture(pictureName)) || (iconName ? `<span class="picture-card-icon">${icon(iconName, { size: 28 })}</span>` : "");
+  const body = `${art}<strong class="picture-card-title">${esc(title)}</strong>${line ? `<span class="picture-card-line">${esc(line)}</span>` : ""}`;
+  const attrs = `class="picture-card${className ? ` ${esc(className)}` : ""}"${id ? ` id="${esc(id)}"` : ""}`;
+  if (input) return `<label ${attrs}>${input}${body}</label>`;
+  return href ? `<a ${attrs} href="${esc(href)}">${body}</a>` : `<button type="button" ${attrs}>${body}</button>`;
+}
+
+/** A required notice as a neutral chip of 2-3 words that opens the full sentence, unchanged. Never green. */
+export function noticeChip(label, text) {
+  return `<details class="notice-chip"><summary>${icon("info", { size: 16 })}<span>${esc(label)}</span></summary><p>${esc(text)}</p></details>`;
+}
+
+/** Everything a screen keeps but does not need at first sight, one click away under a 2-4 word summary. */
+export function moreInfo(summary, html, { id = "" } = {}) {
+  return `<details class="more-info"${id ? ` id="${esc(id)}"` : ""}><summary>${esc(summary)}</summary><div class="more-info-body">${html}</div></details>`;
+}
+
+/** An empty state: a spot drawing, one line, and one action (the console's own markup). */
+export function emptyState({ pictureName = "empty", line, action = "" }) {
+  return `<div class="empty-state">${picture(pictureName) ?? ""}<p>${esc(line)}</p>${action}</div>`;
 }

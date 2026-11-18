@@ -92,6 +92,8 @@ async function around(selector) {
 // 1. Home's first card, "Build an agent for your industry": the start form with an Industry Pack chosen, a name, and
 // the "Who approves each step?" choice.
 await settle();
+// With no project yet the start form sits folded behind Home's "Build an agent" tile, which opens it in place.
+await page.click("#homeBuildTile");
 await page.waitForSelector("#a4HomeTitle");
 const homeTitle = (await page.textContent("#a4HomeTitle")).trim();
 if (homeTitle !== "Build an agent for your industry") throw new Error(`The home card says "${homeTitle}": use a workspace with no agent project yet.`);
@@ -112,11 +114,11 @@ await settle();
 await page.waitForSelector(".a4-start");
 await saveWebp(await around(".a4-practice, .a4-start"), "a4-project.webp");
 
-// 3. Home once a project exists: carry on with it, or watch an agent, run a task and score the record.
+// 3. Home once a project exists: the three ways in, and the project's route with Continue.
 await page.goto(`${base}/console/home`);
 await settle();
-await page.waitForSelector("#firstUse");
-await saveWebp(await around("#a4HomeCard, #firstUse"), "console-home.webp");
+await page.waitForSelector("#a4HomeCard .route");
+await saveWebp(await around("#homeStart, #a4HomeCard"), "console-home.webp");
 
 // 4. A project that needs a second person, waiting for its first approval (a4-approval.webp, on website/a4.html). The
 // owner starts a project from the same pack and follows the "What to do now" button, filling each stage's questions with

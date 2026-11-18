@@ -16,6 +16,7 @@ import { register as registerActivate } from "./a4Activate.js";
 import { API, claimSink, errorText, guarded, listOf, me, notice, one, params, previewOptions, root, send, setClaimSink, setMe, setShowClaims,
   showClaims, showError, storePack, storedPack, tell, uuid } from "./a4Send.js";
 import { bindCreateForm, renderListPage } from "./a4ListPage.js";
+import { syncWaiting } from "./homeView.js";
 
 const page = document.body.dataset.page;
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -53,11 +54,38 @@ async function showHomeEntry() {
     const latestReadiness = latest?.stage === "activate"
       ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}/readiness`).then((reply) => reply?.readiness ?? reply, () => null) : null;
     card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null, latestReadiness });
-    card.hidden = false;
     bindCreateForm(card.querySelector("#a4HomeForm"));
+    placeHomeCard(card, { waiting: Boolean(waiting), empty: projects.length === 0 });
   } catch {
     // Signed out, unreachable or refused: the card stays absent, which is the preview gate's closed state.
   }
+}
+
+/**
+ * Where Home's A4 card goes: an approval that waits joins "Waiting for you"; with no project yet the start form stays
+ * folded behind the "Build an agent" tile, which opens it in place; otherwise it shows the project's route.
+ */
+function placeHomeCard(card, { waiting, empty }) {
+  const list = document.getElementById("homeWaitingList");
+  if (waiting && list) {
+    card.classList.remove("card");
+    list.insertBefore(card, list.firstChild);
+    card.hidden = false;
+    syncWaiting(document);
+    return;
+  }
+  card.hidden = empty;
+  if (!empty || document.body.dataset.buildTileBound === "1") return;
+  document.body.dataset.buildTileBound = "1";
+  // app.js redraws the tiles, so the click is caught on the document rather than on the tile itself.
+  document.addEventListener("click", (event) => {
+    const tile = event.target?.closest?.("#homeBuildTile");
+    if (!tile || !card.isConnected || !card.querySelector("#a4HomeForm")) return;
+    event.preventDefault();
+    card.hidden = false;
+    card.scrollIntoView({ block: "start", behavior: "smooth" });
+    card.querySelector("#a4HomeForm select, #a4HomeForm input")?.focus({ preventScroll: true });
+  });
 }
 
 function mountProject(projectId, options) {

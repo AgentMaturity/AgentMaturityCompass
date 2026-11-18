@@ -4,7 +4,9 @@
 // action, so the primary action only points at the page's own buttons and never decides anything itself.
 import { QUESTION_LABELS } from "./a4Questions.js";
 import { SELF_APPROVE, decidedByMe, selfApproves, selfCountsOnce } from "./a4Who.js";
-import { itemTitle } from "./a4Plain.js";
+import { STAGE_SHORT, itemTitle } from "./a4Plain.js";
+import { moreInfo, noticeChip, routeTrack } from "./pageKit.js";
+import { icon } from "./iconSet.js";
 import { actionButton, reasonsText, STAGES, STAGE_PLAIN, STEP_NEXT, STEP_PLAIN, STEP_TITLES, TRUTH, esc, previewNoticeHtml, renderCreateForm } from "./a4View.js";
 
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -592,24 +594,31 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
   }
   if (isObject(waiting?.project)) {
     const { project: row, kind } = waiting;
-    return `<h2 id="a4HomeTitle">An approval waits for you</h2>
-      <p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${kind === "effect"
-        ? `needs your approval on a second request, which ${row.stage === "adapt" ? "activates the plan" : "applies what was built"}`
-        : kind === "release" ? "needs your approval on its release request, a second request on the approved plan that releases it" : `asks for its ${esc(kind)} approval`}. Open it, read what it asks for, then approve it or request changes.</p>
-      <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>`;
+    const asks = kind === "effect"
+      ? `needs your approval on a second request, which ${row.stage === "adapt" ? "activates the plan" : "applies what was built"}`
+      : kind === "release" ? "needs your approval on its release request, a second request on the approved plan that releases it" : `asks for its ${esc(kind)} approval`;
+    return `<div class="wait-tile">${icon("wait", { size: 24 })}<div class="wait-tile-words"><h2 id="a4HomeTitle" class="wait-title">An approval waits for you</h2>
+      <span>${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))}</span></div>
+      <a class="button" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>
+      ${moreInfo("What is asked?", `<p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${asks}. Open it, read what it asks for, then approve it or request changes.</p>`)}`;
   }
   const project = latestProject(projects);
   if (project) {
     const at = STAGES.indexOf(project.stage);
     const where = at >= 0 ? `Step ${at + 1} of 4: ${STAGE_PLAIN[project.stage]} (${title(project.stage)}). Part: ${STEP_PLAIN[project.step] ?? project.step}.` : "";
+    // The stage waits for a person while it is on hold or asks a second person to approve.
+    const waits = project.hold || ["proposed", "reviewed"].includes(project.step);
+    const route = at >= 0 ? routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: `${STAGE_PLAIN[name]} (${title(name)})`,
+      state: index < at ? "done" : index > at ? "todo" : waits ? "wait" : "now" })), { label: `Where ${project.name} is` }) : "";
     return `<h2 id="a4HomeTitle">Continue ${esc(project.name)}</h2>
+      ${route}
       <p class="first-use-lead">${esc(project.hold ? "This project is on hold until a project owner resumes it." : releaseNext(project, latestReadiness)
         ?? STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
-      ${where ? `<p class="muted">${esc(where)}</p>` : ""}
       <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(project.projectId ?? "")}">Continue</a>
-      <a href="./a4?new=1">Start another</a></div>`;
+      <a href="./a4?new=1">Start another</a></div>
+      ${where ? moreInfo("Which part?", `<p class="muted">${esc(where)}</p>`) : ""}`;
   }
   return `<h2 id="a4HomeTitle">Build an agent for your industry</h2><p class="first-use-lead">${esc(lead)}</p>
     ${renderCreateForm(true, industryHtml, { home: true, start })}
-    <p class="muted">A4 Forge preview. ${esc(TRUTH.signatures)}; nothing here says the agent is safe, correct or lawful.</p>`;
+    ${noticeChip("Preview", `A4 Forge preview. ${TRUTH.signatures}; nothing here says the agent is safe, correct or lawful.`)}`;
 }

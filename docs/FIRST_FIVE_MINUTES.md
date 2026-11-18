@@ -83,7 +83,7 @@ After you sign in, the home page shows:
 - a progress line, such as "Your progress: 0 of 4.", that names the next step;
 - everything else under **More**.
 
-"How AMC works" at the top of the page opens a three-step guide whenever you want it.
+The **?** button at the top of the page, "How AMC works", opens a three-step guide whenever you want it.
 
 ## Step 4: build an agent for your industry
 

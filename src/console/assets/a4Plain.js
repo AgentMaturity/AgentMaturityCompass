@@ -6,6 +6,8 @@
 import { esc } from "./a4Html.js";
 
 export const STAGE_PLAIN = { aspire: "Say what it is for", assemble: "Build it", adapt: "Fit it to your rules", activate: "Release it" };
+/** The same four stages in at most two words, for the waypoints of a route. */
+export const STAGE_SHORT = { aspire: "Describe it", assemble: "Build it", adapt: "Fit rules", activate: "Release it" };
 export const STEP_PLAIN = { asked: "Answer the questions", understood: "Check how AMC understood you", explained: "See AMC's choices explained",
   proposed: "Review the plan", direction_approved: "Get approval to build", built: "Build", reviewed: "Review the result",
   completion_approved: "Get final approval" };

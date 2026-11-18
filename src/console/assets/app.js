@@ -1,10 +1,11 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
-import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
+import { askInline, confirmPress, moreInfo, recordDetails, recordRows, showResult } from "./pageKit.js";
+import { activationRouteHtml, approvalsTileHtml, homeStartHtml, syncWaiting } from "./homeView.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { toolRatesHtml } from "./runtimeRates.js";
 import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
-import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
+import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, pendingApprovalCount, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
 import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
@@ -1392,6 +1393,9 @@ function renderAuthScreen() {
 const STUDIO_VAULT_NOTE = "Vault state of the running Studio process; each CLI process unlocks the vault on its own.";
 
 async function renderHome() {
+  const homeStart = document.getElementById("homeStart");
+  // The three ways in come first, before anything is fetched; the agent is filled in once Studio names it.
+  if (homeStart && !homeStart.firstElementChild) homeStart.innerHTML = homeStartHtml({ agentId: currentAgent(), demoMode: currentWorkspaceLabel() === "demo" });
   const status = await apiGet("/status");
   const agentsResp = await apiGet("/agents");
   // A linked Studio agent selection takes precedence over the host's CLI default.
@@ -1413,15 +1417,24 @@ async function renderHome() {
   const launchCommand = demoMode ? "$ amc up --demo --no-open" : "$ amc up";
   const agentStatus = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`).catch(() => ({ latestRun: null }));
   const latestRun = agentStatus.latestRun;
+  // The greeting and its three ways in, then "Waiting for you" (a4.js adds its approval tile there).
+  if (homeStart) homeStart.innerHTML = homeStartHtml({ agentId, demoMode });
+  const waitingApprovals = document.getElementById("homeWaitingApprovals");
+  if (waitingApprovals) {
+    waitingApprovals.innerHTML = approvalsTileHtml(await pendingApprovalCount());
+    syncWaiting(document);
+  }
   // The claim strip moves under "More" below; take it out of #app first so this re-render does not destroy it.
   const claimStrip = document.getElementById("claimStrip");
   if (claimStrip && root.contains(claimStrip)) root.before(claimStrip);
   root.innerHTML = `
-    ${firstUseCard(agentId, demoMode)}
-    <section class="home-progress" aria-label="Your progress">
-      <p>${htmlEscape(progressLineText(onboarding?.activation))}</p>
-      <details id="activationSteps">
+    <section class="home-progress" aria-labelledby="homeProgressTitle">
+      <h2 id="homeProgressTitle" class="section-title">First steps</h2>
+      ${activationRouteHtml(onboarding?.activation)}
+      <details id="activationSteps" class="more-info">
       <summary>Show all steps</summary>
+      <div class="more-info-body">
+      <p>${htmlEscape(progressLineText(onboarding?.activation))}</p>
     ${card("Activation path", `
       <div class="row spaced wrap">
         <div>
@@ -1443,8 +1456,10 @@ async function renderHome() {
         <pre id="onboardingOut" class="scroll muted"></pre>
       </details>
     `)}
+      </div>
       </details>
     </section>
+    ${moreInfo("Other ways in", firstUseCard(agentId, demoMode))}
 
     <details id="homeMore" class="home-more">
     <summary>More</summary>
