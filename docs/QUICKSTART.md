@@ -157,6 +157,14 @@ OS-confined `bash` without network access, a `warn` firewall, signed budgets and
 in a signed `users.yaml`. It asks for the owner's Studio login (or reads `AMC_BOOTSTRAP_OWNER_USERNAME` and
 `AMC_BOOTSTRAP_OWNER_PASSWORD` in a non-interactive shell) and prints the monitor fingerprint to pin.
 
+A folder you already set up with bare `amc` can move to the same setup in place: choose "Set up an agent that edits
+files and runs commands here" in the `amc` menu, or run `amc init --coding` there in your own terminal. It shows what
+the setup allows, asks before it changes anything, keeps the folder's keys, records and history, and asks you for a
+vault passphrase of your own in place of the one AMC generated. It is refused for an agent, without a terminal, and in a
+folder whose accounts, approval policy, tools or Action Policy someone already changed. The move is written to the
+signed evidence as `WORKSPACE_CODING_SETUP_ADOPTED`. In a chat with the stand-in model (`--provider stub`) a plain
+sentence gets a reply that names a tool request to type, because that model cannot choose a tool itself.
+
 Until the next release is published, `npm install agent-maturity-compass` installs 1.1.1, which has neither the native SDK nor `amc init --coding`. Install your source build instead: in the checkout from step 1, after `pnpm run build`, run `npm pack --ignore-scripts` (without that flag `npm pack` first runs the full release gate), then `npm install <the .tgz it wrote>` in your project.
 
 ```bash

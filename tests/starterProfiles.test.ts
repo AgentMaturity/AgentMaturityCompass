@@ -239,7 +239,9 @@ describe("runStarterInit (P1-40)", () => {
     mkdirSync(join(dir, ".amc"));
     vi.stubEnv("AMC_BOOTSTRAP_OWNER_USERNAME", OWNER.username);
     vi.stubEnv("AMC_BOOTSTRAP_OWNER_PASSWORD", OWNER.password);
-    await expect(runStarterInit(dir, "coding")).rejects.toThrow("already has an .amc directory");
+    // UX-01: --coding over an existing .amc is the in-place move, which needs a person at a terminal (tests/codingAdoption.test.ts).
+    await expect(runStarterInit(dir, "coding")).rejects.toThrow("Nothing was changed.");
+    await expect(runStarterInit(dir, "regulated")).rejects.toThrow("already has an .amc directory");
   });
 
   it("collects the secrets before --force deletes anything", async () => {
@@ -274,7 +276,7 @@ describe("runStarterInit (P1-40)", () => {
     vi.stubEnv("AMC_BOOTSTRAP_OWNER_PASSWORD", OWNER.password);
     const lines: string[] = [];
     vi.spyOn(console, "log").mockImplementation((...args: unknown[]) => { lines.push(args.join(" ")); });
-    const report = await runStarterInit(dir, "coding");
+    const report = (await runStarterInit(dir, "coding"))!;
     const out = lines.join("\n");
     expect(report.readiness.ready).toBe(true);
     expect(out).not.toContain(PASSPHRASE);

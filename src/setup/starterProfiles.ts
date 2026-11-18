@@ -27,14 +27,16 @@ import { compileCatalogPlan } from "../catalog/catalogCli.js";
 import { signAmcConfig } from "../config/amcConfigSignature.js";
 import { readSecretFromEnvOrFile } from "../config/loadConfig.js";
 import { keyPaths } from "../crypto/keys.js";
+import { keysetAnchoring } from "../keys/keyset.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { savePresets, preparePresetsAsync } from "../presets/agentPresets.js";
 import { captureOrgFiles, assertOrgPairsCurrent, captureOrgPairsAuthority, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
-import { writeRuntimeFirewallPolicy } from "../runtime/firewall.js";
+import { loadRuntimeFirewallPolicy, writeRuntimeFirewallPolicy, type RuntimeFirewallMode } from "../runtime/firewall.js";
 import { signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition } from "../toolhub/toolsSchema.js";
 import { originForEntry } from "../tools/builtin/nativeToolBreadth/originPolicy.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
+import { prepareCodingAdoption, recordCodingAdoption, sealAdoptionPassphrase } from "./codingAdoption.js";
 import { sha256Hex } from "../utils/hash.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, saveAMCConfig } from "../workspace.js";
@@ -46,7 +48,7 @@ export interface StarterProfileReport {
   readonly kind: StarterProfileKind;
   readonly readiness: ToolsetReadiness;
   readonly owner: { readonly userId: string; readonly username: string };
-  readonly firewallMode: "warn" | "block";
+  readonly firewallMode: RuntimeFirewallMode;
   /** sha256 of the monitor public key, for the operator to record outside the workspace and pin at verification. */
   readonly monitorFingerprint: string;
   /** The compiled, signed, never activated Layer 0 plan (`--regulated` only). */
@@ -190,7 +192,7 @@ const nextCommandFor = (kind: StarterProfileKind): string => kind === "coding"
   : 'amc agent-loop run "..." --provider stub --tools workspace --preset regulated';
 
 /** What init prints: readiness, the owner, the monitor fingerprint, the plan (`--regulated`) and the next command. */
-function starterReport(workspace: string, kind: StarterProfileKind, firewallMode: "warn" | "block",
+function starterReport(workspace: string, kind: StarterProfileKind, firewallMode: RuntimeFirewallMode,
   owner: { readonly userId: string; readonly username: string }): StarterProfileReport {
   return { kind, firewallMode, readiness: checkToolsetReadiness(workspace), owner: { userId: owner.userId, username: owner.username },
     monitorFingerprint: sha256Hex(readFileSync(keyPaths(workspace).monitorPublic)), plan: kind === "regulated" ? compileStarterPlan(workspace) : null,
@@ -206,7 +208,7 @@ class StarterProfilePublicationError extends Error {
 }
 /** Maintained starter counterpart. Existing sync policy/approval/control-plan producers keep their own contracts. */
 async function applyStarterProfileAsync(workspace: string, kind: StarterProfileKind, owner: StarterOwner, webHosts: readonly string[] = [],
-  options: OrgPairsOptions = {}): Promise<StarterProfileReport> {
+  options: OrgPairsOptions & { keepFirewall?: boolean } = {}): Promise<StarterProfileReport> {
   const selectedOwner = { username: owner.username, password: owner.password }, caller = options.beforePublish, inputs = options.assertInputsCurrent;
   const original = captureOrgPairsAuthority(workspace, () => { caller?.(); assertOwnerMode(workspace, "init"); });
   const completed: string[] = []; let phase = "users-precondition";
@@ -215,13 +217,15 @@ async function applyStarterProfileAsync(workspace: string, kind: StarterProfileK
   try {
     phase = "tools-body"; writeFileAtomic(toolsConfigPath(workspace), starterTools(webHosts), 0o644); completed.push(phase);
     phase = "tools-signature"; signToolsConfig(workspace); completed.push(phase);
-    const firewallMode = kind === "coding" ? "warn" : "block";
-    phase = "firewall"; const firewall = writeRuntimeFirewallPolicy({ workspace, mode: firewallMode }); completed.push(phase);
+    const kept = options.keepFirewall === true ? loadRuntimeFirewallPolicy(workspace)?.mode : undefined;
+    const firewallMode: RuntimeFirewallMode = kept ?? (kind === "coding" ? "warn" : "block");
+    // A workspace moved in place keeps the firewall policy it has (UX-01): the starter's warn mode never replaces block.
+    phase = "firewall"; const firewall = options.keepFirewall === true ? null : writeRuntimeFirewallPolicy({ workspace, mode: firewallMode }); completed.push(phase);
     phase = "config-body"; saveAMCConfig(workspace, applyAMCConfigProfile(kind === "coding" ? "dev" : "prod", loadAMCConfig(workspace))); completed.push(phase);
     phase = "config-signature"; signAmcConfig(workspace); completed.push(phase);
     phase = "users"; const users = initUsersConfig({ workspace, ...selectedOwner }); completed.push(phase);
     const paths = [toolsConfigPath(workspace), `${toolsConfigPath(workspace)}.sig`, join(workspace, ".amc", "amc.config.yaml"),
-      join(workspace, ".amc", "amc.config.yaml.sig"), users.path, users.sigPath, firewall.path, firewall.signaturePath, firewall.checkpointPath];
+      join(workspace, ".amc", "amc.config.yaml.sig"), users.path, users.sigPath, ...(firewall === null ? [] : [firewall.path, firewall.signaturePath, firewall.checkpointPath])];
     if (kind === "coding") {
       phase = "action-policy"; const action = await initActionPolicyAsync(workspace, codingActionPolicy()); completed.push(phase);
       paths.push(action.policyPath, action.signaturePath);
@@ -313,13 +317,16 @@ function printReport(workspace: string, report: StarterProfileReport): void {
 }
 
 /**
- * `amc init --coding|--regulated` in `workspace`, which must not hold an .amc directory yet. The operator's secrets are
- * collected first, so a refusal leaves an existing workspace untouched; only then does `force` delete .amc, as
- * `amc init --force` does.
+ * `amc init --coding|--regulated` in `workspace`. A new folder gets a new workspace. A folder bare `amc` set up moves to
+ * the coding setup in place when a person says yes (UX-01, ./codingAdoption.ts). The operator's secrets are collected
+ * first, so a refusal leaves an existing workspace untouched; only then does `force` delete .amc, as `amc init --force` does.
+ * Returns null when the person said no.
  */
-export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false, webHosts: readonly string[] = []): Promise<StarterProfileReport> {
-  const owner = await starterSecrets(kind);
+export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false, webHosts: readonly string[] = []): Promise<StarterProfileReport | null> {
   const amcDir = join(workspace, ".amc");
+  if (kind === "coding" && !force && pathExists(amcDir)) return adoptCodingSetup(workspace, webHosts);
+  const owner = await starterSecrets(kind);
+  if (force) refuseForceOverCommittedKeys(workspace);
   if (force && pathExists(amcDir)) {
     rmSync(amcDir, { recursive: true, force: true });
     console.log("Removed existing .amc directory (--force mode)");
@@ -333,4 +340,29 @@ export async function runStarterInit(workspace: string, kind: StarterProfileKind
     const report = await applyStarterProfileAsync(workspace, kind, owner, webHosts);
     printReport(workspace, report); return report;
   } catch (cause) { throw new StarterProfilePublicationError(Object.freeze(initialized ? ["workspace-initialized"] : []), "starter-init", cause); }
+}
+
+/**
+ * UX-29: `--force` deleted .amc and then failed with ROLLBACK_DETECTED wherever this machine committed the folder's key
+ * set, so it destroyed the records and left a folder AMC refuses to set up. That refusal is anti-rollback (P1-08,
+ * docs/KEY_LIFECYCLE.md "Anti-rollback"): a workspace that comes back with new keys is what a swap looks like. So --force
+ * is refused there before anything is deleted.
+ */
+export function refuseForceOverCommittedKeys(workspace: string): void {
+  if (!pathExists(join(workspace, ".amc")) || keysetAnchoring(workspace).state !== "committed") return;
+  throw new Error("--force would delete .amc here, and then AMC could not set this folder up again: this computer remembers that the "
+    + "folder had signing keys and refuses new ones in their place, because that is what a swapped workspace looks like. Nothing was deleted. "
+    + "To move a folder the amc menu set up to the coding setup, run amc init --coding without --force. To start over, use a new folder.");
+}
+
+/** UX-01: the coding setup over a workspace bare `amc` made, keeping its keys, evidence and history. */
+async function adoptCodingSetup(workspace: string, webHosts: readonly string[]): Promise<StarterProfileReport | null> {
+  const adoption = await prepareCodingAdoption(workspace);
+  if (adoption === null) return null;
+  const owner = await starterSecrets("coding");
+  sealAdoptionPassphrase(workspace, adoption);
+  const report = await applyStarterProfileAsync(workspace, "coding", owner, webHosts, { keepFirewall: adoption.keepFirewall });
+  recordCodingAdoption(workspace, owner.username, adoption);
+  printReport(workspace, report);
+  return report;
 }
