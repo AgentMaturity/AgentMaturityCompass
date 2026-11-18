@@ -25,7 +25,7 @@ const receiptFields = {
   savedBytes: z.number().int().positive().safe(), measurement: z.literal("payload-bytes-not-tokens")
 };
 /** The provider failure code an `overflow` trigger cites. */
-export const CONTEXT_OVERFLOW_CODE = "CONTEXT_WINDOW_EXCEEDED";
+const CONTEXT_OVERFLOW_CODE = "CONTEXT_WINDOW_EXCEEDED";
 /**
  * v2 = automatic: what fired it and, for a summary, the signed request that wrote it. `automatic` is the measured
  * threshold; `overflow` (HP-05) is a provider's refusal of a request as too large for the window, cited by its signed

@@ -165,7 +165,7 @@ describe("reactive compaction after a context-window overflow (HP-05 item 1)", (
   });
 
   it.each([[400, OVERFLOW, "the summary request itself overflows"], [401, "{}", "the summary request is refused"]] as const)(
-    "MUTATION: when the summary answers HTTP %i the turn ends with the original overflow, without a retry", async (status, body) => {
+    "MUTATION: when the summary answers HTTP %i the turn ends with the original overflow, without a retry", async (status, body, _why) => {
       // Turn 1 completes. In turn 2 (request 2) nothing can be pruned, so the summary step runs and its request (3) fails.
       const { h } = run([textStep("A".repeat(3000), { inputTokens: 100 })], [2], { compaction: { summarize: true }, failures: { 3: [status, body] } });
       await turn(h, "First question.");

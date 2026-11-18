@@ -24,7 +24,7 @@ import { sha256Hex } from "../../utils/hash.js";
 import type { StepRunnerInit } from "../stepRunner.js";
 
 export const RESTORE_MAX_FILES = 5;
-export const RESTORE_MAX_BYTES = 32_000;
+const RESTORE_MAX_BYTES = 32_000;
 /** Room for the read tool's own truncation note, which it writes after `maxBytes`. */
 const NOTE_ROOM = 256;
 const FILE_TOOLS: ReadonlySet<string> = new Set(["fs.read", "fs.write", "fs.edit"]);
@@ -32,7 +32,7 @@ const TRUNCATED = "\n[amc: truncated at ";
 export const FILES_RESTORED_AUDIT = "COMPACTION_FILES_RESTORED";
 export const OVERFLOW_DECISION_AUDIT = "CONTEXT_OVERFLOW_RECOVERY";
 
-export interface RestoredFile {
+interface RestoredFile {
   readonly path: string;
   /** sha256 of the text placed in context (the read tool's output), not of the file. */
   readonly sha256: string;
@@ -70,7 +70,7 @@ function wholeText(workspace: string, row: EvidenceEvent): boolean {
  * Files this session's own successful file calls named, newest first, one per path. A restore after the newest call
  * of a path counts as being in context: restored text enters as a message no compaction removes, so it is not added twice.
  */
-export function recentFiles(workspace: string, events: readonly EvidenceEvent[]): readonly Touch[] {
+function recentFiles(workspace: string, events: readonly EvidenceEvent[]): readonly Touch[] {
   const results = new Map(events.filter(row => row.event_type === "tool/result").map(row => [callKey(metaOf(row)), row]));
   const live = new Map(describeLiveEntries(events).map(entry => [entry.originEventId, entry]));
   const touches = new Map<string, Touch>();
