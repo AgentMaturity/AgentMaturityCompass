@@ -7,6 +7,7 @@ import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { initWorkspace } from "../src/workspace.js";
+import { applyStarterProfile } from "../src/setup/starterProfiles.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { nativeMcpToolName } from "../src/mcp/nativeMcpClient.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -479,6 +480,30 @@ describe("P01 connected native chat behavior", () => {
     expect(seam.commands[1]).not.toContain("--fork-from");
     expect(logs.filter(line => line.startsWith("Session second-session · 1 turn"))).toHaveLength(1);
     expect(fail).not.toHaveBeenCalled();
+  });
+
+  // HP-08: plan mode is the person's flag on each turn's run child; no tool can change it.
+  it("--plan and /plan forward --plan to exactly the turns the person chose, and plan mode is refused without workspace tools", async () => {
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "chat-plan-mode");
+    const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-chat-plan-")));
+    try {
+      initWorkspace({ workspacePath: workspace, agentId: "reviewer", trustBoundaryMode: "isolated" });
+      applyStarterProfile(workspace, "coding", { username: "plan-owner", password: "plan-owner-password" });
+      const turn = (n: number) => ({ code: 0, body: summary({ assistantText: Array.from({ length: n }, (_, i) => `reply ${i + 1}`),
+        endings: Array.from({ length: n }, (_, i) => ({ reason: "complete" as const, turn: i + 1 })) }) });
+      seam.answers = ["investigate", "/plan", "now do it", "/plan", "plan again", "/exit"];
+      seam.results = [turn(1), turn(2), turn(3)];
+      await run({ workspace, tools: "workspace", approvalMode: "default", plan: true });
+      expect(fail).not.toHaveBeenCalled();
+      expect(seam.commands.map(argv => argv.includes("--plan"))).toEqual([true, false, true]);
+      expect(logs.join("\n")).toContain("Plan mode is off.");
+      expect(logs.join("\n")).toContain("Plan mode is on.");
+      fail.mockReset(); errors = []; seam.commands = []; seam.answers = ["task", "/exit"];
+      await run({ workspace, tools: "none", plan: true });
+      expect(seam.commands).toEqual([]);
+      expect(errors.join("\n")).toContain("Plan mode narrows the workspace tools");
+      expect(fail).toHaveBeenCalledTimes(1);
+    } finally { rmSync(workspace, { recursive: true, force: true }); }
   });
 
   it("resumes with the settings a session was started with and keeps a flag passed now", async () => {

@@ -25,6 +25,7 @@ import { todoTool } from "../tools/builtin/todoTool.js";
 import { goalTool } from "../autonomy/goalTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
 import { fileCheckpoints, type FileCheckpointWriter } from "../tools/builtin/fileCheckpoint.js";
+import { planExitTool } from "../tools/builtin/planExitTool.js";
 import { skillLoadTool } from "../skills/skillLoadTool.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
@@ -714,6 +715,8 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     }));
   }
 
+  // HP-08: plan_exit exists only in a plan-mode turn; it records the plan and ends the turn, and changes no mode.
+  if (options.planMode === true && recorder !== undefined) registry.define(planExitTool((row) => recorder.recordProjectedEvidence(row)));
   const planModeWithheld = options.planMode === true ? applyPlanMode(registry) : null;
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
