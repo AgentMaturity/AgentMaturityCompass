@@ -73,7 +73,7 @@ import {
 } from "./loopTypes.js";
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
-import { firstStop, TurnGuards, turnPolicies, type TurnPolicy } from "./turnGuards.js";
+import { firstStop, sentByPerson, TurnGuards, turnPolicies, type TurnPolicy } from "./turnGuards.js";
 import { projectNativeCost } from "../budgets/nativeCostProjection.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
@@ -595,7 +595,7 @@ export class AgentDriver {
         }
 
         // A person's message reaching the turn is a reason to repeat a call: the repeat counts start again.
-        if (decision.messages.some(message => message.origin !== "tool")) this.guards.clearRepeats();
+        if (decision.messages.some(sentByPerson)) this.guards.clearRepeats();
         signal.throwIfAborted();
         this.head = this.session.startStep();
         phase.step = step;

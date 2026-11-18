@@ -46,6 +46,15 @@ export function canonicalArguments(raw: string): string | null {
   }
 }
 
+/**
+ * Whether a claimed inbox message was sent by a person into the turn: an allow-list of the steer and follow-up lanes
+ * (`driver.steer`/`followup`: the CLI's --steer, a parent's IPC steer frame, a host's queue). Never "not a tool": an
+ * `inject` (context snapshots, host reminders) or a `tool` message must not clear the repeat counts.
+ */
+export function sentByPerson(message: { readonly origin: string; readonly contextSnapshot?: true }): boolean {
+  return message.contextSnapshot !== true && (message.origin === "steer" || message.origin === "followup");
+}
+
 /** What `beforeCall` hands back: the loop's own answer (or null to dispatch), and the call's place in the count. */
 export interface GuardDecision { readonly answer: ToolCallOutcome | null; readonly ticket: GuardTicket | null }
 /** A counted call: its signature and when it was counted (for the write reset). */

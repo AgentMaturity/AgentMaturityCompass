@@ -1,6 +1,6 @@
 import { rmSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
-import { canonicalArguments, describeTurnStop, firstStop, projectTurnStops, TurnGuards, TURN_GUARD_DEFAULTS, turnPolicies } from "../src/agent/turnGuards.js";
+import { canonicalArguments, describeTurnStop, firstStop, projectTurnStops, sentByPerson, TurnGuards, TURN_GUARD_DEFAULTS, turnPolicies } from "../src/agent/turnGuards.js";
 import { describeRunLimit, parseRunLimits, RunLimitTracker } from "../src/agent/runLimits.js";
 import { isTurnCancelCause } from "../src/session/sessionTypes.js";
 import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
@@ -311,6 +311,24 @@ describe("turn guards in the driver", () => {
     await harness.driver.whenIdle();
     expect(tools.calls).toHaveLength(3);
     expect(lastEnd(harness.events())?.reason).toBe("complete");
+  });
+
+  it("an inject or a context snapshot between repeats does not clear the counts; only a person's message does", () => {
+    expect(sentByPerson({ origin: "steer" })).toBe(true);
+    expect(sentByPerson({ origin: "followup" })).toBe(true);
+    expect(sentByPerson({ origin: "inject" })).toBe(false);
+    expect(sentByPerson({ origin: "tool" })).toBe(false);
+    expect(sentByPerson({ origin: "steer", contextSnapshot: true })).toBe(false);
+  });
+
+  it("an injected message delivered into the turn does not start the counts again", async () => {
+    const tools = new ClassedSeam({ read: async () => ok("x") }, { read: "READ_ONLY" });
+    const harness = harnessFor({ scripts: [toolStep("a", "read", "{}"), toolStep("b", "read", "{}"), toolStep("c", "read", "{}"), textStep("done")], tools,
+      hooks: { notify: (n) => { if (n.kind === "step-end") harness.driver.inject(`reminder after step ${n.step}`); } } });
+    harness.driver.followup("Go.");
+    await harness.driver.whenIdle();
+    expect(tools.calls).toHaveLength(2);
+    expect(results(harness.events()).at(-1)?.denied).toBe(true);
   });
 
   it("the guard stop is per turn: a later turn that completes reports none", async () => {

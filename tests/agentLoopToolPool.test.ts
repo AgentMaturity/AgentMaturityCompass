@@ -226,12 +226,13 @@ describe("P3.2 — the bounded tool pool and cancellation", () => {
     );
     const harness = harnessFor({
       scripts: [
+        // Distinct arguments: a fourth identical call in one turn would meet the repeated-call guard.
         toolStepMulti([
-          { id: "call-1", name: "para", args: "{}" },
-          { id: "call-2", name: "para", args: "{}" },
+          { id: "call-1", name: "para", args: '{"n":1}' },
+          { id: "call-2", name: "para", args: '{"n":2}' },
           { id: "call-3", name: "solo", args: "{}" },
-          { id: "call-4", name: "para", args: "{}" },
-          { id: "call-5", name: "para", args: "{}" }
+          { id: "call-4", name: "para", args: '{"n":4}' },
+          { id: "call-5", name: "para", args: '{"n":5}' }
         ]),
         textStep("done.")
       ],
