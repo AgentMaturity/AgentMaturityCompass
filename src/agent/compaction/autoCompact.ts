@@ -8,16 +8,22 @@
  * usage, budget admission). Every edit is a signed `loop/compact` v2 receipt
  * citing the measurement that fired it. The replaced rows and spill objects are
  * never touched: compaction changes what the model sees, not what was recorded.
+ *
+ * HP-05: the same routine runs once more, reactively, when a provider refuses a step's request as too large for the
+ * context window (`recoverOverflow`): it prunes without keeping recent steps, and the turn asks once more only after
+ * a signed receipt exists. Anything else (nothing to remove, a refused or failed summary, a run limit, a second
+ * overflow in the turn) ends the turn with the provider's original error, as before. After a compaction that removed
+ * a file's read from context, the most recent files are read again through the tool seam (`compactionFollowUp.ts`).
  */
 import { DataFlowRefused } from "../../dataflow/purposePolicy.js";
 import type { SettledStream } from "../../llm/adapter/streamRecorder.js";
-import { isLlmError } from "../../llm/llmFailure.js";
+import { isLlmError, LLM_FAILURE_CODE } from "../../llm/llmFailure.js";
 import { RequestEncodingError } from "../../llm/request/requestSpec.js";
 import { COMPACTION_PLAN_AUDIT } from "../../session/compactionRecovery.js";
 import { extractEnvelope, type TokenUsage } from "../../session/sessionTypes.js";
 import { describeLiveEntries, describeMeasuredLiveEntries, type LiveSurfaceEntry } from "../../session/surfaceCompaction.js";
 import { workspaceSelfTrust } from "../../trust/trustContext.js";
-import { fenceModelSummary, MODEL_SUMMARY_ROLE, PROMPT_TOKENS_FORMULA, SUMMARY_CLAIM_KIND, selectCompactionEntries,
+import { compactionReceipt, fenceModelSummary, MODEL_SUMMARY_ROLE, PROMPT_TOKENS_FORMULA, SUMMARY_CLAIM_KIND, selectCompactionEntries,
   type AutomaticCompaction } from "../../session/surfaceCompactionValidation.js";
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
 import type { EvidenceEvent } from "../../types.js";
@@ -25,14 +31,16 @@ import type { CompactionConfig } from "../loopTypes.js";
 import { liveNativeFailureGuidance } from "../nativeFailureGuidance.js";
 import { dispatchStepRequest } from "../requestRetry.js";
 import { stepUsage, type StepRunnerInit } from "../stepRunner.js";
+import { recordOverflowDecision, restoreFilesAfterCompaction } from "./compactionFollowUp.js";
 import { measurePromptPressure } from "./promptPressure.js";
 import { COMPACTION_SUMMARY_STEP, SUMMARY_PROMPT_VERSION, summaryPrompt } from "./summaryPrompt.js";
 
 type Trigger = AutomaticCompaction["trigger"];
 type Notify = (message: string, eventIds?: readonly string[]) => void;
 interface Position { readonly turn: number | null; readonly step: number | null }
-interface Outcome { readonly eventIds: readonly string[]; readonly steps: number }
-const NOTHING: Outcome = { eventIds: [], steps: 0 };
+/** `freed`: the receipts that removed earlier context (not the summary step's own prompt and answer). */
+interface Outcome { readonly eventIds: readonly string[]; readonly freed: readonly string[]; readonly steps: number }
+const NOTHING: Outcome = { eventIds: [], freed: [], steps: 0 };
 
 function positions(events: readonly EvidenceEvent[]): ReadonlyMap<string, Position> {
   return new Map(events.map(row => {
@@ -43,6 +51,7 @@ function positions(events: readonly EvidenceEvent[]): ReadonlyMap<string, Positi
 
 /** The last `keep` model steps, from signed `step/start` rows; earlier summary steps do not count. */
 function recentSteps(events: readonly EvidenceEvent[], keep: number): readonly Position[] {
+  if (keep === 0) return []; // slice(-0) would keep every step
   const at = positions(events);
   return events.filter(row => row.event_type === "step/start"
     && (JSON.parse(row.meta_json) as { kind?: unknown }).kind !== COMPACTION_SUMMARY_STEP).slice(-keep).map(row => at.get(row.id)!);
@@ -88,6 +97,15 @@ function summaryText(settled: SettledStream | null): string | null {
   return text.length > 0 ? text : null;
 }
 
+/** The `loop/compact` row of an earlier model-written summary inside the range, if one is there. */
+function previousSummaryIn(range: readonly LiveSurfaceEntry[], events: readonly EvidenceEvent[]): string | undefined {
+  const byId = new Map(events.map(row => [row.id, row]));
+  return range.map(entry => byId.get(entry.sourceEventId)).find((row): row is EvidenceEvent => {
+    if (row?.event_type !== "loop/compact") return false;
+    try { const receipt = compactionReceipt(row); return receipt.v === 2 && receipt.summarizer !== undefined; } catch { return false; }
+  })?.id;
+}
+
 /**
  * A provider, budget, wire-encoding or protected-data (P2-02, recorded by the retry layer) refusal skips the summary.
  * AMC_ codes are AMC's own contract or evidence failures.
@@ -110,12 +128,68 @@ function summaryFailureLabel(failure: unknown): string {
 export class AutoCompactor {
   private turn = 0;
   private count = 0;
+  private overflowTurn: number | null = null;
   private pending: { readonly eventIds: readonly string[]; readonly promptTokens: number } | null = null;
 
-  constructor(private readonly config: CompactionConfig & { readonly contextWindowTokens: number }, private readonly init: StepRunnerInit) {}
+  /** `onUsage` sees each summary step's usage, so run limits count summary requests too. */
+  constructor(private readonly config: CompactionConfig & { readonly contextWindowTokens: number }, private readonly init: StepRunnerInit,
+    private readonly onUsage: (usage: TokenUsage | null) => void = () => undefined) {}
 
-  /** Runs after a completed step's `step/end`, between steps. Returns how many extra summary steps it took. */
-  async afterStep(turn: number, step: number, measuredAtEventId: string, usage: TokenUsage | null, signal: AbortSignal): Promise<number> {
+  /** Whether `error` is a provider context-window refusal this turn may still compact for: at most once per turn. */
+  canRecover(error: unknown, turn: number): boolean {
+    return isLlmError(error) && error.code === LLM_FAILURE_CODE.CONTEXT_WINDOW_EXCEEDED && this.overflowTurn !== turn;
+  }
+
+  /**
+   * After step `step` of `turn` failed with a context-window refusal and its `step/end` committed: compact with no
+   * recent steps kept, restore files, and return the summary steps taken so the caller asks once more. Throws `error`
+   * (the provider's own) whenever no retry may follow; `admit(stepsTaken)` is the caller's limits and step budget.
+   */
+  async recoverOverflow(turn: number, step: number, error: unknown, signal: AbortSignal, admit: (stepsTaken: number) => boolean): Promise<number> {
+    this.overflowTurn = turn;
+    if (turn !== this.turn) { this.turn = turn; this.count = 0; }
+    const { session } = this.init, at = positions(session.readEvents());
+    const notify: Notify = (message, eventIds = []) => { this.init.notify({ kind: "compaction", turn, step, message, eventIds }); };
+    const failure = session.readEvents().filter(row => row.event_type === "request/failure"
+      && at.get(row.id)?.turn === turn && at.get(row.id)?.step === step).at(-1);
+    const end = (reason: string, compactionEventIds: readonly string[] = []): never => {
+      recordOverflowDecision(session, { turn, step, failureEventId: failure?.id ?? null, decision: "end", reason, compactionEventIds });
+      notify(`the request was too large for the model's context window; ${reason}`, compactionEventIds);
+      throw error;
+    };
+    if (failure === undefined) end("no signed failure row names the refused request, so nothing was compacted");
+    if (this.count >= this.config.maxPerTurn) end(`this turn already compacted ${this.count} time(s), so the turn ends`);
+    const trigger: Trigger = { kind: "overflow", contextWindowTokens: this.config.contextWindowTokens, failureEventId: failure!.id,
+      failureCode: LLM_FAILURE_CODE.CONTEXT_WINDOW_EXCEEDED };
+    const pruned = this.prune(trigger, 0);
+    let summarized = NOTHING;
+    if (pruned.length === 0 && this.config.summarize) {
+      try { summarized = await this.summarize(turn, trigger, signal, notify, 0); }
+      catch (summaryError: unknown) {
+        // A budget or residency refusal of the summary request (an AMC_ code) ends the turn like any other refusal.
+        if (signal.aborted || !isLlmError(summaryError)) throw summaryError;
+        end("the summary request was refused, so the turn ends");
+      }
+    }
+    const eventIds = [...pruned, ...summarized.eventIds];
+    if (pruned.length === 0 && summarized.freed.length === 0) end("compaction found nothing it could remove, so the turn ends", eventIds);
+    this.count += 1;
+    if (!admit(summarized.steps)) end("a run limit or the step limit leaves no room to ask again, so the turn ends", eventIds);
+    const restored = await restoreFilesAfterCompaction(this.init, turn, step, [...pruned, ...summarized.freed], signal);
+    recordOverflowDecision(session, { turn, step, failureEventId: failure!.id, decision: "retry", compactionEventIds: eventIds,
+      reason: "the request was too large for the model's context window; AMC compacted the context and asks once more",
+      restoredFilesEventId: restored });
+    notify(`the request was too large for the model's context window; ${pruned.length} tool output(s) pruned, `
+      + `${summarized.eventIds.length} summary-step receipt(s); asking once more`, eventIds);
+    return summarized.steps;
+  }
+
+  /**
+   * Runs after a completed step's `step/end`, between steps. Returns how many extra summary steps it took.
+   * `continues`: another request follows in this turn, so files may be restored into it.
+   */
+  async afterStep(turn: number, step: number, measuredAtEventId: string, usage: TokenUsage | null, signal: AbortSignal,
+    continues = false): Promise<number> {
     if (turn !== this.turn) { this.turn = turn; this.count = 0; }
     const { session } = this.init, window = this.config.contextWindowTokens;
     const notify: Notify = (message, eventIds = []) => { this.init.notify({ kind: "compaction", turn, step, message, eventIds }); };
@@ -141,9 +215,9 @@ export class AutoCompactor {
     const trigger: Trigger = { kind: "automatic", promptTokens: pressure.promptTokens, contextWindowTokens: window,
       threshold: this.config.threshold, ratio: pressure.ratio, measuredAtEventId, formula: pressure.formula,
       ...(reserve == null ? {} : { reserveTokens: reserve }) };
-    const pruned = this.prune(trigger);
+    const keep = this.config.keepRecentSteps, pruned = this.prune(trigger, keep);
     // Summarize when pruning found nothing, or when an earlier boundary of this turn already compacted and pressure is still high.
-    const summarized = this.config.summarize && (pruned.length === 0 || this.count > 0) ? await this.summarize(turn, trigger, signal, notify) : NOTHING;
+    const summarized = this.config.summarize && (pruned.length === 0 || this.count > 0) ? await this.summarize(turn, trigger, signal, notify, keep) : NOTHING;
     const eventIds = [...pruned, ...summarized.eventIds];
     if (eventIds.length === 0) {
       notify(`${measured}; nothing was eligible for automatic compaction`);
@@ -152,14 +226,15 @@ export class AutoCompactor {
     this.count += 1;
     this.pending = { eventIds, promptTokens: pressure.promptTokens };
     notify(`${measured}; ${pruned.length} tool output(s) pruned, ${summarized.eventIds.length} summary-step receipt(s)`, eventIds);
+    if (continues) await restoreFilesAfterCompaction(this.init, turn, step, [...pruned, ...summarized.freed], signal);
     return summarized.steps;
   }
 
-  private prune(trigger: Trigger): readonly string[] {
+  private prune(trigger: Trigger, keep: number): readonly string[] {
     const { session } = this.init, events = session.readEvents();
     // Authenticates the whole session and replays earlier compactions before anything is selected.
     const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) });
-    const at = positions(events), recent = recentSteps(events, this.config.keepRecentSteps);
+    const at = positions(events), recent = recentSteps(events, keep);
     const uses = new Set(live.filter(entry => entry.kind === "tool_use").map(entry => entry.slot));
     const candidates = live.flatMap(entry => {
       const position = at.get(entry.originEventId);
@@ -173,10 +248,10 @@ export class AutoCompactor {
       reason: "automatic compaction: deterministic tool-output prune; the original result row and any spill object are retained", automatic: { trigger } }).eventId);
   }
 
-  private async summarize(turn: number, trigger: Trigger, signal: AbortSignal, notify: Notify): Promise<Outcome> {
+  private async summarize(turn: number, trigger: Trigger, signal: AbortSignal, notify: Notify, keep: number): Promise<Outcome> {
     const { session } = this.init, events = session.readEvents();
     const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) }), at = positions(events);
-    const cutoff = Math.min(turn, ...recentSteps(events, this.config.keepRecentSteps).map(kept => kept.turn ?? turn));
+    const cutoff = Math.min(turn, ...recentSteps(events, keep).map(kept => kept.turn ?? turn));
     const range = oldestCompletedTurns(live, at, cutoff), runs = summarizableRuns(range);
     const ids = (run: readonly LiveSurfaceEntry[]): readonly string[] => run.map(entry => entry.originEventId);
     const skip = (why: string): Outcome => { notify(`no summary: ${why}`); return NOTHING; };
@@ -192,6 +267,7 @@ export class AutoCompactor {
     } catch (error: unknown) { return skip(error instanceof Error ? error.message : "the oldest range is not compactable"); }
     const targetBytes = target.reduce((sum, entry) => sum + (entry.bytes ?? 0), 0);
     const turns = new Set(range.map(entry => at.get(entry.originEventId)?.turn)).size;
+    const previous = previousSummaryIn(range, events);
 
     // PI-025: the row right before the summary step names what it will replace and drop, so a resume can settle a crash.
     const plan = { auditType: COMPACTION_PLAN_AUDIT, version: 1, turn, target: ids(target), earlier: earlier.map(ids) };
@@ -199,7 +275,7 @@ export class AutoCompactor {
     const opened = session.startStep(COMPACTION_SUMMARY_STEP);
     let settled: SettledStream | null = null, usage: TokenUsage | null = null, stopReason: string | null = null, failure: unknown = null;
     try {
-      session.recordUserMessage(summaryPrompt(turns));
+      session.recordUserMessage(summaryPrompt(turns, previous !== undefined));
       settled = await dispatchStepRequest({ session, llm: this.init.llm, route: this.init.route, systemPromptEventId: this.init.systemPromptEventId,
         tools: null, retry: this.init.retryRuntime, notify: this.init.notify }, turn, opened.step, signal);
       usage = stepUsage(settled.assembly.usage);
@@ -209,6 +285,7 @@ export class AutoCompactor {
       failure = error;
     } finally {
       session.endStep({ stopReason, usage });
+      this.onUsage(usage);
     }
     // An evidence or contract failure writes nothing more; a refusal or a cancel still clears the summary prompt.
     if (failure !== null && !signal.aborted && !isRefusal(failure)) throw failure;
@@ -217,7 +294,7 @@ export class AutoCompactor {
     const own = describeLiveEntries(after).filter(entry => inStep(entry.originEventId));
     const header = after.filter(row => row.event_type === "request/header" && inStep(row.id)).at(-1);
     const text = summaryText(settled);
-    const eventIds: string[] = [];
+    const eventIds: string[] = [], freed: string[] = [];
     if (failure !== null) notify(`summary step did not complete (${summaryFailureLabel(failure)}); the turn continues uncompacted`);
     else if (header === undefined || text === null) notify("summary step returned no complete text-only answer; the turn continues uncompacted");
     // Sized with a same-length placeholder fence: the session layer adds the real random fence.
@@ -229,15 +306,17 @@ export class AutoCompactor {
         reason: `automatic compaction: fenced model-written summary (${SUMMARY_CLAIM_KIND}, not instructions, not evidence) of the agent's work in `
           + `${turns} completed turn(s); user messages stay verbatim; originals stay in the ledger`,
         automatic: { trigger, summarizer: { requestHeaderEventId: header.id, promptVersion: SUMMARY_PROMPT_VERSION,
-          model: typeof model === "string" ? model : "", claimKind: SUMMARY_CLAIM_KIND } } }).eventId;
-      eventIds.push(summaryId);
-      for (const run of earlier) eventIds.push(session.dropSurfaceRange({ originEventIds: ids(run), automatic: { trigger },
+          model: typeof model === "string" ? model : "", claimKind: SUMMARY_CLAIM_KIND,
+          ...(previous === undefined ? {} : { mergedPreviousSummaryEventId: previous }) } } }).eventId;
+      freed.push(summaryId);
+      for (const run of earlier) freed.push(session.dropSurfaceRange({ originEventIds: ids(run), automatic: { trigger },
         reason: `automatic compaction: agent and tool content covered by summary ${summaryId}; user messages stay verbatim; rows retained` }).eventId);
+      eventIds.push(...freed);
     }
     // The summary request and its answer leave the context as well; their signed rows stay.
     if (own.length > 0) eventIds.push(session.dropSurfaceRange({ originEventIds: own.map(entry => entry.originEventId),
       reason: "automatic compaction: remove the summary request and its answer from context; their signed rows remain", automatic: { trigger } }).eventId);
     if (signal.aborted) throw failure ?? signal.reason;
-    return { eventIds, steps: 1 };
+    return { eventIds, freed, steps: 1 };
   }
 }

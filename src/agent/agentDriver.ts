@@ -199,7 +199,7 @@ export class AgentDriver {
       guards: this.guards = new TurnGuards(init.runLimits?.limits)
     };
     const window = compaction.contextWindowTokens;
-    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit, usage => this.limits?.recordUsage(usage));
     this.limits = init.runLimits === undefined ? null
       // ponytail: the cost limit re-reads the session at each step and turn, only while one is set.
       : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true,
@@ -604,6 +604,7 @@ export class AgentDriver {
 
         let stopReason: string | null = null;
         let usage: TokenUsage | null = null;
+        let overflow: unknown = null; // HP-05: a context-window refusal this turn may compact for once
         try {
           for (const message of decision.messages) {
             if (message.audioParts !== undefined) {
@@ -633,7 +634,8 @@ export class AgentDriver {
           if (ending === null || ending.reason !== "max_tokens") ending = outcome.ending;
         } catch (error: unknown) {
           stopReason = signal.aborted ? "cancelled" : "error";
-          throw error;
+          if (signal.aborted || repair?.active || this.compactor?.canRecover(error, turnRef.turn) !== true) throw error;
+          overflow = error;
         } finally {
           // ALWAYS. This is what keeps a cancelled turn balanced at step
           // granularity, and it is the shape crash repair also produces.
@@ -648,13 +650,20 @@ export class AgentDriver {
         // The ordered turn policies read what `step/end` just committed: a run limit cancels the turn and closes
         // admission; a guard ends only this turn, keeping queued work. Both before any further request.
         const stop = signal.aborted ? null : firstStop(this.policies);
+        if (overflow !== null && stop !== null) throw overflow; // a limit leaves the overflow terminal, as before
         if (stop?.scope === "run") this.limitCancel(stop.cause);
         else if (stop?.scope === "turn") this.cancel(stop.cause, { by: "turn-guard", keepInbox: true });
         signal.throwIfAborted();
+        if (overflow !== null) {
+          phase.step += await this.compactor!.recoverOverflow(turnRef.turn, step, overflow, signal,
+            taken => firstStop(this.policies) === null && step + taken < this.config.maxStepsPerTurn);
+          target = "next-step";
+          continue;
+        }
         // Between steps only, after `step/end` committed the usage it measures. A
         // summary step it runs takes the next step number, so keep ours in line.
         if (!repair?.active && this.compactor !== null && this.head !== null) {
-          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal);
+          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal, ending === null);
         }
         // A listener that objects to the turn stopping says so by steering; the
         // inbox is re-read after it runs, so listener ORDER cannot change the
