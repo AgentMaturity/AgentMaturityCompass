@@ -124,3 +124,16 @@ export function deleteIfUnchanged(execution: ToolExecution, ledger: ReadBeforeEd
   stillAsPlanned(execution, ledger, full, path, before);
   unlinkSync(full);
 }
+
+/**
+ * HP-15: the one post-edit diagnostic that needs no dependency and runs no project code: a `.json` file that no longer
+ * parses as strict JSON gets one line on the tool result. The parser's own message is left out (it quotes file text).
+ */
+export function strictJsonNote(path: string, bytes: Buffer): string {
+  if (!path.toLowerCase().endsWith(".json")) return "";
+  try { JSON.parse(bytes.toString("utf8")); return ""; }
+  catch (error) {
+    const at = /position (\d+)/.exec(error instanceof Error ? error.message : "")?.[1];
+    return `\n[amc: ${path} does not parse as strict JSON${at === undefined ? "" : ` (at character ${at})`}; a file meant to allow comments, like tsconfig.json, may ignore this]`;
+  }
+}
