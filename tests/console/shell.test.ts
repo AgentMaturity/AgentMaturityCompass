@@ -340,6 +340,21 @@ describe("renderTopbar", () => {
     expect(styles).toContain("body[data-status-pill] #ucBanner:not(.uc-pinned):not(.uc-open) {");
   });
 
+  // Colour means process state, never quality: a healthy status, an "ok" pill and an ok line are drawn in ink, and the
+  // edges of fields, buttons and hollow waypoints reach 3:1 on every surface in both themes.
+  test("styles.css keeps results neutral and UI edges at 3:1", () => {
+    const styles = readFileSync("src/console/assets/styles.css", "utf8");
+    const rule = (selector: string) => styles.slice(styles.indexOf(`\n${selector} {`), styles.indexOf("}", styles.indexOf(`\n${selector} {`)));
+    for (const selector of [".status-dot", ".pill.ok", ".status-ok", ".banner"]) expect(rule(selector), selector).not.toContain("var(--accent)");
+    const lum = (hex: string) => [1, 3, 5].map((at) => parseInt(hex.slice(at, at + 2), 16) / 255)
+      .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)).reduce((sum, v, at) => sum + v * [0.2126, 0.7152, 0.0722][at]!, 0);
+    const ratio = (a: string, b: string) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+    const tokens = (block: string) => Object.fromEntries([...block.matchAll(/--(bg|surface|surface-2|line-strong): (#[0-9A-Fa-f]{6});/g)].map((m) => [m[1], m[2]]));
+    const light = tokens(styles.slice(0, styles.indexOf("@media (prefers-color-scheme: dark)")));
+    const dark = tokens(styles.slice(styles.indexOf(':root[data-theme="dark"]')));
+    for (const theme of [light, dark]) for (const surface of ["bg", "surface", "surface-2"]) expect(ratio(theme["line-strong"]!, theme[surface]!)).toBeGreaterThanOrEqual(3);
+  });
+
   test("draws nothing on a page without a menu, and api.js draws it whenever it learns who is signed in", () => {
     const doc = new FakeDocument();
     doc.body.appendChild(doc.el("main", {}, [doc.el("p", { id: "status" }, "")]));

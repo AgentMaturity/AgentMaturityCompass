@@ -58,7 +58,7 @@ async function showHomeEntry() {
     const detail = latest && ["proposed", "reviewed"].includes(latest.step)
       ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}`).then((reply) => one(reply, "project"), () => null) : null;
     const rows = detail ? projects.map((row) => (row === latest ? { ...row, practiceActive: detail.practiceActive === true } : row)) : projects;
-    card.innerHTML = start.homeCardHtml({ projects: rows, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null, latestReadiness });
+    card.innerHTML = start.homeCardHtml({ projects: rows, waiting, industryHtml: packs.packSelectHtml(catalog, null, { fold: true }), start: options.workspace?.start ?? null, latestReadiness });
     bindCreateForm(card.querySelector("#a4HomeForm"));
     placeHomeCard(card, { waiting: Boolean(waiting), empty: projects.length === 0 });
   } catch {

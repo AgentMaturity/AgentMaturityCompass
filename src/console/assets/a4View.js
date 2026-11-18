@@ -8,6 +8,7 @@ import { exclusionLine, PRACTICE_CHOICE } from "./a4Who.js";
 import { cardLabel, codes, esc, isObject, list, shown, stageTitle, time } from "./a4Html.js";
 import { STAGE_PLAIN, STEP_PLAIN, code, itemLine, itemTitle, record, say, sayCode, when } from "./a4Plain.js";
 import { renderOutline } from "./a4Outline.js";
+import { moreInfo } from "./pageKit.js";
 export { clashingChanges, jsonDiff, mergeOnTop, presenceRows, renderConflict, renderPresence, validateA4Poll } from "./a4Sync.js";
 
 export { esc, STAGE_PLAIN, STEP_PLAIN };
@@ -136,15 +137,22 @@ export function practiceBanner(project) {
  * a pack is regulated: a second person approves each step. A practice project is offered when Studio says one person
  * alone may open one (`start` is GET /options' workspace.start); otherwise its reason is shown.
  */
-export function approverChoiceHtml(start) {
+export function approverChoiceHtml(start, { fold = false } = {}) {
   if (!isObject(start)) return "";
   const practice = start.practiceAvailable === true;
-  return `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>
-    <label><input type="radio" name="practice" value="" checked /> A second person (needed for real work)</label>
-    <p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
-      you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>
-    <label><input type="radio" name="practice" value="yes"${practice ? "" : " disabled"} /> Just me, as practice (for learning AMC alone)</label>
-    <p class="muted">${practice ? PRACTICE_CHOICE : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>
+  const second = `<p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
+      you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>`;
+  const alone = `<p class="muted">${practice ? PRACTICE_CHOICE : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>`;
+  const radio = (value, words, disabled) => `<label><input type="radio" name="practice" value="${value}"${value ? "" : " checked"}${disabled ? " disabled" : ""} /> ${words}</label>`;
+  // Home's form keeps the two explanations one click away (the console's text budget); the A4 page shows them.
+  return fold
+    ? `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>${radio("", "A second person (needed for real work)")}
+    ${radio("yes", "Just me, as practice (for learning AMC alone)", !practice)}${moreInfo("Which should I pick?", second + alone)}</fieldset>`
+    : `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>
+    ${radio("", "A second person (needed for real work)")}
+    ${second}
+    ${radio("yes", "Just me, as practice (for learning AMC alone)", !practice)}
+    ${alone}
     </fieldset>`;
 }
 
@@ -164,7 +172,7 @@ export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATO
 export function renderCreateForm(open, industryHtml = "", { home = false, start = null } = {}) {
   const form = `<form id="${home ? "a4HomeForm" : "a4CreateForm"}" class="a4-form" novalidate>
       ${industryHtml}
-      ${approverChoiceHtml(start)}
+      ${approverChoiceHtml(start, { fold: home })}
       <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="${home ? "a4HomeNameHint" : "a4NameHint"}" /></label>
       <p class="muted" id="${home ? "a4HomeNameHint" : "a4NameHint"}">A short name your team will recognise. It is stored in the project's record.</p>
       ${home ? '<input type="hidden" name="expertise" value="novice" />' : `<details class="a4-more"><summary>More options</summary>

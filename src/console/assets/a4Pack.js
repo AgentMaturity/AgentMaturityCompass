@@ -2,6 +2,7 @@
 // /industry-packs/:id), HTML or plain values out; every pack string goes through esc(). Nothing here is recorded: the
 // suggestions fill empty Aspire answers on the page, and the member checks them and presses Save answers.
 import { esc } from "./a4View.js";
+import { icon } from "./iconSet.js";
 import { QUESTIONNAIRE_NOTICE } from "./industryPackView.js";
 
 const list = (value) => (Array.isArray(value) ? value : []);
@@ -30,15 +31,15 @@ export function packAnswers(pack) {
 }
 
 /** The create form's industry choice: every pack, grouped by station; empty when the catalog could not be read. */
-export function packSelectHtml(packs, selected) {
+export function packSelectHtml(packs, selected, { fold = false } = {}) {
   const rows = list(packs).filter((pack) => packIdOf(pack?.packId));
   if (rows.length === 0) return "";
   const stations = [...new Set(rows.map((pack) => String(pack.domain ?? "")))].sort();
   return `<label>Your industry (optional) <select name="pack" aria-describedby="a4PackHint"><option value="">No industry pack</option>${stations.map((station) =>
     `<optgroup label="${esc(title(station))}">${rows.filter((pack) => String(pack.domain ?? "") === station).map((pack) =>
       `<option value="${esc(pack.packId)}"${pack.packId === selected ? " selected" : ""}>${esc(pack.name || pack.packId)}</option>`).join("")}</optgroup>`).join("")}</select></label>
-    <p class="muted" id="a4PackHint">Pick the Industry Pack closest to what the agent will do. AMC then suggests the sector, a risk level and the rules to check, and shows
-      the risks the pack names. You can change every suggestion. ${esc(QUESTIONNAIRE_NOTICE)}</p>`;
+    ${fold ? `<details class="notice-chip"><summary>${icon("info", { size: 16 })}<span>AI-drafted, not legal advice</span></summary>` : ""}<p class="muted" id="a4PackHint">Pick the Industry Pack closest to what the agent will do. AMC then suggests the sector, a risk level and the rules to check, and shows
+      the risks the pack names. You can change every suggestion. ${esc(QUESTIONNAIRE_NOTICE)}</p>${fold ? "</details>" : ""}`;
 }
 
 /** The project page's panel while it starts from a pack: what was suggested, the pack's risks, and its questionnaire. */

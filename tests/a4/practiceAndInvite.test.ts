@@ -144,6 +144,18 @@ describe("the start form says which kind of project needs a second person", () =
     expect(refused).toContain("3 people can sign in to this workspace.");
     expect(view.practiceBanner({ practice: true, practiceActive: false })).toContain("This was a practice project");
   });
+
+  test("Home's start form keeps both explanations and the pack notice one click away, with the same inputs", async () => {
+    const view = await import("../../src/console/assets/a4View.js");
+    const packs = await import("../../src/console/assets/a4Pack.js");
+    const folded = view.approverChoiceHtml({ practiceAvailable: true, practiceRefusal: null }, { fold: true });
+    expect(folded).toMatch(/<details class="more-info"><summary>Which should I pick\?<\/summary>[\s\S]*Every Industry Pack is high risk or above[\s\S]*<\/details>/);
+    expect(folded).toContain('name="practice" value="" checked />');
+    expect(folded).toContain('name="practice" value="yes" />');
+    const select = packs.packSelectHtml([{ packId: "digital-health-record", name: "Record", domain: "health" }], null, { fold: true });
+    expect(select).toMatch(/<details class="notice-chip"><summary>[\s\S]*AI-drafted, not legal advice[\s\S]*not reviewed by a qualified expert; not legal advice\.<\/p><\/details>/);
+    expect(select).toContain('aria-describedby="a4PackHint"');
+  });
 });
 
 test("the separation-of-duties words keep the acknowledgement when someone else can approve", () => {

@@ -601,7 +601,7 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
     return `<div class="wait-tile">${icon("wait", { size: 24 })}<div class="wait-tile-words"><strong id="a4HomeTitle" class="wait-title">An approval waits for you</strong>
       <span>${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))}</span>
       ${moreInfo("What is asked?", `<p class="first-use-lead">${esc(row.name)}: ${esc(STAGE_PLAIN[row.stage] ?? title(row.stage))} (${esc(title(row.stage))}) ${asks}. Open it, read what it asks for, then approve it or request changes.</p>`)}</div>
-      <a class="button secondary" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>`;
+      <a class="button" href="./a4Project?project=${encodeURIComponent(row.projectId ?? "")}&stage=${encodeURIComponent(row.stage ?? "")}">Open the approval</a></div>`;
   }
   const project = latestProject(projects);
   if (project) {
