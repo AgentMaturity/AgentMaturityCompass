@@ -85,7 +85,7 @@ const VIEWER_SCRIPT = `(function () {
     if (text.length <= LIMIT) { el("pre", "content", text, parent); }
     else { el("pre", "content", text.slice(0, LIMIT) + " …", parent); var more = el("details", null, null, parent); el("summary", null, "Show all (" + text.length + " characters)", more); el("pre", "content", text, more); }
     if (c.truncated) el("p", "note", "Shortened in this export; the record holds the full text.", parent);
-    if (c.redactions) el("p", "note", c.redactions + " secret(s) hidden in this copy.", parent);
+    if (c.redactions) el("p", "note", c.redactions + " secret(s) shown as [REDACTED:kind] in this copy. The full text is in the signed record; a person with access to the workspace reads it with: amc session show " + doc.sessionId, parent);
   }
   var head = el("header", "head");
   el("h1", null, "What happened in this agent session", head);
