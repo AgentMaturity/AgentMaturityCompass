@@ -73,6 +73,8 @@ interface OpenIdentity {
   readonly harnessVersion: string;
   readonly compositionDigest: string;
   readonly policyDigest: string;
+  /** See assertSessionContinuationConfiguration: a session a skill turn opened before UX-02. */
+  readonly legacyCompositionDigest?: (openingSkills: readonly string[]) => string;
 }
 
 export interface ResumeSessionParams extends OpenIdentity {

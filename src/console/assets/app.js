@@ -4,6 +4,9 @@ import { askInline, confirmPress, emptyState, moreInfo, noticeChip, recordDetail
 import { approvalCardHtml, approvalPeopleHtml, approvalSubHtml, bindStationFilter, gapListHtml, layerBarsHtml, packCatalogHtml, pageIntroHtml, runCardsHtml, scoreDialHtml, statRowHtml, surfaceTilesHtml } from "./dailyView.js";
 import { activationRouteHtml, approvalsTileHtml, firstStepActionHtml, homeStartHtml, syncWaiting } from "./homeView.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
+import { renderAgentSessionsInto } from "./agentSessions.js";
+import { approvalCallHtml, offersApprove } from "./approvalCallView.js";
+import { renderGovernorOutcomes } from "./governorOutcomes.js";
 import { toolRatesHtml } from "./runtimeRates.js";
 import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, pendingApprovalCount, setAdminToken, whoami } from "./api.js";
@@ -861,6 +864,7 @@ async function renderEvidence() {
       `)}
     </div>
   `;
+  void renderAgentSessionsInto(root, agentId, 10, { after: ":scope > .surface-chips + .more-info" });
 
   bindFullScore("evidenceRunScore", renderEvidence);
   onAction(document.getElementById("evidenceSnapshot"), "click", async () => {
@@ -1509,6 +1513,7 @@ async function renderHome() {
     </details>
     </details>
   `;
+  void renderAgentSessionsInto(root, agentId, 3, { quietWhenEmpty: true });
   // Every claim-bearing number on Home (trends, KPI tiles) sits under "More", so its labels sit there too.
   if (claimStrip) document.getElementById("homeMore")?.querySelector("summary")?.after(claimStrip);
   bindFirstUse();
@@ -1687,7 +1692,8 @@ async function renderApprovals() {
         requestIntegrity: data.requestIntegrity,
         chainIntegrity: data.chainIntegrity,
         contextIntegrity: data.contextIntegrity,
-        executionReady: data.executionReady
+        executionReady: data.executionReady,
+        call: data.call
       }])
     : [...(activity.requests || []), ...a4Rows];
   const integrityValid = selectedApprovalId || activity?.integrity?.valid === true;
@@ -1697,6 +1703,7 @@ async function renderApprovals() {
   root.innerHTML = `
     ${pageIntroHtml(selectedApprovalId ? "One approval request" : "Decisions waiting for people", selectedApprovalId ? "Who decided, and what is left." : "Approve or deny a request, and see who decided.", { id: "approvalsIntro" })}
     ${demoActor ? '<p class="banner">Demo sessions cannot decide approvals. Sign in with an authorized identity to review and record a decision.</p>' : !approvalActorAllowed ? '<p class="banner">Your identity can review these requests but cannot record approval decisions. An authorized approver, owner or auditor must decide.</p>' : ""}
+    ${selectedApprovalId && rows[0] ? approvalCallHtml(rows[0]) : ""}
     ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : `
       <div class="row wrap appr-show" role="group" aria-label="Which requests">
         <button type="button" class="secondary" data-appr-show="PENDING" aria-pressed="${showing === "PENDING"}">Waiting</button>
@@ -1769,8 +1776,9 @@ async function renderApprovals() {
       row.contextIntegrity?.valid === true;
     if (canDecide) {
       return `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
-            <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>
+            ${offersApprove(row, a4Rows.includes(row) || Boolean(a4.a4ProjectOf(row.intentId)) || row.approvalRequestId.startsWith("a4gate_")) ? `<button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
+            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>`
+              : selectedApprovalId ? "" : `<a class="button secondary" href="./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}">See the call to decide</a>`}
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
           </div>`;
     }
@@ -1789,7 +1797,9 @@ async function renderApprovals() {
     selected: row.approvalRequestId === selectedApprovalId,
     href: selectedApprovalId ? "" : `./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}`,
     details: requestDetails(row)
-  })).join("") || emptyState({ line: showing === "PENDING" && !selectedApprovalId ? "Nothing waits for a decision." : "No requests match." })) : "";
+  })).join("") || emptyState(showing === "PENDING" && !selectedApprovalId
+    ? { line: "Nothing waits for a decision.", action: '<button id="approvalShowAll" type="button" class="secondary">Show decided requests</button>' }
+    : { line: "No requests match." })) : "";
   // The list rows carry counts only; each request's own record names its tool and who decided. `/view` reads it without
   // observing the expiry, so opening the list writes nothing (first 50 cards).
   if (!selectedApprovalId) {
@@ -1828,6 +1838,10 @@ async function renderApprovals() {
       search?.parentElement?.querySelector(":scope > .action-error")?.remove();
       search?.insertAdjacentHTML("afterend", `<p class="action-error status-bad" role="alert">${htmlEscape(errText(error))}</p>`);
     }
+  });
+  document.getElementById("approvalShowAll")?.addEventListener("click", async () => {
+    approvalActivityState.status = "";
+    await renderApprovals();
   });
   document.getElementById("approvalFiltersReset")?.addEventListener("click", async () => {
     Object.assign(approvalActivityState, {
@@ -2980,6 +2994,7 @@ async function renderRuntimeRuns() {
         <pre id="runtimeOut" class="scroll muted"></pre>`)}
     </div>
   `;
+  void renderAgentSessionsInto(root, agentId, 10, { after: ":scope > section.card" });
   const out = document.getElementById("runtimeOut");
   const currentRun = () => document.getElementById("runtimeRunId")?.value || latest?.runId || "";
   const currentStage = () => document.getElementById("runtimeStage")?.value || "gateway.connected";
@@ -3864,26 +3879,7 @@ async function renderPage() {
     if (page === "policypacks") return await renderPolicyPacks();
     if (page === "industrypacks") return await renderIndustryPacks();
     if (page === "governor") {
-      const actionClasses = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY"];
-      const rows = [];
-      for (const actionClass of actionClasses) {
-        const decision = await apiPost("/governor/check", {
-          agentId: currentAgent(),
-          actionClass,
-          riskTier: "med",
-          mode: "EXECUTE"
-        }).catch((error) => ({ error: errText(error) }));
-        rows.push({ actionClass, decision });
-      }
-      // A check only evaluates the policy; it records nothing.
-      const classWords = { READ_ONLY: "Reading only", WRITE_LOW: "Small changes", WRITE_HIGH: "Bigger changes", DEPLOY: "Releasing", SECURITY: "Security settings" };
-      const verdict = ({ decision }) => decision.error ? `could not be checked: ${htmlEscape(decision.error)}`
-        : !decision.allowed ? "not allowed"
-          : decision.effectiveMode === "SIMULATE" ? "allowed only as a dry run: AMC records what would happen and does nothing" : "allowed";
-      root.innerHTML = card("Governor", `
-        <p class="muted">What the Governor would decide for ${htmlEscape(currentAgent())} if it asked to really do each kind of action at medium risk.</p>
-        <ul>${rows.map((row) => `<li><strong>${classWords[row.actionClass]}</strong> <small class="muted">${row.actionClass}</small>: ${verdict(row)}</li>`).join("")}</ul>
-        ${jsonDetails("Full decisions, with every condition and reason:", rows)}`);
+      root.innerHTML = await renderGovernorOutcomes(currentAgent());
       return;
     }
     if (page === "toolhub") {

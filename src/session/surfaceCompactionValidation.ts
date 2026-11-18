@@ -24,14 +24,24 @@ const receiptFields = {
   replacedBytes: count, replacementBytes: z.number().int().nonnegative().max(1_000_000).safe(),
   savedBytes: z.number().int().positive().safe(), measurement: z.literal("payload-bytes-not-tokens")
 };
-/** v2 = automatic: the measurement that fired it and, for a summary, the signed request that wrote it. */
+/** The provider failure code an `overflow` trigger cites. */
+const CONTEXT_OVERFLOW_CODE = "CONTEXT_WINDOW_EXCEEDED";
+/**
+ * v2 = automatic: what fired it and, for a summary, the signed request that wrote it. `automatic` is the measured
+ * threshold; `overflow` (HP-05) is a provider's refusal of a request as too large for the window, cited by its signed
+ * `request/failure` row (there is no usage to measure, so nothing is estimated).
+ */
 const automaticFields = {
-  trigger: z.object({ kind: z.literal("automatic"), promptTokens: count, contextWindowTokens: z.number().int().positive().safe(),
+  trigger: z.union([z.object({ kind: z.literal("automatic"), promptTokens: count, contextWindowTokens: z.number().int().positive().safe(),
     reserveTokens: count.optional(), threshold: z.number().min(0.5).max(0.95), ratio: z.number().nonnegative(), measuredAtEventId: z.string().min(1),
     formula: z.literal(PROMPT_TOKENS_FORMULA) }).strict()
     .refine(trigger => trigger.reserveTokens === undefined || trigger.reserveTokens < trigger.contextWindowTokens),
+  z.object({ kind: z.literal("overflow"), contextWindowTokens: z.number().int().positive().safe(), failureEventId: z.string().min(1),
+    failureCode: z.literal(CONTEXT_OVERFLOW_CODE) }).strict()]),
   summarizer: z.object({ requestHeaderEventId: z.string().min(1), promptVersion: z.number().int().positive().safe(),
-    model: z.string().min(1), claimKind: z.literal(SUMMARY_CLAIM_KIND), role: z.enum(["user", "assistant"]) }).strict().optional()
+    model: z.string().min(1), claimKind: z.literal(SUMMARY_CLAIM_KIND), role: z.enum(["user", "assistant"]),
+    /** The `loop/compact` row of an earlier summary that was in the summarized range and that the prompt asked to merge. */
+    mergedPreviousSummaryEventId: z.string().min(1).optional() }).strict().optional()
 };
 export const surfaceCompactionReceiptSchema = z.discriminatedUnion("v", [
   z.object({ v: z.literal(1), ...receiptFields }).strict(),
@@ -110,13 +120,35 @@ const usageSchema = z.object({ inputTokens: count, outputTokens: count, cacheRea
   .refine(usage => usage.reasoningTokens == null || usage.reasoningTokens <= usage.outputTokens);
 /**
  * A v2 receipt's provenance is re-derived from earlier signed rows of the same
- * session, never taken on the receipt's word: its trigger must equal the usage
- * on the `step/end` it cites, and a summary must cite a real `request/header`
- * whose model it names.
+ * session, never taken on the receipt's word: a threshold trigger must equal the
+ * usage on the `step/end` it cites, an overflow trigger must cite a signed
+ * `request/failure` with the context-window code, and a summary must cite a real
+ * `request/header` whose model it names.
  */
 export function assertAutomaticProvenance(receipt: SurfaceCompactionReceipt, prior: ReadonlyMap<string, EvidenceEvent>, sessionId: string): void {
   if (receipt.v !== 2) return;
-  const { trigger, summarizer } = receipt, measured = prior.get(trigger.measuredAtEventId);
+  const { trigger, summarizer } = receipt;
+  if (summarizer?.mergedPreviousSummaryEventId !== undefined) {
+    const previous = prior.get(summarizer.mergedPreviousSummaryEventId);
+    if (previous?.event_type !== "loop/compact" || previous.session_id !== sessionId) throw new Error("automatic summary names a merged summary that is not an earlier compaction of this session");
+  }
+  if (trigger.kind === "overflow") {
+    const failed = prior.get(trigger.failureEventId);
+    const code = failed?.event_type === "request/failure" && failed.session_id === sessionId
+      ? (JSON.parse(failed.meta_json) as { failure?: { code?: unknown } }).failure?.code : undefined;
+    if (code !== CONTEXT_OVERFLOW_CODE) throw new Error("overflow compaction does not cite a signed context-window failure of this session");
+  } else {
+    assertMeasuredTrigger(trigger, prior.get(trigger.measuredAtEventId), sessionId);
+  }
+  if (summarizer === undefined) return;
+  const header = prior.get(summarizer.requestHeaderEventId);
+  if (header?.event_type !== "request/header" || header.session_id !== sessionId
+    || (JSON.parse(header.meta_json) as { model?: unknown }).model !== summarizer.model) {
+    throw new Error("automatic summary does not cite its own signed summarizer request");
+  }
+}
+
+function assertMeasuredTrigger(trigger: Extract<AutomaticReceipt["trigger"], { kind: "automatic" }>, measured: EvidenceEvent | undefined, sessionId: string): void {
   const meta = measured?.event_type === "step/end" && measured.session_id === sessionId
     ? JSON.parse(measured.meta_json) as { usage?: unknown; usageVersion?: unknown } : null;
   const usage = meta && (meta.usageVersion === undefined || meta.usageVersion === 2)
@@ -126,12 +158,6 @@ export function assertAutomaticProvenance(receipt: SurfaceCompactionReceipt, pri
     || (trigger.reserveTokens === undefined ? trigger.ratio < trigger.threshold
       : trigger.promptTokens < trigger.contextWindowTokens - trigger.reserveTokens)) {
     throw new Error("automatic compaction trigger disagrees with the signed step usage it cites");
-  }
-  if (summarizer === undefined) return;
-  const header = prior.get(summarizer.requestHeaderEventId);
-  if (header?.event_type !== "request/header" || header.session_id !== sessionId
-    || (JSON.parse(header.meta_json) as { model?: unknown }).model !== summarizer.model) {
-    throw new Error("automatic summary does not cite its own signed summarizer request");
   }
 }
 

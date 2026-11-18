@@ -83,6 +83,8 @@ You deleted (or replaced) the `.amc/` folder in a folder where AMC ran before. T
 - Put the `.amc/` folder back from a backup, then run the command again. If AMC still refuses, run the `amc keys rotate --restore` command the message names.
 - Or start in a new folder.
 
+AMC has no command that starts such a folder over, because doing so would remove this computer's memory of the folder's keys, which is the protection itself. For the same reason `amc init --force` (and `amc init --coding --force`) is refused in a folder whose keys this computer created, before it deletes anything; it used to delete `.amc` and then stop at this error. To move a folder the `amc` menu set up to the coding setup, run `amc init --coding` without `--force`.
+
 ### The console or the app shows `Starting AMC…` for a long time
 
 The page is waiting for its first answer from AMC. In a browser, press ⌘R (Ctrl+R on Windows and Linux) to reload. In the macOS app, press ⌘R too (Studio > Reload). If it still stays on `Starting AMC…` or blank, run `amc doctor` in the workspace folder and check `.amc/studio/logs/studio.log`. In the macOS app, Studio > Show Logs opens the launcher log (`~/Library/Logs/Agent Maturity Compass/studio-launcher.log`). The app's own workspace folder is `~/Library/Application Support/Agent Maturity Compass/workspace` (the demo is in `studio-workspace` next to it), and the app's own `amc` is `../runtime/node_modules/.bin/amc` from there ([Desktop Packages](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/DESKTOP_PACKAGES.md)).

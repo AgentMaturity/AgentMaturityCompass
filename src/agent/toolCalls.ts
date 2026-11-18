@@ -46,6 +46,7 @@ import type { ToolOutcome } from "../session/sessionTypes.js";
 import type { ToolUseContentBlock } from "../llm/streamChunk.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "./toolSeam.js";
 import { providerToolWireName } from "../llm/request/providerToolNames.js";
+import type { TurnGuards } from "./turnGuards.js";
 
 export interface ToolCallsInput {
   readonly session: SessionService;
@@ -61,6 +62,8 @@ export interface ToolCallsInput {
   readonly acceptContext: (text: string) => void;
   /** The model's calls, in model order. */
   readonly calls: readonly ToolUseContentBlock[];
+  /** The driver's turn guards (HP-01, HP-23): may answer a repeated call itself, and counts refusals. */
+  readonly guards?: TurnGuards;
 }
 
 /** What running a step's calls told the loop about the turn. */
@@ -329,10 +332,15 @@ class RunState {
 
   private start(index: number, call: ToolUseContentBlock): void {
     this.started = Math.max(this.started, index + 1);
+    // In model order: a repeated call is answered by the loop and reaches no seam, like an unoffered one.
+    const { guards, tools } = this.input, guard = guards?.beforeCall(call) ?? null;
     this.inFlight.set(
       index,
-      (call.unoffered === true ? Promise.resolve(unofferedOutcome(this.input.tools, call.name))
-        : this.input.tools.execute(requestFor(this.input, call))).then(
+      (call.unoffered === true ? Promise.resolve(unofferedOutcome(tools, call.name)) : guard?.answer ? Promise.resolve(guard.answer)
+        : tools.execute(requestFor(this.input, call)).then(outcome => {
+          guards?.afterCall(call.name, outcome, tools.actionClassOf?.(call.name) ?? null, guard?.ticket ?? null);
+          return outcome;
+        })).then(
         (outcome) => {
           this.slots[index] = outcome;
           return index;

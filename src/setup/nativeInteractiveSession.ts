@@ -20,6 +20,7 @@ import { loadNativeExtensions, nativeExtensionRunArgv, type NativeExtensionManag
 import { prepareSkillTurn, workspaceSkillRoots } from "../skills/skillTurn.js";
 import { buildSkillCatalog } from "../skills/skillCatalog.js";
 import { resolveNativeValidationSelection } from "./nativeValidationConfig.js";
+import { describeTurnCheck, needsCheckWarning } from "../agent/turnVerification.js";
 import { nativeRouteFor, paramsFor } from "../cli-agent-options.js";
 import { NATIVE_INTERACTIVE_COMMANDS, nativeInteractiveCompleter } from "./nativeInteractiveCommands.js";
 import { listNativeInteractiveSessions, renderNativeInteractiveSession, assertNativeInteractiveSelection, type NativeInteractiveSessionSummary } from "./nativeInteractiveNavigation.js";
@@ -50,6 +51,7 @@ export interface NativeChatOptions extends NativeChatProfileOptions {
   readonly validationConfigSha256?: string;
   readonly validationRepair?: string;
   readonly validate?: readonly string[];
+  readonly verifyOnStop?: boolean;
   readonly extension?: readonly string[];
   readonly extensionPin?: readonly string[];
   /** One reviewed config per server; each grant keeps its signed action class. */
@@ -417,7 +419,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       ...(options.compactThreshold === undefined ? [] : ["--compact-threshold", options.compactThreshold]),
       ...(options.autoSummary === false ? ["--no-auto-summary"] : []), ...(options.autoCompact === false ? ["--no-auto-compact"] : []),
       ...(approvalClass === undefined ? [] : ["--approve-tools", approvalClass, "--approve-risk", approvalRisk]),
-      ...(approvalMode === undefined || !approvalMode.ok ? [] : ["--approval-mode", approvalMode.mode]), ...mcpArgs, ...validationArgs];
+      ...(approvalMode === undefined || !approvalMode.ok ? [] : ["--approval-mode", approvalMode.mode]), ...mcpArgs, ...validationArgs,
+      ...(options.verifyOnStop === false ? ["--no-verify-on-stop"] : [])];
     const routeArgs = () => [...routeBaseArgs(), ...nativeChatProfileArgv(profile)];
     const chatProfileArgs = [...(options.trustWorkspace === true ? ["--trust-workspace"] : []), ...nativeChatProfileArgv(profile, "chat")];
     // What `--session`/`--continue` restores from the saved settings (nativeChatInput.ts); the rest stays on the resume line.
@@ -743,6 +746,8 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       }
       previousSummary = summary;
       const ending = freshEndings.at(-1);
+      // HP-04: an unchecked or failed-check turn's status sits right under the reply, in plain words.
+      for (const row of summary.turnChecks ?? []) if (row.turn === ending?.turn && needsCheckWarning(row)) io.log(chalk.yellow(describeTurnCheck(row)));
       io.log(renderTurnFooter({ recorded: shownLive || fresh.length > 0, turn: ending?.turn, ending: ending?.reason, usage: summary.usage, context: chatDisplay.context() }));
       // The usage, diagnostics and validation blocks print for a turn that did not finish cleanly; otherwise /status has them.
       if (!(outcome.code === 0 && ending?.reason === "complete" && summary.driverStatus !== "failed")) for (const line of sessionDetailLines(summary)) io.log(line);

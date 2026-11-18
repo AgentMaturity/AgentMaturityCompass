@@ -1,6 +1,6 @@
 import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { recordDeliveredContext } from "../prompt/context/nativeCompositionContext.js";
-import { cancelCauseOf, contextNotification, fenceToolContext, originFor, withResolvers } from "./agentDriverSupport.js";
+import { cancelCauseOf, contextNotification, fenceToolContext, observedToolSeam, originFor, triggerForNextTurn, withResolvers } from "./agentDriverSupport.js";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
  *
@@ -43,17 +43,18 @@ import { cancelCauseOf, contextNotification, fenceToolContext, originFor, withRe
  * write.
  */
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
-import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
+import type { TokenUsage, TurnCancelCause } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
 import { canonicalTurnCancelCause } from "../session/turnLifecycleMeta.js";
 import { LoopInbox } from "./inbox.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import { recordNativeImageMessage } from "./nativeImageMessage.js";
 import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
-import { assertOrderedClaimDecision, recordNativeOrderedMessage } from "./nativeOrderedMessage.js";
+import { recordNativeOrderedMessage } from "./nativeOrderedMessage.js";
 import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
-import { assertAudioClaimDecision, recordNativeAudioMessage } from "./nativeAudioMessage.js";
-import { DEFAULT_RETRY_RUNTIME } from "./requestRetry.js";
+import { recordNativeAudioMessage } from "./nativeAudioMessage.js";
+import { claimAndDecide } from "./stepAdmission.js";
+import { DEFAULT_RETRY_RUNTIME, noteOverflowOutage } from "./requestRetry.js";
 import {
   DEFAULT_AGENT_LOOP_CONFIG,
   NO_HOOKS,
@@ -62,7 +63,6 @@ import {
   type AgentLoopConfig,
   type AgentStatus,
   type CancelOptions,
-  type InboxMessage,
   type InboxReceipt,
   type InboxTarget,
   type LoopHooks,
@@ -72,21 +72,17 @@ import {
   type TurnEnding
 } from "./loopTypes.js";
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
-import { EMPTY_TOOL_SEAM, type AgentToolSeam, type ToolCallOutcome } from "./toolSeam.js";
-import { sha256Hex } from "../utils/hash.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
+import { firstStop, sentByPerson, TurnGuards, turnPolicies, type TurnPolicy } from "./turnGuards.js";
+import { projectNativeCost } from "../budgets/nativeCostProjection.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
+import { TurnChecks, type VerifyOnStopInit } from "./verifyOnStop.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
 import { RunLimitTracker, type RunLimitBreach, type RunLimits } from "./runLimits.js";
 import { resolveRouteCompaction } from "./compaction/promptPressure.js";
 import { shutdownTimeoutMs, shutdownToolResults, type AgentShutdownResult } from "./agentShutdown.js";
 export type { AgentShutdownResult } from "./agentShutdown.js";
-
-/** A settled tool call for observers: outcome, digest and size, never the content (SH-EXT-01). */
-function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
-  const content = typeof outcome.content === "string" ? Buffer.from(outcome.content, "utf8") : outcome.content;
-  return { ok: outcome.outcome === "OK" && !outcome.denied, outputSha256: sha256Hex(content), outputBytes: content.length };
-}
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -96,6 +92,11 @@ export interface AgentDriverInit {
   readonly systemPromptEventId: string;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
+  /**
+   * HP-04 checks after edits: absent reads the workspace's signed default; false is the operator's per-run off switch;
+   * `{ parent }` marks a delegated child, which records its status and never runs checks itself.
+   */
+  readonly verifyOnStop?: VerifyOnStopInit;
   readonly hooks?: LoopHooks;
   readonly config?: Partial<AgentLoopConfig>;
   /**
@@ -120,9 +121,6 @@ type Phase =
   | { kind: "running"; abort: AbortController; turn: number; step: number; wakeRequested: boolean }
   | { readonly kind: "failed"; readonly cause: unknown; readonly turn: number };
 
-/** A pre-step that decided to enter, with the batch it decided to enter with. */
-type PreparedStep = Extract<PreStepDecision, { kind: "enter" }>;
-
 export class AgentDriver {
   readonly inbox: LoopInbox;
 
@@ -134,10 +132,15 @@ export class AgentDriver {
 
   private readonly stepInit: StepRunnerInit;
   private readonly validation: NativeValidationPlan | undefined;
+  /** HP-04: the turn/start marker, the verify-on-stop hook and each turn's check-status row. */
+  private readonly turnChecks: TurnChecks;
   /** Null when neither reviewed route metadata nor explicit settings supply a window. */
   private readonly compactor: AutoCompactor | null;
   /** Null when the run carries no limit. */
   private readonly limits: RunLimitTracker | null;
+  /** Per-turn guards (HP-01, HP-23) and the ordered checks run after each `step/end` (HP-03). */
+  private readonly guards: TurnGuards;
+  private readonly policies: readonly TurnPolicy[];
   private deadline: NodeJS.Timeout | null = null;
   /** The limit whose signed `loop/cancel` ended this run's work; once set, new work is refused at admission. */
   private limitEnding: RunLimitBreach | null = null;
@@ -164,6 +167,7 @@ export class AgentDriver {
     const selected = init.route.pinned ?? init.llm.pin?.(init.route);
     const compaction = resolveRouteCompaction(init.config?.compaction, init.route, selected?.modelMetadata);
     this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, compaction };
+    this.turnChecks = new TurnChecks(init.session, init.validation !== undefined, init.verifyOnStop, this.config.toolAbandonGraceMs);
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
@@ -171,20 +175,7 @@ export class AgentDriver {
     this.stepInit = {
       session: init.session,
       llm: init.llm,
-      tools: tools.extensionHooks ? { ...tools,
-        // Keep the WP31 effect-guard capability: a spread alone drops class-defined members.
-        ...(tools.supportsEffectGuard ? { supportsEffectGuard: true as const } : {}),
-        schemas: () => tools.schemas(), executionMode: request => tools.executionMode(request),
-        prepareStep: tools.prepareStep?.bind(tools), authorizationIntent: tools.authorizationIntent?.bind(tools),
-        bindApprovalGate: tools.bindApprovalGate?.bind(tools),
-        execute: async request => {
-          await this.observeExtensions({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
-          // The result's digest and size name what settled (SH-EXT-01 PostToolUse); its text never crosses.
-          let settled: { ok: boolean; outputSha256: string; outputBytes: number } | undefined;
-          try { const outcome = await tools.execute(request); settled = describeToolOutcome(outcome); return outcome; }
-          finally { await this.observeExtensions({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName, callId: request.callId, ...settled }, request.signal); }
-        }
-      } : tools,
+      tools: tools.extensionHooks ? observedToolSeam(tools, (event, signal) => this.observeExtensions(event, signal)) : tools,
       route: selected === undefined ? init.route : { ...init.route, pinned: selected },
       systemPromptEventId: init.systemPromptEventId,
       config: this.config,
@@ -197,12 +188,20 @@ export class AgentDriver {
       },
       notify: (notification: LoopNotification) => {
         this.hooks.notify(notification);
-      }
+      },
+      guards: this.guards = new TurnGuards(init.runLimits?.limits)
     };
     const window = compaction.contextWindowTokens;
-    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit, usage => {
+      // A summary request's usage counts against the token limit; unknown usage stops the run before any further request.
+      const breach = this.limits?.recordUsage(usage, "compaction-summary");
+      if (breach) this.limitReached(breach);
+    });
     this.limits = init.runLimits === undefined ? null
-      : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true);
+      // ponytail: the cost limit re-reads the session at each step and turn, only while one is set.
+      : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true,
+        () => projectNativeCost(this.session.readEvents(), this.session.sessionId));
+    this.policies = turnPolicies(this.limits, this.guards);
     if (this.limits?.deadlineMs !== undefined) {
       // Armed from construction: the deadline bounds the whole run, idle time included, like a child's timeout-ms.
       this.deadline = setTimeout(() => this.limitReached(this.limits!.deadlineReached()), this.limits.deadlineMs);
@@ -230,6 +229,8 @@ export class AgentDriver {
 
   /** The limit that ended this run's work, or null: what a host reports instead of a silent stop. */
   get runLimitEnding(): RunLimitBreach | null { return this.limitEnding; }
+  /** The last turn-guard stop (repeated call, malformed responses, denials); it ended a turn, not the run. */
+  get turnGuardEnding(): RunLimitBreach | null { return this.guards.trip; }
 
   private async observeExtensions(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<void> {
     // Observer failures, including reporting failures, cannot veto the signed turn or its seal.
@@ -540,9 +541,10 @@ export class AgentDriver {
       return false;
     }
 
-    const turnRef = this.session.startTurn({ trigger: this.triggerForNextTurn(phase.turn) });
+    const turnRef = this.session.startTurn({ trigger: triggerForNextTurn(this.inbox, phase.turn), ...this.turnChecks.marker });
     this.head = turnRef;
     phase.turn = turnRef.turn;
+    this.guards.reset();
     let ending: TurnEnding | null = null;
     let target: InboxTarget = "next-turn";
     let validation: NativeValidationTurn | undefined;
@@ -589,6 +591,8 @@ export class AgentDriver {
           return false;
         }
 
+        // A person's message reaching the turn is a reason to repeat a call: the repeat counts start again.
+        if (decision.messages.some(sentByPerson)) this.guards.clearRepeats();
         signal.throwIfAborted();
         this.head = this.session.startStep();
         phase.step = step;
@@ -597,6 +601,7 @@ export class AgentDriver {
 
         let stopReason: string | null = null;
         let usage: TokenUsage | null = null;
+        let overflow: unknown = null; // HP-05: a context-window refusal this turn may compact for once
         try {
           for (const message of decision.messages) {
             if (message.audioParts !== undefined) {
@@ -626,7 +631,8 @@ export class AgentDriver {
           if (ending === null || ending.reason !== "max_tokens") ending = outcome.ending;
         } catch (error: unknown) {
           stopReason = signal.aborted ? "cancelled" : "error";
-          throw error;
+          if (signal.aborted || repair?.active || this.compactor?.canRecover(error, turnRef.turn) !== true) throw error;
+          overflow = error;
         } finally {
           // ALWAYS. This is what keeps a cancelled turn balanced at step
           // granularity, and it is the shape crash repair also produces.
@@ -638,15 +644,22 @@ export class AgentDriver {
           await this.observeExtensions({ kind: "step-end", turn: turnRef.turn, step }, signal);
         }
 
-        // The token budget was checked against what `step/end` just committed; a breach cancels the
-        // turn here with the limit as its cause, before any further request.
-        const exhausted = this.limits?.breach ?? null;
-        if (exhausted !== null && !signal.aborted) this.limitCancel(exhausted);
+        // The ordered turn policies read what `step/end` just committed: a run limit cancels the turn and closes
+        // admission; a guard ends only this turn, keeping queued work. Both before any further request.
+        const stop = signal.aborted ? null : firstStop(this.policies);
+        if (overflow !== null && stop !== null) throw overflow; // a limit leaves the overflow terminal, as before
+        if (stop?.scope === "run") this.limitCancel(stop.cause);
+        else if (stop?.scope === "turn") this.cancel(stop.cause, { by: "turn-guard", keepInbox: true });
         signal.throwIfAborted();
+        if (overflow !== null) {
+          await this.compactor!.recoverOverflow(turnRef.turn, step, overflow, signal, () => firstStop(this.policies) === null && step < this.config.maxStepsPerTurn);
+          target = "next-step";
+          continue;
+        }
         // Between steps only, after `step/end` committed the usage it measures. A
         // summary step it runs takes the next step number, so keep ours in line.
         if (!repair?.active && this.compactor !== null && this.head !== null) {
-          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal);
+          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal, ending === null);
         }
         // A listener that objects to the turn stopping says so by steering; the
         // inbox is re-read after it runs, so listener ORDER cannot change the
@@ -672,6 +685,14 @@ export class AgentDriver {
               target = "next-step";
               continue;
             }
+          } else if (ending.reason === "complete") {
+            const feedback = await this.turnChecks.atStop(turnRef.turn, phase.step, this.stepInit.tools, signal);
+            if (feedback !== null) {
+              acceptRepairContext(feedback);
+              ending = null;
+              target = "next-step";
+              continue;
+            }
           }
           break;
         }
@@ -685,6 +706,7 @@ export class AgentDriver {
       if (error instanceof NativeValidationRepairStop || repair?.signal.aborted) ending = { reason: "complete" };
       else {
         ending = { reason: "error", error };
+        noteOverflowOutage(this.session, error); // a final overflow only: a recovered one is not a provider outage
         this.notifyError(error);
         throw error;
       }
@@ -692,7 +714,11 @@ export class AgentDriver {
       let cleanupFailure: { error: unknown } | undefined;
       try { for (const id of repairContextIds) this.inbox.cancelNextStep(id); }
       catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
+      let finishErrored = false;
       try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
+      catch (error) { finishErrored = true; ending = { reason: "error", error }; this.notifyError(error); }
+      // HP-04: always the last row before turn/end, so the turn's seal covers it; a failed finish above reads check-errored.
+      try { this.turnChecks.record(turnRef.turn, this.stepInit.tools, finishErrored); }
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {
@@ -743,53 +769,10 @@ export class AgentDriver {
     }
   }
 
-  /**
-   * Claim a batch, then let listeners decide whether the step is entered.
-   *
-   * The claim is DURABLE BEFORE the waterfall runs — dsh's ordering, kept — so a
-   * veto consumes the messages it was handed. That loss is real, and AMC records
-   * it rather than hiding it: the `loop/veto` row names the vetoing party and
-   * every message id the veto burned.
-   */
+  /** Claim a batch, then let listeners decide whether the step is entered (claimAndDecide says why in this order). */
   private async preStep(target: InboxTarget, turn: number, step: number, signal: AbortSignal): Promise<PreStepDecision> {
-    const claimed: readonly InboxMessage[] = this.inbox.claim(target);
-    // A hook may mutate the batch array, but cannot erase the captured v2 claims.
-    const orderedClaims = claimed.filter(message => message.parts !== undefined);
-    const audioClaims = claimed.filter(message => message.audioParts !== undefined);
-    const decision = await this.hooks.preStep(
-      { turn, step, target, messages: claimed, signal, contextSession: Object.freeze({
-        sessionId: this.session.sessionId, workspace: this.session.workspace,
-        readEvents: () => this.session.readEvents(),
-        recordProjectedEvidence: this.session.recordProjectedEvidence.bind(this.session)
-      }) },
-      (): Promise<PreparedStep> => Promise.resolve({ kind: "enter", messages: claimed })
-    );
-    signal.throwIfAborted();
-    if (decision.kind === "reject") {
-      this.head = this.session.recordLoopEvent({
-        kind: "veto",
-        turn,
-        step,
-        by: decision.by,
-        claimedMessageIds: claimed.map((message) => message.messageId)
-      });
-    }
-    if (decision.kind === "enter") assertOrderedClaimDecision(orderedClaims, decision.messages);
-    if (decision.kind === "enter") assertAudioClaimDecision(audioClaims, decision.messages);
+    const { decision, vetoRow } = await claimAndDecide({ inbox: this.inbox, hooks: this.hooks, session: this.session }, target, turn, step, signal);
+    if (vetoRow !== null) this.head = vetoRow;
     return decision;
-  }
-
-  /**
-   * Which lane opened this turn.
-   *
-   * The distinction the spine's vocabulary asks for is the one a reader wants:
-   * `user` is the prompt that started the conversation, `followup` is a later
-   * prompt, `steer` is a turn opened by steering alone, and `resume` is a driver
-   * that woke with nothing queued.
-   */
-  private triggerForNextTurn(lastTurn: number): TurnTrigger {
-    if (this.inbox.nextTurn.length > 0) return lastTurn === 0 ? "user" : "followup";
-    if (this.inbox.nextStep.length > 0) return "steer";
-    return "resume";
   }
 }

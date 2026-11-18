@@ -1831,6 +1831,7 @@ Interactive native tasks over the existing governed run/resume path for the sele
 | `--extension <manifest>` | - |
 | `--extension-pin <sha256>` | - |
 | `--preset <id>` | - |
+| `--no-verify-on-stop` | - |
 | `--persona <text>` | - |
 | `--delegate` | - |
 | `--no-delegate` | - |
@@ -1982,6 +1983,7 @@ Run one agent turn and report what the signed log recorded
 | `--interactive-approvals` | - |
 | `--output-format <format>` | - |
 | `--validation-repair <json>` | - |
+| `--no-verify-on-stop` | - |
 | `--interactive-ask-user` | - |
 | `--web-search-searxng <origin>` | - |
 | `--goal-rounds <n>` | - |

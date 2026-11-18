@@ -1,5 +1,6 @@
 import type { NativeValidationStatus } from "../agent/nativeValidation.js";
 import type { TurnEndReason } from "../session/sessionTypes.js";
+import { turnCheckFrom, type TurnCheckRow } from "../agent/turnVerification.js";
 
 /** Only the fields chat actually displays, not a fabricated full run summary. */
 export interface NativeChatChildSummary {
@@ -10,6 +11,8 @@ export interface NativeChatChildSummary {
   readonly validation?: { readonly status: NativeValidationStatus };
   readonly usage?: unknown;
   readonly diagnostics?: unknown;
+  /** HP-04: the child's turn check rows, re-admitted field by field. */
+  readonly turnChecks?: readonly TurnCheckRow[];
 }
 export type NativeChatResult =
   | { readonly ok: true; readonly summary: NativeChatChildSummary }
@@ -91,6 +94,7 @@ export function parseNativeChatResult(input: {
     assistantText: [...assistantText], endings,
     ...(validation === undefined ? {} : { validation }),
     ...(row.usage === undefined ? {} : { usage: row.usage }),
-    ...(row.diagnostics === undefined ? {} : { diagnostics: row.diagnostics })
+    ...(row.diagnostics === undefined ? {} : { diagnostics: row.diagnostics }),
+    ...(Array.isArray(row.turnChecks) ? { turnChecks: row.turnChecks.flatMap(item => { const parsed = turnCheckFrom(item, object(item)?.eventId); return parsed === null ? [] : [parsed]; }) } : {})
   } };
 }

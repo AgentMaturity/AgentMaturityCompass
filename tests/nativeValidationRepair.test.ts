@@ -738,3 +738,26 @@ describe("trusted guards at the effect boundary", () => {
     } finally { journal.close(); }
   });
 });
+
+describe("a context-window overflow during validation repair (HP-05 review M4)", () => {
+  test("MUTATION: is not compacted and retried by the loop: repair keeps its own bounds and the turn ends", async () => {
+    let requests = 0;
+    const overflowBody = JSON.stringify({ error: { message: "This model's maximum context length is 10000 tokens.", code: "context_length_exceeded" } });
+    const transport: HttpTransport = async () => (++requests === 2
+      ? { status: 400, headers: { "content-type": "application/json" }, body: bodyFromChunks([overflowBody]) }
+      : { status: 200, headers: { "content-type": "text/event-stream" }, body: bodyFromChunks([]) });
+    // Request 1 completes; the public check fails; request 2 is the first repair request, and it overflows.
+    const f = fixture([textStep("Initial completion.", { inputTokens: 100 }), read(), textStep("never")], undefined, transport);
+    const d = new AgentDriver({ session: f.harness.session, llm: f.harness.llm, systemPromptEventId: f.harness.systemPromptEventId,
+      route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } }, tools: f.tools, validation: plan(),
+      config: { toolAbandonGraceMs: 20, maxStepsPerTurn: 20, compaction: { contextWindowTokens: 10_000, threshold: 0.8, reserveTokens: null,
+        keepRecentSteps: 2, pruneMinBytes: 1, summarize: false, maxPerTurn: 3 } } });
+    d.followup("Repair only the explicitly selected public failure within the operator policy.");
+    await d.whenIdle();
+    const rows = f.harness.events();
+    expect(requests).toBe(2);
+    expect(rows.filter(row => row.event_type === "request/failure").map(row => (meta(row).failure as { code: string }).code)).toEqual(["CONTEXT_WINDOW_EXCEEDED"]);
+    expect(rows.filter(row => row.event_type === "audit" && meta(row).auditType === "CONTEXT_OVERFLOW_RECOVERY")).toHaveLength(0);
+    expect(rows.filter(row => row.event_type === "loop/compact")).toHaveLength(0);
+  });
+});

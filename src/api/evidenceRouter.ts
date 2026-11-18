@@ -370,6 +370,36 @@ export async function handleEvidenceRoute(
     return true;
   }
 
+  // GET /api/v1/evidence/sessions — native agent sessions (CLI chats and runs) with the actions each took (UX-04).
+  // GET /api/v1/evidence/sessions/<id>/export?format=json|html — one session for an auditor (UX-05). Read-only GETs:
+  // every signed-in human role may call them (accessPolicy), and the file holds the signed record without message text.
+  if (pathname === '/api/v1/evidence/sessions' && method === 'GET') {
+    try {
+      const { listAuditSessions } = await import('../evidence/sessionAudit.js');
+      const url = req.url ?? '';
+      res.setHeader('Cache-Control', 'no-store');
+      apiSuccess(res, listAuditSessions(workspace, queryParam(url, 'agentId') ?? 'default', { limit: Number(queryParam(url, 'limit') ?? 20), cursor: queryParam(url, 'cursor') }));
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Sessions could not be read');
+    }
+    return true;
+  }
+  const sessionExport = pathname.match(/^\/api\/v1\/evidence\/sessions\/([^/]+)\/export$/);
+  if (sessionExport && method === 'GET') {
+    const format = queryParam(req.url ?? '', 'format') ?? 'json';
+    if (format !== 'json' && format !== 'html') { apiError(res, 400, 'format must be json or html'); return true; }
+    try {
+      const { sessionAuditExport } = await import('../evidence/sessionAudit.js');
+      const file = sessionAuditExport(workspace, decodeURIComponent(sessionExport[1]!), format);
+      if (file.status !== 200) { apiError(res, file.status, file.error); return true; }
+      res.writeHead(200, { 'Content-Type': file.contentType, 'Content-Disposition': `attachment; filename="${file.fileName}"`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store' });
+      res.end(file.body);
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'The session could not be exported');
+    }
+    return true;
+  }
+
   // GET /api/v1/evidence/export — export evidence bundle
   if (pathname === '/api/v1/evidence/export' && method === 'GET') {
     try {

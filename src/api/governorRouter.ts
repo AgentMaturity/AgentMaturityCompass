@@ -73,6 +73,20 @@ export async function handleGovernorRoute(
     return true;
   }
 
+  // GET /api/v1/governor/outcomes — what really happens to each kind of action in this workspace (UX-06). A read.
+  if (pathname === '/api/v1/governor/outcomes' && method === 'GET') {
+    try {
+      const { resolveAgentId } = await import('../fleet/paths.js');
+      const { ACTION_CLASSES } = await import('../governor/actionCatalog.js');
+      const { actionPolicyOutcomes, actionPolicyState } = await import('../tools/guards/actionPolicyGuard.js');
+      const agentId = resolveAgentId(workspace, queryParam(req.url ?? '', 'agentId') ?? 'default');
+      apiSuccess(res, { agentId, policy: actionPolicyState(workspace), outcomes: actionPolicyOutcomes(workspace, agentId, ACTION_CLASSES) });
+    } catch (err) {
+      apiError(res, 500, err instanceof Error ? err.message : 'Governor outcomes could not be read');
+    }
+    return true;
+  }
+
   // GET /api/v1/governor/report — governor matrix report
   if (pathname === '/api/v1/governor/report' && method === 'GET') {
     try {

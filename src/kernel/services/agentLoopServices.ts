@@ -97,6 +97,7 @@ export class AgentLoopSeamService extends AmcSeam {
       systemPromptEventId: config.systemPromptEventId,
       ...(config.tools !== undefined ? { tools: config.tools } : {}),
       ...(config.validation !== undefined ? { validation: config.validation } : {}),
+      ...(config.verifyOnStop !== undefined ? { verifyOnStop: config.verifyOnStop } : {}),
       ...(config.hooks !== undefined ? { hooks: config.hooks } : {}),
       ...(config.config !== undefined ? { config: config.config } : {}),
       ...(config.retryRuntime !== undefined ? { retryRuntime: config.retryRuntime } : {}),

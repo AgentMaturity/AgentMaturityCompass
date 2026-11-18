@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { evaluateGate, parseEvidenceEvent, type ParsedEvidenceEvent } from "../src/diagnostic/gates.js";
 import { selectRelevantEvents } from "../src/diagnostic/runner.js";
 import { AMC_PUBLIC_METHODOLOGY_VERSION } from "../src/methodology/publicMethodology.js";
@@ -25,6 +25,11 @@ import type { Gate } from "../src/types.js";
  */
 const DAY = 24 * 60 * 60 * 1000;
 const BASE = Date.parse("2026-08-20T12:00:00Z");
+
+// The fixtures are dated, and evidence older than 90 days is degraded to SELF_REPORTED (gates.ts), which drops it from
+// these OBSERVED-only gates. Pin the clock a week after BASE so the fixtures stay fresh on every run date.
+beforeAll(() => { vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(BASE + 7 * DAY); });
+afterAll(() => { vi.useRealTimers(); });
 
 /**
  * Built through `parseEvidenceEvent`, not hand-shaped.

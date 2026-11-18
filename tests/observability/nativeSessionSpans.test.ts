@@ -57,7 +57,7 @@ const attrOf = (span: Span, key: string) => span.attributes.find((a) => a.key ==
 
 describe("native session span folder", () => {
   it("folds a stub turn with a tool call into invoke_agent -> turn -> chat + execute_tool, synthetic usage, no cost", async () => {
-    const { sessionId } = await runStubSession(ws, "read the note", { tools: "workspace" });
+    const { sessionId } = await runStubSession(ws, JSON.stringify({ tool: "fs.read", arguments: { path: "note.txt" } }), { tools: "workspace" });
     const rows = sessionEvents(ws, sessionId);
     expect(rows.some((row) => row.event_type === "tool/call")).toBe(true);
     const folder = new NativeSpanFolder();

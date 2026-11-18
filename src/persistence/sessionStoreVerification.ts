@@ -33,6 +33,7 @@ import { pathExists } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { join } from "node:path";
 import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
+import { overflowRetryProblems } from "../session/overflowRetryRule.js";
 import { legacyLedgerRowKeys, operationalSessionProblems } from "../keys/operationalLedgerReader.js";
 import { boundProviderKey } from "../keys/keyset.js";
 import { verifySessionRecords } from "./sessionRecordVerification.js";
@@ -287,6 +288,7 @@ function verifyStoredSession(workspace: string, rows: readonly EvidenceEvent[], 
   if (full) {
     try { validateSurfaceCompactions(workspace, rows, { trust: options.trust }); }
     catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
+    for (const problem of overflowRetryProblems(rows)) errors.push(`Session overflow retry invalid: ${problem}`);
   }
   if (options.sessionRecords !== undefined) verifySessionRecords(rows, options.sessionRecords, legacyLedgerRowKeys(workspace), errors);
   return { ok: errors.length === 0, errors, trustRoot };

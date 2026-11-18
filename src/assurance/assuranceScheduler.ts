@@ -7,6 +7,7 @@ import {
 } from "./assurancePolicyStore.js";
 import { issueAssuranceCertificate } from "./assuranceCertificates.js";
 import { runAssurance } from "./assuranceRunner.js";
+import { AgentResponderUnavailableError } from "./agentResponder.js";
 import type { AssuranceSchedulerState } from "./assuranceSchema.js";
 import { includes } from "../utils/typeGuards.js";
 import { assertOrgPairsCurrent, captureOrgPairsAuthority, orgPairBytes, type OrgPairsOptions } from "../org/preparedOrgPairs.js";
@@ -129,7 +130,7 @@ export async function assuranceSchedulerRunNow(input: {
 }
 
 export async function assuranceSchedulerTick(input: { workspace: string; workspaceReady: boolean; eventType?: string }, options: OrgPairsOptions = {}): Promise<
-  | { ran: false; reason: "disabled" | "workspace_not_ready" | "policy_untrusted" | "not_due" }
+  | { ran: false; reason: "disabled" | "workspace_not_ready" | "policy_untrusted" | "not_due" | "no_agent" }
   | { ran: true; runId: string; certIssued: boolean; certificateFailure: ReturnType<typeof failureDetails> | null }
 > {
   const params = { ...input }; options = { ...options }; const actor = options.beforePublish; actor?.();
@@ -143,16 +144,42 @@ export async function assuranceSchedulerTick(input: { workspace: string; workspa
   if (!params.workspaceReady) { await save({ ...state, lastOutcome: { status: "SKIPPED", reason: "workspace not ready" } }); return { ran: false, reason: "workspace_not_ready" }; }
   const policyInput = captureAssurancePolicy(params.workspace), policyCurrent = () => assertOrgPairsCurrent(policyInput.snapshot);
   if (!policyInput.signature.valid) {
-    await save({ ...state, lastOutcome: { status: "ERROR", reason: `assurance policy invalid: ${policyInput.signature.reason ?? "unknown"}` } }, policyCurrent);
+    // A fixed code (L6): the signature check's own text can name host paths, and this state is served.
+    await save({ ...state, lastOutcome: { status: "ERROR", reason: "assurance_policy_invalid" } }, policyCurrent);
     return { ran: false, reason: "policy_untrusted" };
   }
   const policy = policyInput.parsePolicy()!, nowTs = Date.now();
   const eventTriggered = Boolean(params.eventType && includes(policy.assurancePolicy.cadence.runAfterEvents, params.eventType)), due = !state.nextRunTs || state.nextRunTs <= nowTs;
   if (!eventTriggered && !due) return { ran: false, reason: "not_due" };
+  // UX-30: with no agent to test (no model named for the scan), a scheduled run never starts: no ledger rows (an idle Studio
+  // used to record a HIGH "run aborted" every minute), and it waits a full cadence. A named agent whose gateway is down or
+  // whose key is missing is a real failure (M6): the run starts, records its abort, and the state says run_failed.
+  if (!process.env.AMC_ASSURANCE_MODEL?.trim()) {
+    // A fixed reason: an error's own text can carry a provider URL with credentials or a host path, and this state is served.
+    await save({ ...state, nextRunTs: nextRunTs(nowTs, policy.assurancePolicy.cadence.defaultRunHours),
+      lastOutcome: { status: "SKIPPED", reason: "no_agent" } }, policyCurrent);
+    return { ran: false, reason: "no_agent" };
+  }
   // Retain the actual tick decision state through child preparation; own final state publication drops this old-target gate.
   const beforePublish = () => { actor?.(); policyCurrent(); };
   assertOrgPairsCurrent(current.snapshot);
-  const result = await assuranceSchedulerRunNow({ workspace: params.workspace, scopeType: "WORKSPACE", selectedPack: "all" },
-    { beforePublish, assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(current.snapshot); } });
+  let result: Awaited<ReturnType<typeof assuranceSchedulerRunNow>>;
+  try {
+    result = await assuranceSchedulerRunNow({ workspace: params.workspace, scopeType: "WORKSPACE", selectedPack: "all" },
+      { beforePublish, assertInputsCurrent: () => { options.assertInputsCurrent?.(); assertOrgPairsCurrent(current.snapshot); } });
+  } catch (error) {
+    // The run recorded its own abort; one failure per cadence, under a fixed code, never the error's text.
+    await save({ ...state, nextRunTs: nextRunTs(nowTs, policy.assurancePolicy.cadence.defaultRunHours),
+      lastOutcome: { status: "ERROR", reason: unreachable(error) ? "agent_unreachable" : "run_failed" } }, policyCurrent).catch(() => undefined);
+    throw error;
+  }
   return { ran: true, runId: result.run.assuranceRunId, certIssued: Boolean(result.cert), certificateFailure: result.certificateFailure };
+}
+
+/** The run failed because the named agent could not be reached (its gateway down, its key missing). */
+function unreachable(error: unknown): boolean {
+  for (let cause: unknown = error, depth = 0; cause instanceof Error && depth < 5; cause = cause.cause, depth++) {
+    if (cause instanceof AgentResponderUnavailableError) return true;
+  }
+  return false;
 }

@@ -14,7 +14,7 @@
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/v/release/AgentMaturity/AgentMaturityCompass?labelColor=0a0a0a&color=4AEF79&label=release" alt="GitHub release" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/releases"><img src="https://img.shields.io/github/downloads/AgentMaturity/AgentMaturityCompass/total?labelColor=0a0a0a&color=4AEF79&label=downloads" alt="verified release downloads" /></a>
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AgentMaturity/AgentMaturityCompass/ci.yml?branch=main&labelColor=0a0a0a&color=4AEF79&label=CI" alt="CI" /></a>
-  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C687-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
+  <a href="https://github.com/AgentMaturity/AgentMaturityCompass/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/test%20source%20files-2%2C703-4AEF79?labelColor=0a0a0a" alt="test source files" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-4AEF79?labelColor=0a0a0a" alt="MIT" /></a>
 </p>
 
@@ -25,7 +25,7 @@
   <a href="docs/DOMAIN_PACKS.md">Industry Packs</a> ·
   <a href="docs/FIRST_FIVE_MINUTES.md">First Five Minutes</a> ·
   <a href="docs/FIRST_FIVE_MINUTES.md#words-you-will-meet">Glossary</a> ·
-  <a href="#run-a-native-agent-task">Run a task</a> ·
+  <a href="#run-a-native-agent-task">Native Tasks</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
@@ -119,7 +119,7 @@ amc agent-loop guide
 
 The guide reports the next setup or task command without changing the workspace or calling a model. Follow [Your first native AMC workflow](docs/NATIVE_AGENT_WORKFLOW.md) for provider credentials, interactive tasks, reviewed file permissions and approvals. [Native SDK](docs/NATIVE_SDK.md) covers application integration; [code navigation](docs/ARCHITECTURE_NAVIGATION.md) follows the implementation through Graphify's focused maps. Local source and installed-package acceptance do not imply a public release or measured superiority over another harness.
 
-In Compass Console, open **Run a task** to run the same native AMC runtime from the browser. Select an agent, inspect the tool scope, submit a task, review approvals and continue or cancel its recorded session. The [Studio task guide](docs/NATIVE_STUDIO_TASKS.md) explains setup and recovery. The stand-in model (canned replies) needs no provider key.
+In Studio, open **Native Tasks** to run the same native AMC runtime from the browser. Select an agent, inspect the tool scope, submit a task, review approvals and continue or cancel its recorded session. The [Studio task guide](docs/NATIVE_STUDIO_TASKS.md) explains setup and recovery. The local recording demonstration needs no provider key.
 
 ## Assess agent maturity
 
@@ -1069,7 +1069,7 @@ AMC is MIT licensed. We welcome contributions — especially new **assurance pac
 
 ```bash
 git clone https://github.com/AgentMaturity/AgentMaturityCompass.git
-cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,687<!-- /amc:count --> test source files; Vitest reports run outcomes
+cd AgentMaturityCompass && pnpm install --frozen-lockfile && npm test   # <!-- amc:count:testFiles -->2,703<!-- /amc:count --> test source files; Vitest reports run outcomes
 ```
 
 **→ [CONTRIBUTING.md](CONTRIBUTING.md)** — includes guides for writing packs, mapping research papers, and adding adapters.

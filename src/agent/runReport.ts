@@ -37,6 +37,7 @@ import type { EvidenceEvent } from "../types.js";
 import type { AgentStatus } from "./loopTypes.js";
 import type { NativeValidationResult } from "./nativeValidation.js";
 import { projectNativeValidation } from "./nativeValidationProjection.js";
+import { describeTurnCheck, projectTurnChecks, turnVerificationErrors, type TurnCheckRow } from "./turnVerification.js";
 import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
 import { projectNativeRunUsage, renderNativeRunUsage, type NativeRunUsage } from "./nativeRunUsage.js";
 import { projectNativeRunDiagnostics, renderNativeRunDiagnostics, type NativeRunDiagnostic } from "./nativeFailureGuidance.js";
@@ -85,6 +86,8 @@ export interface AgentRunSummary {
   readonly usage?: NativeRunUsage;
   /** Cumulative recorded failed attempts; not the latest turn's success verdict. */
   readonly diagnostics?: readonly NativeRunDiagnostic[];
+  /** HP-04: each turn's recorded check status; optional for older summaries. */
+  readonly turnChecks?: readonly TurnCheckRow[];
 }
 
 /** Read one session's committed rows in commit order. */
@@ -175,7 +178,8 @@ export function readAgentRunSummary(
     unsignedRows: events.filter((event) => event.writer_sig === UNSIGNED).length,
     validation: projectNativeValidation(workspace, events),
     usage: projectNativeRunUsage(events, sessionId),
-    diagnostics: projectNativeRunDiagnostics(events, sessionId)
+    diagnostics: projectNativeRunDiagnostics(events, sessionId),
+    turnChecks: projectTurnChecks(events)
   };
 }
 
@@ -270,6 +274,7 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
     sessionChainErrors.push(`Session ${sessionId} is not closed and sealed; a verified prefix needs a finalized target`);
   }
   let unsignedRowIds: string[];
+  let sessionRows: readonly EvidenceEvent[] = [];
   const marker = readSessionStoreMarker(workspace);
   if (marker === "jsonl" || marker === "postgres") {
     // The operations SQLite ledger is not the JSONL (or Postgres) session lifecycle.
@@ -281,8 +286,8 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
       if (store.readSessionRecord(sessionId) === null) {
         sessionChainErrors.push(`Session ${sessionId} not found`);
       }
-      unsignedRowIds = store.readSessionEvents(sessionId)
-        .filter((event) => event.writer_sig === UNSIGNED).map((event) => event.id);
+      sessionRows = store.readSessionEvents(sessionId);
+      unsignedRowIds = sessionRows.filter((event) => event.writer_sig === UNSIGNED).map((event) => event.id);
     } finally {
       store.close();
     }
@@ -295,14 +300,14 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
         sessionChainErrors.push(`Session ${sessionId} not found`);
       }
       verifySessionChains(ledger, sessionChainErrors);
-      unsignedRowIds = ledger
-        .getAllEvents()
-        .filter((event) => event.session_id === sessionId && event.writer_sig === UNSIGNED)
-        .map((event) => event.id);
+      sessionRows = ledger.getAllEvents().filter((event) => event.session_id === sessionId);
+      unsignedRowIds = sessionRows.filter((event) => event.writer_sig === UNSIGNED).map((event) => event.id);
     } finally {
       ledger.close();
     }
   }
+  // HP-04: each recorded turn check status must match the turn's own rows.
+  sessionChainErrors.push(...turnVerificationErrors(sessionRows));
   // P1-38: a pi-ai request re-derives only through the pinned library, loaded only when this session used it.
   const piEncoders = await (await import("../llm/providers/piAi/piAiAdapter.js")).piAiDerivationEncoders(workspace, sessionId);
   const requests = deriveSessionRequests({ workspace, sessionId, ...(piEncoders === null ? {} : { encoders: piEncoders }) }).map((derivation) => ({
@@ -361,6 +366,8 @@ export function renderRunSummary(summary: AgentRunSummary): string {
   for (const text of summary.assistantText) {
     lines.push(`  assistant: ${text}`);
   }
+  // Right after the model's words, so a claim of "done" is read beside what the record shows (HP-04).
+  for (const row of summary.turnChecks ?? []) if (row.status !== "no-changes") lines.push(`  check: ${describeTurnCheck(row)}`);
   lines.push(renderNativeRunUsage(summary.usage));
   lines.push(renderNativeRunDiagnostics(summary.diagnostics));
   lines.push(`  validation ${summary.validation.status}${summary.validation.turn === null ? "" : ` (turn ${summary.validation.turn})`}`);

@@ -17,7 +17,7 @@ import { canonicalize } from "../utils/json.js";
 import { digestField, type OutputDigest } from "../dataflow/tokenizer.js";
 import { outputDigestFor } from "../dataflow/tokenVault.js";
 import { argumentSchemaError, freezeToolArguments } from "./toolArguments.js";
-import { denialOutcome, effectGuardDenial, effectVerdict, notDispatched, thrownOutcome } from "./toolOutcomes.js";
+import { denialOutcome, effectGuardDenial, effectVerdict, notDispatched, thrownOutcome, unboundFreezeDenial } from "./toolOutcomes.js";
 import type { ToolRegistry } from "./toolRegistry.js";
 import {
   DefiniteFailureError,
@@ -31,7 +31,6 @@ import {
   type RecordedToolCall
 } from "./toolTypes.js";
 import { killSwitchDenial } from "../runtime/killSwitch.js";
-import { activeFreezeStatus } from "../drift/freezeEngine.js";
 
 /**
  * The tool execution pipeline (P4.1, ADR-4).
@@ -59,6 +58,8 @@ import { activeFreezeStatus } from "../drift/freezeEngine.js";
  * Putting approval last would let a granted approval overturn a policy denial,
  * which is precisely the laundering the monotonic guard type exists to
  * prevent. A guard denial is final and no approval reaches past it.
+ *
+ * UX-03: the guards take an early, SIMULATE look before anyone is asked (`earlyGuardDenial`); it only adds refusals.
  *
  * Post-execute filters may rewrite OUTPUT and nothing else. A filter that
  * could clear `denied` would be a seventh way to launder a denial.
@@ -175,6 +176,8 @@ export interface ToolCallInput {
   readonly authority?: ToolAuthority;
   /** Trusted narrowing guard after all approval waits and immediately before the body; null alone permits dispatch. */
   readonly beforeEffect?: () => string | null;
+  /** Trusted composition only (UX-03): the guards' early refusal, recorded as this call's denial. */
+  readonly refusedBeforeApproval?: ToolDenial;
 }
 
 /** What the authorization stage needs, decided when the call entered. */
@@ -265,6 +268,29 @@ export class ToolPipeline {
       effectiveMode: this.entryMode(definition.name, definition.actionClass, input, true), arguments: input.arguments }, this.init.authorizationContext?.());
   }
 
+  /** UX-03: the guards' refusal before anyone is asked, or null to ask (a route or schema refusal is reported when it runs). */
+  async denialBeforeApproval(input: Pick<ToolCallInput, "name" | "agentId" | "arguments" | "requestedMode" | "parentToken" | "callId" | "signal">): Promise<ToolDenial | null> {
+    const definition = this.init.registry.visible(input.agentId).get(input.name), arguments_ = freezeToolArguments(input.arguments), callId = input.callId ?? randomUUID();
+    if (!definition || this.init.registry.invocationDenial(input.name, input.agentId, (input.parentToken ?? null) !== null) !== undefined
+      || argumentSchemaError(definition.parameters, arguments_) !== null) return null;
+    return this.earlyGuardDenial({ token: `tok_${randomUUID()}`, callId, rootCallId: callId, name: definition.name, agentId: input.agentId,
+      workspace: this.init.workspace, actionClass: definition.actionClass, requestedMode: input.requestedMode, effectiveMode: this.entryMode(definition.name, definition.actionClass, input, true),
+      arguments: arguments_, parentToken: input.parentToken ?? null, ...(input.signal === undefined ? {} : { signal: input.signal }) });
+  }
+
+  /** The early look at one execution: entry refusals, then every guard, on a SIMULATE copy bound like the real call. */
+  private async earlyGuardDenial(execution: ToolExecution): Promise<ToolDenial | null> {
+    const draft: ToolExecution = { ...execution, effectiveMode: "SIMULATE", preApproval: { mode: execution.effectiveMode } }, entered = await this.enter(draft, undefined, undefined);
+    if (entered.refused !== null) return entered.refused;
+    const look = entered.bound?.ok ? boundExecution(draft, entered.bound) : draft;
+    // Selected like the real call (the sandbox permit reads it); a look that cannot finish only asks: the later stage decides.
+    selectedDefinitions.set(look, selectedDefinitions.get(execution) ?? this.init.registry.visible(execution.agentId).get(execution.name)!);
+    selectedAvailability.set(look, selectedAvailability.get(execution) ?? this.init.registry.admissionCheck(execution.name, execution.agentId, execution.parentToken !== null));
+    const denied = await Promise.resolve(this.init.prepareGuards?.(look)).then(() => this.init.registry.guardReason(look)).catch(() => undefined)
+      .finally(() => { selectedDefinitions.delete(look); selectedAvailability.delete(look); });
+    return denied ? { stage: "guard", reason: denied.reason, guardLabel: denied.label } : null;
+  }
+
   private entryMode(name: string, actionClass: ActionClass, input: Pick<ToolCallInput, "agentId" | "requestedMode">, approved: boolean): ToolMode {
     return input.requestedMode === "EXECUTE" && this.init.narrowMode?.({ name, agentId: input.agentId, actionClass, requestedMode: "EXECUTE",
       approved: approved && this.authorizes(actionClass) }) === "SIMULATE" ? "SIMULATE" : input.requestedMode;
@@ -345,8 +371,8 @@ export class ToolPipeline {
               execution = fresh;
               selectedDefinitions.set(execution, definition);
               selectedAvailability.set(execution, available);
-            }, input.beforeEffect)
-          : await this.runStages(execution, definition.body, authorization!, input.beforeEffect);
+            }, input)
+          : await this.runStages(execution, definition.body, authorization!, input);
       } finally {
         release?.();
         selectedDefinitions.delete(execution);
@@ -458,6 +484,8 @@ export class ToolPipeline {
     const authorizes = this.authorizes(draft.actionClass);
     let authority = supplied;
     if (gate !== undefined && draft.parentToken !== null) {
+      const early = await this.earlyGuardDenial(draft);
+      if (early !== null) return { refused: early, context: null, bound: null, required: false };
       const intent = authorizes ? authorizationIntentFor(draft, this.init.authorizationContext?.()) : null;
       // An intent that cannot bind is not put to a human; the authorization stage denies it after the guards.
       const granted = intent?.ok === false ? undefined : await waitingOnApproval(draft, () => gate.ask(draft, intent)).catch((): null => null);
@@ -550,11 +578,11 @@ export class ToolPipeline {
   }
 
   private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization,
-    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
+    checks: Pick<ToolCallInput, "beforeEffect" | "refusedBeforeApproval">): Promise<ToolOutcome> {
     if (authorization.refused !== null) return denialOutcome(authorization.refused);
     const approval = await this.askApproval(execution);
     if (approval !== null) return approval;
-
+    if (checks.refusedBeforeApproval) return denialOutcome(checks.refusedBeforeApproval);
     await this.init.prepareGuards?.(execution);
     const denied = this.init.registry.guardReason(execution);
     if (denied) {
@@ -569,7 +597,7 @@ export class ToolPipeline {
     // Read again after the approval wait: a call cancelled while it waited (a timed-out program's sub-call) never runs.
     if (execution.signal?.aborted) return notDispatched();
 
-    const effectDenial = effectGuardDenial(beforeEffect);
+    const effectDenial = effectGuardDenial(checks.beforeEffect);
     if (effectDenial !== null) return denialOutcome(effectDenial);
 
     try {
@@ -587,7 +615,7 @@ export class ToolPipeline {
    */
   private async runJournaled(open: () => ActionJournal, execution: ToolExecution, body: ToolBody,
     authorization: CallAuthorization | null, enter: () => Promise<CallAuthorization>, selectExecution: (execution: ToolExecution) => void,
-    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
+    checks: Pick<ToolCallInput, "beforeEffect" | "refusedBeforeApproval">): Promise<ToolOutcome> {
     const initial = authorization?.bound;
     const executionId = initial?.ok ? initial.record.executionId : `exec_${randomUUID()}`;
     const idempotencyKey = initial?.ok ? initial.record.idempotencyKey : authorization === null ? mintIdempotencyKey() : null;
@@ -653,9 +681,10 @@ export class ToolPipeline {
       }
     }
     const bound = authorization.bound;
-    if (authorization.refused !== null) return deny(authorization.refused, "approval_denied");
+    if (authorization.refused !== null) return deny(authorization.refused, refusalCode(authorization.refused));
     const approval = await this.askApproval(execution);
-    if (approval?.denied) return deny(approval.denied, "approval_denied");
+    if (approval?.denied) return deny(approval.denied, refusalCode(approval.denied));
+    if (checks.refusedBeforeApproval) return deny(checks.refusedBeforeApproval, refusalCode(checks.refusedBeforeApproval));
     await this.init.prepareGuards?.(execution);
     const guard = this.init.registry.guardReason(execution);
     if (guard) return deny({ stage: "guard", reason: guard.reason, guardLabel: guard.label }, `guard_denied:${guard.label}`);
@@ -681,7 +710,7 @@ export class ToolPipeline {
     if (!recheck.ok) {
       return deny({ stage: "authorization", reason: recheck.failures.join(", "), guardLabel: null }, `recheck_failed:${recheck.failures.join(",")}`);
     }
-    const effectDenial = effectGuardDenial(beforeEffect);
+    const effectDenial = effectGuardDenial(checks.beforeEffect);
     if (effectDenial !== null) return deny(effectDenial, "guard_denied:trusted-before-effect");
     try {
       journal.start(executionId, bound.record);
@@ -755,6 +784,7 @@ export class ToolPipeline {
         guardLabel: null
       });
     }
+    const early = await this.earlyGuardDenial(execution); if (early !== null) return denialOutcome(early);
     const approve = this.init.approve;
     const answer = await waitingOnApproval(execution, () => approve(execution)).catch((): ToolApprovalAnswer => "unavailable");
     if (answer === "allow") return null;
@@ -766,13 +796,4 @@ export class ToolPipeline {
   }
 }
 
-/** A drift or integrity freeze holding this call's class, as ToolHub refuses it. A freeze that cannot be read denies. */
-function unboundFreezeDenial(execution: ToolExecution): string | null {
-  try {
-    const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
-    return freeze.active && (freeze.actionClasses as readonly string[]).includes(execution.actionClass)
-      ? `action_class_frozen: incidents ${freeze.incidentIds.join(", ")}` : null;
-  } catch (error) {
-    return `action_class_frozen: the freeze state could not be read: ${String(error)}`;
-  }
-}
+/** The journal's reason code for a refusal before the guard stage. */ const refusalCode = (denied: ToolDenial): string => denied.stage === "guard" ? `guard_denied:${denied.guardLabel ?? "unlabelled"}` : "approval_denied";

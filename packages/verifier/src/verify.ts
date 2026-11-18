@@ -12,6 +12,7 @@ import { isGzip, readTarGz, rootedAt } from "./archive.js";
 import { evaluateReceipt } from "./kinds/receipt.js";
 import { evaluateRevocationList, evaluateTrustList } from "./kinds/lists.js";
 import { evaluateKeyRotation, evaluateRootRotation } from "./kinds/rotation.js";
+import { embeddedSessionExport, evaluateSessionExport, isSessionExport } from "./kinds/sessionExport.js";
 import { buildReport, type VerifierReport } from "./report.js";
 import { isRecord } from "./schema.js";
 import { trustContext } from "./trust.js";
@@ -67,6 +68,7 @@ function evaluate(value: unknown, bytes: Uint8Array, env: Env): Evaluation {
   if (nestedType("statement") === "amc.key-rotation") return evaluateKeyRotation(value, bytes, env);
   if (nestedType("statement") === "amc.root-rotation") return evaluateRootRotation(value, bytes, env);
   if ("dsseEnvelope" in value || "payloadType" in value) return evaluateDsseIntoto(value, env);
+  if (isSessionExport(value)) return evaluateSessionExport(value, env, false);
   return refused("unknown", { code: "UNSUPPORTED_VERSION", detail: "not a record type this verifier supports (v1)" });
 }
 
@@ -85,6 +87,17 @@ function evaluateArchive(bytes: Uint8Array, revocationLists: readonly SuppliedLi
   return refused("unknown", { code: "UNSUPPORTED_VERSION", detail: "an archive that is neither an AMC passport nor an AMC evidence bundle" });
 }
 
+function isHtml(bytes: Uint8Array): boolean {
+  return /^\s*<!doctype html/i.test(Buffer.from(bytes.subarray(0, 64)).toString("utf8"));
+}
+
+/** An `amc session export` HTML viewer: its one embedded document is verified; the page around it is not (a warning says so). */
+function evaluateHtml(bytes: Uint8Array, env: Env): Evaluation {
+  const doc = embeddedSessionExport(bytes);
+  return isRecord(doc) && isSessionExport(doc) ? evaluateSessionExport(doc, env, true)
+    : refused("unknown", { code: "UNSUPPORTED_VERSION", detail: "an HTML file that does not hold exactly one AMC session export" });
+}
+
 /**
  * Verifies one artifact as of `options.asOf`, trusting only the supplied trust lists, pinned roots and evidence. Keys,
  * authorities and anchors the artifact names are looked up there, never believed.
@@ -98,7 +111,7 @@ export function verifyArtifact(bytes: Uint8Array, options: VerifyOptions): Verif
   const extraIntegrity: Finding<"integrity">[] = evidence.mismatched
     .map(digest => ({ code: "DIGEST_MISMATCH", detail: `evidence supplied as ${digest} does not hash to that digest` }));
   let value: unknown;
-  let evaluation: Evaluation | null = isGzip(bytes) ? evaluateArchive(bytes, options.revocationLists ?? [], env) : null;
+  let evaluation: Evaluation | null = isGzip(bytes) ? evaluateArchive(bytes, options.revocationLists ?? [], env) : isHtml(bytes) ? evaluateHtml(bytes, env) : null;
   if (evaluation === null) {
     try {
       value = parseJson(bytes);

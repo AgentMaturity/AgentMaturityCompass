@@ -101,6 +101,18 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
       return init.pipeline.authorizationIntent({ name: request.toolName, agentId: init.agentId, arguments: args, requestedMode: "EXECUTE", parentToken: request.parentToken });
     },
 
+    async denialBeforeApproval(request: ToolCallRequest) {
+      let args: Record<string, unknown>;
+      try {
+        args = parseArguments(request.rawArguments);
+      } catch {
+        return null;
+      }
+      const denied = await init.pipeline.denialBeforeApproval({ name: request.toolName, agentId: init.agentId, arguments: args,
+        requestedMode: "EXECUTE", parentToken: request.parentToken, callId: request.callId, signal: request.signal });
+      return denied;
+    },
+
     bindApprovalGate(gate) {
       init.pipeline.bindApprovalGate(gate);
     },
@@ -167,7 +179,8 @@ export function pipelineToolSeam(init: PipelineToolSeamInit): AgentToolSeam {
           signal: request.signal,
           ownerStep: { sessionId: request.sessionId, turn: request.turn, step: request.step, callId: request.callId },
           ...(request.beforeEffect === undefined ? {} : { beforeEffect: request.beforeEffect }),
-          ...(request.authority === undefined ? {} : { authority: request.authority })
+          ...(request.authority === undefined ? {} : { authority: request.authority }),
+          ...(request.refusedBeforeApproval === undefined ? {} : { refusedBeforeApproval: request.refusedBeforeApproval })
         });
         return toLoopOutcome(outcome, request.signal.aborted);
       } catch (error: unknown) {

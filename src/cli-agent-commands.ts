@@ -41,7 +41,7 @@ import { liveBudgetRefusalCause, liveNativeFailureGuidance } from "./agent/nativ
 import { nativeUnknownUsageNotice } from "./budgets/nativeBudgetAdmission.js";
 import { missingCredentialGuidance } from "./setup/nativeFirstUseGuide.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, VERIFY_ON_STOP_OFF_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { continuedSession, reportContinueRefusal, resolveContinuityRun, withContinuityChatOptions, withContinuityRunOptions, type ContinuityOptions } from "./cli/agentLoopContinuityOptions.js";
 import { agentToolset, toolsetConfinementNotice, type AgentToolset } from "./agent/agentToolset.js";
@@ -49,6 +49,7 @@ import { runLease } from "./leases/runLease.js";
 import { NATIVE_DELEGATION_CAPABILITIES, selectSupportedNativeTools } from "./agent/nativeToolCapabilities.js";
 import type { MountedNativeMcpServer } from "./mcp/nativeMcpClient.js";
 import { resolveNativeValidationSelection } from "./setup/nativeValidationConfig.js";
+import { harnessCheckLabel } from "./agent/nativeValidation.js";
 import { NativeMcpConfigError, reviewedNativeMcpApprovalOptions, type ReviewedNativeMcpServer } from "./setup/nativeMcpConfig.js";
 import { DEFAULT_MAX_DELEGATION_DEPTH } from "./agent/delegationIdentity.js";
 import { parseDelegationScope } from "./agent/delegationScope.js";
@@ -112,7 +113,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
-    .option("--preset <id>", "reviewed signed native composition; pinned for the chat")
+    .option("--preset <id>", "reviewed signed native composition; pinned for the chat").option("--no-verify-on-stop", VERIFY_ON_STOP_OFF_HELP)
     .option("--persona <text>", "explicit native persona override")
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
@@ -683,7 +684,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                         io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
                       }
                       try { process.send({ type: "amc/native-approval-raised", v: 1, agentId,
-                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, ...reportedCallFor(event) }, error => {
+                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, ...harnessCheckLabel(event.toolCallId), ...reportedCallFor(event) }, error => {
                           if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
                         });
                       } catch { io.error("Native approval IPC failed; cancelling this turn."); process.emit("SIGINT"); }
@@ -721,7 +722,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 })
               }),
           config: { maxStepsPerTurn: maxSteps, ...(compaction === undefined ? {} : { compaction }) },
-          ...(validation === undefined ? {} : { validation }),
+          ...(validation === undefined ? {} : { validation }), ...(opts.verifyOnStop === false ? { verifyOnStop: false as const } : {}),
           ...breadth.turn,
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a

@@ -43,6 +43,7 @@ import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/
 import type { ApprovalMode } from "../approvals/approvalModes.js";
 import type { AgentLoopConfig, AgentStatus, CancelOptions, InboxReceipt, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
+import { resolveVerifyOnStop } from "../agent/verifyOnStop.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
@@ -253,6 +254,8 @@ export interface ComposedTurnOptions {
   readonly encoders?: RequestEncoderRegistry;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
+  /** HP-04: false turns the workspace's checks after edits off for this run (recorded on each turn). */
+  readonly verifyOnStop?: false;
   /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
   readonly bindToolSession?: (session: ComposedToolSession) => void;
   readonly config?: Partial<AgentLoopConfig>;
@@ -366,6 +369,8 @@ export interface ComposedTurnOutcome {
   readonly keptOpen?: boolean;
   /** Set when an operator run limit ended this run's work; the signed `loop/cancel` row carries the same cause. */
   readonly runLimit?: RunLimitBreach;
+  /** The turn guard (repeated call, malformed responses, denials) that ended a turn of this run, if any. */
+  readonly guardStop?: RunLimitBreach;
 }
 
 /**
@@ -443,7 +448,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
   let parent: SessionLineage | null = null;
   if (options.resume !== undefined) {
     if (options.sessionId === undefined) throw new Error("runComposedTurn: resume requires sessionId");
-    const opened = resumeSession({ workspace: options.workspace, sessionId: options.sessionId, ...options.resume, ...identity });
+    const opened = resumeSession({ workspace: options.workspace, sessionId: options.sessionId, ...options.resume, ...identity, legacyCompositionDigest: (skills) => compositionDigestOf(options, profile, skills) });
     session = opened.service;
     resumed = opened.report;
   } else if (options.forkFrom !== undefined) {
@@ -584,6 +589,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           // the parent's guards cannot see. `notify` is deliberately not part
           // of it; see `LoopHookControl`.
           hookControl: hooks,
+          // HP-04: the root's own setting, handed down as data so no child reads the workspace checks again.
+          parentChecks: resolveVerifyOnStop(options.workspace, options.validation !== undefined, options.verifyOnStop).setting,
           harnessVersion: amcVersion,
           compositionDigest: compositionDigestOf(options, profile),
           policyDigest: policyDigestOf(options),
@@ -672,6 +679,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       systemPromptEventId: systemPromptRef.eventId,
       ...(tools !== undefined ? { tools } : {}),
       ...(options.validation !== undefined ? { validation: options.validation } : {}),
+      ...(options.verifyOnStop === false ? { verifyOnStop: false } : {}),
       ...(options.config !== undefined ? { config: options.config } : {}),
       // A resumed session's earlier steps count toward the token bound; unmeasured ones fail it closed. A fork is a new
       // session: it records its parent's counts as FORK_TOKEN_COUNTS and starts its own budget at zero.
@@ -730,7 +738,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // would name sections the prompt does not contain.
       promptSections: prompt.assemble().sections.map((section) => section.name),
       ...(resumed === null ? {} : { resumed }),
-      ...(loop.agent.runLimitEnding === null ? {} : { runLimit: loop.agent.runLimitEnding })
+      ...(loop.agent.runLimitEnding === null ? {} : { runLimit: loop.agent.runLimitEnding }),
+      ...(loop.agent.turnGuardEnding === null ? {} : { guardStop: loop.agent.turnGuardEnding })
     };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);

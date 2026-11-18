@@ -158,7 +158,10 @@ export function gateToolCallsOnApproval(
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
     ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),
+    ...(inner.hasBackgroundWork === undefined ? {} : { hasBackgroundWork: () => inner.hasBackgroundWork!() }),
     ...(inner.actionClassOf === undefined ? {} : { actionClassOf: (toolName: string) => inner.actionClassOf!(toolName) }),
+    ...(inner.denialBeforeApproval === undefined ? {} : { denialBeforeApproval: (request: ToolCallRequest) => inner.denialBeforeApproval!(request) }),
+    asksBeforeRunning: (toolName: string): boolean => isGated(options, toolName, classOf(toolName)),
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>
       inner.executionMode(request),
@@ -168,6 +171,14 @@ export function gateToolCallsOnApproval(
       const intent = inner.authorizationIntent?.(request) ?? null;
       // A call whose intent cannot bind is not put to a human: the pipeline denies it with the reason.
       if (intent?.ok === false) return inner.execute(request);
+      // UX-03: a call the automatic checks refuse is not put to a person. It still goes through `execute`, which records
+      // the guards' refusal; its effect guard refuses too, so the call cannot run unasked if they change their answer.
+      const early = inner.supportsEffectGuard === true ? await inner.denialBeforeApproval?.(request) ?? null : null;
+      if (early !== null) {
+        // The pipeline records the early refusal as the call's denial; the effect guard is the backstop if a wrapper drops it.
+        return inner.execute({ ...request, refusedBeforeApproval: early,
+          beforeEffect: () => `not run: the automatic checks refused it before anyone was asked (${early.reason})` });
+      }
       const decision = await ask(approval, options, { callId: request.callId, toolName: request.toolName, intent,
         where: `during turn ${request.turn}, step ${request.step}`, signal: request.signal,
         // Without an intent, the model's own arguments, verbatim.

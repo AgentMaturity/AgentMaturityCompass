@@ -5,6 +5,7 @@ import { foldSurfaceEntries } from "./surfaceProjection.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { sha256Hex } from "../utils/hash.js";
 import { renderMarkdown } from "../utils/terminalMarkdown.js";
+import { describeTurnCheck, needsCheckWarning, projectTurnChecks } from "../agent/turnVerification.js";
 
 const ROLES: Readonly<Record<string, string>> = { user: "You", assistant: "Agent", tool: "Tool result", system: "System" };
 const MAX_TOOL_LINES = 12;
@@ -19,7 +20,15 @@ export function renderSessionTranscript(workspace: string, events: readonly Evid
   const lines: string[] = [];
   let unreadable = 0;
   let role: string | null = null;
-  for (const entry of foldSurfaceEntries(events)) {
+  const approvedBy = approvedCalls(events);
+  const entries = foldSurfaceEntries(events);
+  // HP-04: an unchecked or failed-check turn's status line goes right after that turn's last assistant text.
+  const warnings = new Map(projectTurnChecks(events).filter(needsCheckWarning).map(row => [row.turn, describeTurnCheck(row)]));
+  const turnOf = (id: string): unknown => { try { return JSON.parse(byId.get(id)?.meta_json ?? "{}").turn; } catch { return null; } };
+  const lastText = new Map<unknown, string>();
+  for (const entry of entries) if (entry.role === "assistant" && entry.part.kind === "text") lastText.set(turnOf(entry.sourceEventId), entry.sourceEventId);
+  const warn = (turn: unknown): void => { const line = warnings.get(turn as number); if (line !== undefined) { warnings.delete(turn as number); lines.push(chalk.yellow(`  check: ${line}`)); } };
+  for (const entry of entries) {
     if (entry.role !== role) { role = entry.role; lines.push("", chalk.bold(`${ROLES[entry.role] ?? entry.role}:`)); }
     const event = byId.get(entry.sourceEventId);
     const payload = event === undefined ? null : readEventPayload(workspace, event);
@@ -32,16 +41,38 @@ export function renderSessionTranscript(workspace: string, events: readonly Evid
     // The system prompt and the runtime-context snapshots are model-visible but not the conversation: named, not printed (--json has them).
     if (entry.part.kind === "text" && (entry.role === "system" || text.startsWith("Current runtime context."))) {
       lines.push(chalk.dim(`  [${entry.role === "system" ? "system prompt" : "runtime context snapshot"}, ${text.split("\n").length} lines]`));
-    } else if (entry.part.kind === "text") lines.push(...renderMarkdown(text, width === null ? null : width - 2).map(line => `  ${line}`));
+    } else if (entry.part.kind === "text") {
+      lines.push(...renderMarkdown(text, width === null ? null : width - 2).map(line => `  ${line}`));
+      if (lastText.get(turnOf(entry.sourceEventId)) === entry.sourceEventId) warn(turnOf(entry.sourceEventId));
+    }
     else if (entry.part.kind === "tool_use") {
       const meta = JSON.parse(event.meta_json) as { toolName?: unknown };
       const name = typeof meta.toolName === "string" ? meta.toolName : "tool";
       lines.push(`  ${chalk.cyan("→")} ${escapeTerminalControls(name)} ${chalk.dim(escapeTerminalControls(text.replace(/\s+/g, " ").slice(0, 160)))}`);
     } else if (entry.part.kind === "tool_result") {
+      const meta = JSON.parse(event.meta_json) as { toolCallId?: unknown; denied?: unknown };
+      const approver = meta.denied === true && typeof meta.toolCallId === "string" ? approvedBy.get(meta.toolCallId) : undefined;
+      // UX-03: the guards let it through before the question and refused it after: the person's approval stands as given.
+      if (approver !== undefined) lines.push(chalk.yellow(`  Approved by ${escapeTerminalControls(approver)}, then refused by an automatic check before it ran:`));
       const shown = text.split("\n");
       lines.push(...shown.slice(0, MAX_TOOL_LINES).map(line => `  ${escapeTerminalControls(line)}`));
       if (shown.length > MAX_TOOL_LINES) lines.push(chalk.dim(`  (${shown.length - MAX_TOOL_LINES} more lines)`));
     } else lines.push(chalk.dim(`  [${entry.part.kind}, ${payload.bytes.length} bytes]`));
   }
+  for (const turn of [...warnings.keys()]) warn(turn);
   return { lines, unreadable };
+}
+
+/** Calls a person approved, by tool call id, with who answered (from the session's own approval rows). */
+function approvedCalls(events: readonly EvidenceEvent[]): Map<string, string> {
+  const asked = new Map<string, string>(), approved = new Map<string, string>();
+  for (const event of events) {
+    if (event.event_type !== "approval/request" && event.event_type !== "approval/answer") continue;
+    const meta = JSON.parse(event.meta_json) as { approvalId?: unknown; toolCallId?: unknown; answer?: unknown; answeredBy?: unknown };
+    if (typeof meta.approvalId !== "string") continue;
+    if (event.event_type === "approval/request" && typeof meta.toolCallId === "string") asked.set(meta.approvalId, meta.toolCallId);
+    const call = asked.get(meta.approvalId);
+    if (event.event_type === "approval/answer" && meta.answer === "allow" && call !== undefined) approved.set(call, typeof meta.answeredBy === "string" ? meta.answeredBy : "a person");
+  }
+  return approved;
 }

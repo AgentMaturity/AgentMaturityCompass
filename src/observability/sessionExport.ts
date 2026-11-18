@@ -137,9 +137,11 @@ function exportContent(workspace: string, rows: readonly EvidenceEvent[]): Recor
     if (payload.status !== "ok") { out[event.id] = { unavailable: payload.status === "pruned" ? "payload pruned by retention" : payload.detail }; continue; }
     if (sha256Hex(payload.bytes) !== event.payload_sha256) { out[event.id] = { unavailable: "payload bytes do not match the committed digest" }; continue; }
     const truncated = payload.bytes.length > MAX_CONTENT_BYTES;
-    const text = redacted(payload.bytes.subarray(0, MAX_CONTENT_BYTES).toString("utf8"));
+    // Redact the whole text, then cut: a secret the cut would split (or a key whose END lies past it) is never partly shown.
+    const text = redacted(payload.bytes.toString("utf8"));
+    const shown = truncated ? Buffer.from(text.text, "utf8").subarray(0, MAX_CONTENT_BYTES).toString("utf8").replace(/\uFFFD$/, "") : text.text;
     total += Math.min(payload.bytes.length, MAX_CONTENT_BYTES);
-    out[event.id] = { text: text.text, sha256: event.payload_sha256, source: event.payload_inline !== null && event.payload_inline !== undefined ? "inline" : "blob", truncated, redactions: text.redactions };
+    out[event.id] = { text: shown, sha256: event.payload_sha256, source: event.payload_inline !== null && event.payload_inline !== undefined ? "inline" : "blob", truncated, redactions: text.redactions };
   }
   return out;
 }
@@ -238,6 +240,8 @@ function verifyDocument(value: SessionExportDocument, options: SessionExportVeri
   verifySessionRows([value.monitorPublicKeyPem], rows, errors);
   const sealed = value.record !== null && value.record.ended_ts !== null;
   if (sealed) verifySeal([value.monitorPublicKeyPem], value.record, rows, value.sessionId, errors);
+  // The signed rows show a close: a document that carries no seal for it had the seal removed (a downgrade to "open").
+  else if (rows.at(-1)?.event_type === "session/close") errors.push("the rows show the session was closed, but the export carries no seal: the seal was removed");
   const content = { verified: 0, unverifiable: 0, unavailable: 0 };
   if (value.content !== null) {
     const byId = new Map(rows.map((row) => [row.id, row]));

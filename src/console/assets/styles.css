@@ -2490,3 +2490,19 @@ button.station-tile[aria-pressed="true"] { border-color: var(--accent); box-shad
   .route-small .is-now .route-dot { margin: -4px 0; }
   .route-small .route-label { font-size: 12px; }
 }
+
+/* Agent sessions (Home, Records, Live runs), the call behind an approval, and the Governor grid. Approvals are cards,
+   so Approve and Deny stay on screen at phone width without a sideways scroll. */
+.agent-session .more-info { margin: 6px 0 0; }
+.agent-session-actions { margin: 6px 0; padding-left: 18px; }
+.agent-session-buttons { margin-top: 8px; }
+.agent-session-result:empty { display: none; }
+.approval-call-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 16px; margin: 0 0 12px; }
+.approval-call-facts dt { font-size: 13px; color: var(--muted); }
+.approval-call-facts dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.approval-call-lines { white-space: pre-wrap; word-break: break-word; max-height: 28rem; }
+.governor-grid th, .governor-grid td { text-align: center; padding: 8px 10px; }
+.governor-grid tbody th { text-align: left; font-weight: 600; }
+.governor-cell.on { white-space: nowrap; }
+.governor-cell .state-dot { vertical-align: middle; }
+.governor-word { font-size: 13px; font-weight: 600; }

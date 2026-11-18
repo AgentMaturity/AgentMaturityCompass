@@ -191,7 +191,7 @@ export class SessionService extends SessionEventWriter {
 
     const ref = this.appendSessionEvent({
       eventType: "turn/start",
-      typeMeta: { turn, trigger: params.trigger },
+      typeMeta: { turn, trigger: params.trigger, ...(params.verifyOnStop === undefined ? {} : { verifyOnStop: params.verifyOnStop }) },
       surface: { op: "none" },
       turn,
       step: null
