@@ -1,7 +1,7 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, emptyState, moreInfo, noticeChip, recordDetails, recordRows, showResult } from "./pageKit.js";
-import { approvalCardHtml, approvalPeopleHtml, bindStationFilter, gapListHtml, layerBarsHtml, packCatalogHtml, pageIntroHtml, runCardsHtml, scoreDialHtml, statRowHtml, surfaceTilesHtml } from "./dailyView.js";
+import { approvalCardHtml, approvalPeopleHtml, approvalSubHtml, bindStationFilter, gapListHtml, layerBarsHtml, packCatalogHtml, pageIntroHtml, runCardsHtml, scoreDialHtml, statRowHtml, surfaceTilesHtml } from "./dailyView.js";
 import { activationRouteHtml, approvalsTileHtml, firstStepActionHtml, homeStartHtml, syncWaiting } from "./homeView.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { toolRatesHtml } from "./runtimeRates.js";
@@ -129,6 +129,26 @@ function onAction(target, type, handler) {
       note.textContent = text;
       control.insertAdjacentElement("afterend", note);
       setStatus(text, true);
+    }
+  });
+}
+
+/** "Run the full score" (button `id`): runs `amc` through Studio, then draws the page again with `rerender`. */
+function bindFullScore(id, rerender) {
+  onAction(document.getElementById(id), "click", async (event) => {
+    const button = event.currentTarget;
+    const original = button.textContent;
+    button.textContent = "running...";
+    button.disabled = true;
+    try {
+      await apiPost("/cli/exec", { command: "amc", format: "json", timeout: 120000 });
+      setStatus("Full score generated.");
+      await rerender();
+    } catch (error) {
+      setStatus(`Full score failed: ${cliFailureText(error)}`, true);
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
     }
   });
 }
@@ -840,22 +860,7 @@ async function renderEvidence() {
     </div>
   `;
 
-  onAction(document.getElementById("evidenceRunScore"), "click", async (event) => {
-    const button = event.currentTarget;
-    const original = button.textContent;
-    button.textContent = "running...";
-    button.disabled = true;
-    try {
-      await apiPost("/cli/exec", { command: "amc", format: "json", timeout: 120000 });
-      setStatus("Full score generated.");
-      await renderEvidence();
-    } catch (error) {
-      setStatus(`Full score failed: ${cliFailureText(error)}`, true);
-    } finally {
-      button.disabled = false;
-      button.textContent = original;
-    }
-  });
+  bindFullScore("evidenceRunScore", renderEvidence);
   onAction(document.getElementById("evidenceSnapshot"), "click", async () => {
     const out = await apiPost("/api/v1/enforce/resources/snapshot", { agentId });
     setStatus("Enforce resource snapshot generated.");
@@ -1511,22 +1516,7 @@ async function renderHome() {
     renderLine(document.getElementById("overallTrend"), [latestRun.integrityIndex, latestRun.integrityIndex]);
     renderLine(document.getElementById("integrityTrend"), [latestRun.integrityIndex, latestRun.integrityIndex]);
   }
-  onAction(document.getElementById("studioRunFullScore"), "click", async (event) => {
-    const button = event.currentTarget;
-    const original = button.textContent;
-    button.textContent = "running...";
-    button.disabled = true;
-    try {
-      await apiPost("/cli/exec", { command: "amc", format: "json", timeout: 120000 });
-      setStatus("Full score generated.");
-      await renderHome();
-    } catch (error) {
-      setStatus(`Full score failed: ${cliFailureText(error)}`, true);
-    } finally {
-      button.disabled = false;
-      button.textContent = original;
-    }
-  });
+  bindFullScore("studioRunFullScore", renderHome);
   onAction(document.getElementById("studioRunOnboarding"), "click", async (event) => {
     const button = event.currentTarget;
     const original = button.textContent;
@@ -1592,12 +1582,15 @@ async function renderAgent() {
         : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>` : "");
   root.innerHTML = `${pageIntroHtml("How your agent is doing", `Agent ${agentId}: its latest score, and what to improve next.`, { id: "agentIntro" })}
     <section class="card agent-card">
-      ${report ? "" : emptyState({ pictureName: "check", line: "No score yet." })}
+      ${report ? "" : emptyState({ pictureName: "check", line: "No score yet.",
+        // `amc` scores the workspace's default agent, so the button is offered only there; other agents name `amc run`.
+        action: agentId === "default" ? '<button id="agentRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>' : "" })}
       ${runStateWarning(row.latestRun)}
       ${score}
       ${report ? moreInfo("About this score", details) : details}
     </section>
   `;
+  bindFullScore("agentRunScore", renderAgent);
 }
 
 async function renderEqualizer() {
@@ -1676,9 +1669,11 @@ async function renderApprovals() {
   // The default inbox (no agent chosen) also lists the requests of the A4 projects' agents whose inventory verifies.
   const a4Projects = await a4.a4Projects();
   const a4Agents = [...new Set(a4Projects.map((project) => project.agentId))].filter((other) => other !== agentId);
-  const a4Rows = selectedApprovalId || qs("agent") || activity?.integrity?.valid !== true ? [] : (await Promise.all(a4Agents
-    .map((other) => activityFor(other).then((found) => (found?.integrity?.valid === true ? (found.requests || []).map((row) => ({ ...row, agentId: other })) : []))
-      .catch(() => [])))).flat();
+  const a4Found = selectedApprovalId || qs("agent") || activity?.integrity?.valid !== true ? [] : (await Promise.all(a4Agents
+    .map((other) => activityFor(other).then((found) => (found?.integrity?.valid === true ? found : null)).catch(() => null)))).filter(Boolean);
+  const a4Rows = a4Found.flatMap((found) => (found.requests || []).map((row) => ({ ...row, agentId: found.agentId })));
+  // The sentence counts every list shown: this agent's and the A4 projects' agents'.
+  const matched = Number(activity?.totalMatched || 0) + a4Found.reduce((sum, found) => sum + Number(found.totalMatched || 0), 0);
   const rows = selectedApprovalId
     ? await apiGet(`/approvals/requests/${encodeURIComponent(selectedApprovalId)}`).then((data) => [{
         ...data.request,
@@ -1757,7 +1752,7 @@ async function renderApprovals() {
       `)}
       <p id="approvalActivityIntegrity" class="${activity?.integrity?.valid ? "muted" : "status-bad"}">
         ${activity?.integrity?.valid
-          ? `${Number(activity.returned || 0)} of ${Number(activity.totalMatched || 0)} matching requests shown. The signed list checks out.`
+          ? `${Number(activity.returned || 0) + a4Rows.length} of ${matched} matching requests shown. The signed list checks out.`
           : `Approval activity unavailable: ${htmlEscape((activity?.integrity?.reasonCodes || ["INTEGRITY_UNAVAILABLE"]).join(", "))}`}
       </p>
     `}
@@ -1792,12 +1787,16 @@ async function renderApprovals() {
     href: selectedApprovalId ? "" : `./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}`,
     details: requestDetails(row)
   })).join("") || emptyState({ line: showing === "PENDING" && !selectedApprovalId ? "Nothing waits for a decision." : "No requests match." })) : "";
-  // The list rows carry counts only; each request's own record names who decided (read only, first 20 cards).
+  // The list rows carry counts only; each request's own record names its tool and who decided. `/view` reads it without
+  // observing the expiry, so opening the list writes nothing (first 50 cards).
   if (!selectedApprovalId) {
-    for (const row of rows.slice(0, 20)) {
-      apiGet(`/approvals/requests/${encodeURIComponent(row.approvalRequestId)}`).then((detail) => {
-        const holder = body.querySelector(`[data-appr-people="${CSS.escape(row.approvalRequestId)}"]`);
+    for (const row of rows.slice(0, 50)) {
+      apiGet(`/approvals/requests/${encodeURIComponent(row.approvalRequestId)}/view`).then((detail) => {
+        const card = body.querySelector(`[data-appr="${CSS.escape(row.approvalRequestId)}"]`);
+        const holder = card?.querySelector("[data-appr-people]");
         if (holder) holder.innerHTML = approvalPeopleHtml(row, detail);
+        const sub = card?.querySelector(".appr-sub");
+        if (sub) sub.outerHTML = approvalSubHtml(row, detail);
       }).catch(() => { /* the count stays; the request page shows the people */ });
     }
   }
@@ -2464,7 +2463,9 @@ async function renderIndustryPacks() {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
       }
       detail.hidden = false;
-      rows.hidden = true; // one pack at a time; Close brings the catalog back
+      // One pack at a time: the catalog and its heading step aside (the pack carries its own notice chip); Close brings them back.
+      rows.hidden = true;
+      document.getElementById("packsIntro")?.setAttribute("hidden", "");
       // M2: start at the pack's heading, wherever in the catalog it was opened from.
       const heading = document.getElementById("industryPackHeading") || detail;
       heading.scrollIntoView({ block: "start" });
@@ -2477,8 +2478,13 @@ function bindIndustryPackDetail(detail, opener) {
   onAction(document.getElementById("industryPackClose"), "click", () => {
     detail.hidden = true;
     detail.replaceChildren();
-    document.getElementById("industryPackRows")?.removeAttribute("hidden");
-    opener.focus();
+    const rows = document.getElementById("industryPackRows");
+    rows?.removeAttribute("hidden");
+    document.getElementById("packsIntro")?.removeAttribute("hidden");
+    // A pack opened through ?pack= has a hidden card: pick its field first, so focus returns to a card a person can see.
+    const card = opener.closest(".pack-card");
+    if (card?.hidden) rows?.querySelector(`.station-tile[data-station="${CSS.escape(card.dataset.station || "")}"]`)?.click();
+    (card?.hidden ? rows?.querySelector(".station-tile") : opener)?.focus();
   });
   const form = document.getElementById("industryPackForm");
   const out = document.getElementById("industryPackResult");

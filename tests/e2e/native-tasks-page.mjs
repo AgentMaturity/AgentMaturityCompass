@@ -287,9 +287,11 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       const popupPromise=page.waitForEvent("popup"); await link.click(); const popup=await popupPromise;
       try {
         await expect(popup.locator("#apprRows")).toContainText(approval.approvalRequestId);
-        popup.once("dialog", dialog=>dialog.accept("Browser acceptance denies the actual synthetic tool request."));
+        // Deny asks for its reason inline (no browser dialog); the decided card says "Turned down" and its fold "Denied".
         await popup.locator(`[data-deny="${approval.approvalRequestId}"]`).click();
-        await expect(popup.locator("#apprRows")).toContainText("DENIED");
+        await popup.locator("#apprRows .ask-inline input").fill("Browser acceptance denies the actual synthetic tool request.");
+        await popup.locator("#apprRows .ask-inline button[type=submit]").click();
+        await expect(popup.locator("#apprRows")).toContainText("Turned down");
       } finally { await popup.close(); }
       const after=await ui.ready(); await expect(page.locator("#nativeTaskTranscript")).toContainText(/denied|failed/i);
       await ui.control("release"); await ui.newTask();

@@ -134,6 +134,8 @@ export function bindQuestions(form, { submitAnywhere = false } = {}) {
   form.insertBefore(nav, submitRow);
   if (submit) nav.insertBefore(submit, nav.querySelector(".a4-q-count"));
   if (submitAnywhere) nav.querySelector("[data-a4-q-next]").className = "secondary a4-q-next";
+  // With Score always in reach, the form's other buttons (Clear answers) join the same row.
+  if (submitAnywhere) for (const extra of submitRow?.querySelectorAll("button") ?? []) nav.insertBefore(extra, nav.querySelector(".a4-q-count"));
   if (submitRow && submitRow.children.length === 0) submitRow.hidden = true;
   let at = 0;
   const show = (index, focus = true) => {

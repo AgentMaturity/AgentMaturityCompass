@@ -2410,7 +2410,9 @@ body[data-page="login"] #status:empty {
 .surface-name { font-weight: 600; }
 .surface-state { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-align: right; }
 .state-dot { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--line-strong); }
-.is-done .state-dot, .is-now .state-dot { background: var(--accent); border-color: var(--accent); }
+.is-done .state-dot { background: var(--accent); border-color: var(--accent); }
+/* Under way: a ring, so a running thing never looks like a finished one. */
+.is-now .state-dot { border: 3px solid var(--accent); }
 .is-wait .state-dot { background: var(--wait); border-color: var(--wait); }
 .is-stop .state-dot { background: var(--stop); border-color: var(--stop); }
 .records-folds { display: grid; gap: 4px; margin: 0 0 24px; }

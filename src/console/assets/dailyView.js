@@ -97,8 +97,13 @@ export function approvalPeopleHtml(row, detail = null) {
   const decisions = list(detail?.decisions ?? row?.decisions);
   const required = num(row?.quorum?.required ?? detail?.quorum?.required);
   const received = num(row?.quorum?.received ?? detail?.quorum?.received);
-  const chips = decisions.map((d) => personChip(d.username ?? "someone", String(d.decision).startsWith("APPROVE") ? "done" : "stop",
-    DECISION_WORDS[d.decision] ?? plainCode(d.decision)));
+  // An approval counts only when the person signed in (or answered at the chat's terminal); a deny always counts.
+  const counts = (d) => d.decision === "DENY" || d.authentication === "authenticated" || d.authentication === "terminal";
+  const chips = decisions.map((d) => {
+    const words = DECISION_WORDS[d.decision] ?? plainCode(d.decision);
+    return counts(d) ? personChip(d.username ?? "someone", String(d.decision).startsWith("APPROVE") ? "done" : "stop", words)
+      : personChip(d.username ?? "someone", "todo", `${words}, does not count (not signed in)`);
+  });
   const open = row?.status === "PENDING" ? Math.max(required - received, 0) : 0;
   for (let i = 0; i < open; i += 1) chips.push('<li class="a4-person is-wait"><span class="a4-avatar" aria-hidden="true">?</span>'
     + '<span class="a4-person-words"><strong>An approver</strong><small>not decided yet</small></span></li>');
@@ -110,17 +115,32 @@ export function approvalPeopleHtml(row, detail = null) {
 }
 
 /**
+ * What a request is for, under its title: the tool it would run and when it was asked, then its risk and agent. The list
+ * rows carry no tool, so app.js redraws this line from the request's own record (`detail`) once it is read.
+ * @param {any} row
+ * @param {any} [detail]
+ */
+export function approvalSubHtml(row, detail = null) {
+  const request = detail?.request ?? row ?? {};
+  const risk = row?.riskTier ? `${String(row.riskTier)[0].toUpperCase()}${String(row.riskTier).slice(1)} risk` : "";
+  const ts = Number(row?.createdTs ?? request.createdTs);
+  const asked = ts > 0 ? `Asked ${new Date(ts).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}.` : "";
+  const tool = request.toolName ? `<code>${esc(request.toolName)}</code>. ` : "";
+  return `<span class="appr-sub"${request.intentId ? ` title="${esc(`Intent ${request.intentId}`)}"` : ""}>${tool}${esc(asked)} `
+    + `${esc([risk, row?.agentId ? `agent ${row.agentId}` : ""].filter(Boolean).join(", "))}</span>`;
+}
+
+/**
  * One approval request as a card: what it is, its route, its people and the decision controls (passed in unchanged).
  * @param {any} row
  * @param {{ controls?: string, href?: string, selected?: boolean, detail?: any, details?: string }} [options]
  */
 export function approvalCardHtml(row, { controls = "", href = "", selected = false, detail = null, details = "" } = {}) {
   const id = String(row?.approvalRequestId ?? "");
-  const risk = row?.riskTier ? `${String(row.riskTier)[0].toUpperCase()}${String(row.riskTier).slice(1)} risk` : "";
   const title = plainCode(row?.actionClass || "Request");
   return `<article class="appr-card${selected ? " selected" : ""}" data-appr="${esc(id)}">
     <div class="appr-head">${icon("approvals", { size: 22 })}<div><strong class="appr-title">${esc(title)}</strong>`
-    + `<span class="appr-sub">${esc([risk, row?.agentId ? `agent ${row.agentId}` : ""].filter(Boolean).join(", "))}</span></div>`
+    + `${approvalSubHtml(row, detail)}</div>`
     + `${href ? `<a class="appr-open" href="${esc(href)}" title="${esc(id)}">Open</a>` : ""}</div>
     ${approvalRoute(row?.status)}
     <div data-appr-people="${esc(id)}">${approvalPeopleHtml(row, detail)}</div>
@@ -201,6 +221,8 @@ export function bindStationFilter(holder) {
   });
 }
 
+/** "gateway.connected" → "Last step: gateway connected" (the code stays in the line's tooltip). */
+const stageWords = (stage) => (stage ? `Last step: ${String(stage).replace(/[._-]+/g, " ").trim()}` : "No step yet");
 const RUN_STATE = { running: ["now", "Running"], degraded: ["wait", "Needs a look"], completed: ["done", "Finished"], canceled: ["todo", "Stopped"], cancelled: ["todo", "Stopped"] };
 
 /** Live runs as cards: the run's name, its state as a dot and two words, its stage and its counts. */
@@ -209,6 +231,6 @@ export function runCardsHtml(runs, when = (value) => String(value ?? "")) {
     const [state, words] = RUN_STATE[String(run.status)] ?? ["todo", stateWords(run.status ?? "unknown")];
     return `<li class="run-card is-${state}"><div class="run-card-head"><span class="state-dot" aria-hidden="true"></span><strong>${esc(run.runId)}</strong>`
       + `<span class="run-card-state" title="${esc(run.status)}">${esc(words)}</span></div>`
-      + `<p class="muted">${esc(`Stage ${run.currentStage ?? "none"}. ${num(run.eventCount)} events, ${num(run.alertCount)} alerts, ${num(run.policyDecisionCount)} policy decisions. Updated ${when(run.updatedAt)}.`)}</p></li>`;
+      + `<p class="muted" title="${esc(run.currentStage ?? "")}">${esc(`${stageWords(run.currentStage)}. ${num(run.eventCount)} events, ${num(run.alertCount)} alerts, ${num(run.policyDecisionCount)} policy decisions. Updated ${when(run.updatedAt)}.`)}</p></li>`;
   }).join("")}</ul>`;
 }
