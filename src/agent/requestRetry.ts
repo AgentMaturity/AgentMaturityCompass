@@ -216,7 +216,10 @@ function noteFinalFailure(session: SessionService, outcomeEventId: string, reaso
 /** A turn that ends on a context-window overflow: the final request failure is recorded as an outage incident then. */
 export function noteOverflowOutage(session: SessionService, error: unknown): void {
   if (!isLlmError(error) || error.code !== LLM_FAILURE_CODE.CONTEXT_WINDOW_EXCEEDED) return;
-  const failure = session.readEvents().filter(row => row.event_type === "request/failure").at(-1);
+  let failure: { readonly id: string } | undefined;
+  // Never replaces the provider's error: a failed read is reported, as a failed incident write is.
+  try { failure = session.readEvents().filter(row => row.event_type === "request/failure").at(-1); }
+  catch (readFailure: unknown) { process.stderr.write(`[amc] the provider-outage incident could not be recorded: ${readFailure instanceof Error ? readFailure.message : String(readFailure)}\n`); }
   if (failure !== undefined) noteFinalFailure(session, failure.id, "the request was too large for the model's context window, and the turn ended on it");
 }
 

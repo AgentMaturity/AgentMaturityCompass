@@ -14,7 +14,7 @@ const AMC_I18N = (() => {
       navDomainPacks: 'Domain Packs', navScale: 'Maturity Scale', navResearch: 'Research',
       navEUAct: 'EU AI Act', navGitHub: 'GitHub ↗', navBack: '← Back to AMC',
       // Hero
-      heroTagline: 'MIT Open Source · 1,306 CLI Paths · 2,694 Test Source Files',
+      heroTagline: 'MIT Open Source · 1,306 CLI Paths · 2,695 Test Source Files',
       heroSimpleH1: 'See what your AI agent<br>', heroSimpleH1Strong: 'really does.',
       heroSimpleSub: 'AMC watches Claude Code, Codex or your own agent at work on your machine, keeps a signed record of what it did, and scores it from that record.',
       heroTechH1: 'Install it,<br>type ', heroTechH1Strong: 'amc.',
