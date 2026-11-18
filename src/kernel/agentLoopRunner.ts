@@ -43,6 +43,7 @@ import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/
 import type { ApprovalMode } from "../approvals/approvalModes.js";
 import type { AgentLoopConfig, AgentStatus, CancelOptions, InboxReceipt, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
+import { resolveVerifyOnStop } from "../agent/verifyOnStop.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
@@ -588,6 +589,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           // the parent's guards cannot see. `notify` is deliberately not part
           // of it; see `LoopHookControl`.
           hookControl: hooks,
+          // HP-04: the root's own setting, handed down as data so no child reads the workspace checks again.
+          parentChecks: resolveVerifyOnStop(options.workspace, options.validation !== undefined, options.verifyOnStop).setting,
           harnessVersion: amcVersion,
           compositionDigest: compositionDigestOf(options, profile),
           policyDigest: policyDigestOf(options),

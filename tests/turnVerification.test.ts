@@ -11,7 +11,8 @@ import type { NativeValidationPlan } from "../src/agent/nativeValidation.js";
 import { projectNativeValidation } from "../src/agent/nativeValidationProjection.js";
 import { pipelineToolSeam } from "../src/agent/pipelineToolSeam.js";
 import { readAgentRunSummary, renderRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
-import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, turnCheckFrom, workspaceAfterEditChecks } from "../src/agent/turnVerification.js";
+import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, turnCheckFrom, type TurnCheckContext } from "../src/agent/turnVerification.js";
+import { resolveVerifyOnStop, workspaceAfterEditChecks, type VerifyOnStopInit } from "../src/agent/verifyOnStop.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
 import { fsTools } from "../src/tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../src/tools/builtin/readBeforeEdit.js";
@@ -24,7 +25,12 @@ import { readEventPayload } from "../src/session/eventPayload.js";
 import { strictJsonNote } from "../src/tools/builtin/fsWritePrimitives.js";
 import { parseNativeChatResult } from "../src/setup/nativeChatResult.js";
 import type { EvidenceEvent } from "../src/types.js";
-import { loopHarness, textStep, toolStep, LOOP_MODEL, LOOP_PROVIDER, type LoopHarness, type ScriptedStream } from "./helpers/agentLoopHarness.js";
+import type { AgentToolSeam } from "../src/agent/toolSeam.js";
+import { FixedCredentials, loopHarness, scriptedAdapter, silentTransport, textStep, toolStep, LOOP_MODEL, LOOP_PROVIDER, type LoopHarness, type ScriptedStream } from "./helpers/agentLoopHarness.js";
+import { SessionService } from "../src/session/sessionService.js";
+import { AdapterRegistry } from "../src/llm/adapter/adapterRegistry.js";
+import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
+import { credentialRef } from "../src/credentials/credentialRef.js";
 
 const opened: LoopHarness[] = [];
 afterEach(() => {
@@ -51,10 +57,11 @@ function fixture(scripts: ScriptedStream[], approve?: ToolApprovalAsker) {
     ...(approve === undefined ? {} : { approve, approvalRequiredFor: new Set(["WRITE_HIGH"]) }) }), agentId: "default" });
   return { harness, tools };
 }
-async function run(f: ReturnType<typeof fixture>, verifyOnStop?: false | NativeValidationPlan, maxStepsPerTurn = 20, prompts = ["Make the change."]) {
+async function run(f: ReturnType<typeof fixture>, verifyOnStop?: VerifyOnStopInit, maxStepsPerTurn = 20, prompts = ["Make the change."],
+  validation?: NativeValidationPlan, tools: AgentToolSeam = f.tools) {
   const driver = new AgentDriver({ session: f.harness.session, llm: f.harness.llm, systemPromptEventId: f.harness.systemPromptEventId,
-    route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } }, tools: f.tools,
-    ...(verifyOnStop === undefined ? {} : { verifyOnStop }), config: { toolAbandonGraceMs: 20, maxStepsPerTurn } });
+    route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } }, tools,
+    ...(verifyOnStop === undefined ? {} : { verifyOnStop }), ...(validation === undefined ? {} : { validation }), config: { toolAbandonGraceMs: 20, maxStepsPerTurn } });
   for (const prompt of prompts) { driver.followup(prompt); await driver.whenIdle(); }
   return driver;
 }
@@ -144,15 +151,16 @@ describe("verify-on-stop on the real loop", () => {
     const f = fixture([write(), textStep("Done."), edit(), textStep("Fixed.")], async () => (++asked === 1 ? "allow" : "deny"));
     await run(f, plan());
     expect(asked).toBe(2);
-    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "check-execution-denied"]]);
+    // The refusal came from the pipeline's approver, which writes no approval rows: the record cannot say "approval".
+    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "check-refused-before-run"]]);
   });
 
   test("a check that needs an approval nobody gives never runs and the turn stays changed-unchecked", async () => {
     const f = fixture([write(), textStep("Done.")], async () => "unavailable");
     await run(f, plan("touch check-ran.txt"));
     expect(existsSync(join(f.harness.dir, "check-ran.txt"))).toBe(false);
-    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "check-execution-denied"]]);
-    expect(describeTurnCheck(checks(f)[0]!)).toContain("needed an approval nobody gave");
+    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "check-refused-before-run"]]);
+    expect(describeTurnCheck(checks(f)[0]!)).not.toContain("approval nobody gave");
   });
 
   test("the operator's off switch runs no check and is recorded", async () => {
@@ -179,56 +187,75 @@ describe("verify-on-stop on the real loop", () => {
   });
 });
 
-describe("the verifier recomputes the status", () => {
-  test("a forged status fails integrity", async () => {
-    const f = fixture([write(), textStep("Done.")]);
-    await run(f, false);
-    const session = f.harness.session;
-    session.startTurn({ trigger: "user" } as never);
-    session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: { kind: "native-turn-verification", version: 1, turn: 2,
-      status: "changed-and-checked-pass", changes: 1, lastChangeEventId: checks(f)[0]!.lastChangeEventId, checkEventId: null, reason: null, verifyOnStop: "off" } });
-    session.endTurn({ reason: "complete" } as never);
+describe("the verifier recomputes the status (review M1)", () => {
+  type Row = { status?: string; turn?: number; setting?: string; reason?: string | null; changes?: number };
+  /** One hand-written turn on the real SessionService; `rows` are status rows written where `where` says. */
+  function forgeTurn(session: LoopHarness["session"], opts: { marker?: string; write?: boolean; dup?: boolean; rows?: Row[]; where?: "before-write" | "end";
+    honest?: TurnCheckContext; ending?: string }): void {
+    session.startTurn({ trigger: "user", ...(opts.marker === undefined ? {} : { verifyOnStop: opts.marker }) } as never);
+    const turn = session.turnsStarted;
+    const statusRows = (): void => { for (const row of opts.rows ?? []) session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: { kind: "native-turn-verification",
+      version: 1, turn: row.turn ?? turn, status: row.status ?? "no-changes", changes: row.changes ?? 0, lastChangeEventId: null, checkEventId: null,
+      reason: row.reason ?? null, verifyOnStop: row.setting ?? opts.marker ?? "off", backgroundWork: false } }); };
+    session.startStep();
+    if (opts.where === "before-write") statusRows();
+    if (opts.write === true || opts.dup === true) {
+      session.recordToolCall({ toolCallId: "w", toolName: "fs.write", dispatch: "native", parentToken: null, args: "{}" } as never);
+      if (opts.dup === true) session.recordToolCall({ toolCallId: "w", toolName: "fs.read", dispatch: "native", parentToken: null, args: "{}" } as never);
+      session.recordToolResult({ toolCallId: "w", outcome: "OK", exitCode: null, timedOut: false, denied: false, content: "ok" });
+    }
+    session.endStep({ stopReason: "end_turn", usage: null });
+    if (opts.honest !== undefined) recordTurnVerification(session, turn, opts.honest);
+    if (opts.where !== "before-write") statusRows();
+    session.endTurn({ reason: opts.ending ?? "complete", ...(opts.ending === "error" ? { error: new Error("x") } : {}) } as never);
     session.sealTurn();
-    f.harness.finish();
-    const report = await verifyAgentRun(f.harness.dir, f.harness.sessionId);
-    expect(report.integrityOk).toBe(false);
-    expect(report.sessionChainErrors.join("\n")).toContain("Turn 2's recorded check status (changed-and-checked-pass) does not match its recorded actions (no-changes)");
-  });
-
-  test("the verifier agrees with the writer on a turn with a repeated call id, and refuses a forged no-changes", async () => {
+  }
+  async function errorsFor(...turns: Parameters<typeof forgeTurn>[1][]): Promise<string[]> {
     const f = fixture([textStep("Hello.")]);
     await run(f, false);
-    const session = f.harness.session;
-    const turnWith = (status: string | null): void => {
-      session.startTurn({ trigger: "user" } as never);
-      session.startStep();
-      session.recordToolCall({ toolCallId: "dup", toolName: "fs.write", dispatch: "native", parentToken: null, args: "{}" } as never);
-      session.recordToolCall({ toolCallId: "dup", toolName: "fs.read", dispatch: "native", parentToken: null, args: "{}" } as never);
-      session.recordToolResult({ toolCallId: "dup", outcome: "OK", exitCode: null, timedOut: false, denied: false, content: "ok" });
-      session.endStep({ stopReason: "end_turn", usage: null });
-      const turn = session.turnsStarted;
-      if (status === null) recordTurnVerification(session, turn, "off");
-      else session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: { kind: "native-turn-verification", version: 1, turn,
-        status, changes: 0, lastChangeEventId: null, checkEventId: null, reason: null, verifyOnStop: "off" } });
-      session.endTurn({ reason: "complete" } as never);
-      session.sealTurn();
-    };
-    turnWith(null);
-    expect(checks(f).at(-1)?.status).toBe("changed-unchecked");
-    turnWith("no-changes");
+    for (const opts of turns) forgeTurn(f.harness.session, opts);
     f.harness.finish();
     const report = await verifyAgentRun(f.harness.dir, f.harness.sessionId);
-    expect(report.sessionChainErrors.filter(error => error.includes("recorded check status"))).toEqual([
-      expect.stringContaining("Turn 3's recorded check status (no-changes) does not match its recorded actions (changed-unchecked)")]);
+    return report.sessionChainErrors.filter(error => /check-status|check status|checks were/.test(error));
+  }
+  const honest: TurnCheckContext = { setting: "off", backgroundWork: false, finishErrored: false };
+
+  test("an honest turn verifies, a repeated call id included; a session from before the marker verifies as before", async () => {
+    expect(await errorsFor({ marker: "off", dup: true, honest }, { write: true })).toEqual([]);
+  });
+  test("probe 1: a no-changes row written before a write in the same turn", async () => {
+    expect(await errorsFor({ marker: "off", write: true, where: "before-write", rows: [{ status: "no-changes" }] }))
+      .toEqual([expect.stringContaining("Turn 2's check-status record is not the last row before the turn ends")]);
+  });
+  test("probe 2: a marked turn with a write and no status row", async () => {
+    expect(await errorsFor({ marker: "off", write: true })).toEqual([expect.stringContaining("Turn 2 has 0 check-status records")]);
+  });
+  test("probe 3: checks claimed off on a turn opened with checks on", async () => {
+    expect(await errorsFor({ marker: "on", rows: [{ setting: "off" }] })).toEqual([expect.stringContaining('claims checks were "off"; the turn was opened with "on"')]);
+  });
+  test("two rows, a row naming another turn, a forged status, check-errored without an error, a row in an unmarked turn", async () => {
+    expect(await errorsFor({ marker: "off", rows: [{}, {}] })).toEqual([expect.stringContaining("Turn 2 has 2 check-status records")]);
+    expect(await errorsFor({ marker: "off", rows: [{ turn: 7 }] })).toEqual([expect.stringContaining("names another turn")]);
+    expect(await errorsFor({ marker: "off", dup: true, rows: [{ status: "no-changes" }] }))
+      .toEqual([expect.stringContaining("Turn 2's recorded check status (no-changes) does not match its recorded actions (changed-unchecked)")]);
+    expect(await errorsFor({ marker: "off", rows: [{ status: "changed-unchecked", reason: "check-errored" }] }))
+      .toEqual([expect.stringContaining("says checking errored, but the turn did not end in an error")]);
+    expect(await errorsFor({ marker: "off", ending: "error", honest: { ...honest, finishErrored: true } })).toEqual([]);
+    expect(await errorsFor({ rows: [{}] })).toEqual([expect.stringContaining("outside any turn opened with a check setting")]);
   });
 
   test("the status is computed from row order", () => {
     const row = (id: string, eventType: string, m: Record<string, unknown>): EvidenceEvent => ({ id, event_type: eventType, meta_json: JSON.stringify({ turn: 1, ...m }) } as EvidenceEvent);
     const checked = [row("c", "tool/call", { toolCallId: "a", toolName: "bash" }), row("r", "tool/result", { toolCallId: "a", outcome: "OK" }),
-      row("q", "audit", { kind: "native-validation", phase: "requested" }), row("f", "audit", { kind: "native-validation", phase: "finished", status: "passed", checks: [] })];
+      row("q", "audit", { kind: "native-validation", phase: "requested" }), row("s", "audit", { kind: "native-validation", phase: "check-start" }),
+      row("f", "audit", { kind: "native-validation", phase: "finished", status: "passed", checks: [] })];
     expect(computeTurnVerification(checked, 1).status).toBe("changed-and-checked-pass");
     // The same check before the change: not checked.
     expect(computeTurnVerification([...checked.slice(2), ...checked.slice(0, 2)], 1)).toMatchObject({ status: "changed-unchecked", reason: "check-before-last-change" });
+    // H1: armed before the change ("requested"), started after it: the check counts from its start.
+    expect(computeTurnVerification([checked[2]!, ...checked.slice(0, 2), ...checked.slice(3)], 1).status).toBe("changed-and-checked-pass");
+    // Started before the change and finished after it: does not count.
+    expect(computeTurnVerification([checked[2]!, checked[3]!, ...checked.slice(0, 2), checked[4]!], 1).status).toBe("changed-unchecked");
     // A change with no result yet, after the check: not checked.
     expect(computeTurnVerification([...checked, row("c2", "tool/call", { toolCallId: "b", toolName: "mcp__x__y" })], 1).status).toBe("changed-unchecked");
     // Security finding 2: a repeated call id cannot pair a write's result with another call and hide the write.
@@ -308,3 +335,139 @@ describe("text from stored rows cannot steer a terminal", () => {
     expect(strictJsonNote(`${"a".repeat(400)}.json`, Buffer.from("{")).length).toBeLessThan(400);
   });
 });
+
+describe("review fixes on the real loop", () => {
+  test("H1: a --validate check after an edit records pass or fail, not 'check ran before the last change'", async () => {
+    const pass = fixture([write("fixed\n"), textStep("Done.")]);
+    await run(pass, undefined, 20, ["Make it."], plan());
+    expect(checks(pass).map(row => [row.status, row.verifyOnStop])).toEqual([["changed-and-checked-pass", "validate"]]);
+    const fail = fixture([write(), textStep("Done.")]);
+    await run(fail, undefined, 20, ["Make it."], plan());
+    expect(checks(fail).map(row => [row.status, row.reason])).toEqual([["changed-and-checked-fail", "nonzero-exit"]]);
+    expect(describeTurnCheck(checks(fail)[0]!)).toContain("FAILED");
+    fail.harness.finish();
+    expect((await verifyAgentRun(fail.harness.dir, fail.harness.sessionId)).integrityOk).toBe(true);
+  });
+
+  test("H1: --validate and workspace checks together run the check once", async () => {
+    const f = fixture([write("fixed\n"), textStep("Done.")]);
+    await run(f, plan(), 20, ["Make it."], plan());
+    expect(checkStarts(f)).toHaveLength(1);
+    expect(checks(f)[0]?.status).toBe("changed-and-checked-pass");
+  });
+
+  test("M2: a child never runs the workspace checks; the root's check covers the child's edit and continues the root turn", async () => {
+    const f = fixture([toolStep("d1", "delegate", JSON.stringify({ task: "write calc.txt" })), textStep("Delegated, done."), textStep("I see it failed.")]);
+    initToolsConfig(f.harness.dir, { tools: { ...defaultToolsConfig().tools, afterEdits: { checks: [{ id: "tests", title: "Tests", command: CHECK }] } } });
+    let child: EvidenceEvent[] = [];
+    const tools: AgentToolSeam = { ...f.tools,
+      schemas: () => [...(f.tools.schemas() ?? []), { name: "delegate", description: "run a child", parameters: { type: "object", properties: { task: { type: "string" } } } }],
+      executionMode: () => "exclusive",
+      execute: async request => {
+        if (request.toolName !== "delegate") return f.tools.execute(request);
+        child = await runChild(f.harness.dir, [write(), textStep("Child done.")]);
+        return { outcome: "OK", content: "child finished", exitCode: null, timedOut: false, denied: false };
+      } };
+    await run(f, plan(), 20, ["Delegate it."], undefined, tools);
+    expect(child.filter(row => meta(row).kind === "native-validation")).toHaveLength(0);
+    expect(projectTurnChecks(child).map(row => [row.status, row.reason, row.verifyOnStop])).toEqual([["changed-unchecked", "checked-by-parent", "child-parent-checks"]]);
+    expect(checkStarts(f)).toHaveLength(1);
+    expect(checks(f).map(row => [row.status, row.changes])).toEqual([["changed-and-checked-fail", 1]]);
+    f.harness.finish();
+    expect(readAgentRunSummary(f.harness.dir, f.harness.sessionId, "idle").requests).toBe(3);
+  });
+
+  test("L2: background work still running means no check and no pass", async () => {
+    const f = fixture([write("fixed\n"), textStep("Done.")]);
+    await run(f, plan(), 20, ["Make it."], undefined, { ...f.tools, hasBackgroundWork: () => true });
+    expect(checkStarts(f)).toHaveLength(0);
+    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "background-work-running"]]);
+    expect(describeTurnCheck(checks(f)[0]!)).toContain("background work");
+  });
+
+  test("L2/L6: tools that write or start a process count; only reads are read-only", () => {
+    const row = (id: string, eventType: string, m: Record<string, unknown>): EvidenceEvent => ({ id, event_type: eventType, meta_json: JSON.stringify({ turn: 1, ...m }) } as EvidenceEvent);
+    const status = (name: string): string => computeTurnVerification([row("c", "tool/call", { toolCallId: "a", toolName: name }), row("r", "tool/result", { toolCallId: "a", outcome: "OK" })], 1).status;
+    for (const name of ["bash", "job_start", "job_kill", "terminal_open", "terminal_send", "terminal_signal", "delegate", "delegate_continue", "workflow", "apply_patch", "mcp__x__y"])
+      expect([name, status(name)]).toEqual([name, "changed-unchecked"]);
+    for (const name of ["fs.read", "glob", "grep", "ls", "job_output", "job_list", "terminal_read", "terminal_list", "web_fetch"])
+      expect([name, status(name)]).toEqual([name, "no-changes"]);
+  });
+
+  test("L4: a check that runs out of time is labelled timed out", async () => {
+    const f = fixture([write(), textStep("Done.")]);
+    await run(f, { configSha256: "b".repeat(64), checks: [{ id: "slow", title: "Slow", command: "sleep 5", timeoutMs: 300 }] });
+    expect(checks(f).map(row => row.reason)).toEqual(["check-timed-out"]);
+    expect(describeTurnCheck(checks(f)[0]!)).toContain("ran out of time");
+  });
+
+  test("L5: a turn whose only change is a write that errored asks nobody to approve a check", async () => {
+    const f = fixture([toolStep("w1", "fs.write", JSON.stringify({ path: "../outside.txt", content: "x" })), textStep("Could not.")]);
+    await run(f, plan());
+    expect(checkStarts(f)).toHaveLength(0);
+    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "write-did-not-complete"]]);
+  });
+
+  test("L8: a throw while finishing the turn's checks still writes the status row, as check-errored", async () => {
+    const f = fixture([write("fixed\n"), textStep("Done.")]);
+    const real = f.harness.session.recordProjectedEvidence.bind(f.harness.session);
+    f.harness.session.recordProjectedEvidence = (row) => {
+      if (row.meta.kind === "native-validation" && row.meta.phase === "finished") throw new Error("synthetic finish failure");
+      return real(row);
+    };
+    await run(f, undefined, 20, ["Make it."], plan());
+    expect(checks(f).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "check-errored"]]);
+    const rows = f.harness.events();
+    const end = rows.findIndex(row => row.event_type === "turn/end");
+    expect(meta(rows[end - 1]!).kind).toBe("native-turn-verification");
+    expect(meta(rows[end]!).reason).toBe("error");
+  });
+
+  test("L3: a check list whose signature does not verify is its own reason, never 'not set up'", async () => {
+    const f = fixture([write(), textStep("Done.")]);
+    initToolsConfig(f.harness.dir, { tools: { ...defaultToolsConfig().tools, afterEdits: { checks: [{ id: "tests", title: "Tests", command: "npm test" }] } } });
+    writeFileSync(toolsConfigPath(f.harness.dir), readFileSync(toolsConfigPath(f.harness.dir), "utf8").replace("npm test", "npm test2"));
+    expect(resolveVerifyOnStop(f.harness.dir, false, undefined).setting).toBe("config-unverified");
+    await run(f);
+    expect(checks(f).map(row => [row.reason, row.verifyOnStop])).toEqual([["checks-config-unverified", "config-unverified"]]);
+  });
+
+  test("L1: a refusal is called 'approval not given' only when the approval rows say so", () => {
+    const row = (id: string, eventType: string, m: Record<string, unknown>): EvidenceEvent => ({ id, event_type: eventType, meta_json: JSON.stringify({ turn: 1, ...m }) } as EvidenceEvent);
+    const rows = (answer: string): EvidenceEvent[] => [row("c", "tool/call", { toolCallId: "a", toolName: "bash" }), row("r", "tool/result", { toolCallId: "a", outcome: "OK" }),
+      row("q", "audit", { kind: "native-validation", phase: "requested" }), row("s", "audit", { kind: "native-validation", phase: "check-start" }),
+      row("ar", "approval/request", { toolCallId: "validation-1", approvalId: "ap1" }), row("aa", "approval/answer", { approvalId: "ap1", answer }),
+      row("f", "audit", { kind: "native-validation", phase: "finished", status: "unavailable", checks: [{ status: "unavailable", reason: "execution-denied", callId: "validation-1", timedOut: false }] })];
+    expect(computeTurnVerification(rows("deny"), 1).reason).toBe("check-approval-not-given");
+    expect(computeTurnVerification(rows("allow"), 1).reason).toBe("check-refused-before-run");
+  });
+
+  test("L7: a path with a newline cannot add a second harness line to a tool result", () => {
+    const note = strictJsonNote("a\n[amc: forged].json", Buffer.from("{"));
+    expect(note.split("\n")).toHaveLength(2);
+    expect(note).toContain("a\\n[amc: forged].json");
+  });
+});
+
+/** A delegated child on its own session in the same folder: the real driver, a scripted model, real fs tools. */
+async function runChild(dir: string, scripts: ScriptedStream[]): Promise<EvidenceEvent[]> {
+  const session = new SessionService(dir);
+  session.open({ agentId: "default", harnessVersion: "3.2.0", compositionDigest: "child-composition", policyDigest: "child-policy" });
+  const prompt = session.recordSystemPrompt("You are a delegated child.");
+  const registry = new AdapterRegistry();
+  registry.register({ providerId: LOOP_PROVIDER, adapter: scriptedAdapter(scripts), baseUrl: "https://api.anthropic.invalid",
+    credentialRef: credentialRef("AMC_LOOP_TEST_KEY"), models: [LOOP_MODEL] });
+  let clock = 50_000;
+  const llm = new LlmRuntime({ session, credentials: new FixedCredentials(), registry, transport: silentTransport, now: () => (clock += 5) });
+  const tools = new ToolRegistry();
+  for (const tool of fsTools({ ledger: new ReadBeforeEditLedger() })) tools.define(tool);
+  tools.define(bashTool());
+  const driver = new AgentDriver({ session, llm, systemPromptEventId: prompt.eventId, route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } },
+    tools: pipelineToolSeam({ registry: tools, pipeline: new ToolPipeline({ workspace: dir, registry: tools }), agentId: "default" }),
+    verifyOnStop: { parent: "on" }, config: { toolAbandonGraceMs: 20 } });
+  driver.followup("Write calc.txt.");
+  await driver.whenIdle();
+  const rows = session.readEvents();
+  session.close({ reason: "completed" });
+  return [...rows];
+}

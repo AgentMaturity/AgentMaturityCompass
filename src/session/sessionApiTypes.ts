@@ -106,6 +106,11 @@ export interface SessionAttachParams {
 
 export interface TurnStartParams {
   readonly trigger: TurnTrigger;
+  /**
+   * HP-04: the run's check setting (src/agent/turnVerification.ts). Present means the turn ends with exactly one
+   * check-status row, which `agent-loop verify` then requires; absent (older builds, other writers) means no such rule.
+   */
+  readonly verifyOnStop?: string;
 }
 
 /**

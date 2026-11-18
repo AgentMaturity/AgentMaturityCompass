@@ -50,9 +50,10 @@ import { LoopInbox } from "./inbox.js";
 import type { NativeImageInput } from "../attachments/nativeImageInput.js";
 import { recordNativeImageMessage } from "./nativeImageMessage.js";
 import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
-import { assertOrderedClaimDecision, recordNativeOrderedMessage } from "./nativeOrderedMessage.js";
+import { recordNativeOrderedMessage } from "./nativeOrderedMessage.js";
 import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
-import { assertAudioClaimDecision, recordNativeAudioMessage } from "./nativeAudioMessage.js";
+import { recordNativeAudioMessage } from "./nativeAudioMessage.js";
+import { claimAndDecide } from "./stepAdmission.js";
 import { DEFAULT_RETRY_RUNTIME, noteOverflowOutage } from "./requestRetry.js";
 import {
   DEFAULT_AGENT_LOOP_CONFIG,
@@ -62,7 +63,6 @@ import {
   type AgentLoopConfig,
   type AgentStatus,
   type CancelOptions,
-  type InboxMessage,
   type InboxReceipt,
   type InboxTarget,
   type LoopHooks,
@@ -77,7 +77,7 @@ import { firstStop, sentByPerson, TurnGuards, turnPolicies, type TurnPolicy } fr
 import { projectNativeCost } from "../budgets/nativeCostProjection.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
-import { recordTurnVerification, VerifyOnStop, workspaceAfterEditChecks, type VerifyOnStopSetting } from "./turnVerification.js";
+import { TurnChecks, type VerifyOnStopInit } from "./verifyOnStop.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
 import { RunLimitTracker, type RunLimitBreach, type RunLimits } from "./runLimits.js";
 import { resolveRouteCompaction } from "./compaction/promptPressure.js";
@@ -92,8 +92,11 @@ export interface AgentDriverInit {
   readonly systemPromptEventId: string;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
-  /** HP-04 checks after edits: absent reads the workspace's signed default; false is the operator's per-run off switch. */
-  readonly verifyOnStop?: false | NativeValidationPlan;
+  /**
+   * HP-04 checks after edits: absent reads the workspace's signed default; false is the operator's per-run off switch;
+   * `{ parent }` marks a delegated child, which records its status and never runs checks itself.
+   */
+  readonly verifyOnStop?: VerifyOnStopInit;
   readonly hooks?: LoopHooks;
   readonly config?: Partial<AgentLoopConfig>;
   /**
@@ -118,9 +121,6 @@ type Phase =
   | { kind: "running"; abort: AbortController; turn: number; step: number; wakeRequested: boolean }
   | { readonly kind: "failed"; readonly cause: unknown; readonly turn: number };
 
-/** A pre-step that decided to enter, with the batch it decided to enter with. */
-type PreparedStep = Extract<PreStepDecision, { kind: "enter" }>;
-
 export class AgentDriver {
   readonly inbox: LoopInbox;
 
@@ -132,7 +132,8 @@ export class AgentDriver {
 
   private readonly stepInit: StepRunnerInit;
   private readonly validation: NativeValidationPlan | undefined;
-  private readonly verifyStop: VerifyOnStop | null; private readonly verifySetting: VerifyOnStopSetting;
+  /** HP-04: the turn/start marker, the verify-on-stop hook and each turn's check-status row. */
+  private readonly turnChecks: TurnChecks;
   /** Null when neither reviewed route metadata nor explicit settings supply a window. */
   private readonly compactor: AutoCompactor | null;
   /** Null when the run carries no limit. */
@@ -166,9 +167,7 @@ export class AgentDriver {
     const selected = init.route.pinned ?? init.llm.pin?.(init.route);
     const compaction = resolveRouteCompaction(init.config?.compaction, init.route, selected?.modelMetadata);
     this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, compaction };
-    const checks = init.validation !== undefined || init.verifyOnStop === false ? null : init.verifyOnStop ?? workspaceAfterEditChecks(init.session.workspace);
-    this.verifySetting = init.validation !== undefined ? "validate" : init.verifyOnStop === false ? "off" : checks === null ? "no-checks" : "on";
-    this.verifyStop = checks === null ? null : new VerifyOnStop(init.session, checks, this.config.toolAbandonGraceMs);
+    this.turnChecks = new TurnChecks(init.session, init.validation !== undefined, init.verifyOnStop, this.config.toolAbandonGraceMs);
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
@@ -542,7 +541,7 @@ export class AgentDriver {
       return false;
     }
 
-    const turnRef = this.session.startTurn({ trigger: triggerForNextTurn(this.inbox, phase.turn) });
+    const turnRef = this.session.startTurn({ trigger: triggerForNextTurn(this.inbox, phase.turn), ...this.turnChecks.marker });
     this.head = turnRef;
     phase.turn = turnRef.turn;
     this.guards.reset();
@@ -686,9 +685,14 @@ export class AgentDriver {
               target = "next-step";
               continue;
             }
-          } else if (ending.reason === "complete" && this.verifyStop !== null) {
-            const feedback = await this.verifyStop.atStop(turnRef.turn, phase.step, this.stepInit.tools, signal);
-            if (feedback !== null) { acceptRepairContext(feedback); ending = null; target = "next-step"; continue; }
+          } else if (ending.reason === "complete") {
+            const feedback = await this.turnChecks.atStop(turnRef.turn, phase.step, this.stepInit.tools, signal);
+            if (feedback !== null) {
+              acceptRepairContext(feedback);
+              ending = null;
+              target = "next-step";
+              continue;
+            }
           }
           break;
         }
@@ -710,7 +714,11 @@ export class AgentDriver {
       let cleanupFailure: { error: unknown } | undefined;
       try { for (const id of repairContextIds) this.inbox.cancelNextStep(id); }
       catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
-      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); recordTurnVerification(this.session, turnRef.turn, this.verifySetting); } // HP-04: inside the turn, under its seal
+      let finishErrored = false;
+      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
+      catch (error) { finishErrored = true; ending = { reason: "error", error }; this.notifyError(error); }
+      // HP-04: always the last row before turn/end, so the turn's seal covers it; a failed finish above reads check-errored.
+      try { this.turnChecks.record(turnRef.turn, this.stepInit.tools, finishErrored); }
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {
@@ -761,39 +769,10 @@ export class AgentDriver {
     }
   }
 
-  /**
-   * Claim a batch, then let listeners decide whether the step is entered.
-   *
-   * The claim is DURABLE BEFORE the waterfall runs — dsh's ordering, kept — so a
-   * veto consumes the messages it was handed. That loss is real, and AMC records
-   * it rather than hiding it: the `loop/veto` row names the vetoing party and
-   * every message id the veto burned.
-   */
+  /** Claim a batch, then let listeners decide whether the step is entered (claimAndDecide says why in this order). */
   private async preStep(target: InboxTarget, turn: number, step: number, signal: AbortSignal): Promise<PreStepDecision> {
-    const claimed: readonly InboxMessage[] = this.inbox.claim(target);
-    // A hook may mutate the batch array, but cannot erase the captured v2 claims.
-    const orderedClaims = claimed.filter(message => message.parts !== undefined);
-    const audioClaims = claimed.filter(message => message.audioParts !== undefined);
-    const decision = await this.hooks.preStep(
-      { turn, step, target, messages: claimed, signal, contextSession: Object.freeze({
-        sessionId: this.session.sessionId, workspace: this.session.workspace,
-        readEvents: () => this.session.readEvents(),
-        recordProjectedEvidence: this.session.recordProjectedEvidence.bind(this.session)
-      }) },
-      (): Promise<PreparedStep> => Promise.resolve({ kind: "enter", messages: claimed })
-    );
-    signal.throwIfAborted();
-    if (decision.kind === "reject") {
-      this.head = this.session.recordLoopEvent({
-        kind: "veto",
-        turn,
-        step,
-        by: decision.by,
-        claimedMessageIds: claimed.map((message) => message.messageId)
-      });
-    }
-    if (decision.kind === "enter") assertOrderedClaimDecision(orderedClaims, decision.messages);
-    if (decision.kind === "enter") assertAudioClaimDecision(audioClaims, decision.messages);
+    const { decision, vetoRow } = await claimAndDecide({ inbox: this.inbox, hooks: this.hooks, session: this.session }, target, turn, step, signal);
+    if (vetoRow !== null) this.head = vetoRow;
     return decision;
   }
 }

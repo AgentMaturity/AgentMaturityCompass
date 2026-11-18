@@ -158,6 +158,7 @@ export function gateToolCallsOnApproval(
     ...(inner.supportsEffectGuard === true ? { supportsEffectGuard: true as const } : {}),
     ...(inner.shutdown === undefined ? {} : { shutdown: () => inner.shutdown!() }),
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),
+    ...(inner.hasBackgroundWork === undefined ? {} : { hasBackgroundWork: () => inner.hasBackgroundWork!() }),
     ...(inner.actionClassOf === undefined ? {} : { actionClassOf: (toolName: string) => inner.actionClassOf!(toolName) }),
     ...(inner.denialBeforeApproval === undefined ? {} : { denialBeforeApproval: (request: ToolCallRequest) => inner.denialBeforeApproval!(request) }),
     asksBeforeRunning: (toolName: string): boolean => isGated(options, toolName, classOf(toolName)),

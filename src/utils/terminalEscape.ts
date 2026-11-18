@@ -11,3 +11,8 @@ const BIDI_CONTROLS = "؜‎‏‪-‮⁦-⁩";
 export function escapeTerminalControls(text: string): string {
   return text.replace(new RegExp(`${TERMINAL_CONTROLS.source.slice(0, -1)}${BIDI_CONTROLS}]`, "g"), (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 }
+
+/** One line of text for a harness note: newlines and every other control shown as escapes, bidi marks too, capped. */
+export function oneLineText(text: string, max = 256): string {
+  return escapeTerminalControls(JSON.stringify(text.slice(0, max)).slice(1, -1));
+}

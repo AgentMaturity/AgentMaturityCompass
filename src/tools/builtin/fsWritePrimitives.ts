@@ -9,7 +9,7 @@ import { readRegularFile } from "./fsRegularFile.js";
 import { unifiedDiff } from "./lineDiff.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { insideWorkspace } from "./workspacePath.js";
-import { escapeTerminalControls } from "../../utils/terminalEscape.js";
+import { oneLineText } from "../../utils/terminalEscape.js";
 
 /**
  * The write primitives every filesystem tool shares (fs.write, fs.edit, apply_patch): read what is there, show a
@@ -135,6 +135,6 @@ export function strictJsonNote(path: string, bytes: Buffer): string {
   try { JSON.parse(bytes.toString("utf8")); return ""; }
   catch (error) {
     const at = /position (\d+)/.exec(error instanceof Error ? error.message : "")?.[1];
-    return `\n[amc: ${escapeTerminalControls(path.slice(0, 256))} does not parse as strict JSON${at === undefined ? "" : ` (at character ${at})`}; a file meant to allow comments, like tsconfig.json, may ignore this]`;
+    return `\n[amc: ${oneLineText(path)} does not parse as strict JSON${at === undefined ? "" : ` (at character ${at})`}; a file meant to allow comments, like tsconfig.json, may ignore this]`;
   }
 }

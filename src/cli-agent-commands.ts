@@ -683,7 +683,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                         io.error("The native approval channel disconnected; cancelling this turn."); process.emit("SIGINT"); return;
                       }
                       try { process.send({ type: "amc/native-approval-raised", v: 1, agentId,
-                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, ...reportedCallFor(event) }, error => {
+                          approvalId: event.approvalId, approvalRequestId: event.approvalRequestId, toolCallId: event.toolCallId, ...reportedCallFor(event) }, error => {
                           if (error) { io.error("Could not deliver the actual approval request to native chat; cancelling this turn."); process.emit("SIGINT"); }
                         });
                       } catch { io.error("Native approval IPC failed; cancelling this turn."); process.emit("SIGINT"); }
