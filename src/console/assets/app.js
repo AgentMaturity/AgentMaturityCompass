@@ -1703,8 +1703,7 @@ async function renderApprovals() {
   root.innerHTML = `
     ${pageIntroHtml(selectedApprovalId ? "One approval request" : "Decisions waiting for people", selectedApprovalId ? "Who decided, and what is left." : "Approve or deny a request, and see who decided.", { id: "approvalsIntro" })}
     ${demoActor ? '<p class="banner">Demo sessions cannot decide approvals. Sign in with an authorized identity to review and record a decision.</p>' : !approvalActorAllowed ? '<p class="banner">Your identity can review these requests but cannot record approval decisions. An authorized approver, owner or auditor must decide.</p>' : ""}
-    ${selectedApprovalId && rows[0] ? approvalCallHtml(rows[0]) : ""}
-    ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : `
+    ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>${rows[0] ? approvalCallHtml(rows[0]) : ""}` : `
       <div class="row wrap appr-show" role="group" aria-label="Which requests">
         <button type="button" class="secondary" data-appr-show="PENDING" aria-pressed="${showing === "PENDING"}">Waiting</button>
         <button type="button" class="secondary" data-appr-show="" aria-pressed="${showing === ""}">All</button>

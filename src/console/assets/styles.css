@@ -2506,3 +2506,10 @@ button.station-tile[aria-pressed="true"] { border-color: var(--accent); box-shad
 .governor-cell.on { white-space: nowrap; }
 .governor-cell .state-dot { vertical-align: middle; }
 .governor-word { font-size: 13px; font-weight: 600; }
+/* On a phone each kind of action is one row: its name and what happens to it (the other columns are empty). */
+@media (max-width: 560px) {
+  .governor-grid thead { display: none; }
+  .governor-grid tr { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
+  .governor-grid tbody th, .governor-grid td { padding: 10px 0; border: 0; text-align: left; }
+  .governor-grid td:not(.on):not([colspan]) { display: none; }
+}
