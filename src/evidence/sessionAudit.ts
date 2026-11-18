@@ -9,6 +9,7 @@
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { listApprovalDecisions, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
+import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { buildSessionExport } from "../observability/sessionExport.js";
 import { renderSessionExportHtml } from "../observability/sessionExportHtml.js";
 import { readEventPayload } from "../session/eventPayload.js";
@@ -137,7 +138,7 @@ function recordedCall(workspace: string, request: ApprovalRequestRecord): { tool
  * session record, because a diff against today's files would not be what was approved then.
  */
 export function approvalCallFor(workspace: string, request: ApprovalRequestRecord, status: string):
-  ShownCall | { readonly unavailable: string } | { readonly withheld: readonly string[]; readonly digest: string } {
+  ShownCall | { readonly unavailable: string; readonly approveHere?: false } | { readonly withheld: readonly string[]; readonly digest: string; readonly approveHere: false } {
   if (status !== "PENDING") return { unavailable: "this request is decided; what ran is in the session's record (Records, Agent sessions)" };
   try {
     const call = recordedCall(workspace, request);
@@ -146,17 +147,25 @@ export function approvalCallFor(workspace: string, request: ApprovalRequestRecor
     // One rule (UX-04): anything secret-shaped anywhere in the call, and no argument content leaves this process. The
     // person refuses here or decides at the terminal; the approval still covers the exact call, by its digest.
     const digest = typeof request.authorizationIntent?.argumentsDigest === "string" ? request.authorizationIntent.argumentsDigest : request.boundHashes.intentHash;
-    const kinds = secretKinds(call.rawArguments);
-    if (kinds.length > 0) return { withheld: kinds, digest };
-    return { ...shareable(workspace, describeReportedCall(workspace, call)), digest };
+    const kinds = secretKinds(call.rawArguments, call.toolName);
+    if (kinds.length > 0) return { withheld: kinds, digest, approveHere: false };
+    const shown = shareable(workspace, describeReportedCall(workspace, call));
+    // Everything the card would carry is scanned too (M1): a secret the arguments hid in a key or a derived line withholds.
+    const derived = secretKinds(JSON.stringify(shown), "");
+    if (derived.length > 0) return { withheld: derived, digest, approveHere: false };
+    // Approve is offered only for a call shown whole (M3), as the terminal allows a local decision only then.
+    return { ...shown, digest, approveHere: shown.complete };
   } catch (error) {
-    return { unavailable: `the call could not be shown: ${error instanceof Error ? error.message : String(error)}` };
+    void error; // its text can name host paths; the card gets a fixed reason
+    return { unavailable: "the call could not be shown here" };
   }
 }
 
 type ShownCall = { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean; readonly folder: string;
   /** The digest of the exact arguments the signed request binds: what the approval covers, not this rendering. */
-  readonly digest?: string };
+  readonly digest?: string;
+  /** Whether a console card may offer Approve: only for a call shown whole and with nothing secret-shaped in it. */
+  readonly approveHere?: boolean };
 
 /**
  * The call as it may leave this machine's process for a browser: host paths (the workspace, the home folder) written
@@ -180,7 +189,12 @@ const DECIDING_ROLES = ["APPROVER", "OWNER", "AUDITOR"];
 export function approvalCallField(workspace: string, request: ApprovalRequestRecord, status: string,
   viewer: { readonly isAdmin: boolean; readonly userId: string | null; readonly roles: Iterable<string> }): { readonly call?: ReturnType<typeof approvalCallFor> } {
   const roles = [...viewer.roles];
-  const decides = viewer.isAdmin || roles.some((role) => DECIDING_ROLES.includes(role) && (request.rolesAllowed as readonly string[]).includes(role));
+  // The decide route's rule (approvalStudioService.ts, inline there): the CURRENT signed policy's rolesAllowed for this
+  // class, default APPROVER and OWNER, among the roles Studio's decide route admits; the admin token decides too.
+  let allowed: readonly string[];
+  try { allowed = loadApprovalPolicy(workspace).approvalPolicy.actionClasses[request.actionClass]?.rolesAllowed ?? ["APPROVER", "OWNER"]; }
+  catch { allowed = []; }
+  const decides = viewer.isAdmin || roles.some((role) => DECIDING_ROLES.includes(role) && allowed.includes(role));
   const raised = viewer.userId !== null && request.initiator !== undefined && (request.initiator === viewer.userId || request.initiator.endsWith(`:${viewer.userId}`));
   return decides || raised ? { call: approvalCallFor(workspace, request, status) } : {};
 }
@@ -189,14 +203,15 @@ export function approvalCallField(workspace: string, request: ApprovalRequestRec
  * The kinds of secret the BROAD shared detectors find anywhere in the call: the raw argument text and every string value
  * of the parsed arguments (JSON-unescaped). Every argument counts: a file's content is what the approver approves.
  */
-function secretKinds(raw: string): string[] {
+function secretKinds(raw: string, toolName: string): string[] {
   const kinds = new Set<string>();
   const scan = (text: string) => { for (const region of secretRegions(text)) kinds.add(region.type.replaceAll("_", " ")); };
   scan(raw);
+  scan(toolName);
   const walk = (value: unknown): void => {
     if (typeof value === "string") scan(value);
     else if (Array.isArray(value)) value.forEach(walk);
-    else if (value !== null && typeof value === "object") Object.values(value).forEach(walk);
+    else if (value !== null && typeof value === "object") for (const [key, item] of Object.entries(value)) { scan(key); walk(item); }
   };
   try { walk(JSON.parse(raw === "" ? "{}" : raw)); } catch { /* the raw text was scanned */ }
   return [...kinds].sort();

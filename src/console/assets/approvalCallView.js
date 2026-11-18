@@ -14,6 +14,16 @@ function linesHtml(lines) {
     <details><summary>Show all ${lines.length} lines</summary><pre class="scroll approval-call-lines">${all}</pre></details>`;
 }
 
+/**
+ * The one rule for offering Approve (and Dry run only) on a tool-call request, wherever approval controls are drawn
+ * (the inbox list and one request's page): only when Studio sent the call and marked it shown whole with nothing
+ * secret-shaped in it (`approveHere`). An agent project's own request (`isProjectRequest`) keeps its project rules.
+ * This withholds a console control only; who may approve is decided by the server, unchanged.
+ */
+export function offersApprove(row, isProjectRequest = false) {
+  return isProjectRequest || row?.call?.approveHere === true;
+}
+
 /** The card shown above one request's decision buttons. */
 export function approvalCallHtml(row) {
   const call = row.call;
@@ -28,6 +38,6 @@ export function approvalCallHtml(row) {
     ${linesHtml(Array.isArray(call.lines) ? call.lines : [])}
     ${covers}
     ${call.complete ? `<p class="muted">This is the whole call, checked against the signed request.</p>`
-      : `<p class="status-bad">Part of this call could not be shown in full (long, hidden or unreadable characters). Read it with care.</p>`}
+      : `<p class="status-bad">Part of this call is not shown here (it is long, or has hidden or unreadable characters), so it cannot be approved from this page. Decide it at the terminal where the agent is running, where the whole call is visible, or refuse it here.</p>`}
   </section>`;
 }

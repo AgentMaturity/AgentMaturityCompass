@@ -3,7 +3,7 @@ import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { renderAgentSessionsInto } from "./agentSessions.js";
-import { approvalCallHtml } from "./approvalCallView.js";
+import { approvalCallHtml, offersApprove } from "./approvalCallView.js";
 import { renderGovernorOutcomes } from "./governorOutcomes.js";
 import { toolRatesHtml } from "./runtimeRates.js";
 import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
@@ -1813,8 +1813,9 @@ async function renderApprovals() {
         : Number(row.decisionCount || 0)}</td>
       <td>
         ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
-            ${Array.isArray(row.call?.withheld) ? "" : `<button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>`}
+            ${offersApprove(row, a4Rows.includes(row) || Boolean(a4.a4ProjectOf(row.intentId)) || row.approvalRequestId.startsWith("a4gate_")) ? `<button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
+            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>`
+              : selectedApprovalId ? "" : `<a href="./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}">See the call to decide</a>`}
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
           </div>` : '<span class="muted">Unavailable</span>'}
       </td>
