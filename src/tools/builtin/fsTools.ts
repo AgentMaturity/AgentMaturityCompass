@@ -7,7 +7,7 @@ import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
 import { scanRegularFile } from "./fsRegularFile.js";
-import { readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
+import { readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, strictJsonNote, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
 import { insideWorkspace } from "./workspacePath.js";
 
 export { insideWorkspace } from "./workspacePath.js";
@@ -209,7 +209,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           bytesBefore: before?.length ?? 0, bytesAfter: after.length, replacements: null,
           diffSha256: diff === null ? null : sha256Hex(diff.text), diffTruncated: diff?.truncated ?? false
         };
-        return { ok: true, output: diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text), bytes: after.length, fileChanges: [change] };
+        return { ok: true, output: (diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text)) + strictJsonNote(args.path, after), bytes: after.length, fileChanges: [change] };
       }
     }),
 
@@ -280,7 +280,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           path: rel, beforeSha256: sha256Hex(raw), afterSha256: sha256Hex(after), bytesBefore: raw.length,
           bytesAfter: after.length, replacements: plan.replacements, diffSha256: sha256Hex(diff.text), diffTruncated: diff.truncated
         };
-        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text), bytes: after.length, fileChanges: [change] };
+        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text) + strictJsonNote(args.path, after), bytes: after.length, fileChanges: [change] };
       }
     })
   ];

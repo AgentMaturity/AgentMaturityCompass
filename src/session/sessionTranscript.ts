@@ -5,6 +5,7 @@ import { foldSurfaceEntries } from "./surfaceProjection.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { sha256Hex } from "../utils/hash.js";
 import { renderMarkdown } from "../utils/terminalMarkdown.js";
+import { describeTurnCheck, needsCheckWarning, projectTurnChecks } from "../agent/turnVerification.js";
 
 const ROLES: Readonly<Record<string, string>> = { user: "You", assistant: "Agent", tool: "Tool result", system: "System" };
 const MAX_TOOL_LINES = 12;
@@ -20,7 +21,14 @@ export function renderSessionTranscript(workspace: string, events: readonly Evid
   let unreadable = 0;
   let role: string | null = null;
   const approvedBy = approvedCalls(events);
-  for (const entry of foldSurfaceEntries(events)) {
+  const entries = foldSurfaceEntries(events);
+  // HP-04: an unchecked or failed-check turn's status line goes right after that turn's last assistant text.
+  const warnings = new Map(projectTurnChecks(events).filter(needsCheckWarning).map(row => [row.turn, describeTurnCheck(row)]));
+  const turnOf = (id: string): unknown => { try { return JSON.parse(byId.get(id)?.meta_json ?? "{}").turn; } catch { return null; } };
+  const lastText = new Map<unknown, string>();
+  for (const entry of entries) if (entry.role === "assistant" && entry.part.kind === "text") lastText.set(turnOf(entry.sourceEventId), entry.sourceEventId);
+  const warn = (turn: unknown): void => { const line = warnings.get(turn as number); if (line !== undefined) { warnings.delete(turn as number); lines.push(chalk.yellow(`  check: ${line}`)); } };
+  for (const entry of entries) {
     if (entry.role !== role) { role = entry.role; lines.push("", chalk.bold(`${ROLES[entry.role] ?? entry.role}:`)); }
     const event = byId.get(entry.sourceEventId);
     const payload = event === undefined ? null : readEventPayload(workspace, event);
@@ -33,7 +41,10 @@ export function renderSessionTranscript(workspace: string, events: readonly Evid
     // The system prompt and the runtime-context snapshots are model-visible but not the conversation: named, not printed (--json has them).
     if (entry.part.kind === "text" && (entry.role === "system" || text.startsWith("Current runtime context."))) {
       lines.push(chalk.dim(`  [${entry.role === "system" ? "system prompt" : "runtime context snapshot"}, ${text.split("\n").length} lines]`));
-    } else if (entry.part.kind === "text") lines.push(...renderMarkdown(text, width === null ? null : width - 2).map(line => `  ${line}`));
+    } else if (entry.part.kind === "text") {
+      lines.push(...renderMarkdown(text, width === null ? null : width - 2).map(line => `  ${line}`));
+      if (lastText.get(turnOf(entry.sourceEventId)) === entry.sourceEventId) warn(turnOf(entry.sourceEventId));
+    }
     else if (entry.part.kind === "tool_use") {
       const meta = JSON.parse(event.meta_json) as { toolName?: unknown };
       const name = typeof meta.toolName === "string" ? meta.toolName : "tool";
@@ -48,6 +59,7 @@ export function renderSessionTranscript(workspace: string, events: readonly Evid
       if (shown.length > MAX_TOOL_LINES) lines.push(chalk.dim(`  (${shown.length - MAX_TOOL_LINES} more lines)`));
     } else lines.push(chalk.dim(`  [${entry.part.kind}, ${payload.bytes.length} bytes]`));
   }
+  for (const turn of [...warnings.keys()]) warn(turn);
   return { lines, unreadable };
 }
 

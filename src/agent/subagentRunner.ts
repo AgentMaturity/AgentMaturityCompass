@@ -12,6 +12,7 @@ import { agentToolset } from "./agentToolset.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { AgentDriver } from "./agentDriver.js";
 import { composeNativeAgent } from "./nativeAgentComposition.js";
+import type { VerifyOnStopSetting } from "./turnVerification.js";
 import { readAgentRunSummary } from "./runReport.js";
 import { compactionSummaryRows } from "./compaction/summaryPrompt.js";
 import type { LoopLlm, LoopRoute } from "./stepRunner.js";
@@ -105,6 +106,8 @@ export interface DriverRunnerInit {
    * so a parent's live observer would see a child's steps as its own.
    */
   readonly hookControl?: LoopHookControl;
+  /** HP-04: the root run's check setting; children record it and never run checks themselves. */
+  readonly parentChecks?: VerifyOnStopSetting;
   /** The parent's resolved shell decision; children inherit it and never widen it. Absent, a child inherits no opt-in. */
   readonly parentShell?: NativeShellReadiness;
   /**
@@ -418,7 +421,8 @@ export function createDriverRunner(init: DriverRunnerInit): SubagentRunner {
           hasOwnedWork: () => toolset?.hasOwnedWork() ?? false,
           admit: () => recordHookControl({ session, ctx, inherited, gate, scope, descendantScope, descendantStops, approvalMode: init.approvalMode,
             stepCeiling: childConfig?.maxStepsPerTurn ?? DEFAULT_AGENT_LOOP_CONFIG.maxStepsPerTurn }),
-          ...(childConfig === undefined ? {} : { driver: { config: childConfig } })
+          // HP-04: a child never runs the workspace checks; its parent's turn does (data passed down, never re-read).
+          driver: { verifyOnStop: { parent: init.parentChecks ?? "no-checks" }, ...(childConfig === undefined ? {} : { config: childConfig }) }
         });
       } catch (error) {
         sessionSettled = true; // composeNativeAgent closed it as a failed composition, never `completed`

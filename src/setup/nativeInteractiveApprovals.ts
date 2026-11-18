@@ -8,6 +8,7 @@ import { cliInitiator, decideApprovalForIntent } from "../approvals/approvalEngi
 import { interactiveOperator } from "../vault/operatorContext.js";
 import { readNativeApprovalActor } from "./nativeApprovalIdentity.js";
 import { callMatchesRequest, describeReportedCall, parseReportedCall, type ReportedCall } from "./nativeApprovalPreview.js";
+import { escapeTerminalControls } from "../utils/terminalEscape.js";
 
 export interface NativeApprovalPromptOptions {
   readonly child: ChildProcess; readonly workspace: string; readonly entry: string;
@@ -26,6 +27,8 @@ interface Raised {
   readonly agentId: string; readonly approvalId: string; readonly approvalRequestId: string;
   /** The call's own arguments as the run reported them; shown only once they match the signed request's digest. */
   readonly call?: unknown;
+  /** Set by the run only for a check its validation path is running (HP-04); the model cannot set it. */
+  readonly harnessCheck?: unknown;
 }
 function raised(value: unknown, agentId: string): value is Raised {
   if (value === null || typeof value !== "object") return false;
@@ -46,12 +49,16 @@ function terminalMayDecide(workspace: string, item: ApprovalInboxItem, shown: bo
 }
 const ROLE_WORDS: Record<string, string> = { OWNER: "an owner", APPROVER: "an approver", AUDITOR: "an auditor", OPERATOR: "an operator", VIEWER: "a viewer", AGENT: "an agent" };
 type CallView = ReturnType<typeof describeReportedCall>;
+/** HP-04: the check's title, only when the run marked this request as raised by its own validation path. */
+const harnessCheckTitleOf = (event: Raised, what: CallView | null): string | null =>
+  what !== null && typeof event.harnessCheck === "string" && event.harnessCheck.length > 0 ? event.harnessCheck.slice(0, 160) : null;
 /** The request in a few plain lines: what the call would do (or why it cannot be shown), and what the approval needs. */
-function describeAsk(item: ApprovalInboxItem, call: ReportedCall | null, what: CallView | null): string[] {
+function describeAsk(item: ApprovalInboxItem, call: ReportedCall | null, what: CallView | null, check: string | null = null): string[] {
   const request = item.request;
   const needs = request.requiredApprovals <= 1 ? "one approval" : `${request.requiredApprovals} approvals`;
   return [
-    what === null ? `The agent wants to use the tool "${request.toolName}".` : `The agent wants to: ${what.title}`,
+    check !== null ? `AMC wants to run its configured check "${escapeTerminalControls(check)}" (set by a person, not by the agent), because the agent changed files:`
+      : what === null ? `The agent wants to use the tool "${request.toolName}".` : `The agent wants to: ${what.title}`,
     ...(what === null
       ? [call === null ? "  AMC cannot show this call here: the run did not send its arguments." : "  AMC cannot show this call here: the arguments sent do not match the signed request."]
       : [...what.lines.map(line => `  ${line}`), ...(what.complete ? [] : ["  Part of this call is not shown here, so it cannot be allowed from this terminal alone."])]),
@@ -160,7 +167,7 @@ export function createNativeInteractiveApprovals(options: NativeApprovalPromptOp
       const call = event.call === undefined ? null : parseReportedCall(event.call);
       const what = call !== null && callMatchesRequest(workspace, request, call) ? describeReportedCall(workspace, call) : null;
       const shown = what !== null && what.complete;
-      options.log(describeAsk(item, call, what).join("\n"));
+      options.log(describeAsk(item, call, what, harnessCheckTitleOf(event, what)).join("\n"));
       if (terminalMayDecide(workspace, item, shown)) { await decideHere(event, item, controller.signal); return; }
       options.log(shown
         ? "This approval needs a signed-in reviewer: type approve, deny or cancel, then give a sign-in file from `amc approvals login`."

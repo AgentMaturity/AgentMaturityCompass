@@ -43,6 +43,7 @@ import { gateToolCallsOnApproval, type ToolApprovalGateOptions } from "../agent/
 import type { ApprovalMode } from "../approvals/approvalModes.js";
 import type { AgentLoopConfig, AgentStatus, CancelOptions, InboxReceipt, LoopHooks, LoopNotification } from "../agent/loopTypes.js";
 import type { LoopRoute } from "../agent/stepRunner.js";
+import { resolveVerifyOnStop } from "../agent/verifyOnStop.js";
 import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "../agent/toolSeam.js";
 import type { NativeShellReadiness } from "../sandbox/nativeShellGate.js";
 import type { NativeValidationPlan, NativeValidationResult } from "../agent/nativeValidation.js";
@@ -253,6 +254,8 @@ export interface ComposedTurnOptions {
   readonly encoders?: RequestEncoderRegistry;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
+  /** HP-04: false turns the workspace's checks after edits off for this run (recorded on each turn). */
+  readonly verifyOnStop?: false;
   /** Binds prebuilt tools after new/resume/fork selects the writer, before dispatch. */
   readonly bindToolSession?: (session: ComposedToolSession) => void;
   readonly config?: Partial<AgentLoopConfig>;
@@ -586,6 +589,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
           // the parent's guards cannot see. `notify` is deliberately not part
           // of it; see `LoopHookControl`.
           hookControl: hooks,
+          // HP-04: the root's own setting, handed down as data so no child reads the workspace checks again.
+          parentChecks: resolveVerifyOnStop(options.workspace, options.validation !== undefined, options.verifyOnStop).setting,
           harnessVersion: amcVersion,
           compositionDigest: compositionDigestOf(options, profile),
           policyDigest: policyDigestOf(options),
@@ -674,6 +679,7 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       systemPromptEventId: systemPromptRef.eventId,
       ...(tools !== undefined ? { tools } : {}),
       ...(options.validation !== undefined ? { validation: options.validation } : {}),
+      ...(options.verifyOnStop === false ? { verifyOnStop: false } : {}),
       ...(options.config !== undefined ? { config: options.config } : {}),
       // A resumed session's earlier steps count toward the token bound; unmeasured ones fail it closed. A fork is a new
       // session: it records its parent's counts as FORK_TOKEN_COUNTS and starts its own budget at zero.

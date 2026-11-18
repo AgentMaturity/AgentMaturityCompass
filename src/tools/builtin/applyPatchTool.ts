@@ -7,7 +7,7 @@ import { defineTool } from "../toolRegistry.js";
 import type { FileChange, ToolBodyResult, ToolDefinition, ToolExecution } from "../toolTypes.js";
 import { MAX_PATCH_BYTES, parsePatch, type PatchSection } from "./applyPatchParse.js";
 import { applyHunks, locateBudget, type LocateBudget } from "./applyPatchPlan.js";
-import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
+import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, strictJsonNote, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { insideWorkspaceNoLinks } from "./workspacePath.js";
 
@@ -232,7 +232,8 @@ export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger }):
         }
       }
       const bytes = landed.reduce((sum, entry) => sum + entry.bytesAfter, 0);
-      return { ok: true, output: render(`applied patch: ${operations.length} file(s)`, operations), bytes, effect: "applied", fileChanges: landed };
+      const jsonNotes = operations.map(op => op.kind === "delete" ? "" : strictJsonNote((op.kind === "update" && op.moveTo !== null ? op.moveTo : op.target).path, op.after)).join("");
+      return { ok: true, output: render(`applied patch: ${operations.length} file(s)`, operations) + jsonNotes, bytes, effect: "applied", fileChanges: landed };
     }
   });
 }

@@ -78,6 +78,8 @@ export interface AgentToolSeam {
   /** Native resource cleanup before the owning writer closes or is handed off. */
   shutdown?(): Promise<boolean>;
   hasOwnedWork?(): boolean;
+  /** A background job or an open terminal this toolset started is still alive (HP-04: no check can show a pass then). */
+  hasBackgroundWork?(): boolean;
   /** The same selected native extension runtime used by the toolset guard. */
   readonly extensionHooks?: NativeHookRuntime;
   /** The consented or explicitly reviewed tool policy enforced by this seam. In-process descendants inherit it. */
