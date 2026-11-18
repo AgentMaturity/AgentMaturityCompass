@@ -40,7 +40,7 @@ function okJson(description: string, schemaRef: string, example?: Record<string,
 }
 
 /** GET one approval request: the observing read and its `/view` twin, which writes nothing, answer alike. */
-function approvalDetailGet(summary: string): Record<string, unknown> {
+function approvalDetailGet(summary: string): Record<string, OpenApiOperation> {
   return { get: { summary, tags: ["Studio", "Approvals", "Enforce"], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
     security: [{ adminToken: [] }, { sessionCookie: [] }], responses: { "200": okJson("Canonical approval request", "#/components/schemas/ApprovalDetailResponse"),
       "401": errJson("Unauthorized"), "404": errJson("Approval request not found") } } };
