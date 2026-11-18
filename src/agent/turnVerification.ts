@@ -23,6 +23,7 @@ import type { SessionEventRef } from "../session/sessionApiTypes.js";
 import type { SessionService } from "../session/sessionService.js";
 import { loadVerifiedToolsConfigSnapshot } from "../toolhub/toolhubValidators.js";
 import type { EvidenceEvent } from "../types.js";
+import { escapeTerminalControls } from "../utils/terminalEscape.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import type { AgentToolSeam } from "./toolSeam.js";
 
@@ -46,6 +47,9 @@ export interface TurnCheckRow extends TurnVerification {
 
 export const TURN_VERIFICATION_KIND = "native-turn-verification";
 export const VERIFY_ON_STOP_KIND = "native-verify-on-stop";
+/** The closed set of reason codes; a stored row with any other value reads as "unknown-reason" (and fails verify). */
+const REASON_CODES: ReadonlySet<string> = new Set(["no-check", "check-before-last-change", "nonzero-exit", "check-cancelled", "check-execution-denied",
+  "check-deadline-exceeded", "check-execution-unavailable", "check-prior-check-unavailable", "check-unavailable", "unknown-reason"]);
 const STATUSES: ReadonlySet<string> = new Set(["no-changes", "changed-and-checked-pass", "changed-and-checked-fail", "changed-unchecked"]);
 const SETTINGS: ReadonlySet<string> = new Set(["on", "off", "no-checks", "validate"]);
 /** Built-in tools that cannot change workspace files. Everything else may. */
@@ -95,7 +99,8 @@ export function computeTurnVerification(rows: readonly EvidenceEvent[], turn: nu
   }
   if (after.status === "passed") return { status: "changed-and-checked-pass", changes, lastChangeEventId, checkEventId: after.eventId, reason: null };
   if (after.status === "failed") return { status: "changed-and-checked-fail", changes, lastChangeEventId, checkEventId: after.eventId, reason: "nonzero-exit" };
-  return { status: "changed-unchecked", changes, lastChangeEventId, checkEventId: after.eventId, reason: `check-${after.reason ?? "unavailable"}` };
+  const code = `check-${after.reason ?? "unavailable"}`;
+  return { status: "changed-unchecked", changes, lastChangeEventId, checkEventId: after.eventId, reason: REASON_CODES.has(code) ? code : "check-unavailable" };
 }
 
 /** Written once per turn, before `turn/end`, so the turn's seal covers it. */
@@ -111,7 +116,8 @@ export function turnCheckFrom(value: unknown, eventId: unknown): TurnCheckRow | 
     || !Number.isSafeInteger(meta.changes) || typeof eventId !== "string") return null;
   const text = (field: unknown): string | null => typeof field === "string" ? field : null;
   return { turn: meta.turn as number, status: meta.status as TurnVerificationStatus, changes: meta.changes as number, verifyOnStop: meta.verifyOnStop as VerifyOnStopSetting,
-    lastChangeEventId: text(meta.lastChangeEventId), checkEventId: text(meta.checkEventId), reason: text(meta.reason), eventId };
+    lastChangeEventId: text(meta.lastChangeEventId), checkEventId: text(meta.checkEventId),
+    reason: meta.reason === null || meta.reason === undefined ? null : REASON_CODES.has(String(meta.reason)) ? String(meta.reason) : "unknown-reason", eventId };
 }
 
 /** The recorded rows, as written. Malformed rows are left out here and caught by {@link turnVerificationErrors}. */
@@ -146,16 +152,18 @@ const REASONS: Readonly<Record<string, string>> = {
   "check-before-last-change": "a check ran before the last of them, not after",
   "check-execution-denied": "the check was refused or needed an approval nobody gave",
   "check-deadline-exceeded": "the check ran out of time",
-  "check-cancelled": "the check was cancelled"
+  "check-cancelled": "the check was cancelled",
+  "unknown-reason": "the record names a reason this version does not know"
 };
-/** One plain line for a person, e.g. "Turn 3 ran 2 actions that can change files; no check ran afterwards." */
-export function describeTurnCheck(row: TurnCheckRow): string {
+/** One plain line for a person, e.g. "Turn 3 ran 2 actions that can change files; no check ran afterwards." Escaped for a terminal. */
+export function describeTurnCheck(row: TurnCheckRow): string { return escapeTerminalControls(turnCheckWords(row)); }
+function turnCheckWords(row: TurnCheckRow): string {
   const actions = `Turn ${row.turn} ran ${row.changes} action${row.changes === 1 ? "" : "s"} that can change files`;
   const off = row.verifyOnStop === "off" ? " Checks after edits were turned off for this run." : "";
   if (row.status === "no-changes") return `Turn ${row.turn} ran no action that can change files.`;
   if (row.status === "changed-and-checked-pass") return `${actions}; the configured check ran afterwards and passed.`;
   if (row.status === "changed-and-checked-fail") return `${actions}; the configured check ran afterwards and FAILED. Do not read the reply above as "done".`;
-  const why = row.reason === null || row.reason === "no-check" ? "" : ` (${REASONS[row.reason] ?? `the check did not finish: ${row.reason.replace(/^check-/, "")}`})`;
+  const why = row.reason === null || row.reason === "no-check" ? "" : ` (${REASONS[row.reason] ?? "the check did not finish"})`;
   return `${actions}; no check ran afterwards${why}. Nothing in this record shows the result works.${off}`;
 }
 export const needsCheckWarning = (row: TurnCheckRow): boolean => row.status === "changed-unchecked" || row.status === "changed-and-checked-fail";

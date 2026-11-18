@@ -11,7 +11,7 @@ import type { NativeValidationPlan } from "../src/agent/nativeValidation.js";
 import { projectNativeValidation } from "../src/agent/nativeValidationProjection.js";
 import { pipelineToolSeam } from "../src/agent/pipelineToolSeam.js";
 import { readAgentRunSummary, renderRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
-import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, workspaceAfterEditChecks } from "../src/agent/turnVerification.js";
+import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, turnCheckFrom, workspaceAfterEditChecks } from "../src/agent/turnVerification.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
 import { fsTools } from "../src/tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../src/tools/builtin/readBeforeEdit.js";
@@ -289,5 +289,22 @@ describe("chat reads the status from the child's summary", () => {
     const result = parseNativeChatResult({ stdout, truncated: false, requestedSessionId: null, forkFrom: null });
     expect(result.ok && result.summary.turnChecks).toEqual([good]);
     expect(describeTurnCheck(good as never)).toBe("Turn 1 ran 2 actions that can change files; no check ran afterwards. Nothing in this record shows the result works.");
+  });
+});
+
+describe("text from stored rows cannot steer a terminal", () => {
+  const hostile = "x\u001b[2J‮";
+  test("an unknown reason in a stored row reads as a fixed code and prints only fixed words", () => {
+    const row = turnCheckFrom({ turn: 1, status: "changed-unchecked", changes: 1, verifyOnStop: "on", reason: `check-${hostile}` }, "v1")!;
+    expect(row.reason).toBe("unknown-reason");
+    const line = describeTurnCheck(row);
+    expect(line).not.toMatch(/[\u001b‮]/);
+    expect(line).toContain("the record names a reason this version does not know");
+  });
+  test("a hostile .json path in the post-edit note is shown escaped and capped", () => {
+    const note = strictJsonNote(`${hostile}.json`, Buffer.from("{"));
+    expect(note).not.toMatch(/[\u001b‮]/);
+    expect(note).toContain("x\\u001b[2J\\u202e.json");
+    expect(strictJsonNote(`${"a".repeat(400)}.json`, Buffer.from("{")).length).toBeLessThan(400);
   });
 });
