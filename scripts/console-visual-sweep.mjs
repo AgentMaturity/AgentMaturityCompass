@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // Opens every Compass Console page (src/console/pages) in a running Studio at 1440 and 390 px wide, in the light and the
-// dark theme, takes a screenshot of each, and fails on (a) a console error or page error, (b) a page wider than the
-// window (sideways scrolling), or (c) an asset request that failed. A script for people checking the console's look,
+// dark theme, takes a screenshot of each, and fails on (a) a console error or page error, (b) anything drawn past the
+// window's right edge, or (c) an asset request that failed. A script for people checking the console's look,
 // not a gate check: it needs a running Studio and a person to sign in as. Run it from the repository root:
 //   npm run console:sweep -- --base http://127.0.0.1:3210 --user owner --password-file <file> [--out <folder>] [--pages home,a4]
-// Errors before the sign-in (the sign-in page asks who is signed in and is told nobody) are not counted. It never
-// prints a password.
+// Errors before the sign-in (the sign-in page asks who is signed in and is told nobody) are not counted, nor are the
+// reads that answer 404 by design on a workspace with no data yet (EXPECTED_404). It never prints a password.
 import { createRequire } from "node:module";
 import { mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -32,6 +32,9 @@ const pages = values.pages ? values.pages.split(",").map((name) => name.trim()).
 const { chromium } = createRequire(`${process.cwd()}/`)("playwright");
 
 const WIDTHS = [1440, 390];
+// Reads that answer 404 "nothing yet" by design (no organisation score, no value snapshot or contracts yet).
+const EXPECTED_404 = [/^\/org\/scorecards\/latest/, /^\/value\/snapshot\/latest/, /^\/value\/contracts/];
+const expected404 = (text, path) => /status of 404/.test(text) && EXPECTED_404.some((pattern) => pattern.test(path));
 const SCHEMES = ["light", "dark"];
 const problems = [];
 
@@ -53,7 +56,9 @@ async function sweep(browser, width, scheme) {
   // is told apart from a broken page that way).
   page.on("console", (message) => {
     if (message.type() !== "error") return;
-    const where = message.location()?.url ? ` (${message.location().url.replace(base, "")})` : "";
+    const path = String(message.location()?.url ?? "").replace(base, "");
+    if (expected404(message.text(), path)) return;
+    const where = path ? ` (${path})` : "";
     found.push(`console error: ${message.text().slice(0, 200)}${where}`);
   });
   page.on("pageerror", (error) => found.push(`page error: ${String(error).slice(0, 200)}`));
@@ -64,8 +69,17 @@ async function sweep(browser, width, scheme) {
     await page.goto(`${base}/console/${name}`);
     await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => found.push("still loading after 15 s"));
     await page.waitForTimeout(500);
-    const wider = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-    if (wider > 0) found.push(`${wider} px wider than the window`);
+    // body hides sideways overflow, so the page never scrolls sideways: look for anything drawn past the window instead.
+    const cut = await page.evaluate(() => [...document.querySelectorAll("body *")].filter((node) => {
+      const box = node.getBoundingClientRect();
+      if (!box.width || !box.height || box.right <= window.innerWidth + 1) return false;
+      // Inside a box that scrolls or clips sideways (a wide table, a code block), going past is expected.
+      for (let up = node.parentElement; up && up !== document.body; up = up.parentElement) {
+        if (["auto", "scroll", "hidden", "clip"].includes(getComputedStyle(up).overflowX)) return false;
+      }
+      return getComputedStyle(node).position !== "fixed" || box.left < window.innerWidth;
+    }).slice(0, 3).map((node) => `${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ""}${node.className && typeof node.className === "string" ? `.${node.className.trim().split(/\s+/)[0]}` : ""}`));
+    if (cut.length) found.push(`drawn past the window's right edge: ${cut.join(", ")}`);
     await page.screenshot({ path: join(out, `${name}-${width}-${scheme}.png`) });
     for (const problem of found) problems.push(`${name} at ${width} px, ${scheme}: ${problem}`);
     console.log(`${found.length ? "FAIL" : "ok  "} ${name} ${width} ${scheme}`);

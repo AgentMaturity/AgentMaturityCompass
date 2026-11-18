@@ -78,10 +78,12 @@ It signs your account with the vault keys. If it asks `Use the vault passphrase 
 
 After you sign in, the home page shows:
 
-- one plain status line, with **Details** for the full status;
-- a card titled "See what your AI agent really does.", with **Run a task** (runs a task right here, with no model or tools) and **Connect my agent** (shows the terminal command, `amc connect`, that connects your agent; in a terminal it first offers to watch the Claude Code or Codex you are signed in to, and for any other agent it writes the settings to a private file, `.amc/studio/connect/<agent>.env`, and prints one `source` line to run);
-- a progress line, such as "Your progress: 0 of 4.", that names the next step;
-- everything else under **More**.
+- the question "What would you like to do?" with three tiles: **Build an agent**, **Run a task** (runs a task right here, with no model or tools) and **Check my agent**;
+- **Waiting for you**, with how many approval requests are open;
+- your latest agent project drawn as a route, with **Continue**;
+- your **First steps** as a route, with one button for the next step: **Connect an agent** shows the terminal command, `amc connect`, that connects your agent (in a terminal it first offers to watch the Claude Code or Codex you are signed in to, and for any other agent it writes the settings to a private file, `.amc/studio/connect/<agent>.env`, and prints one `source` line to run);
+- the workspace status as a dot and two words at the top; press it for the full status;
+- everything else under **Other ways in** and **More**.
 
 The **?** button at the top of the page, "How AMC works", opens a three-step guide whenever you want it.
 
