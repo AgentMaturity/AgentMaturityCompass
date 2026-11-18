@@ -735,10 +735,12 @@ function assertGrantedIdentity(h: GrantedFixture, requested: ReturnType<typeof r
   expect(h.grants).toHaveLength(1);
   expect(outcome).toMatchObject({ ok: true, denied: null, action: { state: "completed", evidenceComplete: true, executionId: requested.id } });
   expect(h.bodies).toHaveLength(1);
-  expect(h.guards).toHaveLength(1);
+  // UX-03: the guards take an early look (as SIMULATE, unbound to any approval) before the gate asks, then decide on the final execution.
+  expect(h.guards).toHaveLength(2);
+  expect(h.guards[0]!.effectiveMode).toBe("SIMULATE");
   expect(h.recorded).toHaveLength(1);
   const body = h.bodies[0]!;
-  expect(h.guards[0]).toBe(body);
+  expect(h.guards[1]).toBe(body);
   expect(h.recorded[0]!.execution).toBe(body);
   expect(h.recorded[0]!.outcome).toEqual(outcome);
   expect(body.authorization, "the actual granted body must carry its final authorization").toBeDefined();

@@ -179,7 +179,8 @@ describe("governed native extension hooks", () => {
     const guarded = new ToolPipeline({ registry: p.registry, workspace: f.workspace, authorizeClasses: new Set(),
       prepareGuards: f.manager.hooks.prepare, approve, approvalRequiredFor: new Set(["READ_ONLY"]) });
     expect((await guarded.execute(call)).denied?.stage).toBe("approval");
-    expect(approve).toHaveBeenCalledOnce(); expect(runtime.invoke).not.toHaveBeenCalled(); expect(p.body).not.toHaveBeenCalled();
+    // UX-03: the hook takes its early look before the person is asked; its allow grants nothing, the refusal stands.
+    expect(approve).toHaveBeenCalledOnce(); expect(runtime.invoke).toHaveBeenCalledOnce(); expect(p.body).not.toHaveBeenCalled();
   });
   it("refuses a prepared hook decision after unload", async () => {
     const f = fixture(); f.manager.load(f.path);
