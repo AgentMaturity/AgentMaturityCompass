@@ -177,6 +177,8 @@ describe("canonical navigation", () => {
     for (const link of api.CANONICAL_NAV ?? []) expect(link.label[0], link.label).toBe(link.label[0]!.toUpperCase());
     expect(html).not.toContain("More pages");
     expect(hrefs(html)).toHaveLength(32);
+    // The person is drawn at the foot of the rail, after the theme switch, and comes last for the keyboard too.
+    expect(html.indexOf('href="./login"')).toBeGreaterThan(html.indexOf('class="rail-foot"'));
     expect(html).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 
@@ -270,6 +272,11 @@ describe("topbarHtml", () => {
     for (const variant of [html, topbar({ me: null }), demo]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 
+  test("keeps the workspace's name, escaped, for pages with no status to show", () => {
+    expect(topbar({ workspace: "<acme>" })).toContain('<span class="topbar-workspace muted">&lt;acme&gt; workspace</span>');
+    expect(topbar({})).toContain(">Local workspace</span>");
+  });
+
   test("app.js renders the top bar through renderTopbar, refreshes it after sign-in and wires Sign out to logout then the login page", () => {
     const app = readFileSync("src/console/assets/app.js", "utf8");
     const shellFn = app.slice(app.indexOf("function decorateShell()"), app.indexOf("\n}\n", app.indexOf("function decorateShell()")));
@@ -306,13 +313,17 @@ describe("renderTopbar", () => {
     const pill = () => doc.getElementById("topbarStatus")!;
     expect(pill().hidden).toBe(true);
     banner.hidden = false;
-    banner.innerHTML = '<p class="uc-line">Local workspace · Results ready · Records check out</p>';
+    expect(doc.querySelector(".topbar-workspace")!.hidden).toBe(false);
+    banner.innerHTML = '<p class="uc-line">Local workspace · Results ready · Records check out</p><details class="uc-details"><summary>Details</summary></details>';
     draw(doc, { username: "a" });
     expect(pill().hidden).toBe(false);
+    expect(doc.querySelector(".topbar-workspace")!.hidden).toBe(true);
     expect(pill().querySelector(".status-words")!.textContent).toBe("Local workspace");
     expect(banner.classList.contains("uc-pinned")).toBe(false);
     for (const listener of pill().listeners.get("click") ?? []) listener({} as never);
     expect(banner.classList.contains("uc-open")).toBe(true);
+    // One press shows the details too (trust, integrity, claims), not a second fold.
+    expect(banner.querySelector(".uc-details")!.open).toBe(true);
     expect(pill().getAttribute("aria-expanded")).toBe("true");
     banner.innerHTML = '<div class="danger"><strong>Freeze active:</strong> 1 pause is stopping some agent actions.</div>';
     draw(doc, { username: "a" });

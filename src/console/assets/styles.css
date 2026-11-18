@@ -13,7 +13,7 @@
   --ink: #0F172A;
   --muted: #56637A;
   --line: #D5DBE4;
-  --line-strong: #B4BECC;
+  --line-strong: #7A879C;
   --accent: #15803D;
   --accent-ink: #FFFFFF;
   --wait: #B45309;
@@ -52,7 +52,7 @@
     --ink: #F1F5F9;
     --muted: #A3B0C6;
     --line: #2C3A5C;
-    --line-strong: #41527A;
+    --line-strong: #6A7BA1;
     --accent: #4AEF79;
     --accent-ink: #06130A;
     --wait: #FBBF24;
@@ -71,7 +71,7 @@
   --ink: #F1F5F9;
   --muted: #A3B0C6;
   --line: #2C3A5C;
-  --line-strong: #41527A;
+  --line-strong: #6A7BA1;
   --accent: #4AEF79;
   --accent-ink: #06130A;
   --wait: #FBBF24;
@@ -556,11 +556,20 @@ main:focus {
   display: none;
 }
 
+/* A healthy status is drawn in muted ink: colour is kept for something that waits or has stopped. */
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--muted);
+}
+
+.topbar-workspace {
+  font-size: 13px;
+}
+
+.topbar-workspace[hidden] {
+  display: none;
 }
 
 .status-pill[data-state="stop"] {
@@ -779,8 +788,9 @@ button.danger {
   font-size: 18px;
 }
 
+/* Neutral on purpose: green beside a result reads as "safe" (colour means process state, never quality). */
 .status-ok {
-  color: var(--ok);
+  color: var(--ink);
 }
 
 .status-bad {
@@ -877,7 +887,7 @@ pre code {
 
 .banner {
   border: 1px solid var(--line);
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--line-strong); /* neutral: a banner can sit beside an untrusted result */
   background: var(--surface);
   padding: 12px 16px;
   border-radius: var(--radius);
@@ -902,8 +912,8 @@ pre code {
 }
 
 .pill.ok {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--line-strong);
+  color: var(--ink);
 }
 
 .pill.warn {

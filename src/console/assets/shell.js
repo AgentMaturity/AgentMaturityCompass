@@ -83,7 +83,9 @@ export function canonicalNavHtml(extra = []) {
       `<div class="more-group"><p class="nav-section">${esc(section)}</p>${features.filter((link) => link.section === section).map(navLink).join("")}</div>`).join("")}</div></details>`;
   const pages = own.length ? `<details class="nav-features nav-pages" open><summary>${icon("file")}<span class="nav-label">More pages</span></summary>`
     + `${own.map((link) => navLink({ ...link, icon: "file" })).join("")}</details>` : "";
-  return CANONICAL_NAV.filter((link) => !link.group).map(navLink).join("") + more + pages + railFootHtml();
+  // The person comes last in the document too, so the keyboard reaches it where it is drawn: at the foot of the rail.
+  const top = CANONICAL_NAV.filter((link) => !link.group && !link.person).map(navLink).join("");
+  return top + more + pages + railFootHtml() + CANONICAL_NAV.filter((link) => link.person).map(navLink).join("");
 }
 
 /** Replaces the static menu (every child but the <h1> and the phone toggle) with the canonical one, once per page. */
@@ -154,13 +156,14 @@ export function renderNavSession(doc, me, onSignOut) {
   link.onclick = signedIn ? (event) => { event.preventDefault(); onSignOut?.(); } : null;
 }
 
-/** The Approvals link's count of requests that wait (api.js works it out); 0 or less removes it. */
+/** The Approvals link's count of open requests (api.js works it out); 0 or less removes it. */
 export function setNavBadge(doc, href, count) {
   const link = doc?.querySelector?.(`nav a[href="${href}"]`);
   if (!link) return;
   link.querySelector(".nav-badge")?.remove();
   if (!(count > 0)) return;
-  link.insertAdjacentHTML("beforeend", `<span class="nav-badge"><span aria-hidden="true">${count > 99 ? "99+" : count}</span><span class="visually-hidden">, ${count} waiting</span></span>`);
+  const shown = count >= 50 ? "50+" : String(count); // the inbox reads stop at 50 (api.js OPEN_LIMIT)
+  link.insertAdjacentHTML("beforeend", `<span class="nav-badge"><span aria-hidden="true">${shown}</span><span class="visually-hidden">, ${shown} open</span></span>`);
 }
 
 /** The label of the console's one first action: a demo task in the demo workspace, a real task elsewhere. */
@@ -174,11 +177,12 @@ export const primaryActionHref = (agent = "default") => `./native-tasks?agent=${
  * in #ucBanner), and "How AMC works". The rail carries the rest, Sign out included. In the demo workspace, which has no
  * build card, it keeps the one first action ("Try a demo task") and says it is a demo session.
  */
-export function topbarHtml({ demoMode = false, agent = "default", title = "" } = {}) {
+export function topbarHtml({ workspace = "local", demoMode = false, agent = "default", title = "" } = {}) {
   return `
     <div class="topbar-title">${esc(title || "Compass Console")}</div>
     <div class="topbar-actions">
       ${demoMode ? '<span class="pill">local demo session</span>' : ""}
+      <span class="topbar-workspace muted">${workspace === "local" ? "Local workspace" : `${esc(workspace)} workspace`}</span>
       <button type="button" id="topbarStatus" class="status-pill" aria-controls="ucBanner" aria-expanded="false" hidden><span class="status-dot" aria-hidden="true"></span><span class="status-words">Status</span></button>
       ${demoMode ? `<a class="button" id="topbarPrimaryAction" href="${esc(primaryActionHref(agent))}">${primaryActionLabel(true)}</a>` : ""}
       <a class="topbar-help" id="guideOpenLink" href="./home?guide=1" title="How AMC works">${icon("help")}<span class="visually-hidden">How AMC works</span></a>
@@ -204,7 +208,7 @@ export function renderTopbar(doc, me, onSignOut, agent) {
   }
   const prefix = String(doc.location?.pathname || "").match(/^\/w\/([^/]+)\//)?.[1];
   const workspace = prefix ? decodeURIComponent(prefix) : "local";
-  bar.innerHTML = topbarHtml({ demoMode: workspace === "demo", agent: agent || bar.dataset.agent || "default", title: pageTitle(doc) });
+  bar.innerHTML = topbarHtml({ workspace, demoMode: workspace === "demo", agent: agent || bar.dataset.agent || "default", title: pageTitle(doc) });
   if (agent) bar.dataset.agent = agent;
   bar.querySelector("#topbarStatus")?.addEventListener("click", () => toggleStatus(doc));
   syncStatus(doc);
@@ -226,6 +230,9 @@ function syncStatus(doc) {
   const alert = !banner.hidden && (problem || !plain);
   const line = String(plain?.textContent ?? "").split(" · ")[0].trim();
   pill.hidden = banner.hidden;
+  // The workspace's name shows while there is no status to show (the dot names it otherwise).
+  const workspace = doc.querySelector?.(".topbar-workspace");
+  if (workspace) workspace.hidden = !pill.hidden;
   pill.dataset.state = alert ? "stop" : "ok";
   pill.querySelector(".status-words").textContent = problem ? "Needs attention" : alert ? "Status unknown" : line.split(/\s+/).slice(0, 2).join(" ") || "Status";
   banner.classList.toggle("uc-pinned", alert);
@@ -236,7 +243,10 @@ function syncStatus(doc) {
 function toggleStatus(doc) {
   const banner = doc.getElementById("ucBanner");
   if (!banner || banner.classList.contains("uc-pinned")) return;
-  banner.classList.toggle("uc-open");
+  const open = banner.classList.toggle("uc-open");
+  // One press shows the whole status, its details (trust, integrity, claims) included.
+  const details = banner.querySelector(".uc-details");
+  if (details) details.open = open;
   syncStatus(doc);
 }
 
@@ -329,7 +339,9 @@ function closeOnEscape(doc) {
   doc.addEventListener("keydown", (event) => {
     if (event.key !== "Escape" || event.defaultPrevented) return;
     const active = doc.activeElement;
-    const details = active?.closest?.("details[open]");
+    // Inside the phone sheet, Escape closes the sheet itself (its "More" list has no visible summary to fold).
+    const sheet = active?.closest?.("nav.mobile-nav-open");
+    const details = sheet ? null : active?.closest?.("details[open]");
     if (details) {
       details.open = false;
       details.querySelector("summary")?.focus();

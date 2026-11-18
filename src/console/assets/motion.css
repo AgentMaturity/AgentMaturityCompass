@@ -14,19 +14,10 @@
   animation-duration: .18s;
 }
 
-/* A page's content rises in once; cards follow one after another. */
+/* A page's content arrives without an entrance animation: the route's pulse is the console's one moving thing. */
 @keyframes amc-rise {
   from { opacity: 0; transform: translateY(8px); }
 }
-
-main > :not(.boot-note) {
-  animation: amc-rise .28s cubic-bezier(.2, .7, .2, 1) backwards;
-}
-
-main > :nth-child(2):not(.boot-note) { animation-delay: .04s; }
-main > :nth-child(3):not(.boot-note) { animation-delay: .08s; }
-main > :nth-child(4):not(.boot-note) { animation-delay: .12s; }
-main > :nth-child(n+5):not(.boot-note) { animation-delay: .16s; }
 
 /* Pressed controls give way a little. */
 button:active:not(:disabled),

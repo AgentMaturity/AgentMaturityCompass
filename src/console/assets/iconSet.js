@@ -68,14 +68,14 @@ export function icon(name, { size = 20, className = "icon" } = {}) {
     + ` stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${body}</svg>`;
 }
 
-// Spot drawings for Home's tiles and empty states: 96 x 72, the same stroke, ink at 60% and one accent part.
+// Spot drawings for Home's tiles and empty states: 96 x 72, the same stroke, ink at 60% and one accent or ink part.
 const PICTURES = {
   build: '<g class="pic-ink"><rect x="14" y="40" width="22" height="20" rx="3"/><rect x="40" y="40" width="22" height="20" rx="3"/><path d="M8 63h80"/></g>'
     + '<rect class="pic-accent" x="27" y="15" width="22" height="20" rx="3"/><path class="pic-accent" d="M68 24h14M75 17v14"/>',
   run: '<g class="pic-ink"><rect x="10" y="12" width="56" height="38" rx="10"/><path d="M24 50l-6 12 16-12"/><path d="M22 26h20M22 36h12"/></g>'
     + '<circle class="pic-accent" cx="70" cy="44" r="15"/><path class="pic-accent" d="M66 37.5v13l11-6.5z"/>',
   check: '<g class="pic-ink"><path d="M18 56a30 30 0 1 1 60 0"/><path d="M14 62h68"/><path d="M48 26v5M30 36l3.5 3.5M66 36l-3.5 3.5"/></g>'
-    + '<path class="pic-accent" d="M48 56l14-17"/><circle class="pic-accent" cx="48" cy="56" r="4"/>',
+    + '<path d="M48 56l14-17"/><circle cx="48" cy="56" r="4"/>', // the needle in ink: a score is never drawn green
   empty: '<g class="pic-ink"><path d="M14 30h68v28a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4z"/><path d="M14 30l10-16h48l10 16"/></g>'
     + '<path class="pic-accent" d="M36 30a12 12 0 0 0 24 0"/>'
 };
