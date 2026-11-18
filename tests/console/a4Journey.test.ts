@@ -74,7 +74,7 @@ describe("an approval drawn as people", () => {
 
   test("alone on a practice project the one person fills the place and is never called excluded", () => {
     const html = approvalPeople({ status: "PENDING", required: 1, approvals: 0, excludedKeys: ["LOCAL_USER:u1"], decisions: [] },
-      { staleApprovals: [], selfApprovalAllowed: true }, names, "owner");
+      { staleApprovals: [], selfApprovalAllowed: true }, names, "owner" as never);
     expect(html).toContain("you approve alone, self-approved");
     expect(html).not.toContain("cannot approve");
     expect(html).not.toContain("An approver");
@@ -113,7 +113,7 @@ describe("folds never hide what a person must see", () => {
 describe("the Build page's start form", () => {
   test("three questions, the approver choice as picture cards around the same radios, one submit", () => {
     const industry = packs.packSelectHtml([{ packId: "digital-health-record", name: "Record", domain: "health" }], null, { fold: true, cards: true });
-    const html = view.renderCreateForm(true, industry, { start: { practiceAvailable: false, practiceRefusal: "3 people can sign in." } });
+    const html = view.renderCreateForm(true, industry, { start: { practiceAvailable: false, practiceRefusal: "3 people can sign in." } as never });
     expect(html.match(/data-a4-q="/g)).toHaveLength(3);
     expect(html).toContain('<label class="picture-card a4-approver-card is-disabled"><input type="radio" name="practice" value="yes" disabled />');
     expect(html).toContain("3 people can sign in.");
