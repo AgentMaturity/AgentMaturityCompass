@@ -27,9 +27,9 @@ const NO_ACCOUNT = "No console account exists yet in this workspace. In the term
 export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
   return `
     <div class="card auth-card">
-      <div class="studio-kicker">Agent Maturity Compass</div>
+      <img class="auth-logo" src="./assets/icons/compass.svg" alt="" width="56" height="56" />
       <h2>Sign in to Compass Console</h2>
-      <p class="auth-lead">AMC checks how far you can trust an AI agent, using signed records of what it did instead of promises.</p>
+      <p class="auth-lead">Build, run and check AI agents for regulated work.</p>
       ${demoMode ? DEMO_BANNER : ""}
       <form id="loginForm" method="post">
         <label for="loginUser">Username</label>
@@ -48,7 +48,7 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
         <summary>No account yet? How to get one</summary>
         ${hostMode ? HOST_HINT : LOCAL_HINT}
       </details>`}
-      <h3 class="auth-advanced-title">Advanced</h3>
+      <div class="auth-more">
       <details>
         <summary>Emergency: use admin token</summary>
         <p class="muted">For emergencies only: the admin token lets someone with terminal access in when username and password sign-in is not possible.</p>
@@ -67,6 +67,7 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
         <pre id="authOut" class="muted" aria-live="polite"></pre>
         <div id="pairQr" class="card"></div>
       </details>
+      </div>
     </div>
   `;
 }
