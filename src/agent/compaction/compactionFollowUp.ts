@@ -4,14 +4,16 @@
  *
  * FILE RESTORE. A compaction can remove a file's content from what the model sees. Afterwards the files this
  * session's own `fs.read`, `fs.write` and `fs.edit` calls named are read again, newest first, through the same tool
- * seam a model call uses: policy, guards, hooks, redaction and the read-before-edit ledger all apply exactly as for
- * a normal read, and there is no other way to read a file here. The text enters at the next step as tool context
+ * seam a model call uses: policy, guards, hooks and the read-before-edit ledger apply exactly as for a normal read,
+ * and there is no other way to read a file here. Where protected-data redaction is on, nothing is restored (the
+ * context path is redacted differently from a tool result). The text enters at the next step as tool context
  * (the inbox path a tool's `additionalContext` takes), never in the user's name and never as a `tool/call` the model
  * did not make. A file whose last read is still in context is skipped; a read the seam denies or that fails (the file
  * is gone, outside the workspace, refused by policy) is skipped; a seam that would ask a person first is not used.
  * The total is capped below half the bytes the compaction freed, so restoring cannot undo the compaction.
  */
 import { posix } from "node:path";
+import { protectedDataOptedIn } from "../../dataflow/processorRegistry.js";
 import { readEventPayload } from "../../session/eventPayload.js";
 import type { SessionService } from "../../session/sessionService.js";
 import { SPILL_META_KEY } from "../../session/spill/spillTypes.js";
@@ -41,7 +43,9 @@ export interface RestoredFile {
 
 interface Touch {
   readonly path: string;
-  lastRead: { readonly sha256: string; readonly comparable: boolean; readonly live: boolean } | null;
+  lastRead: { readonly sha256: string; readonly comparable: boolean } | null;
+  /** Its newest content is still in context: the last read's result is live, or a later restore put it there. */
+  inContext: boolean;
 }
 
 type Meta = Record<string, unknown>;
@@ -62,12 +66,19 @@ function wholeText(workspace: string, row: EvidenceEvent): boolean {
   return read.status === "ok" && !read.bytes.toString("utf8").includes(TRUNCATED);
 }
 
-/** Files this session's own successful file calls named, newest first, one per path. */
+/**
+ * Files this session's own successful file calls named, newest first, one per path. A restore after the newest call
+ * of a path counts as being in context: restored text enters as a message no compaction removes, so it is not added twice.
+ */
 export function recentFiles(workspace: string, events: readonly EvidenceEvent[]): readonly Touch[] {
   const results = new Map(events.filter(row => row.event_type === "tool/result").map(row => [callKey(metaOf(row)), row]));
   const live = new Map(describeLiveEntries(events).map(entry => [entry.originEventId, entry]));
   const touches = new Map<string, Touch>();
   for (const row of [...events].reverse()) {
+    if (row.event_type === "audit" && metaOf(row).auditType === FILES_RESTORED_AUDIT) {
+      for (const file of restoredFiles(workspace, row) ?? []) if (!touches.has(file.path)) touches.set(file.path, { path: file.path, lastRead: null, inContext: true });
+      continue;
+    }
     const meta = row.event_type === "tool/call" ? metaOf(row) : null;
     if (meta === null || !FILE_TOOLS.has(String(meta.toolName))) continue;
     const result = results.get(callKey(meta));
@@ -75,12 +86,13 @@ export function recentFiles(workspace: string, events: readonly EvidenceEvent[])
     const args = argumentsOf(workspace, row), raw = args?.path;
     if (typeof raw !== "string" || raw.length === 0 || raw.includes("\0")) continue;
     const path = posix.normalize(raw);
-    const touch = touches.get(path) ?? { path, lastRead: null };
+    const touch = touches.get(path) ?? { path, lastRead: null, inContext: false };
     touches.set(path, touch);
     if (meta.toolName !== "fs.read" || touch.lastRead !== null) continue;
     const entry = live.get(result.id);
+    if (!touch.inContext) touch.inContext = entry !== undefined && entry.sourceEventId === result.id;
     // Only a whole, unspilled read is the same text a new whole read would produce.
-    touch.lastRead = { sha256: result.payload_sha256, live: entry !== undefined && entry.sourceEventId === result.id,
+    touch.lastRead = { sha256: result.payload_sha256,
       comparable: Object.keys(args!).length === 1 && metaOf(result)[SPILL_META_KEY] == null && wholeText(workspace, result) };
   }
   return [...touches.values()];
@@ -93,13 +105,16 @@ export function recentFiles(workspace: string, events: readonly EvidenceEvent[])
 export async function restoreFilesAfterCompaction(init: StepRunnerInit, turn: number, step: number, freedIds: readonly string[],
   signal: AbortSignal): Promise<string | null> {
   const { session, tools } = init;
-  if (freedIds.length === 0 || tools.asksBeforeRunning?.("fs.read") === true || !tools.schemas()?.some(schema => schema.name === "fs.read")) return null;
+  // Skipped where protected-data redaction is on: restored text enters as tool context, whose redaction differs from a
+  // tool result's (no declared-field rules), so it would not be redacted exactly as a normal read is.
+  if (freedIds.length === 0 || tools.asksBeforeRunning?.("fs.read") === true || !tools.schemas()?.some(schema => schema.name === "fs.read")
+    || protectedDataOptedIn(session.workspace)) return null;
   const events = session.readEvents(), freed = new Set(freedIds);
   const saved = events.filter(row => freed.has(row.id)).reduce((sum, row) => sum + compactionReceipt(row).savedBytes, 0);
   const budget = Math.min(RESTORE_MAX_BYTES, Math.floor(saved / 2));
   let left = budget;
   const restored: RestoredFile[] = [];
-  const candidates = recentFiles(session.workspace, events).filter(touch => touch.lastRead?.live !== true).slice(0, RESTORE_MAX_FILES);
+  const candidates = recentFiles(session.workspace, events).filter(touch => !touch.inContext).slice(0, RESTORE_MAX_FILES);
   for (const [index, touch] of candidates.entries()) {
     if (left <= NOTE_ROOM) break;
     signal.throwIfAborted();
@@ -166,11 +181,17 @@ export function describeCompactionFollowUps(workspace: string, events: readonly 
   return [...reasons, ...lines];
 }
 
-function restoredNames(workspace: string, row: EvidenceEvent): string {
+function restoredFiles(workspace: string, row: EvidenceEvent): readonly RestoredFile[] | null {
   const read = readEventPayload(workspace, row);
-  if (read.status !== "ok") return "the file names are stored encrypted; unlock the vault (amc vault unlock) to see them";
+  if (read.status !== "ok") return null;
   try {
-    const files = (JSON.parse(read.bytes.toString("utf8")) as { files: RestoredFile[] }).files;
-    return files.map(file => `${file.path}${file.changedSinceLastRead === true ? " (changed since the agent last read it)" : ""}`).join(", ");
-  } catch { return "the file list could not be read"; }
+    const files: unknown = (JSON.parse(read.bytes.toString("utf8")) as { files?: unknown }).files;
+    return Array.isArray(files) ? files.filter((file): file is RestoredFile => typeof (file as RestoredFile)?.path === "string") : null;
+  } catch { return null; }
+}
+
+function restoredNames(workspace: string, row: EvidenceEvent): string {
+  const files = restoredFiles(workspace, row);
+  if (files === null) return "the file names could not be read (they are stored encrypted; unlock the vault with amc vault unlock)";
+  return files.map(file => `${file.path}${file.changedSinceLastRead === true ? " (changed since the agent last read it)" : ""}`).join(", ");
 }

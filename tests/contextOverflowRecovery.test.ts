@@ -5,6 +5,11 @@
  * A pass here says nothing about a real provider or model.
  */
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
+import YAML from "yaml";
+import { verifyAgentRun } from "../src/agent/runReport.js";
+import { budgetsPath, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
+import { getPublicKeyPem } from "../src/crypto/keys.js";
+import { pinnedTrust } from "./helpers/trustContext.js";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { pipelineToolSeam } from "../src/agent/pipelineToolSeam.js";
@@ -79,6 +84,14 @@ function run(scripts: readonly ScriptedStream[], overflowAt: readonly number[], 
   open.push(h);
   return { h, sent };
 }
+/** The full verifier over the finished session: signatures, chains, compaction replay and every request reconstructed. */
+async function verified(h: LoopHarness): Promise<void> {
+  const pem = getPublicKeyPem(h.dir, "monitor");
+  h.finish();
+  const report = await verifyAgentRun(h.dir, h.sessionId, pinnedTrust([{ publicKeyPem: pem, purposes: ["ledger-row"] }]));
+  expect(report.ok, JSON.stringify(report)).toBe(true);
+  expect(report.requests.every(request => request.status === "reconstructed")).toBe(true);
+}
 async function turn(h: LoopHarness, input: string): Promise<void> {
   h.driver.followup(input);
   await h.driver.whenIdle();
@@ -124,6 +137,7 @@ describe("reactive compaction after a context-window overflow (HP-05 item 1)", (
       "Turn 1: 1 automatic compaction change(s), 1 because a request was too large for the window. The original messages stay in the log.",
       "Turn 1: a request was too large for the model's context window. AMC compacted the context and asked once more."
     ]);
+    await verified(h);
   });
 
   it("MUTATION: a second overflow in the same turn stays terminal, with exactly one compaction and one retry", async () => {
@@ -174,6 +188,23 @@ describe("reactive compaction after a context-window overflow (HP-05 item 1)", (
     expect(rowsOf(rows, "request/header")).toHaveLength(2);
     expect(rowsOf(rows, "loop/compact")).toHaveLength(0);
     expect(audits(rows, OVERFLOW_DECISION_AUDIT)).toHaveLength(0);
+  });
+
+  it("MUTATION: a signed budget that refuses the summary request ends the turn with the overflow, without a retry", async () => {
+    // Turn 1 uses one request; the overflowed request is the second; the per-minute limit of 2 refuses the summary (third).
+    const { h } = run([textStep("A".repeat(3000), { inputTokens: 100 })], [2], { compaction: { summarize: true } });
+    const budget = loadBudgetsConfig(h.dir);
+    budget.budgets.perAgent.default!.unknownTokenUsage = "ALLOW_WITH_WARNING";
+    budget.budgets.perAgent.default!.perMinute.maxLlmRequests = 2;
+    writeFileSync(budgetsPath(h.dir), YAML.stringify(budget));
+    signBudgetsConfig(h.dir);
+    await turn(h, "First question.");
+    await turn(h, "Second question.");
+    const rows = h.events();
+    expect(turnEnds(rows)).toEqual(["complete", "error"]);
+    expect(rowsOf(rows, "request/failure").map(row => (meta(row).failure as { code: string }).code)).toEqual(["CONTEXT_WINDOW_EXCEEDED", "AMC_NATIVE_BUDGET_REFUSED"]);
+    expect(audits(rows, OVERFLOW_DECISION_AUDIT).map(row => [meta(row).decision, meta(row).reason])).toEqual([["end", expect.stringContaining("summary request was refused")]]);
+    expect(rowsOf(rows, "loop/compact").every(row => compactionReceipt(row).mode === "drop")).toBe(true);
   });
 
   it("MUTATION: a run with no step left after the summary does not retry", async () => {
@@ -265,6 +296,29 @@ describe("files read again after compaction (HP-05 item 4)", () => {
     expect(files.length).toBeLessThanOrEqual(RESTORE_MAX_FILES);
     expect(describeCompactionFollowUps(h.dir, rows)).toContain(
       "Turn 1: after compaction, AMC read 2 file(s) into context again: small.txt (changed since the agent last read it), big.txt.");
+    await verified(h);
+  });
+
+  it("MUTATION: marks an unchanged file as unchanged, and does not restore a file a second time at a later compaction", async () => {
+    const calls: ToolCallRequest[] = [];
+    // Turn 2 reads pad.txt (deleted before its overflow, so its restore fails and the next candidate is tried) and other.txt.
+    const { h } = run([...scripts.slice(0, 2), textStep("done one", { inputTokens: 100 }), toolStep("r3", "fs.read", '{"path":"pad.txt"}', { inputTokens: 100 }),
+      toolStep("r4", "fs.read", '{"path":"other.txt"}', { inputTokens: 100 }), textStep("done two", { inputTokens: 100 })], [3, 7],
+    { tools: realFiles({ path: null }, calls), compaction: { pruneMinBytes: 1000 },
+      before: (request, dir) => {
+        if (request === 1) { setUp(dir); writeFileSync(join(dir, "pad.txt"), "p".repeat(9000)); writeFileSync(join(dir, "other.txt"), "y".repeat(1000)); }
+        if (request === 7) rmSync(join(dir, "pad.txt"));
+      } });
+    await turn(h, "Read both files.");
+    await turn(h, "Now read two more.");
+    const rows = h.events();
+    expect(turnEnds(rows)).toEqual(["complete", "complete"]);
+    const restores = audits(rows, FILES_RESTORED_AUDIT).map(row => (JSON.parse(text(h, row)) as { files: { path: string; changedSinceLastRead: boolean | null }[] }).files
+      .map(file => [file.path, file.changedSinceLastRead]));
+    expect(restores).toEqual([[["small.txt", false], ["big.txt", null]], [["other.txt", false]]]);
+    // In turn 2 the restore tried other.txt and the deleted pad.txt, never the files turn 1 already restored.
+    expect(calls.filter(call => call.callId.startsWith("amc-restore-2-")).map(call => JSON.parse(call.rawArguments).path)).toEqual(["other.txt", "pad.txt"]);
+    await verified(h);
   });
 
   it("MUTATION: never restores a path the current policy denies", async () => {
