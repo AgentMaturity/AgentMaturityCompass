@@ -120,6 +120,25 @@ Limits, stated:
 - The window is a signed fact only where a row recorded it: an automatic `loop/compact` receipt. A session that never compacted reports `window not recorded` rather than the catalog's number, because an operator `--context-window` override may have changed it. The live `context` line uses the window the run is configured with, and is not evidence.
 - A step whose provider reported nothing is `unmeasured`, never zero.
 
+## When a request is too large for the model
+
+Sometimes the model's provider refuses a request because it no longer fits the model's context window (the amount of text the model can read at once). AMC then does the following, once per turn, and only when automatic compaction is on:
+
+1. The refused request is recorded and settled like any failed request: its usage stays unknown and counts against the budget as a failed request does.
+2. If a run limit (`--stop`) would stop the run, or no step is left in the turn, nothing else happens: the turn ends with the provider's error, as before.
+3. AMC compacts the context. It first shortens large old tool outputs, this time including those of the most recent steps. Only when there are none does it ask the model for a summary of earlier work, through the normal request path, so budgets, residency and protected-data checks apply to that request too, and its usage counts against `--stop` limits.
+4. Each change is a signed `loop/compact` receipt that says it was caused by an overflow and names the refused request. Nothing is deleted from the record; only what the model sees changes.
+5. If nothing could be removed, the summary request was refused or failed, or a limit leaves no room, the turn ends with the provider's original error.
+6. Otherwise AMC reads recent files again (see below), writes a signed `CONTEXT_OVERFLOW_RECOVERY` record saying the request overflowed, was compacted and is asked once more, and sends the next request. A second overflow in the same turn ends the turn.
+
+AMC does not estimate tokens from text size, so it cannot promise the next request fits; the provider's answer decides, and a second refusal ends the turn.
+
+**Summaries.** The summary prompt (version 2) asks for fixed sections: objective and constraints, decisions and why, work state with file paths, what was and was not verified, open problems, and the next step. When an earlier summary is part of the text being summarized, the model is told to keep what is still true from it and drop what is stale, and the receipt names that earlier summary. Your own messages always stay word for word. A summary that leaves out a section is still used.
+
+**Files read again.** After a compaction that removed content, AMC reads again up to 5 files this session read or edited, newest first, skipping any whose last read is still in context. The reads go through the same `fs.read` tool and checks as a normal read: a file that is gone, outside the workspace or refused by the current policy is skipped, and nothing is read when the read would first ask a person. The text enters as tool context, not as your message, and in total stays below half of what the compaction removed (at most 32,000 bytes). A file that changed since the agent last read it is marked as changed. A signed `COMPACTION_FILES_RESTORED` record lists the paths and digests (in its encrypted payload), never the content. After a threshold compaction this happens only when the turn goes on.
+
+`amc session show <id>` prints all of this in plain words, one line per turn.
+
 ## Not in this slice
 
 - Rewind of files and conversation (`amc session rewind`) is deferred: it needs a checkpoint store that works without vault-backed blob keys, a conflict check against the last recorded `afterSha256` of each file, a live-writer fence on fork, and a composed path that gives the child a truthful identity. Conversation-only rewind remains available as `--fork-from <id>` at the latest sealed turn.

@@ -82,6 +82,7 @@ export function registerSessionCommands(program: Command): void {
       const { projectNativeRunUsage, renderNativeRunUsage } = await import("./agent/nativeRunUsage.js");
       const { projectNativeRunDiagnostics, renderNativeRunDiagnostics } = await import("./agent/nativeFailureGuidance.js");
       const { projectTurnStops } = await import("./agent/turnGuards.js");
+      const { describeCompactionFollowUps } = await import("./agent/compaction/compactionFollowUp.js");
       const { projectSurface } = await import("./session/surfaceProjection.js");
       const { extractEnvelope } = await import("./session/sessionTypes.js");
       try {
@@ -139,6 +140,7 @@ export function registerSessionCommands(program: Command): void {
         for (const line of renderSessionContextAccounting(context)) console.log(line);
         console.log(renderNativeRunDiagnostics(diagnostics));
         for (const stop of turnStops) console.log(chalk.yellow(`Turn ${stop.turn} stopped at a limit: ${escapeTerminalControls(stop.text)}`));
+        for (const line of describeCompactionFollowUps(process.cwd(), events)) console.log(escapeTerminalControls(line));
         console.log("");
         if (!opts.spine) { console.log(chalk.gray(`Event spine: ${spine.length} recorded events; add --spine to list them.`)); return; }
         console.log(chalk.bold("Event spine"));
