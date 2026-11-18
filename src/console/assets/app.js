@@ -2528,7 +2528,7 @@ async function renderCompliance() {
   );
   const fleet = await apiGet(`/compliance/fleet?framework=${encodeURIComponent(framework)}&window=30d`).catch(() => null);
   root.innerHTML = `
-    ${card("Compliance Coverage", `
+    ${card("Compliance", `
       <div class="row wrap">
         ${frameworks
           .map((item) => `<a class="pill" href="./compliance?agent=${encodeURIComponent(agentId)}&framework=${encodeURIComponent(item)}">${plainCodeHtml(item)}</a>`)
@@ -2537,7 +2537,7 @@ async function renderCompliance() {
       <p>Config signature: ${verify.valid ? "<strong>VALID</strong>" : verify.reason === "compliance maps missing"
         ? "<strong>NOT CONFIGURED</strong> <span class='muted'>(no workspace maps file: the built-in maps are used; <code>amc compliance init</code> writes and signs one)</span>"
         : `<strong>INVALID</strong> <span class="muted">(${htmlEscape(verify.reason || "does not verify")})</span>`}</p>
-      <p>Mappings: <strong>${htmlEscape(report.familyReview?.status || "experimental")}</strong>: drafted and refuted by AI agents, not signed off by a named expert (D-08 pending).</p>
+      <p>Mappings: <strong>${htmlEscape(report.familyReview?.status || "experimental")}</strong>: drafted and refuted by AI agents, not yet signed off by a named expert.</p>
       ${(report.familyReview?.flags || []).map((flag) => `<p class="muted">Flag: ${htmlEscape(flag)}</p>`).join("")}
       <p>Coverage score: <strong>${report.coverage?.score == null ? "not evaluated" : Number(report.coverage.score).toFixed(3)}</strong></p>
       <p>Trust coverage (OBS/ATT/SELF): ${((report.trustTierCoverage?.observed || 0) * 100).toFixed(1)}% /

@@ -28,9 +28,9 @@ function renderDimensionBars(rows) {
       return `
       <div class="card">
         <strong>${esc(row.dimensionId)}</strong>
-        <div class="bar"><span style="width:${measuredPct}; background:var(--ink)"></span></div>
+        <div class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:${measuredPct}"></span></div>
         <small>Measured ${measured.toFixed(2)}</small>
-        <div class="bar"><span style="width:${targetPct}; background:var(--muted)"></span></div>
+        <div class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:${targetPct}; background:var(--muted)"></span></div>
         <small>Target ${target.toFixed(2)} | Unknown ${Number(row.unknownCount || 0)}</small>
       </div>
     `;
