@@ -91,7 +91,8 @@ export interface TurnEndMeta {
  */
 export function canonicalTurnCancelCause(cause: TurnCancelCause): TurnCancelCause {
   if (cause.kind === "hook") return { kind: "hook", reason: boundedCancellationText(cause.reason) };
-  if (cause.kind === "limit") return { kind: "limit", condition: cause.condition, bound: cause.bound, ...(cause.unmeasured === true ? { unmeasured: true } : {}) };
+  if (cause.kind === "limit") return { kind: "limit", condition: cause.condition, bound: cause.bound, ...(cause.unmeasured === true ? { unmeasured: true } : {}),
+    ...(cause.tools === undefined ? {} : { tools: [...new Set(cause.tools)].sort().slice(0, 16) }) };
   return { kind: cause.kind };
 }
 
