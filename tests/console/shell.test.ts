@@ -450,7 +450,11 @@ describe("studio-ui inherit review fixes", () => {
     const strip = readFileSync("src/console/assets/components/claimBadge.js", "utf8");
     expect(strip).toContain("app.before(strip);");
     expect(strip).not.toContain("app.after(strip);");
-    expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/nav a\.nav-person \{\n  order: 3;\n  position: sticky;\n  bottom: -14px;/);
+    const styles = readFileSync("src/console/assets/styles.css", "utf8");
+    expect(styles).toMatch(/nav a\.nav-person \{\n  order: 3;\n  position: sticky;\n  bottom: -14px;/);
+    // A control reached by keyboard scrolls clear of it, in the rail and in the phone sheet.
+    expect(styles).toContain("scroll-padding-bottom: 72px;");
+    expect(styles).toContain("scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom));");
   });
 
   test("the title bar colour follows a theme chosen on the page", () => {

@@ -139,6 +139,8 @@ nav {
   border-right: 1px solid var(--line);
   overflow-y: auto;
   overflow-x: hidden;
+  /* A control reached by keyboard scrolls clear of the sticky person at the foot. */
+  scroll-padding-bottom: 72px;
 }
 
 nav h1 {
@@ -2235,6 +2237,9 @@ body[data-page="login"] #status:empty {
     padding: 0 12px;
     font-size: 15px;
     text-align: left;
+  }
+  nav.mobile-nav-open {
+    scroll-padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
   nav.mobile-nav-open a.nav-person {
     bottom: calc(-16px - env(safe-area-inset-bottom));
