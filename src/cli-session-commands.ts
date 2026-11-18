@@ -11,7 +11,7 @@ import { hostname } from "node:os";
 import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
-import { escapeTerminalControls } from "./tools/builtin/askUserTool.js";
+import { escapeTerminalControls } from "./utils/terminalEscape.js";
 import { artifactClaim, printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionContinuityCommands } from "./cli-session-continuity-commands.js";
