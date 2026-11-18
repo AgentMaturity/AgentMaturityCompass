@@ -86,7 +86,7 @@ describe("Home's build card", () => {
   test("home.html carries the card before the rest of Home, and a4.js fills it", () => {
     const home = readFileSync("src/console/pages/home.html", "utf8");
     expect(home.indexOf('id="a4HomeCard"')).toBeLessThan(home.indexOf('id="app"'));
-    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.homeCardHtml({ projects: rows, waiting, industryHtml");
+    expect(readFileSync("src/console/assets/a4.js", "utf8")).toContain("start.homeCardHtml({ projects, waiting, industryHtml");
   });
 });
 

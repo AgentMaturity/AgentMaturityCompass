@@ -49,16 +49,12 @@ async function showHomeEntry() {
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
     const waiting = await approvalWaiting(projects, who, apiNativeRequest, API);
-    // Activate's Next line reads who acts on the release request from that project's readiness.
+    // The route and the Next line read the project's state from its head-stage readiness (a4Journey projectState): a hold,
+    // the release this Studio cannot make, who acts on a release request, and whether one person approves alone.
     const latest = waiting ? null : start.latestProject(projects);
-    const latestReadiness = latest?.stage === "activate"
+    const latestReadiness = latest
       ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}/readiness`).then((reply) => reply?.readiness ?? reply, () => null) : null;
-    // The route draws an approval step as "waiting for a person" unless the person approves it alone (a practice
-    // project); only the project's own read says whether it still is one.
-    const detail = latest && ["proposed", "reviewed"].includes(latest.step)
-      ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}`).then((reply) => one(reply, "project"), () => null) : null;
-    const rows = detail ? projects.map((row) => (row === latest ? { ...row, practiceActive: detail.practiceActive === true } : row)) : projects;
-    card.innerHTML = start.homeCardHtml({ projects: rows, waiting, industryHtml: packs.packSelectHtml(catalog, null, { fold: true }), start: options.workspace?.start ?? null, latestReadiness });
+    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null, { fold: true }), start: options.workspace?.start ?? null, latestReadiness });
     bindCreateForm(card.querySelector("#a4HomeForm"));
     placeHomeCard(card, { waiting: Boolean(waiting), empty: projects.length === 0 });
   } catch {
@@ -95,7 +91,7 @@ function placeHomeCard(card, { waiting, empty }) {
 
 function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
-  const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
+  const state = { project: null, readiness: null, headReadiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
   const invited = []; // what each Add a person answered on this page (first passwords included), never stored
   let loading = null, loadAgain = false;
@@ -220,7 +216,7 @@ function mountProject(projectId, options) {
     // under the next one. The header says when the project is at another stage (movedNote).
     const viewStage = stage ?? (view.STAGES.includes(params.get("stage")) ? params.get("stage")
       : view.STAGES.includes(project.stage) ? project.stage : "activate");
-    const [readiness, gates, revision, comments, members, diff, revisions, refs] = await Promise.all([
+    const [readiness, gates, revision, comments, members, diff, revisions, refs, headReadiness] = await Promise.all([
       apiNativeRequest(projectPath(`/readiness?stage=${viewStage}`)).then((data) => one(data, "readiness")),
       apiNativeRequest(projectPath("/gates")).then((data) => listOf(data, "gates")),
       // The resolved view (P2-42): Adapt's derived parts put back and checked by Studio; the stored form binds them by sha256.
@@ -231,7 +227,10 @@ function mountProject(projectId, options) {
         ? apiNativeRequest(projectPath(`/revisions/diff?from=${project.revisionNo - 1}&to=${project.revisionNo}`)).catch((error) => ({ error: errorText(error) }))
         : null,
       apiNativeRequest(projectPath("/revisions")).then((data) => listOf(data, "revisions")),
-      apiNativeRequest(projectPath(`/evidence?revision=${project.revisionNo}`)).then((data) => listOf(data, "refs"))
+      apiNativeRequest(projectPath(`/evidence?revision=${project.revisionNo}`)).then((data) => listOf(data, "refs")),
+      // Viewing another stage, the route draws the project's own stage from that stage's readiness (a hold, a release
+      // this Studio cannot make), as Home and the Build page do; a failed read only leaves that waypoint less precise.
+      viewStage === project.stage ? null : apiNativeRequest(projectPath("/readiness")).then((data) => one(data, "readiness"), () => null)
     ]);
     // A revision past the head read above landed between the reads; the next load shows it.
     const atStage = revisions.filter((row) => row.stage === viewStage && Number.isSafeInteger(row.revisionNo) && row.revisionNo <= project.revisionNo)
@@ -241,7 +240,7 @@ function mountProject(projectId, options) {
       : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}/resolved`)), "revision");
     // Whether Studio's recorded understanding was made for the answers shown: after a reload Confirm binds the head shown then.
     const understandingCurrent = await start.understandingIsCurrent(stageRevision?.spec).catch(() => false);
-    return { project, readiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage, understandingCurrent };
+    return { project, readiness, headReadiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage, understandingCurrent };
   }
 
   function render() {
@@ -299,8 +298,8 @@ function mountProject(projectId, options) {
     // kept wherever it is; Members and the rest fold, and the panel's go-to opens a fold when it points into one.
     // A stopped step (the release this Studio cannot make, a hold) has nothing to fill in: every section folds.
     const step = state.project.stage === stage && !root.querySelector('.a4-step-panel[data-state="stop"]') ? state.project.step : null;
-    // The panel's words that send a person to the Members card keep it in sight.
-    const keep = [...(/Members card/.test(root.querySelector(".a4-start .a4-now")?.textContent ?? "") ? [".a4-members"] : []), ...(step === "asked" ? ['[data-card="conversation"]'] : []),
+    // A move that sends a person to a card without a button there (the Members card) names it in data-a4-keep.
+    const keep = [...(root.querySelector(".a4-start .a4-now")?.dataset.a4Keep ? [root.querySelector(".a4-start .a4-now").dataset.a4Keep] : []), ...(step === "asked" ? ['[data-card="conversation"]'] : []),
       ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]', ".a4-approvals"] : []),
       ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");
     const rest = sections.filter((section) => !section.contains(target) && !(keep && section.matches(keep)) && !(also && section.matches(also)));

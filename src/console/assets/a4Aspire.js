@@ -5,6 +5,7 @@
 import { registerStageCard } from "./a4Cards.js";
 import * as view from "./a4View.js";
 import { itemWithRecord } from "./a4Plain.js";
+import { laterFold } from "./a4Journey.js";
 
 const { esc } = view;
 const ASPIRE_SPEC = "amc.a4-aspire-spec/v1";
@@ -46,7 +47,7 @@ function renderConversation(ctx) {
   const questions = ctx.questions.filter((question) => question.id !== "expertise" || answered.has("expertise"));
   const note = questions.length < ctx.questions.length
     ? "<p class=\"muted\">Your expertise comes from the project's create form: Understand fills it in for you to confirm or change.</p>" : "";
-  return `${view.renderConversation({ ...ctx, questions }).replaceAll(view.NO_PRODUCER, PRODUCED)}${note}${understood}${explained}`;
+  return `${view.renderConversation({ ...ctx, questions }).replaceAll(view.NO_PRODUCER, PRODUCED)}${note}${laterFold(ctx, "What AMC understood and explained", `${understood}${explained}`)}`;
 }
 
 function renderBuild(ctx) {

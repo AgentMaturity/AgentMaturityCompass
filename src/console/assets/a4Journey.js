@@ -4,7 +4,7 @@
 // Also the Build page's start form asked one question at a time (bindQuestions): the same form, fields and names.
 import { STAGE_PLAIN, STAGE_SHORT, STEP_PLAIN, STEP_SHORT, say } from "./a4Plain.js";
 import { esc } from "./a4Html.js";
-import { routeTrack } from "./pageKit.js";
+import { moreInfo, routeTrack } from "./pageKit.js";
 
 const STAGES = ["aspire", "assemble", "adapt", "activate"];
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
@@ -17,31 +17,67 @@ const title = (stage) => (typeof stage === "string" && stage ? stage[0].toUpperC
  */
 export function moveState(project, move, blocked = false) {
   if (project?.hold || blocked) return "stop";
-  // A move with no action for this person (stop: nobody else can approve yet) waits for someone to act.
-  if (move?.stop) return "wait";
-  if (move?.act?.copy || (!move?.act && /nothing is needed from you|A project owner|waiting/i.test(String(move?.now ?? "")))) return "wait";
+  // A move with no action for this person (stop: nobody else can approve yet) waits for someone to act; so does a move
+  // that only offers the page's link to share, or one nextMove marks as someone else's turn (waits).
+  if (move?.stop || move?.waits || move?.act?.copy) return "wait";
   return "now";
 }
 
-/** The four stages; each waypoint opens that stage of the project. The viewed stage is named in its hint. */
+/** Whether this Studio cannot make the release (Activate's deployment.same_host): the release, not a step, is stopped. */
+export const releaseBlocked = (readiness) => list(readiness?.items).some((item) => item.id === "deployment.same_host" && item.status === "BLOCKED");
+
+/**
+ * The state of the project's own stage, the same on Home, the Build page's list and a project page viewing another stage:
+ * stopped while on hold or while this Studio cannot make the release; waiting at an approval step unless the one person
+ * on a practice project approves it alone (Aspire, and Assemble's first approval: docs/A4_FORGE.md); otherwise now.
+ * `readiness` is the project's head-stage readiness (null when it was not read: then only the hold and the step count).
+ */
+export function projectState(project, readiness = null) {
+  if (project?.hold || readiness?.status === "ON_HOLD" || releaseBlocked(readiness)) return "stop";
+  // Something else blocks the stage (files changed, a denied plan): the project's people fix it on the page first.
+  if (readiness?.status === "BLOCKED") return "now";
+  if (!["proposed", "reviewed"].includes(project?.step)) return "now";
+  // An approval nobody has asked for yet is the owner's to ask for.
+  const gates = readiness?.gates;
+  if (gates && typeof gates === "object" && gates[project.step === "proposed" ? "direction" : "completion"] == null) return "now";
+  const alone = (project?.practiceActive === true || readiness?.selfApprovalAllowed === true)
+    && (project?.stage === "aspire" || (project?.stage === "assemble" && project?.step === "proposed"));
+  return alone ? "now" : "wait";
+}
+
+/** The four stages; each waypoint opens that stage of the project. The viewed stage is marked and named in its hint. */
 export function stageRoute(project, stage, current = "now") {
   const at = STAGES.indexOf(project?.stage);
   const id = encodeURIComponent(project?.projectId ?? "");
   return routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], href: `./a4Project?project=${id}&stage=${name}`,
-    hint: `${STAGE_PLAIN[name]} (${title(name)})${name === stage && name !== project?.stage ? ", you are viewing it" : ""}`,
+    hint: `${STAGE_PLAIN[name]} (${title(name)})${name === stage && name !== project?.stage ? ", you are viewing it" : ""}`, viewed: name === stage,
     state: at < 0 ? "todo" : index < at ? "done" : index > at ? "todo" : current })), { label: "The four stages", className: "a4-stages" });
 }
 
 /**
  * The eight steps of the viewed stage. At the project's own stage: earlier steps done, the current one in `current`. A
  * stage the project has passed is all done; one it has not reached, or any stage of a retired project, is not started.
+ * `stopAt` names a later step that is stopped instead (Activate's Build, the release this Studio cannot make): the current
+ * step is then drawn as not started, never as refused itself.
  */
-export function stepRoute(project, stage, current = "now") {
+export function stepRoute(project, stage, current = "now", stopAt = null) {
   const stageAt = STAGES.indexOf(stage), projectAt = STAGES.indexOf(project?.stage);
   const at = stage === project?.stage ? STEPS.indexOf(project.step) : -1;
+  const stopIndex = stopAt ? STEPS.indexOf(stopAt) : -1;
+  const stopLater = at >= 0 && stopIndex > at;
   return routeTrack(STEPS.map((step, index) => ({ label: STEP_SHORT[step], hint: STEP_PLAIN[step],
     state: stage !== project?.stage ? (projectAt > stageAt ? "done" : "todo")
-      : at < 0 ? "todo" : index < at ? "done" : index > at ? "todo" : current })), { label: `The steps of ${STAGE_PLAIN[stage] ?? title(stage)}`, className: "a4-steps-route" });
+      : at < 0 ? "todo" : index < at ? "done" : stopLater && index === stopIndex ? "stop" : index > at || stopLater ? "todo" : current })),
+  { label: `The steps of ${STAGE_PLAIN[stage] ?? title(stage)}`, className: "a4-steps-route" });
+}
+
+/**
+ * Understand and Explain are steps 2 and 3: past them (a plan to review, a build, an approval) or at a stage that is not
+ * the project's own, what they show folds, unchanged, under one closed summary, so the plan and its approval stay in sight.
+ */
+export function laterFold(ctx, summary, html) {
+  const early = ctx.stage === ctx.project.stage && ["asked", "understood", "explained"].includes(ctx.project.step);
+  return early || !html ? html : moreInfo(summary, html).replace('<details class="more-info"', `<details class="more-info" data-a4-open="later:${esc(summary)}"`);
 }
 
 const initials = (name) => String(name ?? "?").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(" ").slice(0, 2).map((part) => part[0] ?? "").join("").toUpperCase() || "?";
@@ -89,8 +125,12 @@ export function bindQuestions(form) {
   nav.className = "row wrap a4-q-nav";
   nav.innerHTML = '<button type="button" class="secondary" data-a4-q-back>Back</button><button type="button" class="a4-q-next" data-a4-q-next>Next</button>'
     + '<span class="muted a4-q-count" aria-live="polite"></span>';
-  const submitRow = form.querySelector('button[type="submit"]')?.closest(".row") ?? null;
+  // The form's own submit button joins Back on the last question's row (still inside the one form, so Start sends the same).
+  const submit = form.querySelector('button[type="submit"]');
+  const submitRow = submit?.closest(".row") ?? null;
   form.insertBefore(nav, submitRow);
+  if (submit) nav.insertBefore(submit, nav.querySelector(".a4-q-count"));
+  if (submitRow && submitRow.children.length === 0) submitRow.hidden = true;
   let at = 0;
   const show = (index, focus = true) => {
     at = Math.max(0, Math.min(index, questions.length - 1));
@@ -98,7 +138,7 @@ export function bindQuestions(form) {
     const last = at === questions.length - 1;
     nav.querySelector("[data-a4-q-back]").hidden = at === 0;
     nav.querySelector("[data-a4-q-next]").hidden = last;
-    if (submitRow) submitRow.hidden = !last;
+    if (submit) submit.hidden = !last;
     nav.querySelector(".a4-q-count").textContent = `Question ${at + 1} of ${questions.length}`;
     if (focus) questions[at].querySelector("input:not([type=hidden]):not([disabled]), select")?.focus({ preventScroll: true });
   };

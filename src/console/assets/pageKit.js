@@ -157,7 +157,7 @@ export function routeTrack(steps, { label = "Progress", className = "", diagram 
   const items = list.map((step, at) => {
     const state = states[at];
     const mark = ROUTE_ICONS[state] ? icon(ROUTE_ICONS[state], { size: 14 }) : "";
-    return `<li class="route-step is-${state}"${at === current ? ' aria-current="step"' : ""}${step.hint ? ` title="${esc(step.hint)}"` : ""}>`
+    return `<li class="route-step is-${state}${step.viewed ? " is-viewed" : ""}"${at === current ? ' aria-current="step"' : ""}${step.hint ? ` title="${esc(step.hint)}"` : ""}>`
       + `<span class="route-dot" aria-hidden="true">${mark}</span>${step.href ? `<a class="route-label route-link" href="${esc(step.href)}">${esc(step.label)}</a>`
         : `<span class="route-label">${esc(step.label)}</span>`}`
       + (diagram ? "" : `<span class="visually-hidden">: ${ROUTE_WORDS[state]}${step.hint ? `. ${esc(step.hint)}` : ""}</span>`) + "</li>";

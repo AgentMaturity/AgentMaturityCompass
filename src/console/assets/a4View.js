@@ -8,6 +8,7 @@ import { exclusionLine, PRACTICE_CHOICE } from "./a4Who.js";
 import { cardLabel, codes, esc, isObject, list, shown, stageTitle, time } from "./a4Html.js";
 import { STAGE_PLAIN, STAGE_SHORT, STEP_PLAIN, code, itemLine, itemTitle, record, say, sayCode, when } from "./a4Plain.js";
 import { renderOutline } from "./a4Outline.js";
+import { laterFold, projectState } from "./a4Journey.js";
 import { moreInfo, noticeChip, pictureCard, routeTrack } from "./pageKit.js";
 export { clashingChanges, jsonDiff, mergeOnTop, presenceRows, renderConflict, renderPresence, validateA4Poll } from "./a4Sync.js";
 
@@ -193,13 +194,13 @@ export function renderCreateForm(open, industryHtml = "", { home = false, start 
   return home ? form : `<section class="card" id="a4Create"${open ? "" : " hidden"}><h3>Start an agent project</h3>${form}</section>`;
 }
 
-/** Each project as a row: its name, where it is on the four stages, and Open; the codes and agent id in small print. */
-export function renderProjectList(projects) {
+/** Each project as a row: its name, its route (projectState, from its readiness when read) and Open; codes in small print. */
+export function renderProjectList(projects, readinessOf = new Map()) {
   if (projects.length === 0) return "";
   const where = (project) => routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: STAGE_PLAIN[name],
-    state: index < STAGES.indexOf(project.stage) ? "done" : name === project.stage ? (project.hold ? "stop" : "now") : "todo" })),
+    state: index < STAGES.indexOf(project.stage) ? "done" : name === project.stage ? projectState(project, readinessOf.get(project.projectId) ?? null) : "todo" })),
   { label: `Where ${project.name} is`, className: "a4-mini-route" });
-  return `<section class="card"><h3>Your agent projects</h3><ul class="a4-project-list">${projects.map((project) => `<li class="a4-project-row">
+  return `<section class="card" id="a4ProjectList"><h3>Your agent projects</h3><ul class="a4-project-list">${projects.map((project) => `<li class="a4-project-row">
     <div class="a4-project-words"><a href="./a4Project?project=${encodeURIComponent(project.projectId)}"><strong>${esc(project.name)}</strong></a>
     <span class="muted">${esc(STAGE_PLAIN[project.stage] ?? stageTitle(project.stage))}: ${esc(STEP_PLAIN[project.step] ?? project.step)}</span>
     <small class="a4-code">${project.readiness ? `${sayCode("readinessStatus", project.readiness.status)} · ` : ""}agent <code>${esc(project.agentId)}</code> · r${esc(project.revisionNo)}</small>${holdBanner(project)}</div>
@@ -373,7 +374,7 @@ export function renderConversation(ctx) {
       <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${ctx.exampleOffered && open.length
         ? ' <button type="button" class="secondary" data-a4-action="use-example">Use an example</button>' : ""}${answerDrift
         ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>
-    <h4>Understand</h4>
+    ${laterFold(ctx, "Understand and Explain", `<h4>Understand</h4>
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
@@ -383,7 +384,7 @@ export function renderConversation(ctx) {
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap"><select name="level" aria-label="Explanation level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
       ${actionButton("Explain at this level", "explain", stepOffer(allowed.explain, ctx, "explain"))}</div>
-    ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
+    ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`)}`;
 }
 
 /** The part of a revision's spec a member edits: Studio carries `answers` itself and refuses a proposal naming them. */

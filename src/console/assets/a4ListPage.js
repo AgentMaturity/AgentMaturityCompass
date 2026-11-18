@@ -110,4 +110,12 @@ export async function renderListPage(options) {
     const create = root.querySelector("#a4Create");
     if (create) { create.hidden = false; create.querySelector("input")?.focus(); }
   });
+  // Each project's own stage is drawn from its readiness (a hold, the release this Studio cannot make), as Home and the
+  // project page draw it. Read after the page is shown, at most ten, as Home's approval check reads them.
+  const open = projects.filter((project) => project.stage !== "retired").slice(0, 10);
+  if (open.length === 0) return;
+  const read = await Promise.all(open.map((project) => apiNativeRequest(`${API}/projects/${encodeURIComponent(project.projectId)}/readiness`)
+    .then((data) => [project.projectId, one(data, "readiness")], () => null)));
+  const section = root.querySelector("#a4ProjectList");
+  if (section) section.outerHTML = view.renderProjectList(projects, new Map(read.filter(Boolean)));
 }

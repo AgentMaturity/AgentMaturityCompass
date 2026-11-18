@@ -5,7 +5,7 @@
 import { QUESTION_LABELS } from "./a4Questions.js";
 import { SELF_APPROVE, decidedByMe, selfApproves, selfCountsOnce } from "./a4Who.js";
 import { STAGE_SHORT, itemTitle } from "./a4Plain.js";
-import { approvalPeople, moveState, stageRoute, stepRoute } from "./a4Journey.js";
+import { approvalPeople, moveState, projectState, releaseBlocked, stageRoute, stepRoute } from "./a4Journey.js";
 import { moreInfo, noticeChip, routeTrack } from "./pageKit.js";
 import { icon } from "./iconSet.js";
 import { practiceBanner, stageBanner } from "./a4View.js";
@@ -50,7 +50,7 @@ export function nextMove(ctx) {
   const key = PRESS_ALLOWED[move.act?.press];
   const codes = key ? list(ctx.allowed?.[key]?.reasonCodes) : [];
   if (codes.includes("PRINCIPAL_ROLE_INSUFFICIENT") || codes.includes("PRINCIPAL_NOT_MEMBER")) {
-    return { now: `${move.now} A project owner or builder takes this step; nothing is needed from you now.` };
+    return { now: `${move.now} A project owner or builder takes this step; nothing is needed from you now.`, waits: true };
   }
   // A requirement still holds the step (a lowercase code is a readiness item): that requirement comes first.
   const holding = codes.map((value) => itemOf(ctx.readiness, value)).find((entry) => entry && entry.status !== "READY" && entry.status !== "COMPLETE");
@@ -70,13 +70,19 @@ function rawMove(ctx) {
   const { project, readiness, stage } = ctx;
   if (project.stage === "retired") return { now: "This project is retired. Its records stay readable." };
   if (stage !== project.stage) {
-    return { now: `You are viewing ${title(stage)}. The project is at ${title(project.stage)}, step ${STEP_TITLES[project.step] ?? project.step}.`,
-      act: { label: `Go to ${title(project.stage)}`, href: `./a4Project?project=${encodeURIComponent(project.projectId)}&stage=${project.stage}` } };
+    return { now: `This is ${STAGE_SHORT[stage] ?? title(stage)}. The project is at ${STAGE_SHORT[project.stage] ?? title(project.stage)}: ${STEP_PLAIN[project.step] ?? project.step}.`,
+      act: { label: `Go to ${STAGE_SHORT[project.stage] ?? title(project.stage)}`, href: `./a4Project?project=${encodeURIComponent(project.projectId)}&stage=${project.stage}` } };
   }
   if (project.hold) return { now: "The project is on hold, so nothing can change until a project owner resumes it (Approvals card, More, Resume, with a reason).",
     act: { label: "Write a reason to resume", focus: '.a4-approvals [name="reason"]' } };
   const sameHost = itemOf(readiness, "deployment.same_host");
-  if (sameHost?.status === "BLOCKED") return { now: sameHost.nextAction?.label ?? "This Studio cannot deploy this release.", stop: true };
+  // Studio's sentence names the reason and the release steps in one paragraph: its first clause stays in sight, all of it
+  // (commands as code) one click away under "How to release it".
+  if (sameHost?.status === "BLOCKED") {
+    const label = sameHost.nextAction?.label ?? "This Studio cannot deploy this release.";
+    const first = label.split(/[:.]/)[0].trim();
+    return { now: `${first}.`, how: label, stop: true };
+  }
   // Files AMC recorded changed underneath (another AMC process rewrote one): a new revision records them again. At Ask the
   // answers the step asks for are that revision, so the step itself is the way on.
   const blocked = list(readiness?.items).find((item) => item.mandatory && item.status === "BLOCKED" && !["gate.direction", "gate.completion"].includes(item.id)
@@ -85,7 +91,7 @@ function rawMove(ctx) {
     + "To go on, change any answer under Ask and press Save answers: AMC records a new revision with the files as they are now, and you run the steps again from there.",
   act: { label: "Change an answer", focus: "form[data-a4-answers] textarea" } };
   if (blocked) return { now: `Something blocks this stage: ${blocked.nextAction?.label ?? blocked.id}.`, why: `Item ${blocked.id}; see Missing requirements.`,
-    act: { label: "Show what is missing", focus: "#a4Missing" } };
+    act: { label: "Show what is missing", focus: "#a4Missing" }, ...(blocked.id.startsWith("sod") || blocked.id.startsWith("members") ? { keep: ".a4-members" } : {}) };
   const step = project.step;
   if (step === "asked") return askMove(ctx);
   if (step === "understood") return { now: "Explain: AMC explains the choices it will make, at the level you pick.", act: { label: "Explain", press: "explain" } };
@@ -133,7 +139,7 @@ function releaseMove(ctx) {
   }
   if (status === "QUORUM_MET") {
     return ctx.allowed?.release?.allowed === true ? { now: "The release request is approved. Release it on the Release card: AMC builds the signed package and shows the staging lease token once.",
-      act: { label: "Release", press: "release" } } : { now: "The release request is approved. A project owner releases it next on the Release card." };
+      act: { label: "Release", press: "release" } } : { now: "The release request is approved. A project owner releases it next on the Release card.", waits: true };
   }
   return { now: "Approved. Activate's release and deployment approval are completed on the Release card.", act: { label: "Open the Release card", focus: card } };
 }
@@ -302,7 +308,7 @@ function gateMove(ctx, kind) {
     return candidates.length
       ? { now: `Add a second person before asking for approval. ${SOD}. Pick a person on the Members card, choose the approver role and press Add.`,
         act: { label: "Choose an approver", focus: "li[data-principal] select" } }
-      : { now: `Add a second person before asking for approval. ${SOD}, and you are the only person here. In the workspace folder run ${addUserCommand()}, then reload and add them on the Members card.`, stop: true };
+      : { now: `Add a second person before asking for approval. ${SOD}, and you are the only person here. In the workspace folder run ${addUserCommand()}, then reload and add them on the Members card.`, stop: true, keep: ".a4-members" };
   }
   // Never offer a request whose approval would then be held (A4-04): a missing second member or an unresolved plan
   // comes first, because fixing it afterwards cancels the approvals already given.
@@ -404,10 +410,14 @@ export function renderStartHere(ctx) {
   const gate = stage === project.stage && kind ? liveGate(ctx, kind) : null;
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
   // Stopped: on hold, or this Studio cannot make the release (deployment.same_host); never only because no button is offered.
-  const state = moveState(project, move, itemOf(ctx.readiness, "deployment.same_host")?.status === "BLOCKED");
+  // One state for the project's own stage (projectState, as Home and the Build page draw it); at that stage the person's own
+  // move says whether it is theirs to do now or someone else's.
   const here = stage === project.stage;
+  const stopped = releaseBlocked(here ? ctx.readiness : ctx.headReadiness);
+  const shared = projectState(project, here ? ctx.readiness : ctx.headReadiness ?? null);
+  const state = shared === "stop" ? "stop" : here ? moveState(project, move, stopped) : shared;
   const names = new Map([...list(project.members), ...list(ctx.members?.candidates)].map((row) => [row.principalKey, row.username]));
-  const heading = project.stage === "retired" ? "Retired" : project.hold ? "On hold" : here && state === "stop" ? "Stopped here" : !here ? `Viewing ${STAGE_PLAIN[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
+  const heading = project.stage === "retired" ? "Retired" : project.hold ? "On hold" : here && state === "stop" ? "Stopped here" : !here ? `Viewing ${STAGE_SHORT[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
   const part = here && at >= 0 ? `<p class="muted">${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
       <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : "";
   const fold = (summary, html, key) => moreInfo(summary, html).replace('<details class="more-info"', `<details class="more-info" data-a4-open="start:${key}"`);
@@ -419,10 +429,11 @@ export function renderStartHere(ctx) {
     ${stageRoute(project, stage, state)}
     <div class="a4-step-panel" data-state="${here ? state : "todo"}">
       <h3 id="a4StartTitle"><span class="a4-step-label">What to do now<span class="visually-hidden">: </span></span>${esc(heading)}</h3>
-      ${stepRoute(project, stage, state)}
-      <p class="a4-now"><strong>${esc(move.now)}</strong></p>
+      ${stepRoute(project, stage, state, here && stopped && !project.hold ? "built" : null)}
+      <p class="a4-now"${move.keep ? ` data-a4-keep="${esc(move.keep)}"` : ""}><strong>${esc(move.now)}</strong></p>
       ${live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : ""}
       <div class="row wrap">${primary(move.act, move.also)}</div>${move.people ? peopleFormHtml(ctx) : ""}
+      ${move.how ? fold("How to release it", `<p class="muted">${esc(move.how).replace(/`([^`]+)`/g, "<code>$1</code>")}</p>`, "how") : ""}
       ${move.why ? fold("Tell me more", `<p class="muted">${esc(move.why)}</p>`, "why") : ""}
       ${live && !move.effect ? fold("Who must approve?", renderWhoApproves(ctx, live, move.people === true), "who") : ""}
       ${fold(project.practiceActive === true ? "What is a practice project?" : "What is a project?", `${part}<p class="muted">${esc(project.practiceActive === true ? PRACTICE_IS : WHAT_IS_A_PROJECT)}</p>`, "what")}
@@ -587,8 +598,11 @@ export function releaseNext(project, readiness) {
 }
 
 /** Home's "Next:" at an approval one person on a practice project gives alone (the same steps the route draws as "now"). */
-const SELF_NEXT = { proposed: "Next: you approve the plan yourself; it is recorded as self-approved.",
-  reviewed: "Next: you give the final approval yourself; it is recorded as self-approved." };
+const SELF_NEXT = { proposed: "Next: ask for approval of the plan, then approve it yourself; it is recorded as self-approved.",
+  reviewed: "Next: ask for the final approval, then give it yourself; it is recorded as self-approved." };
+/** Home's "Next:" while the project's stage is stopped (projectState): on hold, or the release this Studio cannot make. */
+const STOPPED_NEXT = { hold: "This project is on hold until a project owner resumes it.",
+  release: "Stopped: this AMC cannot release this agent. Open it to see how to go on." };
 
 /** The project Home continues: the most recently changed one that is not retired, else null. */
 export function latestProject(projects) {
@@ -622,16 +636,16 @@ export function homeCardHtml({ projects = [], waiting = null, industryHtml = "",
   if (project) {
     const at = STAGES.indexOf(project.stage);
     const where = at >= 0 ? `Step ${at + 1} of 4: ${STAGE_PLAIN[project.stage]} (${title(project.stage)}). Part: ${STEP_PLAIN[project.step] ?? project.step}.` : "";
-    // The stage waits for a person while it is on hold or asks a second person to approve. Alone on a practice project
-    // the person approves Aspire and Assemble's first approval themselves (docs/A4_FORGE.md), so those are "now".
-    const selfApproves = project.practiceActive === true && (project.stage === "aspire" || (project.stage === "assemble" && project.step === "proposed"));
-    const waits = project.hold || (["proposed", "reviewed"].includes(project.step) && !selfApproves);
+    // The same state the project page and the Build page draw (projectState): stopped on hold or when this Studio cannot
+    // make the release; waiting at an approval a second person gives; now when the person approves it alone (practice).
+    const state = projectState(project, latestReadiness);
     const route = at >= 0 ? routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: `${STAGE_PLAIN[name]} (${title(name)})`,
-      state: index < at ? "done" : index > at ? "todo" : waits ? "wait" : "now" })), { label: `Where ${project.name} is` }) : "";
+      state: index < at ? "done" : index > at ? "todo" : state })), { label: `Where ${project.name} is` }) : "";
+    const alone = state === "now" && ["proposed", "reviewed"].includes(project.step);
     return `<h2 id="a4HomeTitle">Continue ${esc(project.name)}</h2>
       ${route}
-      <p class="first-use-lead">${esc(project.hold ? "This project is on hold until a project owner resumes it." : releaseNext(project, latestReadiness)
-        ?? (selfApproves ? SELF_NEXT[project.step] : null) ?? STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
+      <p class="first-use-lead">${esc(project.hold ? STOPPED_NEXT.hold : state === "stop" && releaseBlocked(latestReadiness) ? STOPPED_NEXT.release
+        : releaseNext(project, latestReadiness) ?? (alone ? SELF_NEXT[project.step] : null) ?? STEP_NEXT[project.step] ?? "Open it to see what it needs next.")}</p>
       <div class="row wrap a4-home-actions"><a class="button" href="./a4Project?project=${encodeURIComponent(project.projectId ?? "")}">Continue</a>
       <a href="./a4?new=1">Start another</a></div>
       ${where ? moreInfo("Which part?", `<p class="muted">${esc(where)}</p>`) : ""}`;

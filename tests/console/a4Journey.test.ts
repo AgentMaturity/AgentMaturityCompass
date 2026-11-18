@@ -5,7 +5,7 @@
  */
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
-import { approvalPeople, moveState, stageRoute, stepRoute } from "../../src/console/assets/a4Journey.js";
+import { approvalPeople, moveState, projectState, stageRoute, stepRoute } from "../../src/console/assets/a4Journey.js";
 import * as start from "../../src/console/assets/a4Start.js";
 import * as view from "../../src/console/assets/a4View.js";
 import * as packs from "../../src/console/assets/a4Pack.js";
@@ -44,7 +44,9 @@ describe("the stage and step routes", () => {
     // No button only means nobody else can act yet: that waits, it is not a refusal.
     expect(moveState({}, { now: "Add a second person before asking for approval.", stop: true })).toBe("wait");
     expect(moveState({}, { now: "Waiting for a second person", act: { label: "Copy link", copy: true } })).toBe("wait");
-    expect(moveState({}, { now: "Approved. A project owner or builder takes this step; nothing is needed from you now." })).toBe("wait");
+    expect(moveState({}, { now: "Approved. A project owner or builder takes this step; nothing is needed from you now.", waits: true })).toBe("wait");
+    // The words never decide the colour: only nextMove's flags do.
+    expect(moveState({}, { now: "Waiting for nothing; a project owner" })).toBe("now");
     expect(moveState({}, { now: "Build", act: { label: "Build", press: "build" } })).toBe("now");
   });
 });
@@ -106,7 +108,8 @@ describe("folds never hide what a person must see", () => {
     const source = readFileSync("src/console/assets/a4.js", "utf8");
     const fill = source.slice(source.indexOf("function fillEmptyAnswers"), source.indexOf("async function startFromPack"));
     expect(fill).toMatch(/field\.closest\("details"\)[\s\S]*fold\.open = true/);
-    expect(source).toMatch(/\/Members card\/\.test\([\s\S]*"\.a4-members"/);
+    expect(source).toContain("dataset.a4Keep");
+    expect(source).not.toMatch(/\/Members card\/\.test/);
   });
 });
 
@@ -125,10 +128,62 @@ describe("the Build page's start form", () => {
 describe("Home's Next line", () => {
   const row = (extra: Record<string, unknown>) => start.homeCardHtml({ projects: [{ projectId: "a4p_1", name: "P", updatedTs: "2026-11-18T00:00:00Z", ...extra }] as never });
   test("alone on a practice project the person approves the plan themselves; otherwise a second person does", () => {
-    expect(row({ stage: "aspire", step: "proposed", practiceActive: true })).toContain("Next: you approve the plan yourself; it is recorded as self-approved.");
-    expect(row({ stage: "aspire", step: "reviewed", practiceActive: true })).toContain("Next: you give the final approval yourself");
+    expect(row({ stage: "aspire", step: "proposed", practiceActive: true })).toContain("Next: ask for approval of the plan, then approve it yourself; it is recorded as self-approved.");
+    expect(row({ stage: "aspire", step: "reviewed", practiceActive: true })).toContain("Next: ask for the final approval, then give it yourself");
     expect(row({ stage: "aspire", step: "proposed" })).toContain("Next: a second person approves the plan");
     // Assemble's final approval needs two other people even on a practice project.
     expect(row({ stage: "assemble", step: "reviewed", practiceActive: true })).toContain("a second person gives the final approval");
+  });
+});
+
+describe("one state for a project on every screen", () => {
+  const stopped = { status: "BLOCKED", items: [{ id: "deployment.same_host", status: "BLOCKED", mandatory: true, reasonCodes: [],
+    nextAction: { label: "This AMC cannot release this agent: AMC deploys an agent only by restarting it. Then run `docker compose up -d --build` there." } }],
+  allowed: {}, gates: {} };
+  const k = { ...project, stage: "activate", step: "asked" };
+
+  test("projectState: hold and a release this Studio cannot make stop; an approval step waits unless one person approves alone", () => {
+    expect(projectState({ ...k, hold: true })).toBe("stop");
+    expect(projectState(k, stopped)).toBe("stop");
+    expect(projectState(k, { items: [] })).toBe("now");
+    expect(projectState({ ...project, step: "proposed" })).toBe("wait");
+    expect(projectState({ ...project, step: "proposed" }, { gates: { direction: { status: "PENDING" } } })).toBe("wait");
+    // Not asked for yet, or blocked by something the project's people fix on the page: theirs to do now.
+    expect(projectState({ ...project, step: "proposed" }, { gates: { direction: null } })).toBe("now");
+    expect(projectState({ ...project, step: "proposed" }, { status: "BLOCKED", items: [], gates: { direction: { status: "PENDING" } } })).toBe("now");
+    expect(projectState({ ...project, stage: "aspire", step: "proposed" }, { selfApprovalAllowed: true })).toBe("now");
+    expect(projectState({ ...project, stage: "assemble", step: "reviewed", practiceActive: true })).toBe("wait");
+  });
+
+  test("Home, the Build page list and the panel viewing another stage all draw the stopped release", () => {
+    const home = start.homeCardHtml({ projects: [{ ...k, updatedTs: "2026-11-18T00:00:00Z" }] as never, latestReadiness: stopped as never });
+    expect(states(home)[3]).toBe("stop");
+    expect(home).toContain("Stopped: this AMC cannot release this agent.");
+    expect(home).not.toContain("answer the questions");
+    expect(states(view.renderProjectList([{ ...k, agentId: "a", revisionNo: 3 }] as never, new Map([["a4p_1", stopped]]) as never))).toEqual(["done", "done", "done", "stop"]);
+    const adapt = start.renderStartHere({ project: k, stage: "adapt", me: { userId: "u1" }, gates: [], members: { candidates: [] }, questions: [],
+      allowed: {}, readiness: { status: "COMPLETE", items: [], allowed: {}, gates: {} }, headReadiness: stopped } as never);
+    expect(states(adapt).slice(0, 4)).toEqual(["done", "done", "done", "stop"]);
+    expect(adapt).toContain("Viewing Fit rules");
+    expect(adapt).toContain("This is Fit rules. The project is at Release it: Answer the questions.");
+    expect(adapt).toMatch(/route-step is-done is-viewed/);
+  });
+
+  test("at Activate the release is stopped, not the step: one sentence in sight, the steps and commands in a fold", () => {
+    const html = start.renderStartHere({ project: k, stage: "activate", me: { userId: "u1" }, gates: [], members: { candidates: [] }, questions: [],
+      allowed: {}, readiness: stopped } as never);
+    expect(html).toContain("Stopped here");
+    expect(html).toContain('<p class="a4-now"><strong>This AMC cannot release this agent.</strong></p>');
+    expect(html).toMatch(/<summary>How to release it<\/summary>[\s\S]*<code>docker compose up -d --build<\/code>/);
+    const steps = states(html).slice(4);
+    expect(steps[0]).toBe("todo");
+    expect(steps[5]).toBe("stop");
+  });
+
+  test("past Explain, Understand and Explain fold so the plan and its approval stay in sight", () => {
+    const ctx = (step: string) => ({ project: { ...project, stage: "aspire", step, projectId: "a4p_1" }, stage: "aspire", answers: [], allowed: {}, questions: [],
+      readiness: { items: [] } });
+    expect(view.renderConversation(ctx("proposed") as never)).toMatch(/<summary>Understand and Explain<\/summary>[\s\S]*<h4>Understand<\/h4>/);
+    expect(view.renderConversation(ctx("understood") as never)).not.toContain("<summary>Understand and Explain</summary>");
   });
 });
