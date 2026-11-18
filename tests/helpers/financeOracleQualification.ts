@@ -161,7 +161,8 @@ try {
           return { ok: true, output: JSON.stringify({ paymentId: paid.payment.paymentId }), effect: "applied", externalRef: paid.payment.paymentId };
         } }));
       registry.guard("signed finance allowlist", toolhubAllowlistGuard(c.workspace, execution => registry.visible(execution.agentId).get(execution.name)));
-      registry.guard("refreshed finance resource", execution => refreshed.get(execution) === true ? undefined : "finance resource refresh unavailable");
+      // As the product's finance-current-payee guard: the early look before approval (UX-03) runs as SIMULATE, before the refresh.
+      registry.guard("refreshed finance resource", execution => execution.effectiveMode === "SIMULATE" || refreshed.get(execution) === true ? undefined : "finance resource refresh unavailable");
       const pipeline = new ToolPipeline({ workspace: c.workspace, registry, journal: () => journal,
         authorizationContext: () => ({ sessionId }), approvalRequiredFor: new Set(["FINANCIAL"]),
         boundApprovalRequiredFor: new Set(["FINANCIAL"]),

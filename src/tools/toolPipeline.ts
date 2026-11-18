@@ -274,13 +274,13 @@ export class ToolPipeline {
     if (!definition || this.init.registry.invocationDenial(input.name, input.agentId, (input.parentToken ?? null) !== null) !== undefined
       || argumentSchemaError(definition.parameters, arguments_) !== null) return null;
     return this.earlyGuardDenial({ token: `tok_${randomUUID()}`, callId, rootCallId: callId, name: definition.name, agentId: input.agentId,
-      workspace: this.init.workspace, actionClass: definition.actionClass, requestedMode: input.requestedMode, effectiveMode: input.requestedMode,
+      workspace: this.init.workspace, actionClass: definition.actionClass, requestedMode: input.requestedMode, effectiveMode: this.entryMode(definition.name, definition.actionClass, input, true),
       arguments: arguments_, parentToken: input.parentToken ?? null, ...(input.signal === undefined ? {} : { signal: input.signal }) });
   }
 
   /** The early look at one execution: entry refusals, then every guard, on a SIMULATE copy bound like the real call. */
   private async earlyGuardDenial(execution: ToolExecution): Promise<ToolDenial | null> {
-    const draft: ToolExecution = { ...execution, effectiveMode: "SIMULATE", preApproval: true }, entered = await this.enter(draft, undefined, undefined);
+    const draft: ToolExecution = { ...execution, effectiveMode: "SIMULATE", preApproval: { mode: execution.effectiveMode } }, entered = await this.enter(draft, undefined, undefined);
     if (entered.refused !== null) return entered.refused;
     const look = entered.bound?.ok ? boundExecution(draft, entered.bound) : draft;
     // Selected like the real call (the sandbox permit reads it); a look that cannot finish only asks: the later stage decides.

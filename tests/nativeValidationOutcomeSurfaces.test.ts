@@ -85,9 +85,10 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
   } finally { observerReceipt = approvals.stop(); }
   // RECORD_PROMPT asks the real stub adapter for one invalid bash call ({text})
   // before its text completion. That separate request is also governed. Do not
-  // erase it or pretend validation was a model tool call.
-  expect(observerReceipt.errors).toEqual([]); expect(observerReceipt.requests).toBe(2);
-  expect(observerReceipt.decisions).toBe(mode === "denied" ? 2 : 4);
+  // erase it or pretend validation was a model tool call. With the daily budget
+  // spent, nobody is asked about the check: the budget refuses it first (UX-03).
+  expect(observerReceipt.errors).toEqual([]); expect(observerReceipt.requests).toBe(mode === "budget" ? 1 : 2);
+  expect(observerReceipt.decisions).toBe(mode === "denied" || mode === "budget" ? 2 : 4);
   const status = mode === "success" ? "passed" : mode === "nonzero" ? "failed" : "unavailable";
   expect(summary.endings.at(-1)?.reason).toBe("complete");
   expect(summary.validation).toMatchObject({ status, configSha256: f.sha256, turn: 1, checks: [{ id: "public", status,
@@ -102,7 +103,7 @@ test.runIf(process.platform === "darwin").each(cases)("Darwin $surface public va
   expect(modelCalls).toHaveLength(1); expect(modelCalls[0].toolCallId).toMatch(/^stub-call-/);
   expect(modelCalls.some(meta => meta.toolCallId === checkCallId)).toBe(false);
   const approvalsForCheck = history.events.filter(row => row.event_type === "approval/request" && JSON.parse(row.meta_json).toolCallId === checkCallId);
-  expect(approvalsForCheck).toHaveLength(1);
+  expect(approvalsForCheck).toHaveLength(mode === "budget" ? 0 : 1);
   expect(history.events.some(row => row.id === outputId && row.event_type === "audit")).toBe(true);
   const projection = readNativeTaskProjection(workspace, summary.sessionId, "default");
   expect(projection.validation).toEqual(summary.validation);
