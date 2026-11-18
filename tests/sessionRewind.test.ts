@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { hostname, tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
@@ -167,15 +167,16 @@ describe("amc session rewind, end to end", () => {
       // MUTATION: skip assertNoLiveWriter and the plan is made while another agent writes.
       expect(() => planSessionRewind(workspace, parent, 1)).toThrow(/still being written by a running agent/);
     } finally { live.close({ reason: "test" }); }
-    // The folder becomes a link to another folder holding the same bytes.
-    const elsewhere = join(workspace, "elsewhere");
-    renameSync(join(workspace, "workspace", "output"), elsewhere);
-    symlinkSync(elsewhere, join(workspace, "workspace", "output"));
+    // note.txt becomes a link to another allowed file holding the same bytes the session last wrote.
+    writeFileSync(out("real-note.txt"), "v2\n");
+    rmSync(out("note.txt"));
+    symlinkSync(out("real-note.txt"), out("note.txt"));
     // MUTATION: resolve with insideWorkspace (links followed) and the file behind the link is rewritten.
     const plan = planSessionRewind(workspace, parent, 1);
-    expect(plan.conflicts.map((conflict) => conflict.reason)).toEqual(["symlink-or-protected", "symlink-or-protected"]);
+    expect(plan.conflicts).toEqual([{ path: "workspace/output/note.txt", reason: "symlink-or-protected" }]);
     executeSessionRewind(workspace, plan, { onlyClean: true });
-    expect(readFileSync(join(elsewhere, "note.txt"), "utf8")).toBe("v2\n");
+    expect(readFileSync(out("real-note.txt"), "utf8")).toBe("v2\n");
+    expect(existsSync(out("new.txt"))).toBe(false);
   }, 120_000);
 
   it("the verifier rejects a rewind row that cites a checkpoint that does not exist", async () => {

@@ -77,8 +77,11 @@ describe("plan_exit", () => {
     expect(sessionRows.filter(row => row.event_type === "request/header")).toHaveLength(1);
     expect(planning.endings?.at(-1)?.reason ?? sessionRows.find(row => row.event_type === "turn/end")?.meta_json).toMatch(/blocked/);
     // The model cannot leave plan mode: the next --plan turn of the same session is still read-only.
+    // MUTATION: skip applyPlanMode and turn 2 calls fs.write.
     await runCli([write, "--plan", "--session", planning.sessionId, "--keep-open"]);
     expect(existsSync(join(workspace, "workspace", "output", "planned.txt"))).toBe(false);
+    const turnTwoCalls = rows(planning.sessionId).filter(row => row.event_type === "tool/call" && extractEnvelope(row.meta_json)?.turn === 2).map(row => meta(row).toolName);
+    expect(turnTwoCalls).not.toContain("fs.write");
     const verified = await verifyAgentRun(workspace, planning.sessionId);
     expect(verified.integrityOk).toBe(true);
   });
