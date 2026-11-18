@@ -213,7 +213,7 @@ export class NativeCommandHooks implements NativeHookRuntime {
     const truncated = Buffer.byteLength(serialized) > NATIVE_COMMAND_HOOK_LIMITS.inputBytes;
     const detail = { tool_name: execution.name, tool_use_id: execution.callId, action_class: execution.actionClass, requested_mode: execution.requestedMode,
       tool_input: truncated ? null : execution.arguments, tool_input_truncated: truncated, tool_input_sha256: sha256Hex(serialized), tool_input_bytes: Buffer.byteLength(serialized),
-      pre_approval: execution.preApproval === true };
+      pre_approval: execution.preApproval !== undefined };
     this.prepared.set(execution, await this.decide("PreToolUse", execution.name, detail, truncated, execution.signal));
   };
 
