@@ -338,6 +338,7 @@ function bindRail(doc) {
       const choice = option.getAttribute("data-theme-choice");
       if (choice === "light" || choice === "dark") root.dataset.theme = choice; else delete root.dataset.theme;
       store("amc-theme", choice === "auto" ? null : choice);
+      globalThis.amcThemeBar?.();
       showTheme();
     });
   }

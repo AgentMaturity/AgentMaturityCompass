@@ -319,8 +319,14 @@ nav .nav-section {
   gap: 6px;
 }
 
+/* Who is signed in stays in sight at the rail's foot (and the phone sheet's) however long the menu is. */
 nav a.nav-person {
   order: 3;
+  position: sticky;
+  bottom: -14px;
+  z-index: 1;
+  flex: none;
+  background: var(--surface);
   margin-top: 6px;
   border-top: 1px solid var(--line);
   border-radius: 0 0 var(--radius) var(--radius);
@@ -531,6 +537,11 @@ main:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* On a phone a long page name wraps rather than losing its last word. */
+@media (max-width: 560px) {
+  .topbar-title { white-space: normal; line-height: 1.25; }
 }
 
 .topbar-actions {
@@ -855,7 +866,7 @@ th {
 }
 
 /* A table row the page marks as chosen (Northstar's agent, an opened approval). */
-tr.selected > td { background: var(--accent-soft); }
+tr.selected > td { background: var(--surface-2); }
 
 .table-wrap {
   max-width: 100%;
@@ -2224,6 +2235,11 @@ body[data-page="login"] #status:empty {
     padding: 0 12px;
     font-size: 15px;
     text-align: left;
+  }
+  nav.mobile-nav-open a.nav-person {
+    bottom: calc(-16px - env(safe-area-inset-bottom));
+    padding-top: 8px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
   }
   nav.mobile-nav-open .mobile-nav-toggle {
     order: -3;

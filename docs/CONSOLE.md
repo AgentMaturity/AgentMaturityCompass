@@ -44,8 +44,10 @@ Every page shows the same menu, and a page reached from another (Assurance from 
 The page's name in the top bar and its menu entry are the same words. Who is signed in is said once, at
 the foot of the menu (with "(view only)" for a viewer). If one request gets no answer while AMC is running, a notice
 says just that and offers to reload the page; only when AMC's health check does not answer either does it say "AMC is
-not running". On a phone the first five pages are a tab bar at the bottom and **More** opens every other page. On
-every page other than Home the "Claims on this page" box sits under the page's own content.
+not running". On a phone the first five pages are a tab bar at the bottom and **More** opens every other page, with
+who is signed in at the top of that sheet. The "Claims on this page" box sits above the page's content, so a result's
+label is in sight before the result; Home keeps it under **More**, and My agent, Records, Approvals, Industry Packs,
+Live runs and the agent project page keep it under their own content.
 
 - `Home`: "What would you like to do?" with three ways in, what waits for you, your latest agent project as a route, and your first steps (see above).
 - `Sign in`: one card with the logo, user name, password and **Sign in**; a failed sign-in says why under the card. The pairing code, "No account yet?", the emergency admin token and pairing another device sit in closed sections.

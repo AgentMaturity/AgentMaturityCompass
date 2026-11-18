@@ -4,6 +4,7 @@
  * loading…" placeholder stayed on every page that never loads the banner.
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
+import vm from "node:vm";
 import { describe, expect, test } from "vitest";
 import { CANONICAL_NAV, PAGE_NAMES, canonicalNavHtml, decorateNav, initShell, isSessionLine, renderCanonicalNav, renderNavSession, renderTopbar, reportNoAnswer, topbarHtml } from "../../src/console/assets/shell.js";
 import { FakeDocument, type FakeElement } from "./fakeDom.js";
@@ -441,5 +442,30 @@ describe("studio-ui inherit slice: one name per page, one 'Signed in as', a true
     expect(await reportNoAnswer(down as never, async () => { throw new TypeError("Failed to fetch"); })).toBe(false);
     expect(down.getElementById("shellNotice")?.textContent).toContain("AMC is not running.");
     expect(notices[0]).toBe("requestFailed");
+  });
+});
+
+describe("studio-ui inherit review fixes", () => {
+  test("a page's claims sit above its results, and the person stays in sight at the rail's foot", () => {
+    const strip = readFileSync("src/console/assets/components/claimBadge.js", "utf8");
+    expect(strip).toContain("app.before(strip);");
+    expect(strip).not.toContain("app.after(strip);");
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/nav a\.nav-person \{\n  order: 3;\n  position: sticky;\n  bottom: -14px;/);
+  });
+
+  test("the title bar colour follows a theme chosen on the page", () => {
+    type Meta = { name?: string; content?: string; media?: string; remove: () => void };
+    const metas: Meta[] = [];
+    const dataset: Record<string, string> = {};
+    const document = { documentElement: { dataset }, head: { append: (meta: Meta) => metas.push(meta) }, querySelectorAll: () => [...metas],
+      createElement: () => { const meta: Meta = { remove: () => metas.splice(metas.indexOf(meta), 1) }; return meta; } };
+    const sandbox: Record<string, unknown> = { document, localStorage: { getItem: () => null }, addEventListener: () => {}, matchMedia: () => ({ matches: false }) };
+    vm.runInNewContext(readFileSync("src/console/assets/pageTransition.js", "utf8"), sandbox);
+    const bars = () => metas.map((meta) => `${meta.content}|${meta.media ?? ""}`);
+    expect(bars()).toEqual(["#F4F6F8|(prefers-color-scheme: light)", "#0F172A|(prefers-color-scheme: dark)"]);
+    dataset.theme = "dark";
+    (sandbox.amcThemeBar as () => void)();
+    expect(bars()).toEqual(["#0F172A|"]);
+    expect(readFileSync("src/console/assets/shell.js", "utf8")).toContain("globalThis.amcThemeBar?.();");
   });
 });
