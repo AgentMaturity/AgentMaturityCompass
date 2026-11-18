@@ -170,7 +170,8 @@ describe("P3.2 — the bounded tool pool and cancellation", () => {
         return ok("done");
       }
     });
-    const calls = [1, 2, 3, 4, 5, 6].map((n) => ({ id: `call-${n}`, name: "work", args: "{}" }));
+    // Distinct arguments: six identical calls in a row would meet the repeated-call guard (src/agent/turnGuards.ts).
+    const calls = [1, 2, 3, 4, 5, 6].map((n) => ({ id: `call-${n}`, name: "work", args: `{"n":${n}}` }));
     const harness = harnessFor({
       scripts: [toolStepMulti(calls), textStep("all six ran.")],
       tools,
@@ -225,12 +226,13 @@ describe("P3.2 — the bounded tool pool and cancellation", () => {
     );
     const harness = harnessFor({
       scripts: [
+        // Distinct arguments: a fourth identical call in one turn would meet the repeated-call guard.
         toolStepMulti([
-          { id: "call-1", name: "para", args: "{}" },
-          { id: "call-2", name: "para", args: "{}" },
+          { id: "call-1", name: "para", args: '{"n":1}' },
+          { id: "call-2", name: "para", args: '{"n":2}' },
           { id: "call-3", name: "solo", args: "{}" },
-          { id: "call-4", name: "para", args: "{}" },
-          { id: "call-5", name: "para", args: "{}" }
+          { id: "call-4", name: "para", args: '{"n":4}' },
+          { id: "call-5", name: "para", args: '{"n":5}' }
         ]),
         textStep("done.")
       ],

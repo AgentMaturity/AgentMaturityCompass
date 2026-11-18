@@ -151,8 +151,20 @@ export type TurnCancelCause =
   | { readonly kind: "parent" }
   | { readonly kind: "hook"; readonly reason: string }
   | { readonly kind: "disposed" }
-  /** An operator run limit the driver enforced (SH-LOOP-06, src/agent/runLimits.ts). */
-  | { readonly kind: "limit"; readonly condition: "max-turns" | "max-tokens" | "deadline"; readonly bound: number; readonly unmeasured?: true };
+  /**
+   * An operator run limit (SH-LOOP-06, src/agent/runLimits.ts) or a turn guard (src/agent/turnGuards.ts) the driver
+   * enforced. `tools` names the refused or repeated tools of a guard stop, sorted.
+   */
+  | { readonly kind: "limit"; readonly condition: TurnLimitCondition; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[] };
+
+/** What a `limit` cause stopped on. `max-cost-usd` is the only one whose bound may be a fraction (US dollars). */
+export type TurnLimitCondition = "max-turns" | "max-tokens" | "deadline" | "max-cost-usd" | "repeated-call" | "malformed-responses" | "denials";
+const LIMIT_CONDITIONS: ReadonlySet<unknown> = new Set<TurnLimitCondition>(["max-turns", "max-tokens", "deadline", "max-cost-usd", "repeated-call", "malformed-responses", "denials"]);
+
+/** The tool names a limit cause may carry: at most 16, each 1-128 characters. */
+function isLimitToolList(value: unknown): value is readonly string[] {
+  return Array.isArray(value) && value.length >= 1 && value.length <= 16 && value.every(name => typeof name === "string" && name.length >= 1 && name.length <= 128);
+}
 
 /**
  * Boundary validation for a cause. A cause read back out of a stored row is
@@ -173,9 +185,10 @@ export function isTurnCancelCause(value: unknown): value is TurnCancelCause {
     case "hook":
       return typeof candidate.reason === "string";
     case "limit":
-      return (candidate.condition === "max-turns" || candidate.condition === "max-tokens" || candidate.condition === "deadline")
-        && typeof candidate.bound === "number" && Number.isSafeInteger(candidate.bound) && candidate.bound >= 0
-        && (candidate.unmeasured === undefined || candidate.unmeasured === true);
+      return LIMIT_CONDITIONS.has(candidate.condition) && typeof candidate.bound === "number"
+        && (candidate.condition === "max-cost-usd" ? Number.isFinite(candidate.bound) && candidate.bound > 0 : Number.isSafeInteger(candidate.bound) && candidate.bound >= 0)
+        && (candidate.unmeasured === undefined || candidate.unmeasured === true)
+        && (candidate.tools === undefined || isLimitToolList(candidate.tools));
     default:
       return false;
   }

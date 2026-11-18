@@ -3,9 +3,17 @@
  * driver stays within its line budget. None of them touch the session or the inbox.
  */
 import { randomBytes } from "node:crypto";
-import { isTurnCancelCause, type TokenUsage, type TurnCancelCause } from "../session/sessionTypes.js";
+import { isTurnCancelCause, type TokenUsage, type TurnCancelCause, type TurnTrigger } from "../session/sessionTypes.js";
 import { promptTokensFor } from "../session/surfaceCompactionValidation.js";
 import type { InboxTarget, LoopNotification } from "./loopTypes.js";
+import type { ToolCallOutcome } from "./toolSeam.js";
+import { sha256Hex } from "../utils/hash.js";
+
+/** A settled tool call for observers: outcome, digest and size, never the content (SH-EXT-01). */
+export function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
+  const content = typeof outcome.content === "string" ? Buffer.from(outcome.content, "utf8") : outcome.content;
+  return { ok: outcome.outcome === "OK" && !outcome.denied, outputSha256: sha256Hex(content), outputBytes: content.length };
+}
 
 /** The live context-occupancy line after a step (SH-LOOP-07). Nulls stay null. */
 export function contextNotification(turn: number, step: number, usage: TokenUsage | null, contextWindowTokens: number | null): LoopNotification {
@@ -52,4 +60,14 @@ export function withResolvers(): { promise: Promise<void>; resolve: () => void }
     };
   });
   return { promise, resolve };
+}
+
+/**
+ * Which lane opened this turn: `user` is the prompt that started the conversation, `followup` a later prompt, `steer` a
+ * turn opened by steering alone, and `resume` a driver that woke with nothing queued.
+ */
+export function triggerForNextTurn(inbox: { readonly nextTurn: readonly unknown[]; readonly nextStep: readonly unknown[] }, lastTurn: number): TurnTrigger {
+  if (inbox.nextTurn.length > 0) return lastTurn === 0 ? "user" : "followup";
+  if (inbox.nextStep.length > 0) return "steer";
+  return "resume";
 }

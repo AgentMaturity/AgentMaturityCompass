@@ -5,6 +5,7 @@ import type { AgentStatus } from "../agent/loopTypes.js";
 import { readAgentRunSummary, renderRunSummary } from "../agent/runReport.js";
 import { renderNativeInteractiveToolResults } from "../setup/nativeInteractiveResults.js";
 import { describeRunLimit, type RunLimitBreach } from "../agent/runLimits.js";
+import { describeTurnStop } from "../agent/turnGuards.js";
 import { executionStatusFor } from "../execution/executionStatus.js";
 import { renderNativeVerifyHint } from "../setup/nativeFirstUseGuide.js";
 import type { GoalRoundsResult } from "../autonomy/goalRounds.js";
@@ -26,7 +27,7 @@ import type { WebSearchProvider } from "../tools/builtin/webSearchTool.js";
  * them. Kept here so the run command composes them without carrying their rules.
  */
 
-interface RunOutcome { readonly sessionId: string; readonly status: AgentStatus; readonly goalRounds?: GoalRoundsResult; readonly workflow?: WorkflowRunResult; readonly runLimit?: RunLimitBreach }
+interface RunOutcome { readonly sessionId: string; readonly status: AgentStatus; readonly goalRounds?: GoalRoundsResult; readonly workflow?: WorkflowRunResult; readonly runLimit?: RunLimitBreach; readonly guardStop?: RunLimitBreach }
 
 export const WEB_SEARCH_SEARXNG_HELP = "opt-in web_search provider for workspace tools: a SearXNG JSON origin, also granted under web_search in the signed tools policy";
 
@@ -123,11 +124,11 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
       // P2-13: the four execution phases; evidence verification stays pending until `agent-loop verify`.
       const execution = executionStatusFor(process.cwd(), { sessionId: summary.sessionId, admission: "admitted",
         turn: ending?.reason ?? (summary.driverStatus === "failed" ? "error" : null), verified: null });
-      const report = { summary, execution, ending, validationRequested, ...(outcome.runLimit === undefined ? {} : { runLimit: outcome.runLimit }), ...(workflow === undefined ? {} : { workflow }),
+      const report = { summary, execution, ending, validationRequested, ...(outcome.runLimit === undefined ? {} : { runLimit: outcome.runLimit }), ...(outcome.guardStop === undefined ? {} : { guardStop: outcome.guardStop }), ...(workflow === undefined ? {} : { workflow }),
         ...(goal === undefined ? {} : { goalStop: goal.stoppedBy, goalReceiptStates: goalRunReceiptStates(process.cwd(), summary.sessionId) }) };
       const exitCode = runExitCode(report);
       if (context.output?.sink) context.output.sink.result({ ...report, exitCode, ...(goal === undefined ? {} : { goalRounds: goal }) });
-      else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal, goalReceiptStates: report.goalReceiptStates }), ...(workflow === undefined ? {} : { workflow }), ...(report.runLimit === undefined ? {} : { runLimit: report.runLimit }), execution, exitCode }, null, 2) : renderRunSummary(summary));
+      else io.log(opts.json ? JSON.stringify({ ...summary, ...(goal === undefined ? {} : { goalRounds: goal, goalReceiptStates: report.goalReceiptStates }), ...(workflow === undefined ? {} : { workflow }), ...(report.runLimit === undefined ? {} : { runLimit: report.runLimit }), ...(report.guardStop === undefined ? {} : { guardStop: report.guardStop }), execution, exitCode }, null, 2) : renderRunSummary(summary));
       if (!opts.json) {
         // M-01: each tool call of the turn as one line with its recorded result or failure.
         if (!context.output?.sink) for (const line of renderNativeInteractiveToolResults(process.cwd(), summary.sessionId)) io.log(line);
@@ -142,6 +143,7 @@ export function resolveBreadthRun(io: AgentLoopCliIo, opts: RunOptions, context:
         if (context.toolMode === "workspace") for (const line of renderSessionLists(process.cwd(), summary.sessionId)) io.log(line);
         io.log("Verify the recorded evidence (this does not evaluate answer quality):\n  " + renderNativeVerifyHint(process.cwd(), summary.sessionId));
       }
+      if (outcome.guardStop !== undefined) io.error(chalk.yellow(`${describeTurnStop(outcome.guardStop)} The signed loop/cancel row names it. To carry on, continue the session with new instructions (--continue).`));
       if (outcome.runLimit !== undefined) io.error(chalk.yellow(`Run limit reached: ${describeRunLimit(outcome.runLimit)}. The signed loop/cancel row names it; queued work was dropped and no more is admitted.`));
       reportExitCode(io, exitCode);
     }

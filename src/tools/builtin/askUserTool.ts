@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { TERMINAL_CONTROLS } from "../../utils/terminalEscape.js";
 import { join } from "node:path";
 import { z } from "zod";
 import { defineTool } from "../toolRegistry.js";
@@ -46,19 +47,8 @@ const MAX_ANSWER_CHARS = 10_000;
 
 const MAX_QUESTIONS = 4;
 
-/** C0 (except tab and newline), DEL and C1: what a terminal reads as cursor and colour control. */
-const TERMINAL_CONTROLS = /[\x00-\x08\x0b-\x1f\x7f-\x9f]/;
-
-/**
- * Bidi marks, embeddings, overrides and isolates: no cursor control, but they reorder what a person reads (a tool name
- * or a result line from an MCP server can make an approval line read backwards). Escaped with the controls.
- */
-const BIDI_CONTROLS = "\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069";
-
-/** Shown, never interpreted: each control or bidi character as a visible `\uXXXX`. */
-export function escapeTerminalControls(text: string): string {
-  return text.replace(new RegExp(`${TERMINAL_CONTROLS.source.slice(0, -1)}${BIDI_CONTROLS}]`, "g"), (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
-}
+// Kept importable from here for existing callers; the definition lives in a shared util the CLI also uses.
+export { escapeTerminalControls } from "../../utils/terminalEscape.js";
 
 // A question is shown to a person on a terminal; control characters could draw a fake prompt or signed decision there.
 const shown = (max: number) => z.string().min(1).max(max).refine((text) => !TERMINAL_CONTROLS.test(text), "must not contain terminal control characters");

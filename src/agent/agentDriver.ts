@@ -1,6 +1,6 @@
 import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { recordDeliveredContext } from "../prompt/context/nativeCompositionContext.js";
-import { cancelCauseOf, contextNotification, fenceToolContext, originFor, withResolvers } from "./agentDriverSupport.js";
+import { cancelCauseOf, contextNotification, describeToolOutcome, fenceToolContext, originFor, triggerForNextTurn, withResolvers } from "./agentDriverSupport.js";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
  *
@@ -43,7 +43,7 @@ import { cancelCauseOf, contextNotification, fenceToolContext, originFor, withRe
  * write.
  */
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
-import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
+import type { TokenUsage, TurnCancelCause } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
 import { canonicalTurnCancelCause } from "../session/turnLifecycleMeta.js";
 import { LoopInbox } from "./inbox.js";
@@ -72,8 +72,9 @@ import {
   type TurnEnding
 } from "./loopTypes.js";
 import { runStep, type LoopLlm, type LoopRoute, type StepRunnerInit } from "./stepRunner.js";
-import { EMPTY_TOOL_SEAM, type AgentToolSeam, type ToolCallOutcome } from "./toolSeam.js";
-import { sha256Hex } from "../utils/hash.js";
+import { EMPTY_TOOL_SEAM, type AgentToolSeam } from "./toolSeam.js";
+import { firstStop, sentByPerson, TurnGuards, turnPolicies, type TurnPolicy } from "./turnGuards.js";
+import { projectNativeCost } from "../budgets/nativeCostProjection.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
@@ -81,12 +82,6 @@ import { RunLimitTracker, type RunLimitBreach, type RunLimits } from "./runLimit
 import { resolveRouteCompaction } from "./compaction/promptPressure.js";
 import { shutdownTimeoutMs, shutdownToolResults, type AgentShutdownResult } from "./agentShutdown.js";
 export type { AgentShutdownResult } from "./agentShutdown.js";
-
-/** A settled tool call for observers: outcome, digest and size, never the content (SH-EXT-01). */
-function describeToolOutcome(outcome: ToolCallOutcome): { ok: boolean; outputSha256: string; outputBytes: number } {
-  const content = typeof outcome.content === "string" ? Buffer.from(outcome.content, "utf8") : outcome.content;
-  return { ok: outcome.outcome === "OK" && !outcome.denied, outputSha256: sha256Hex(content), outputBytes: content.length };
-}
 
 export interface AgentDriverInit {
   readonly session: SessionService;
@@ -138,6 +133,9 @@ export class AgentDriver {
   private readonly compactor: AutoCompactor | null;
   /** Null when the run carries no limit. */
   private readonly limits: RunLimitTracker | null;
+  /** Per-turn guards (HP-01, HP-23) and the ordered checks run after each `step/end` (HP-03). */
+  private readonly guards: TurnGuards;
+  private readonly policies: readonly TurnPolicy[];
   private deadline: NodeJS.Timeout | null = null;
   /** The limit whose signed `loop/cancel` ended this run's work; once set, new work is refused at admission. */
   private limitEnding: RunLimitBreach | null = null;
@@ -197,12 +195,16 @@ export class AgentDriver {
       },
       notify: (notification: LoopNotification) => {
         this.hooks.notify(notification);
-      }
+      },
+      guards: this.guards = new TurnGuards(init.runLimits?.limits)
     };
     const window = compaction.contextWindowTokens;
     this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
     this.limits = init.runLimits === undefined ? null
-      : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true);
+      // ponytail: the cost limit re-reads the session at each step and turn, only while one is set.
+      : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true,
+        () => projectNativeCost(this.session.readEvents(), this.session.sessionId));
+    this.policies = turnPolicies(this.limits, this.guards);
     if (this.limits?.deadlineMs !== undefined) {
       // Armed from construction: the deadline bounds the whole run, idle time included, like a child's timeout-ms.
       this.deadline = setTimeout(() => this.limitReached(this.limits!.deadlineReached()), this.limits.deadlineMs);
@@ -230,6 +232,8 @@ export class AgentDriver {
 
   /** The limit that ended this run's work, or null: what a host reports instead of a silent stop. */
   get runLimitEnding(): RunLimitBreach | null { return this.limitEnding; }
+  /** The last turn-guard stop (repeated call, malformed responses, denials); it ended a turn, not the run. */
+  get turnGuardEnding(): RunLimitBreach | null { return this.guards.trip; }
 
   private async observeExtensions(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<void> {
     // Observer failures, including reporting failures, cannot veto the signed turn or its seal.
@@ -540,9 +544,10 @@ export class AgentDriver {
       return false;
     }
 
-    const turnRef = this.session.startTurn({ trigger: this.triggerForNextTurn(phase.turn) });
+    const turnRef = this.session.startTurn({ trigger: triggerForNextTurn(this.inbox, phase.turn) });
     this.head = turnRef;
     phase.turn = turnRef.turn;
+    this.guards.reset();
     let ending: TurnEnding | null = null;
     let target: InboxTarget = "next-turn";
     let validation: NativeValidationTurn | undefined;
@@ -589,6 +594,8 @@ export class AgentDriver {
           return false;
         }
 
+        // A person's message reaching the turn is a reason to repeat a call: the repeat counts start again.
+        if (decision.messages.some(sentByPerson)) this.guards.clearRepeats();
         signal.throwIfAborted();
         this.head = this.session.startStep();
         phase.step = step;
@@ -638,10 +645,11 @@ export class AgentDriver {
           await this.observeExtensions({ kind: "step-end", turn: turnRef.turn, step }, signal);
         }
 
-        // The token budget was checked against what `step/end` just committed; a breach cancels the
-        // turn here with the limit as its cause, before any further request.
-        const exhausted = this.limits?.breach ?? null;
-        if (exhausted !== null && !signal.aborted) this.limitCancel(exhausted);
+        // The ordered turn policies read what `step/end` just committed: a run limit cancels the turn and closes
+        // admission; a guard ends only this turn, keeping queued work. Both before any further request.
+        const stop = signal.aborted ? null : firstStop(this.policies);
+        if (stop?.scope === "run") this.limitCancel(stop.cause);
+        else if (stop?.scope === "turn") this.cancel(stop.cause, { by: "turn-guard", keepInbox: true });
         signal.throwIfAborted();
         // Between steps only, after `step/end` committed the usage it measures. A
         // summary step it runs takes the next step number, so keep ours in line.
@@ -777,19 +785,5 @@ export class AgentDriver {
     if (decision.kind === "enter") assertOrderedClaimDecision(orderedClaims, decision.messages);
     if (decision.kind === "enter") assertAudioClaimDecision(audioClaims, decision.messages);
     return decision;
-  }
-
-  /**
-   * Which lane opened this turn.
-   *
-   * The distinction the spine's vocabulary asks for is the one a reader wants:
-   * `user` is the prompt that started the conversation, `followup` is a later
-   * prompt, `steer` is a turn opened by steering alone, and `resume` is a driver
-   * that woke with nothing queued.
-   */
-  private triggerForNextTurn(lastTurn: number): TurnTrigger {
-    if (this.inbox.nextTurn.length > 0) return lastTurn === 0 ? "user" : "followup";
-    if (this.inbox.nextStep.length > 0) return "steer";
-    return "resume";
   }
 }

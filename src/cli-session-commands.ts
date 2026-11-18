@@ -11,6 +11,7 @@ import { hostname } from "node:os";
 import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
+import { escapeTerminalControls } from "./utils/terminalEscape.js";
 import { artifactClaim, printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionContinuityCommands } from "./cli-session-continuity-commands.js";
@@ -80,6 +81,7 @@ export function registerSessionCommands(program: Command): void {
       const { readNativeSessionEvents } = await import("./session/readNativeSessionEvents.js");
       const { projectNativeRunUsage, renderNativeRunUsage } = await import("./agent/nativeRunUsage.js");
       const { projectNativeRunDiagnostics, renderNativeRunDiagnostics } = await import("./agent/nativeFailureGuidance.js");
+      const { projectTurnStops } = await import("./agent/turnGuards.js");
       const { projectSurface } = await import("./session/surfaceProjection.js");
       const { extractEnvelope } = await import("./session/sessionTypes.js");
       try {
@@ -104,6 +106,7 @@ export function registerSessionCommands(program: Command): void {
         const history = projectSurface(events);
         const usage = projectNativeRunUsage(events, id);
         const diagnostics = projectNativeRunDiagnostics(events, id);
+        const turnStops = projectTurnStops(events, id);
         const spine = events.map((event) => {
           const envelope = extractEnvelope(event.meta_json);
           return {
@@ -119,7 +122,7 @@ export function registerSessionCommands(program: Command): void {
         const context = sessionContextAccounting(events);
         if (opts.json) {
           const { sessionTokenCounts } = await import("./session/sessionTokenCounts.js");
-          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), context, diagnostics }, null, 2));
+          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), context, diagnostics, turnStops }, null, 2));
           return;
         }
         console.log(chalk.bold(`Session ${id}`) + chalk.gray(` · ${events.length} events`));
@@ -135,6 +138,7 @@ export function registerSessionCommands(program: Command): void {
         console.log(renderNativeRunUsage(usage));
         for (const line of renderSessionContextAccounting(context)) console.log(line);
         console.log(renderNativeRunDiagnostics(diagnostics));
+        for (const stop of turnStops) console.log(chalk.yellow(`Turn ${stop.turn} stopped at a limit: ${escapeTerminalControls(stop.text)}`));
         console.log("");
         if (!opts.spine) { console.log(chalk.gray(`Event spine: ${spine.length} recorded events; add --spine to list them.`)); return; }
         console.log(chalk.bold("Event spine"));

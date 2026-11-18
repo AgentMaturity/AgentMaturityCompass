@@ -21,7 +21,9 @@ export interface ContinuityOptions extends RunOptions {
 }
 
 const CONTINUE_HELP = "continue the most recent released native session for this agent in this workspace (the same flags as its original run are required)";
-const STOP_HELP = "repeatable run limit: max-turns:N (highest session turn number that may open), max-tokens:N (provider-reported tokens over the session) or timeout-ms:N (wall clock from start); a breach is a signed cancel with cause limit";
+const STOP_HELP = "repeatable run limit: max-turns:N (highest session turn number that may open), max-tokens:N (provider-reported tokens over the session), "
+  + "timeout-ms:N (wall clock from start) or max-cost-usd:D (indicative cost over the session; stops if a request has no known cost); a breach is a signed cancel with cause limit. "
+  + "Stricter turn guards: repeated-calls:N (2-5, default: the 5th identical call in one turn ends it), malformed-responses:N (1-3, default 3), denials:N (1-5, default 5 refusals in one turn)";
 
 function collect(value: string, previous: string[] = []): string[] { return [...previous, value]; }
 
@@ -73,6 +75,10 @@ export function resolveContinuityRun(io: AgentLoopCliIo, opts: ContinuityOptions
   if (opts.interactiveSteer && opts.workflowPlan !== undefined) return refuse("--interactive-steer needs a root turn, and a workflow pass runs none.");
   const limits = parseRunLimits(opts.stop);
   if (!limits.ok) return refuse(`--stop: ${limits.reason}`);
+  // Guard settings tighten the root turn's guards; a child always runs the default guards, so they cannot reach one.
+  const guardOnly = limits.conditions.length > 0 && limits.conditions.every(condition => /^(repeated-calls|malformed-responses|denials):/.test(condition));
+  const noRoot = opts.goalRounds !== undefined ? "--goal-rounds" : opts.workflowPlan !== undefined ? "--workflow-plan" : null;
+  if (guardOnly && noRoot !== null) return refuse(`--stop repeated-calls, malformed-responses and denials make the root turn's guards stricter, and ${noRoot} runs no root turn. Each delegated child keeps the default guards (5 identical calls, 3 malformed responses, 5 refusals in one turn). Leave these --stop settings out.`);
   if (limits.conditions.length > 0 && opts.goalRounds !== undefined) return refuse("--stop bounds the root driver, and --goal-rounds runs no root turn: each round is a delegated child, bounded by --delegate-stop and the round ceiling.");
   if (limits.conditions.length > 0 && opts.workflowPlan !== undefined) return refuse("--stop needs a root turn. Use --delegate-stop to bound children in a workflow pass.");
   let session = opts.session;
