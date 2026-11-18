@@ -9,7 +9,8 @@ import type { ApprovalRequestRecord } from "../src/approvals/approvalChainStore.
 import { homedir } from "node:os";
 import { approvalCallField, approvalCallFor, listAuditSessions, sessionAuditExport } from "../src/evidence/sessionAudit.js";
 import { redactSecrets } from "../src/shield/redaction/redactSecrets.js";
-import { verifySessionExport } from "../src/observability/sessionExport.js";
+import { buildSessionExport, verifySessionExport } from "../src/observability/sessionExport.js";
+import { renderSessionExportHtml } from "../src/observability/sessionExportHtml.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { sha256Hex } from "../src/utils/hash.js";
@@ -30,14 +31,14 @@ describe("session audit for the console", () => {
   });
   afterEach(() => { lockVault(workspace); vi.unstubAllEnvs(); rmSync(workspace, { recursive: true, force: true }); });
 
-  function chat(args: string = defaultArgs, toolName = "fs.write"): string {
+  function chat(args: string = defaultArgs, toolName = "fs.write", result = "wrote hello.txt"): string {
     const s = new SessionService(workspace, openSessionEventStore(workspace, "sqlite"));
     s.open({ sessionId: "cli-chat-0001", agentId: "default", harnessVersion: "audit-test", compositionDigest: sha256Hex("c"), policyDigest: sha256Hex("p") });
     s.startTurn({ trigger: "user" }); s.startStep();
     s.recordToolCall({ toolCallId: "call-1", toolName, args, dispatch: "native", parentToken: null });
     s.recordApproval({ phase: "request", approvalId: "appr-1", toolCallId: "call-1", toolName: "fs.write", actionClass: "WRITE_LOW", question: "write hello.txt?" });
     s.recordApproval({ phase: "answer", approvalId: "appr-1", answer: "allow", answeredBy: "owner", approvalRequestId: null, reason: "ok" });
-    s.recordToolResult({ toolCallId: "call-1", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "wrote hello.txt" });
+    s.recordToolResult({ toolCallId: "call-1", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: result });
     s.endStep({ stopReason: "end_turn", usage: null }); s.endTurn({ reason: "complete" }); s.sealTurn();
     s.disposeWithoutClosing(); // a chat closed with /exit: not sealed
     return "cli-chat-0001";
@@ -115,6 +116,47 @@ describe("session audit for the console", () => {
     const text = JSON.stringify(shown);
     expect(text).toContain("Command:");
     expect(text).not.toContain(secret);
+  });
+
+  const KEY_BODY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC7VJTUt9Us8cKj";
+  const PEM = `-----BEGIN PRIVATE KEY-----\n${KEY_BODY}\nMoreKeyMaterialLine2abcdefghijklmnopqrstuvwx\n-----END PRIVATE KEY-----`;
+  const asked = (toolName: string, raw: string) => approvalCallField(workspace, { intentId: "appr-1", toolName, actionClass: "WRITE_HIGH",
+    rolesAllowed: ["OWNER"], boundHashes: { intentHash: sha256Hex(canonicalize({ toolName, rawArguments: raw })) } } as unknown as ApprovalRequestRecord,
+    "PENDING", { isAdmin: false, userId: "owner", roles: ["OWNER"] });
+
+  it("security: the shared redactor removes a private key's whole body, and an unterminated one to the end", () => {
+    expect(redactSecrets(`before\n${PEM}\nafter`, () => "[X]").redacted).toBe("before\n[X]\nafter");
+    expect(redactSecrets(`-----BEGIN RSA PRIVATE KEY-----\n${KEY_BODY}`, () => "[X]").redacted).toBe("[X]");
+  });
+
+  it("security: a private key across lines in fs.write content or a bash heredoc shows no key body on the approval screen", () => {
+    const write = JSON.stringify({ path: "id_key", content: `${PEM}\n` });
+    chat(write);
+    expect(JSON.stringify(asked("fs.write", write))).not.toContain(KEY_BODY);
+  });
+
+  it("security: a key in a bash heredoc is redacted before the command is split into lines", () => {
+    const heredoc = JSON.stringify({ command: `cat > id_key <<'EOF'\n${PEM}\nEOF` });
+    chat(heredoc, "bash");
+    const text = JSON.stringify(asked("bash", heredoc));
+    expect(text).toContain("Command:");
+    expect(text).not.toContain(KEY_BODY);
+    expect(text).not.toContain("MoreKeyMaterial");
+  });
+
+  it("security: a token a display cut would split is not partly shown", () => {
+    const token = `ghp_${"Q1w2E3r4T5".repeat(4).slice(0, 36)}`;
+    const long = JSON.stringify({ command: `echo ${"a".repeat(390)}${token}` });
+    chat(long, "bash");
+    const text = JSON.stringify(asked("bash", long));
+    expect(text).not.toContain("ghp_");
+  });
+
+  it("security: a private key in a tool result shows no key body in the export's timeline or HTML", () => {
+    const id = chat(defaultArgs, "fs.write", `read:\n${PEM}\n`);
+    const doc = buildSessionExport({ workspace, sessionId: id, includeContent: true, decryptContent: true });
+    expect(JSON.stringify(doc.content)).not.toContain(KEY_BODY);
+    expect(renderSessionExportHtml(doc)).not.toContain(KEY_BODY);
   });
 
   it("the new routes are reads: every human role may call them, and no write method is handled", async () => {

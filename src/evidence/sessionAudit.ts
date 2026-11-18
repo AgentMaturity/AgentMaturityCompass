@@ -131,7 +131,11 @@ export function approvalCallFor(workspace: string, request: ApprovalRequestRecor
     const call = recordedCall(workspace, request);
     if ("unavailable" in call) return call;
     if (!callMatchesRequest(workspace, request, call)) return { unavailable: "the recorded call does not match what the signed request binds, so it is not shown" };
-    return shareable(workspace, describeReportedCall(workspace, call));
+    // Redact every argument value whole BEFORE it is split into lines or cut for display, so a secret spanning lines
+    // (a private key body) or one a cut would split is never partly shown.
+    const redacted = redactArguments(call.rawArguments);
+    const shown = shareable(workspace, describeReportedCall(workspace, redacted.call === null ? call : { toolName: call.toolName, arguments: redacted.call }));
+    return redacted.count > 0 || redacted.call === null ? { ...shown, complete: false } : shown;
   } catch (error) {
     return { unavailable: `the call could not be shown: ${error instanceof Error ? error.message : String(error)}` };
   }
@@ -172,4 +176,23 @@ export function approvalCallField(workspace: string, request: ApprovalRequestRec
   const decides = viewer.isAdmin || roles.some((role) => DECIDING_ROLES.includes(role) && (request.rolesAllowed as readonly string[]).includes(role));
   const raised = viewer.userId !== null && request.initiator !== undefined && (request.initiator === viewer.userId || request.initiator.endsWith(`:${viewer.userId}`));
   return decides || raised ? { call: approvalCallFor(workspace, request, status) } : {};
+}
+
+/** Each string in the parsed arguments, redacted whole; null (shown as unreadable) when they are not a JSON object. */
+function redactArguments(raw: string): { readonly call: Record<string, unknown> | null; readonly count: number } {
+  let parsed: unknown;
+  try { parsed = JSON.parse(raw === "" ? "{}" : raw); } catch { return { call: null, count: 0 }; }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { call: null, count: 0 };
+  let count = 0;
+  const walk = (value: unknown): unknown => {
+    if (typeof value === "string") {
+      const result = redactSecrets(value, (type) => `[REDACTED:${type}]`);
+      count += result.findings.length;
+      return result.redacted;
+    }
+    if (Array.isArray(value)) return value.map(walk);
+    if (value !== null && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item)]));
+    return value;
+  };
+  return { call: walk(parsed) as Record<string, unknown>, count };
 }

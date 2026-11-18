@@ -76,7 +76,8 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
   { type: "slack_token", source: "secretBlind", pattern: /xox[bprs]-[A-Za-z0-9-]{10,}/ },
   { type: "slack_webhook", source: "secretBlind", pattern: /hooks\.slack\.com\/services\/T[A-Z0-9]+\/B[A-Z0-9]+\/[A-Za-z0-9]+/ },
   // secretBlind's spelling, because bridge's missed four of the five real forms.
-  { type: "private_key", source: "secretBlind", pattern: /-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----/ },
+  // The whole block, body included (a header-only match left the key body readable); an unterminated BEGIN runs to the end.
+  { type: "private_key", source: "secretBlind", pattern: /-----BEGIN (RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----[\s\S]*?(?:-----END (RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----|$(?![\s\S]))/ },
   { type: "connection_string", source: "secretBlind", pattern: /(mongodb|postgres|mysql|redis|amqp):\/\/[^\s"']+/i },
   { type: "generic_api_key", source: "secretBlind", pattern: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?[A-Za-z0-9_\-]{16,}["']?/i },
   // Bounded, and never across "/" or a quote: unbounded, one URL's "//" ran on through JSON members to any later "@"

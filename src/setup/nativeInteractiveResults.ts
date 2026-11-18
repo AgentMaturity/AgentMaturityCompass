@@ -3,6 +3,7 @@ import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { extractEnvelope } from "../session/sessionTypes.js";
 import { extractSpillRef } from "../session/spill/spillTypes.js";
+import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { EvidenceEvent } from "../types.js";
@@ -87,7 +88,7 @@ export function renderNativeInteractiveToolResults(workspace: string, sessionId:
       if (outcome === "OK" && simulated >= 0) return `  ${chalk.yellow("○")} ${head} · simulated, not run: ${short(text.slice(simulated + SIMULATED.length), 240)}`;
       if (outcome === "OK") return `  ${chalk.green("✓")} ${head} · ${exit}${firstLine(text)}${spill}`;
       // A refusal is shown whole (UX-03): its reason, a hook's own words included, is what a person acts on.
-      if (outcome === "DENIED") return `  ${chalk.red("✗")} ${head} · denied: ${short(text.replace(/^\[amc\] /, ""), 2000)}`;
+      if (outcome === "DENIED") return `  ${chalk.red("✗")} ${head} · denied: ${short(redactSecrets(text.replace(/^\[amc\] /, ""), (type) => `[REDACTED:${type}]`).redacted, 2000)}`;
       const word = outcome === "CANCELLED" ? "cancelled" : outcome === "ERROR" ? "failed" : "outcome unknown";
       return `  ${chalk.red("✗")} ${head} · ${word}: ${exit}${firstLine(text)}${spill}`;
     });
