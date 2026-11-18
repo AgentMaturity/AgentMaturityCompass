@@ -85,14 +85,18 @@ describe("turn check status (always recorded)", () => {
     expect((await verifyAgentRun(f.harness.dir, f.harness.sessionId)).integrityOk).toBe(true);
   });
 
-  test("a refused command is not a change; a tool error still may be", async () => {
+  test("a refused command and a file write that errored are not changes; a failing command still is", async () => {
     const f = fixture([toolStep("b1", "bash", JSON.stringify({ command: "touch x.txt" })), textStep("Could not.")], async () => "deny");
     await run(f, false);
     expect(checks(f)[0]?.status).toBe("no-changes");
-    // The tool body refusing a path is an ERROR result, not a DENIED one: it is counted, because ERROR alone cannot show nothing landed.
+    // fs.write refuses before writing and writes atomically: its ERROR means nothing landed.
     const g = fixture([toolStep("w1", "fs.write", JSON.stringify({ path: "../outside.txt", content: "x" })), textStep("Could not.")]);
     await run(g, false);
-    expect(checks(g)[0]?.status).toBe("changed-unchecked");
+    expect(checks(g)[0]?.status).toBe("no-changes");
+    // A shell command that exits non-zero may still have written: it counts.
+    const h = fixture([toolStep("b2", "bash", JSON.stringify({ command: "touch y.txt; exit 3" })), textStep("Hm.")]);
+    await run(h, false);
+    expect(checks(h)[0]?.status).toBe("changed-unchecked");
   });
 });
 
