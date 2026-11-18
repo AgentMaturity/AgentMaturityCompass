@@ -512,7 +512,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
           additionalCapabilities: [...mcpServers.flatMap(entry => entry.review.capabilities), ...(wantsDelegation ? NATIVE_DELEGATION_CAPABILITIES : [])],
           // Fork chooses a different ID; resume chooses the existing writer.
           get sessionId() { return actualSession().sessionId; },
-          recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable() },
+          recorder: { recordProjectedEvidence: (row) => actualSession().recordProjectedEvidence(row), assertWritable: () => actualSession().assertWritable(), retainFileCheckpoint: (bytes, callId, cap) => actualSession().retainFileCheckpoint(bytes, callId, cap) },
           ...lease,
           ...(dispatchMode === "code" ? { mode: dispatchMode } : {}),
           ...(continuity.planMode ? { planMode: true } : {}),

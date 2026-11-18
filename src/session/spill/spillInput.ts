@@ -60,17 +60,26 @@ export const SPILL_INBOX_MESSAGE_META_KEY = "messageId";
  */
 export type SpillCommitmentSubject =
   | { readonly subject: "user/attachment"; readonly filename: string }
-  | { readonly subject: typeof SPILL_INBOX_SUBJECT; readonly messageId: string };
+  | { readonly subject: typeof SPILL_INBOX_SUBJECT; readonly messageId: string }
+  | { readonly subject: typeof SPILL_CHECKPOINT_SUBJECT; readonly callId: string };
+
+/**
+ * HP-06: a file's prior bytes, kept before a native file tool changed it (src/tools/builtin/fileCheckpoint.ts). The
+ * commitment names the tool call only; the path stays in the NATIVE_FILE_CHECKPOINT row's payload.
+ */
+export const SPILL_CHECKPOINT_SUBJECT = "file/checkpoint" as const;
 
 /** The subject's contribution to the commitment row's signed meta. */
 export function spillCommitmentMeta(subject: SpillCommitmentSubject): Record<string, unknown> {
+  if (subject.subject === SPILL_CHECKPOINT_SUBJECT) return { [SPILL_SUBJECT_META_KEY]: SPILL_CHECKPOINT_SUBJECT, callId: subject.callId };
   return subject.subject === SPILL_INBOX_SUBJECT
     ? { [SPILL_SUBJECT_META_KEY]: SPILL_INBOX_SUBJECT, [SPILL_INBOX_MESSAGE_META_KEY]: subject.messageId }
     : { [SPILL_SUBJECT_META_KEY]: "user/attachment", filename: subject.filename };
 }
 
-/** The store's object-name seed for a subject: the filename, or the queued message id. */
+/** The store's object-name seed for a subject: the filename, the queued message id, or the tool call id. */
 export function spillCommitmentNameSeed(subject: SpillCommitmentSubject): string {
+  if (subject.subject === SPILL_CHECKPOINT_SUBJECT) return subject.callId;
   return subject.subject === SPILL_INBOX_SUBJECT ? subject.messageId : subject.filename;
 }
 const MAX_DESCRIPTOR_BYTES = 1024;

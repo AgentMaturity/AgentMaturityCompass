@@ -536,6 +536,7 @@ export class SessionService extends SessionEventWriter {
     return this.requireSpill().retainInput({ nameSeed: spillCommitmentNameSeed(subject), content: bytes }, { what, cap }, (ref) => void this.appendSessionEvent({ eventType: SPILL_COMMITMENT_EVENT_TYPE,
       surface: { op: "none" }, turn: this.currentTurn, step: this.currentStep, typeMeta: { turn: this.currentTurn, step: this.currentStep, ...spillCommitmentMeta(subject), [SPILL_META_KEY]: ref } }));
   }
+  retainFileCheckpoint(bytes: Buffer, callId: string, cap: number): SpillRef { return this.retainOversizeInput("A file checkpoint", bytes, cap, { subject: "file/checkpoint", callId }).ref; } // HP-06
 
   recordToolCall(call: ToolCallInput): SessionEventRef {
     const gemini = call.gemini === undefined ? undefined : snapshotRecordedGeminiPart(call.gemini, "tool_use", call.args,

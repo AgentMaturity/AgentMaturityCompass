@@ -24,6 +24,7 @@ import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.
 import { todoTool } from "../tools/builtin/todoTool.js";
 import { goalTool } from "../autonomy/goalTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
+import { fileCheckpoints, type FileCheckpointWriter } from "../tools/builtin/fileCheckpoint.js";
 import { skillLoadTool } from "../skills/skillLoadTool.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
@@ -173,6 +174,8 @@ export interface AgentToolsetOptions {
     }): unknown;
     /** Throws when the writer can no longer append (e.g. closed); checked before every tool body (P1-78). */
     assertWritable?(): void;
+    /** HP-06: keeps a file's prior bytes as an encrypted spill object; absent, the file tools keep none. */
+    retainFileCheckpoint?: FileCheckpointWriter["retainFileCheckpoint"];
   };
 }
 
@@ -399,8 +402,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     .map(capability => [capability.name, capability]));
 
   const ledger = new ReadBeforeEditLedger();
-  for (const tool of fsTools({ ledger })) registry.define(tool);
-  registry.define(applyPatchTool({ ledger }));
+  const recorder = options.recorder;
+  const checkpoint = fileCheckpoints(() => recorder?.retainFileCheckpoint === undefined ? null : recorder as FileCheckpointWriter);
+  for (const tool of fsTools({ ledger, checkpoint })) registry.define(tool);
+  registry.define(applyPatchTool({ ledger, checkpoint }));
   registry.define(lsTool());
   for (const tool of searchTools()) registry.define(tool);
   const admittedCatalog = (scope: string, snapshot = loadVerifiedToolsConfigSnapshot(workspace), strict = true) => {

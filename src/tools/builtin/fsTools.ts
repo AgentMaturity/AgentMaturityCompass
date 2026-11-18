@@ -4,6 +4,7 @@ import { z } from "zod";
 import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
+import type { FileCheckpoint } from "./fileCheckpoint.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
 import { scanRegularFile } from "./fsRegularFile.js";
@@ -134,6 +135,8 @@ const withDiff = (head: string, diff: string): string => (diff === "" ? head : `
 
 export interface FsToolDeps {
   readonly ledger: ReadBeforeEditLedger;
+  /** HP-06: keeps a file's prior bytes before a write lands (./fileCheckpoint.ts). */
+  readonly checkpoint?: FileCheckpoint;
 }
 
 export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
@@ -199,6 +202,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (simulated(execution)) {
           return { ok: true, output: withDiff(`SIMULATE fs.write ${args.path} (${after.length} bytes)`, diff?.text ?? ""), bytes: 0 };
         }
+        deps.checkpoint?.(execution, rel, before, after);
         mkdirSync(dirname(full), { recursive: true });
         writeIfUnchanged(execution, ledger, full, args.path, before, after);
         // Refresh: the agent now knows this file's contents, because it just
@@ -274,6 +278,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (simulated(execution)) {
           return { ok: true, output: withDiff(`SIMULATE fs.edit ${args.path} (${summary})`, diff.text), bytes: 0 };
         }
+        deps.checkpoint?.(execution, rel, raw, after);
         writeIfUnchanged(execution, ledger, full, args.path, raw, after);
         ledger.recordRead(execution.agentId, full, after);
         const change = {

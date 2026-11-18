@@ -41,8 +41,9 @@ export function sessionSpillReadTool(options: {
       }
       const sessionId = currentSession();
       const events = readNativeSessionEvents(options.workspace, sessionId);
+      // HP-06: a file checkpoint is a person's restore point, not retained tool output; the model never reads it here.
       if (!events.some(row => row.event_type === "tool/spill-commitment" && row.session_id === sessionId
-        && extractSpillRef(row.meta_json)?.locator === args.locator)) {
+        && extractSpillRef(row.meta_json)?.locator === args.locator && (JSON.parse(row.meta_json) as { subject?: unknown }).subject !== "file/checkpoint")) {
         throw new Error("No tool/spill-commitment in the current session names this locator.");
       }
       // The complete current history reaches the existing verifier, so selecting
