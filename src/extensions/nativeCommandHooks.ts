@@ -202,13 +202,18 @@ export class NativeCommandHooks implements NativeHookRuntime {
     return undefined;
   }
 
-  /** Awaited after approvals in every pipeline path, including journaled and Code Mode sub-calls. */
+  /**
+   * A hook runs before a person is asked and again before the call runs (UX-03), in every pipeline path, journaled and
+   * Code Mode sub-calls included. `pre_approval: true` marks the first run: a hook that counts or rate-limits should
+   * ignore it. A hook therefore sees the arguments of calls a person may go on to refuse.
+   */
   readonly prepare = async (execution: ToolExecution): Promise<void> => {
     if (this.load.status === "trusted" && this.handlers("PreToolUse", execution.name).length === 0) { this.prepared.set(execution, undefined); return; }
     const serialized = JSON.stringify(execution.arguments);
     const truncated = Buffer.byteLength(serialized) > NATIVE_COMMAND_HOOK_LIMITS.inputBytes;
     const detail = { tool_name: execution.name, tool_use_id: execution.callId, action_class: execution.actionClass, requested_mode: execution.requestedMode,
-      tool_input: truncated ? null : execution.arguments, tool_input_truncated: truncated, tool_input_sha256: sha256Hex(serialized), tool_input_bytes: Buffer.byteLength(serialized) };
+      tool_input: truncated ? null : execution.arguments, tool_input_truncated: truncated, tool_input_sha256: sha256Hex(serialized), tool_input_bytes: Buffer.byteLength(serialized),
+      pre_approval: execution.preApproval === true };
     this.prepared.set(execution, await this.decide("PreToolUse", execution.name, detail, truncated, execution.signal));
   };
 

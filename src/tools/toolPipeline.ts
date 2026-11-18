@@ -59,8 +59,7 @@ import { killSwitchDenial } from "../runtime/killSwitch.js";
  * which is precisely the laundering the monotonic guard type exists to
  * prevent. A guard denial is final and no approval reaches past it.
  *
- * UX-03: the guards also take an early look, as SIMULATE (the budget reserves once, after approval), before anyone is
- * asked (`earlyGuardDenial`): nobody approves a call that cannot run. It only adds refusals; the stage below is unchanged.
+ * UX-03: the guards take an early, SIMULATE look before anyone is asked (`earlyGuardDenial`); it only adds refusals.
  *
  * Post-execute filters may rewrite OUTPUT and nothing else. A filter that
  * could clear `denied` would be a seventh way to launder a denial.
@@ -177,6 +176,8 @@ export interface ToolCallInput {
   readonly authority?: ToolAuthority;
   /** Trusted narrowing guard after all approval waits and immediately before the body; null alone permits dispatch. */
   readonly beforeEffect?: () => string | null;
+  /** Trusted composition only (UX-03): the guards' early refusal, recorded as this call's denial. */
+  readonly refusedBeforeApproval?: ToolDenial;
 }
 
 /** What the authorization stage needs, decided when the call entered. */
@@ -279,11 +280,14 @@ export class ToolPipeline {
 
   /** The early look at one execution: entry refusals, then every guard, on a SIMULATE copy bound like the real call. */
   private async earlyGuardDenial(execution: ToolExecution): Promise<ToolDenial | null> {
-    const draft: ToolExecution = { ...execution, effectiveMode: "SIMULATE" }, entered = await this.enter(draft, undefined, undefined);
+    const draft: ToolExecution = { ...execution, effectiveMode: "SIMULATE", preApproval: true }, entered = await this.enter(draft, undefined, undefined);
     if (entered.refused !== null) return entered.refused;
     const look = entered.bound?.ok ? boundExecution(draft, entered.bound) : draft;
-    // An early look that cannot finish only asks: the full guard stage after the approval decides.
-    const denied = await Promise.resolve(this.init.prepareGuards?.(look)).then(() => this.init.registry.guardReason(look)).catch(() => undefined);
+    // Selected like the real call (the sandbox permit reads it); a look that cannot finish only asks: the later stage decides.
+    selectedDefinitions.set(look, selectedDefinitions.get(execution) ?? this.init.registry.visible(execution.agentId).get(execution.name)!);
+    selectedAvailability.set(look, selectedAvailability.get(execution) ?? this.init.registry.admissionCheck(execution.name, execution.agentId, execution.parentToken !== null));
+    const denied = await Promise.resolve(this.init.prepareGuards?.(look)).then(() => this.init.registry.guardReason(look)).catch(() => undefined)
+      .finally(() => { selectedDefinitions.delete(look); selectedAvailability.delete(look); });
     return denied ? { stage: "guard", reason: denied.reason, guardLabel: denied.label } : null;
   }
 
@@ -367,8 +371,8 @@ export class ToolPipeline {
               execution = fresh;
               selectedDefinitions.set(execution, definition);
               selectedAvailability.set(execution, available);
-            }, input.beforeEffect)
-          : await this.runStages(execution, definition.body, authorization!, input.beforeEffect);
+            }, input)
+          : await this.runStages(execution, definition.body, authorization!, input);
       } finally {
         release?.();
         selectedDefinitions.delete(execution);
@@ -574,11 +578,11 @@ export class ToolPipeline {
   }
 
   private async runStages(execution: ToolExecution, body: ToolBody, authorization: CallAuthorization,
-    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
+    checks: Pick<ToolCallInput, "beforeEffect" | "refusedBeforeApproval">): Promise<ToolOutcome> {
     if (authorization.refused !== null) return denialOutcome(authorization.refused);
     const approval = await this.askApproval(execution);
     if (approval !== null) return approval;
-
+    if (checks.refusedBeforeApproval) return denialOutcome(checks.refusedBeforeApproval);
     await this.init.prepareGuards?.(execution);
     const denied = this.init.registry.guardReason(execution);
     if (denied) {
@@ -593,7 +597,7 @@ export class ToolPipeline {
     // Read again after the approval wait: a call cancelled while it waited (a timed-out program's sub-call) never runs.
     if (execution.signal?.aborted) return notDispatched();
 
-    const effectDenial = effectGuardDenial(beforeEffect);
+    const effectDenial = effectGuardDenial(checks.beforeEffect);
     if (effectDenial !== null) return denialOutcome(effectDenial);
 
     try {
@@ -611,7 +615,7 @@ export class ToolPipeline {
    */
   private async runJournaled(open: () => ActionJournal, execution: ToolExecution, body: ToolBody,
     authorization: CallAuthorization | null, enter: () => Promise<CallAuthorization>, selectExecution: (execution: ToolExecution) => void,
-    beforeEffect: ToolCallInput["beforeEffect"]): Promise<ToolOutcome> {
+    checks: Pick<ToolCallInput, "beforeEffect" | "refusedBeforeApproval">): Promise<ToolOutcome> {
     const initial = authorization?.bound;
     const executionId = initial?.ok ? initial.record.executionId : `exec_${randomUUID()}`;
     const idempotencyKey = initial?.ok ? initial.record.idempotencyKey : authorization === null ? mintIdempotencyKey() : null;
@@ -680,6 +684,7 @@ export class ToolPipeline {
     if (authorization.refused !== null) return deny(authorization.refused, refusalCode(authorization.refused));
     const approval = await this.askApproval(execution);
     if (approval?.denied) return deny(approval.denied, refusalCode(approval.denied));
+    if (checks.refusedBeforeApproval) return deny(checks.refusedBeforeApproval, refusalCode(checks.refusedBeforeApproval));
     await this.init.prepareGuards?.(execution);
     const guard = this.init.registry.guardReason(execution);
     if (guard) return deny({ stage: "guard", reason: guard.reason, guardLabel: guard.label }, `guard_denied:${guard.label}`);
@@ -705,7 +710,7 @@ export class ToolPipeline {
     if (!recheck.ok) {
       return deny({ stage: "authorization", reason: recheck.failures.join(", "), guardLabel: null }, `recheck_failed:${recheck.failures.join(",")}`);
     }
-    const effectDenial = effectGuardDenial(beforeEffect);
+    const effectDenial = effectGuardDenial(checks.beforeEffect);
     if (effectDenial !== null) return deny(effectDenial, "guard_denied:trusted-before-effect");
     try {
       journal.start(executionId, bound.record);
@@ -779,8 +784,7 @@ export class ToolPipeline {
         guardLabel: null
       });
     }
-    const early = await this.earlyGuardDenial(execution);
-    if (early !== null) return denialOutcome(early);
+    const early = await this.earlyGuardDenial(execution); if (early !== null) return denialOutcome(early);
     const approve = this.init.approve;
     const answer = await waitingOnApproval(execution, () => approve(execution)).catch((): ToolApprovalAnswer => "unavailable");
     if (answer === "allow") return null;
@@ -792,5 +796,4 @@ export class ToolPipeline {
   }
 }
 
-/** The journal's reason code for a refusal before the guard stage: a guard's early look, or a person's answer. */
-const refusalCode = (denied: ToolDenial): string => denied.stage === "guard" ? `guard_denied:${denied.guardLabel ?? "unlabelled"}` : "approval_denied";
+/** The journal's reason code for a refusal before the guard stage. */ const refusalCode = (denied: ToolDenial): string => denied.stage === "guard" ? `guard_denied:${denied.guardLabel ?? "unlabelled"}` : "approval_denied";

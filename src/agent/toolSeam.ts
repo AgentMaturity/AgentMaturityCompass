@@ -24,6 +24,7 @@ import type { ToolSchema } from "../llm/request/requestSpec.js";
 import type { ToolDispatch, ToolOutcome } from "../session/sessionTypes.js";
 import type { ActionClass } from "../types.js";
 import type { BoundApprovalGate, ToolAuthority } from "../tools/toolPipeline.js";
+import type { ToolDenial } from "../tools/toolTypes.js";
 
 /** One tool call, exactly as the model asked for it. */
 export interface ToolCallRequest {
@@ -43,6 +44,8 @@ export interface ToolCallRequest {
    * the model cannot reach it. The pipeline re-verifies every one against the exact call before the body runs.
    */
   readonly authority?: ToolAuthority;
+  /** Set only by the approval gate (UX-03): the guards' refusal before anyone was asked, recorded as the call's denial. */
+  readonly refusedBeforeApproval?: ToolDenial;
   /** Trusted narrowing guard, rechecked after approvals immediately before an effect; null alone permits dispatch. */
   readonly beforeEffect?: () => string | null;
 }
@@ -104,7 +107,7 @@ export interface AgentToolSeam {
    * Pipeline-backed seams: why the automatic checks (guards, hooks) would refuse this call, asked before a person is
    * (UX-03); null to ask. A gate that skips the question still runs the call through `execute`, where they decide again.
    */
-  denialBeforeApproval?(request: ToolCallRequest): Promise<string | null>;
+  denialBeforeApproval?(request: ToolCallRequest): Promise<ToolDenial | null>;
   /** Pipeline-backed seams: a composed approval gate binds itself, so sub-calls are asked and approvals required. */
   bindApprovalGate?(gate: BoundApprovalGate): void;
   /** The signed action class of a visible tool, or null when the seam cannot name it (an approval mode then gates it). */

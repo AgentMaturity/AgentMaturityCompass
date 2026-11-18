@@ -173,7 +173,9 @@ export function gateToolCallsOnApproval(
       // the guards' refusal; its effect guard refuses too, so the call cannot run unasked if they change their answer.
       const early = inner.supportsEffectGuard === true ? await inner.denialBeforeApproval?.(request) ?? null : null;
       if (early !== null) {
-        return inner.execute({ ...request, beforeEffect: () => `not run: the automatic checks refused it before anyone was asked (${early})` });
+        // The pipeline records the early refusal as the call's denial; the effect guard is the backstop if a wrapper drops it.
+        return inner.execute({ ...request, refusedBeforeApproval: early,
+          beforeEffect: () => `not run: the automatic checks refused it before anyone was asked (${early.reason})` });
       }
       const decision = await ask(approval, options, { callId: request.callId, toolName: request.toolName, intent,
         where: `during turn ${request.turn}, step ${request.step}`, signal: request.signal,
