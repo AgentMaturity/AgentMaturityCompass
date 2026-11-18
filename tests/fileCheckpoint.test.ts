@@ -102,6 +102,27 @@ test("a created file records that it did not exist; fs.edit and apply_patch dele
   expect(existsSync(join(f.workspace, "workspace", "new.txt"))).toBe(false);
 });
 
+test("a later process on the same session reuses a kept copy and counts what the session already kept", async () => {
+  // MUTATION: start each toolset with an empty tally and the second write stores "before" a second time.
+  const f = fixture();
+  await f.call("fs.read", { path: "workspace/note.txt" });
+  await f.call("fs.write", { path: "workspace/note.txt", content: "after\n" });
+  await f.call("fs.write", { path: "workspace/note.txt", content: "before\n" });
+  const commitments = () => f.session.readEvents().filter((row) => row.event_type === "tool/spill-commitment").length;
+  expect(commitments()).toBe(2);
+  const second = agentToolset({ workspace: f.workspace, agentId: "default", sessionId: f.session.sessionId, recorder: f.session });
+  try {
+    const call = (callId: string, toolName: string, args: object) => second.seam.execute({ callId, toolName, rawArguments: JSON.stringify(args),
+      sessionId: f.session.sessionId, turn: 1, step: 1, parentToken: null, dispatch: "native", signal: new AbortController().signal });
+    await call("second-1", "fs.read", { path: "workspace/note.txt" });
+    expect(await call("second-2", "fs.write", { path: "workspace/note.txt", content: "third\n" })).toMatchObject({ outcome: "OK" });
+  } finally { second.close(); }
+  expect(commitments()).toBe(2);
+  const last = JSON.parse(f.checkpoints().at(-1)!.meta_json) as { status: string; locator: string };
+  expect(last.status).toBe("stored");
+  expect(retrieveSpilledContent(f.workspace, f.commitment(last.locator)).toString("utf8")).toBe("before\n");
+});
+
 test("the model cannot read a checkpoint back through session.spill_read", async () => {
   const f = fixture();
   await f.call("fs.read", { path: "workspace/note.txt" });

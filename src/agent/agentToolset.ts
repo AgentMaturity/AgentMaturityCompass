@@ -177,6 +177,7 @@ export interface AgentToolsetOptions {
     assertWritable?(): void;
     /** HP-06: keeps a file's prior bytes as an encrypted spill object; absent, the file tools keep none. */
     retainFileCheckpoint?: FileCheckpointWriter["retainFileCheckpoint"];
+    readEvents?: FileCheckpointWriter["readEvents"];
   };
 }
 

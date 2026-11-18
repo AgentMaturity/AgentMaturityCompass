@@ -3,8 +3,8 @@
  * turn N, then continue the conversation from turn N with `amc agent-loop chat --fork-from <session>`. The library is
  * src/session/sessionRewind.ts; this file only parses, gates and prints.
  *
- * A person's act: agent mode refuses it (OWNER_ONLY_COMMAND_PATHS), and the rewind itself needs a person at an
- * interactive terminal with no agent marker set. `--dry-run` only reads, so it needs neither.
+ * A person's act: agent mode refuses the whole command, --dry-run included (OWNER_ONLY_COMMAND_PATHS), and the rewind
+ * itself needs a person at an interactive terminal with no agent marker set; --dry-run only reads, so it needs neither of those.
  */
 import type { Command } from "commander";
 import chalk from "chalk";

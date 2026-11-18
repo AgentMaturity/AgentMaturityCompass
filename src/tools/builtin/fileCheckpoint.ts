@@ -14,7 +14,8 @@
  * rewind then lists its files as having no pre-image.
  */
 import { sha256Hex } from "../../utils/hash.js";
-import type { SpillRef } from "../../session/spill/spillTypes.js";
+import { extractSpillRef, type SpillRef } from "../../session/spill/spillTypes.js";
+import type { EvidenceEvent } from "../../types.js";
 import type { ToolExecution } from "../toolTypes.js";
 import { refuseBeforeWrite } from "./fsWritePrimitives.js";
 
@@ -30,12 +31,27 @@ type CheckpointStatus = "stored" | "absent" | "too-large" | "session-limit" | "n
 export interface FileCheckpointWriter {
   recordProjectedEvidence(row: { readonly eventType: "audit"; readonly payload: string; readonly meta: Record<string, unknown> }): unknown;
   retainFileCheckpoint(bytes: Buffer, callId: string, cap: number): SpillRef;
+  /** The session's rows, so a resumed session (a new process each chat turn) counts and reuses what it already kept. */
+  readEvents?(): readonly EvidenceEvent[];
 }
 
 /** Called by a file tool after its plan is fixed and before the change lands. `after` is null for a delete. */
 export type FileCheckpoint = (execution: ToolExecution, rel: string, before: Buffer | null, after: Buffer | null) => void;
 
 interface SessionTally { bytes: number; readonly stored: Map<string, string> }
+
+/** What the session already kept, from its signed `file/checkpoint` commitments: the session cap spans every process. */
+function seedTally(writer: FileCheckpointWriter): SessionTally {
+  const tally: SessionTally = { bytes: 0, stored: new Map<string, string>() };
+  for (const row of writer.readEvents?.() ?? []) {
+    if (row.event_type !== "tool/spill-commitment" || !row.meta_json.includes("file/checkpoint")) continue;
+    const ref = extractSpillRef(row.meta_json);
+    if ((JSON.parse(row.meta_json) as { subject?: unknown }).subject !== "file/checkpoint" || ref?.locator == null) continue;
+    tally.bytes += ref.bytes;
+    tally.stored.set(ref.contentSha256, ref.locator);
+  }
+  return tally;
+}
 
 function retain(writer: FileCheckpointWriter, execution: ToolExecution, before: Buffer, tally: SessionTally): { status: CheckpointStatus; locator: string | null; reason: string | null } {
   const digest = sha256Hex(before);
@@ -69,7 +85,7 @@ export function fileCheckpoints(writer: () => FileCheckpointWriter | null): File
     const current = writer();
     if (current === null) return;
     const sessionKey = execution.ownerStep?.sessionId ?? "";
-    const tally = tallies.get(sessionKey) ?? { bytes: 0, stored: new Map<string, string>() };
+    const tally = tallies.get(sessionKey) ?? seedTally(current);
     tallies.set(sessionKey, tally);
     try {
       const kept = before === null ? { status: "absent" as const, locator: null, reason: null } : retain(current, execution, before, tally);

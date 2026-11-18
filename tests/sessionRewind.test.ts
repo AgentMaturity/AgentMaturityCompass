@@ -18,6 +18,8 @@ import { approvalModeGatedClasses } from "../src/approvals/approvalModes.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderRoute, stubProviderTransport } from "../src/agent/stubProvider.js";
 import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { verifyAgentRun } from "../src/agent/runReport.js";
+import { eraseSessionSpills, inventorySessionSpills } from "../src/session/spill/spillLifecycle.js";
+import { lockVault } from "../src/vault/vault.js";
 import { appendOpsAuditEvent } from "../src/ops/audit.js";
 import { assertOwnerMode, setMode } from "../src/mode/mode.js";
 import { SessionService } from "../src/session/sessionService.js";
@@ -177,6 +179,27 @@ describe("amc session rewind, end to end", () => {
     executeSessionRewind(workspace, plan, { onlyClean: true });
     expect(readFileSync(out("real-note.txt"), "utf8")).toBe("v2\n");
     expect(existsSync(out("new.txt"))).toBe(false);
+  }, 120_000);
+
+  it("checkpoints are spill objects: inventory lists them, erasure removes them, and an erased copy is a conflict, not a promise", async () => {
+    const parent = await fourTurns();
+    const events = rows(parent);
+    const inventory = inventorySessionSpills({ workspace, events });
+    expect(inventory.ok).toBe(true);
+    expect(inventory.entries.filter((entry) => entry.status === "retained").length).toBeGreaterThanOrEqual(2);
+    // MUTATION: drop the object inspection in planSessionRewind and note.txt is planned as "put back" with no copy left.
+    expect(eraseSessionSpills({ workspace, events, scope: { sessionIds: [parent] }, reason: "rewind fixture: erase this session's kept copies" }).ok).toBe(true);
+    const plan = planSessionRewind(workspace, parent, 1);
+    expect(plan.conflicts).toEqual([{ path: "workspace/output/note.txt", reason: "no-pre-image" }]);
+    expect(plan.files.map((file) => file.path)).toEqual(["workspace/output/new.txt"]);
+  }, 120_000);
+
+  it("refuses instead of reading unreadable history as no change", async () => {
+    const parent = await fourTurns();
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", "");
+    lockVault(workspace);
+    // MUTATION: let payloadOf return null again and the plan says nothing changed.
+    expect(() => planSessionRewind(workspace, parent, 1)).toThrow(/could not be read/);
   }, 120_000);
 
   it("the verifier rejects a rewind row that cites a checkpoint that does not exist", async () => {

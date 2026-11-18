@@ -32,6 +32,7 @@ import { loadSessionEventHistory } from "./sessionEventHistory.js";
 import { assertSessionOwnerAvailable, readSessionWriter } from "./sessionOwnership.js";
 import { extractEnvelope } from "./sessionTypes.js";
 import { retrieveSpilledContent } from "./spill/spillEvidence.js";
+import { inspectSpillObject } from "./spill/spillStore.js";
 import { extractSpillRef } from "./spill/spillTypes.js";
 
 export const REWIND_INTENDED_AUDIT = "SESSION_REWIND_INTENDED";
@@ -74,21 +75,28 @@ export interface RewindPlan {
 }
 
 export class SessionRewindRefused extends Error {
-  constructor(readonly code: "NOT_FOUND" | "TURN" | "FORK" | "LIVE_WRITER" | "CONFLICTS" | "PRE_IMAGE" | "PERSON", message: string) {
+  constructor(readonly code: "NOT_FOUND" | "TURN" | "FORK" | "LIVE_WRITER" | "CONFLICTS" | "PRE_IMAGE" | "PERSON" | "UNREADABLE", message: string) {
     super(message); this.name = "SessionRewindRefused";
   }
 }
 
 const metaOf = (row: EvidenceEvent): Record<string, unknown> => JSON.parse(row.meta_json) as Record<string, unknown>;
 const turnOf = (row: EvidenceEvent): number => extractEnvelope(row.meta_json)?.turn ?? 0;
-function payloadOf(workspace: string, row: EvidenceEvent): Record<string, unknown> | null {
+/** A row's payload; an unreadable one refuses the rewind, because unseen evidence is never read as "no change". */
+function payloadOf(workspace: string, row: EvidenceEvent): Record<string, unknown> {
   const read = readEventPayload(workspace, row);
-  if (read.status !== "ok") return null;
-  try { return JSON.parse(read.bytes.toString("utf8")) as Record<string, unknown>; } catch { return null; }
+  if (read.status === "ok") {
+    try { return JSON.parse(read.bytes.toString("utf8")) as Record<string, unknown>; } catch { /* reported below */ }
+  }
+  throw new SessionRewindRefused("UNREADABLE", "Part of the recorded history could not be read (if the vault is locked, unlock it with amc vault unlock), so AMC cannot tell which files changed. Nothing was changed.");
 }
 function currentDigest(full: string): string | null {
   try { return sha256Hex(readRegularFile(full)); }
   catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+}
+/** The digest, or "unknown" when the path cannot be read at all (a directory, no permission). */
+function digestOrUnknown(full: string): string | null {
+  try { return currentDigest(full); } catch { return "unknown"; }
 }
 /** The file changes a session's tool audit rows record, in order, with the call and tool that made them. */
 function changesIn(workspace: string, rows: readonly EvidenceEvent[]) {
@@ -96,7 +104,7 @@ function changesIn(workspace: string, rows: readonly EvidenceEvent[]) {
     .flatMap((row) => {
       const payload = payloadOf(workspace, row);
       const meta = metaOf(row);
-      return payload === null ? [] : fileChangesOf(payload).map((change) => ({ ...change, row, callId: String(meta.callId), tool: String(meta.toolName) }));
+      return fileChangesOf(payload).map((change) => ({ ...change, row, callId: String(meta.callId), tool: String(meta.toolName) }));
     });
 }
 
@@ -130,13 +138,14 @@ export function planSessionRewind(workspace: string, sessionId: string, toTurn: 
   let prefix: readonly EvidenceEvent[];
   try { prefix = selectForkPrefix(rows, toTurn).rows; }
   catch { throw new SessionRewindRefused("TURN", `Turn ${toTurn} is not a finished turn of this session. Pick a turn from amc session show ${sessionId}.`); }
-  try { prepareForkConversation(workspace, prefix); }
-  catch (error) { throw new SessionRewindRefused("FORK", `The conversation cannot continue from turn ${toTurn}, so nothing was rewound: ${error instanceof Error ? error.message : String(error)}`); }
-  assertNoLiveWriter(events);
+  // Read first: an unreadable row (a locked vault) is reported as such, before the fork preflight reads the same payloads.
   const after = rows.filter((row) => turnOf(row) > toTurn);
   const changes = changesIn(workspace, after).filter((change) => FILE_TOOLS.has(change.tool));
   const checkpoints = after.filter((row) => row.event_type === "audit" && metaOf(row).auditType === FILE_CHECKPOINT_AUDIT)
     .map((row) => ({ row, meta: metaOf(row), payload: payloadOf(workspace, row) }));
+  try { prepareForkConversation(workspace, prefix); }
+  catch (error) { throw new SessionRewindRefused("FORK", `The conversation cannot continue from turn ${toTurn}, so nothing was rewound: ${error instanceof Error ? error.message : String(error)}`); }
+  assertNoLiveWriter(events);
   const firstTs = new Map<string, number>();
   for (const change of changes) if (!firstTs.has(change.path)) firstTs.set(change.path, change.row.ts);
   const others = changesIn(workspace, events.filter((row) => row.session_id !== sessionId));
@@ -146,19 +155,23 @@ export function planSessionRewind(workspace: string, sessionId: string, toTurn: 
     const first = mine[0]!, last = mine.at(-1)!;
     if (first.beforeSha256 === null && last.afterSha256 === null) continue; // created and removed again: nothing to undo
     const conflict = (reason: RewindConflictReason) => { conflicts.push({ path, reason }); };
-    const checkpoint = checkpoints.find((entry) => entry.meta.callId === first.callId && entry.payload?.path === path
-      && entry.payload?.beforeSha256 === first.beforeSha256);
-    if (first.beforeSha256 !== null && checkpoint?.meta.status !== "stored") {
+    const checkpoint = checkpoints.find((entry) => entry.meta.callId === first.callId && entry.payload.path === path
+      && entry.payload.beforeSha256 === first.beforeSha256);
+    // A removal needs the signed record that the file did not exist; a restore needs a kept copy.
+    if (checkpoint?.meta.status !== (first.beforeSha256 === null ? "absent" : "stored")) {
       conflict(checkpoint?.meta.status === "too-large" ? "too-large" : checkpoint?.meta.status === "not-stored" ? "not-stored" : "no-pre-image"); continue;
     }
     const commitment = first.beforeSha256 === null ? null : rows.find((row) => row.event_type === "tool/spill-commitment"
-      && metaOf(row).subject === "file/checkpoint" && extractSpillRef(row.meta_json)?.locator === checkpoint!.meta.locator);
-    if (commitment === undefined || (commitment !== null && extractSpillRef(commitment.meta_json)?.contentSha256 !== first.beforeSha256)) { conflict("no-pre-image"); continue; }
+      && metaOf(row).subject === "file/checkpoint" && extractSpillRef(row.meta_json)?.locator === checkpoint.meta.locator);
+    const ref = commitment == null ? null : extractSpillRef(commitment.meta_json);
+    if (commitment === undefined || (commitment !== null && (ref?.contentSha256 !== first.beforeSha256 || inspectSpillObject(workspace, ref).status !== "ok"))) {
+      conflict("no-pre-image"); continue; // erased, expired, missing or modified copies are conflicts too
+    }
     let full: string;
     try { full = insideWorkspaceNoLinks(workspace, path).full; } catch { conflict("symlink-or-protected"); continue; }
     if (deniedByPolicy(workspace, last.tool, full)) { conflict("symlink-or-protected"); continue; }
     if (others.some((change) => change.path === path && change.row.ts >= since)) { conflict("other-session"); continue; }
-    if (currentDigest(full) !== last.afterSha256) { conflict("changed-since"); continue; }
+    if (digestOrUnknown(full) !== last.afterSha256) { conflict("changed-since"); continue; }
     files.push({ path, fromSha256: last.afterSha256, toSha256: first.beforeSha256, checkpointEventId: checkpoint?.row.id ?? null, commitmentEventId: commitment?.id ?? null });
   }
   const uncoveredCalls = after.filter((row) => row.event_type === "tool/call" && UNCOVERED_TOOLS.has(String(metaOf(row).toolName))).length;
@@ -195,21 +208,25 @@ export function executeSessionRewind(workspace: string, plan: RewindPlan, option
     v: 1, sessionId: plan.sessionId, toTurn: plan.toTurn, parentHeadEventHash: plan.parentHeadEventHash, by: rewindActor(), onlyClean: options.onlyClean,
     conflicts: plan.conflicts.length, uncoveredCalls: plan.uncoveredCalls,
     files: plan.files.map((file) => ({ checkpointEventId: file.checkpointEventId, commitmentEventId: file.commitmentEventId, fromSha256: file.fromSha256, toSha256: file.toSha256 })) } });
+  // Each file's outcome is total: whatever happens to one file, the FINISHED row is still written for all of them.
   const results = plan.files.map((file, index) => {
-    const full = insideWorkspaceNoLinks(workspace, file.path).full;
-    const unchanged = () => { if (currentDigest(full) !== file.fromSha256) throw new Error("the file changed while the rewind ran"); };
+    let full: string | null = null;
     try {
+      full = insideWorkspaceNoLinks(workspace, file.path).full;
+      const target = full;
+      const unchanged = () => { if (currentDigest(target) !== file.fromSha256) throw new Error("the file changed while the rewind ran"); };
       const content = bytes[index];
       if (content === null || content === undefined) {
         unchanged();
         if (lstatSync(full).isFile()) unlinkSync(full);
-        return { path: file.path, status: "removed" as const, restoredSha256: currentDigest(full) };
+        return { path: file.path, status: "removed" as const, restoredSha256: digestOrUnknown(full) };
       }
       mkdirSync(dirname(full), { recursive: true });
+      // writeFileAtomicSync keeps a replaced file's permission bits; a re-created file gets the default ones.
       writeFileAtomicSync(full, content, { beforeCommit: unchanged });
-      return { path: file.path, status: "restored" as const, restoredSha256: currentDigest(full) };
+      return { path: file.path, status: "restored" as const, restoredSha256: digestOrUnknown(full) };
     } catch {
-      return { path: file.path, status: "failed" as const, restoredSha256: currentDigest(full) };
+      return { path: file.path, status: "failed" as const, restoredSha256: full === null ? "unknown" : digestOrUnknown(full) };
     }
   });
   const finished = appendOpsAuditEvent({ workspace, auditType: REWIND_FINISHED_AUDIT, subjectId: plan.sessionId, payload: {

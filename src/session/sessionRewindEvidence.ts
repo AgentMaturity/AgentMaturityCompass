@@ -11,6 +11,7 @@
  */
 import { openLedger } from "../ledger/ledger.js";
 import { FILE_CHECKPOINT_AUDIT } from "../tools/builtin/fileCheckpoint.js";
+import { PLAN_READY_AUDIT } from "../tools/builtin/planExitTool.js";
 import type { EvidenceEvent } from "../types.js";
 import { escapeTerminalControls } from "../utils/terminalEscape.js";
 import { readEventPayload } from "./eventPayload.js";
@@ -22,25 +23,35 @@ import { extractSpillRef } from "./spill/spillTypes.js";
 
 export const FORK_AFTER_REWIND_AUDIT = "NATIVE_FORK_AFTER_REWIND";
 
-interface OpsRow { readonly row: EvidenceEvent; readonly meta: Record<string, unknown>; readonly payload: Record<string, unknown> }
+interface OpsRow { readonly row: EvidenceEvent; readonly meta: Record<string, unknown>; readonly payload: Record<string, unknown> | null }
 interface RewindFileEntry { readonly checkpointEventId: string | null; readonly commitmentEventId: string | null; readonly fromSha256: string | null; readonly toSha256: string | null }
 interface Outcome { readonly status: string; readonly restoredSha256: string | null }
 
-const metaOf = (row: EvidenceEvent): Record<string, unknown> => JSON.parse(row.meta_json) as Record<string, unknown>;
+/** A row's meta, or {} when it has none that parses (older rows): such a row is no rewind row. */
+function metaOf(row: EvidenceEvent): Record<string, unknown> {
+  try { const meta: unknown = JSON.parse(row.meta_json ?? "{}"); return typeof meta === "object" && meta !== null ? meta as Record<string, unknown> : {}; }
+  catch { return {}; }
+}
 
-/** The signed operations-audit rewind rows of this workspace (payloads are inline JSON). */
+/**
+ * The signed operations-audit rewind rows of this workspace, told apart by their plain meta. A rewind row whose payload
+ * cannot be read keeps `payload: null`, so readers report it instead of passing over it.
+ */
 function rewindRows(workspace: string): OpsRow[] {
-  const ledger = openLedger(workspace, { readonly: true });
+  let ledger: ReturnType<typeof openLedger>;
+  try { ledger = openLedger(workspace, { readonly: true }); } catch { return []; } // no operations ledger: no rewind was ever recorded
   try {
     return ledger.getAllEvents().filter((row) => row.event_type === "audit").flatMap((row) => {
       const meta = metaOf(row);
       if (meta.source !== "ops" || (meta.auditType !== REWIND_INTENDED_AUDIT && meta.auditType !== REWIND_FINISHED_AUDIT)) return [];
       const read = readEventPayload(workspace, row);
-      if (read.status !== "ok") return [];
-      return [{ row, meta, payload: JSON.parse(read.bytes.toString("utf8")) as Record<string, unknown> }];
+      let payload: Record<string, unknown> | null = null;
+      try { if (read.status === "ok") payload = JSON.parse(read.bytes.toString("utf8")) as Record<string, unknown>; } catch { payload = null; }
+      return [{ row, meta, payload }];
     });
   } finally { ledger.close(); }
 }
+const UNREADABLE = "a rewind record of this session could not be read, so it was not checked";
 
 export interface ForkRewind { readonly toTurn: number; readonly finished: EvidenceEvent; readonly parentSessionId: string }
 
@@ -51,11 +62,12 @@ export interface ForkRewind { readonly toTurn: number; readonly finished: Eviden
 export function rewindForFork(workspace: string, parentSessionId: string, parentRows: readonly EvidenceEvent[]): ForkRewind | null {
   const head = parentRows.at(-1);
   if (head === undefined) return null;
-  const finished = rewindRows(workspace).filter((entry) => entry.meta.auditType === REWIND_FINISHED_AUDIT
-    && entry.meta.subjectId === parentSessionId && entry.payload.parentHeadEventHash === head.event_hash).at(-1);
+  const mine = rewindRows(workspace).filter((entry) => entry.meta.auditType === REWIND_FINISHED_AUDIT && entry.meta.subjectId === parentSessionId);
+  if (mine.some((entry) => entry.payload === null)) throw new Error(`${UNREADABLE}; the fork was not created. Unlock the vault (amc vault unlock) and try again.`);
+  const finished = mine.filter((entry) => entry.payload!.parentHeadEventHash === head.event_hash).at(-1);
   if (finished === undefined) return null;
   if (readSessionWriter(head)?.state === "active") assertSessionOwnerAvailable(head);
-  return { toTurn: Number(finished.payload.toTurn), finished: finished.row, parentSessionId };
+  return { toTurn: Number(finished.payload!.toTurn), finished: finished.row, parentSessionId };
 }
 
 /** The child's first row after session/open: which rewind it continues from. No paths. */
@@ -70,7 +82,14 @@ function checkFiles(sessionRows: readonly EvidenceEvent[], toTurn: number, files
   if (files.length !== outcomes.length) return ["a rewind's finished record does not list one outcome per planned file"];
   files.forEach((file, index) => {
     const outcome = outcomes[index]!;
-    if (file.toSha256 !== null) {
+    if (file.toSha256 === null) {
+      // A removal stands on the signed record that the file did not exist before the session created it.
+      const absent = sessionRows.find((row) => row.id === file.checkpointEventId && row.event_type === "audit");
+      if (absent === undefined || metaOf(absent).auditType !== FILE_CHECKPOINT_AUDIT || metaOf(absent).status !== "absent" || (extractEnvelope(absent.meta_json)?.turn ?? 0) <= toTurn) {
+        errors.push(`a rewind removed a file citing ${String(file.checkpointEventId)}, which does not record that file as created after turn ${toTurn}`);
+        return;
+      }
+    } else {
       const checkpoint = sessionRows.find((row) => row.id === file.checkpointEventId && row.event_type === "audit");
       const meta = checkpoint === undefined ? null : metaOf(checkpoint);
       if (checkpoint === undefined || meta?.auditType !== FILE_CHECKPOINT_AUDIT || meta.status !== "stored" || (extractEnvelope(checkpoint.meta_json)?.turn ?? 0) <= toTurn) {
@@ -95,18 +114,21 @@ export function rewindVerificationErrors(workspace: string, sessionId: string, s
   const forkRows = sessionRows.filter((row) => row.event_type === "audit" && metaOf(row).auditType === FORK_AFTER_REWIND_AUDIT);
   const ops = rewindRows(workspace);
   const errors: string[] = [];
-  for (const finished of ops.filter((entry) => entry.meta.auditType === REWIND_FINISHED_AUDIT && entry.meta.subjectId === sessionId)) {
-    const intended = ops.find((entry) => entry.row.id === finished.payload.intendedEventId && entry.row.event_hash === finished.payload.intendedEventHash
+  if (ops.some((entry) => entry.meta.subjectId === sessionId && entry.payload === null)) errors.push(UNREADABLE);
+  for (const finished of ops.filter((entry) => entry.meta.auditType === REWIND_FINISHED_AUDIT && entry.meta.subjectId === sessionId && entry.payload !== null)) {
+    const intended = ops.find((entry) => entry.row.id === finished.payload!.intendedEventId && entry.row.event_hash === finished.payload!.intendedEventHash
       && entry.meta.auditType === REWIND_INTENDED_AUDIT && entry.meta.subjectId === sessionId);
-    if (intended === undefined) { errors.push(`rewind ${finished.row.id} cites no recorded intention`); continue; }
-    errors.push(...checkFiles(sessionRows, Number(intended.payload.toTurn), intended.payload.files as RewindFileEntry[], finished.payload.outcomes as Outcome[]));
+    if (intended?.payload == null) { errors.push(`rewind ${finished.row.id} cites no readable recorded intention`); continue; }
+    const files = Array.isArray(intended.payload.files) ? intended.payload.files as RewindFileEntry[] : [];
+    const outcomes = Array.isArray(finished.payload!.outcomes) ? finished.payload!.outcomes as Outcome[] : [];
+    errors.push(...checkFiles(sessionRows, Number(intended.payload.toTurn), files, outcomes));
   }
   for (const row of forkRows) {
     const meta = metaOf(row);
     const open = sessionRows[0] === undefined ? null : metaOf(sessionRows[0]) as { parentSession?: { sessionId?: unknown; forkTurn?: unknown } };
     const cited = ops.find((entry) => entry.row.id === meta.rewindEventId && entry.row.event_hash === meta.rewindEventHash);
     if (sessionRows.indexOf(row) !== 1) errors.push("a fork's rewind citation is not its first row after session/open");
-    if (cited === undefined || cited.meta.auditType !== REWIND_FINISHED_AUDIT || cited.meta.subjectId !== meta.parentSessionId
+    if (cited?.payload == null || cited.meta.auditType !== REWIND_FINISHED_AUDIT || cited.meta.subjectId !== meta.parentSessionId
       || Number(cited.payload.toTurn) !== meta.toTurn || open?.parentSession?.sessionId !== meta.parentSessionId || open?.parentSession?.forkTurn !== meta.toTurn) {
       errors.push(`fork row ${row.id} cites a rewind that does not exist or does not match this session's parent and fork turn`);
     }
@@ -114,22 +136,50 @@ export function rewindVerificationErrors(workspace: string, sessionId: string, s
   return errors;
 }
 
-/** Plain lines for `amc session show`: rewinds of this session, and the rewind a fork continues from. */
+const NOT_KEPT_WORDS: Readonly<Record<string, string>> = { "too-large": "too large", "session-limit": "past the session's limit", "not-stored": "no encryption key or not saved" };
+
+/** How a finished rewind went, from its own two records. */
+function rewindSummary(finished: OpsRow, intended: OpsRow | undefined): string {
+  const outcomes = (Array.isArray(finished.payload?.outcomes) ? finished.payload!.outcomes : []) as Outcome[];
+  const count = (status: string) => outcomes.filter((outcome) => outcome.status === status).length;
+  const skipped = Number(intended?.payload?.conflicts ?? 0);
+  return `${count("restored")} restored, ${count("removed")} created file(s) removed, ${count("failed")} failed, ${skipped} not put back because of a conflict`;
+}
+
+/**
+ * Plain lines for `amc session show`: per turn, the files whose earlier content was not kept and a plan handed over with
+ * plan_exit; the rewinds of this session; and the rewind a fork continues from.
+ */
 export function describeSessionRewinds(workspace: string, sessionId: string, sessionRows: readonly EvidenceEvent[]): string[] {
-  const ops = rewindRows(workspace);
   const lines: string[] = [];
+  const notKept = new Map<string, number>();
+  for (const row of sessionRows) {
+    const meta = metaOf(row), turn = extractEnvelope(row.meta_json)?.turn ?? 0;
+    if (row.event_type !== "audit") continue;
+    if (meta.auditType === FILE_CHECKPOINT_AUDIT && typeof meta.status === "string" && meta.status in NOT_KEPT_WORDS) {
+      const key = `${turn}\0${NOT_KEPT_WORDS[meta.status]}`; notKept.set(key, (notKept.get(key) ?? 0) + 1);
+    }
+    if (meta.auditType === PLAN_READY_AUDIT) lines.push(`Turn ${turn}: the agent handed over a plan for review (plan_exit), and AMC ended the turn there. Plan mode stays on until you turn it off.`);
+  }
+  for (const [key, count] of notKept) {
+    const [turn, why] = key.split("\0");
+    lines.push(`Turn ${turn}: the earlier content of ${count} file(s) was not kept (${why}); a rewind cannot put those files back.`);
+  }
+  const ops = rewindRows(workspace);
   for (const finished of ops.filter((entry) => entry.meta.auditType === REWIND_FINISHED_AUDIT && entry.meta.subjectId === sessionId)) {
-    const intended = ops.find((entry) => entry.row.id === finished.payload.intendedEventId);
-    const by = (intended?.payload.by ?? {}) as { user?: unknown; host?: unknown };
-    const outcomes = (finished.payload.outcomes ?? []) as Outcome[];
-    const count = (status: string) => outcomes.filter((outcome) => outcome.status === status).length;
+    if (finished.payload === null) { lines.push(`A rewind of this session (record ${finished.row.id}) could not be read; unlock the vault to see it.`); continue; }
+    const intended = ops.find((entry) => entry.row.id === finished.payload!.intendedEventId);
+    const by = (intended?.payload?.by ?? {}) as { user?: unknown; host?: unknown };
     lines.push(`Files rewound to turn ${String(finished.payload.toTurn)} on ${new Date(finished.row.ts).toISOString()} by ${String(by.user)} on ${String(by.host)} `
-      + `(at a terminal, no sign-in): ${count("restored")} restored, ${count("removed")} created file(s) removed, ${count("failed")} failed. `
+      + `(at a terminal, no sign-in): ${rewindSummary(finished, intended)}. `
       + `This session's rows are unchanged; continue from that turn with amc agent-loop chat --fork-from ${sessionId}.`);
   }
   for (const row of sessionRows.filter((entry) => entry.event_type === "audit" && metaOf(entry).auditType === FORK_AFTER_REWIND_AUDIT)) {
     const meta = metaOf(row);
-    lines.push(`This session continues session ${String(meta.parentSessionId)} from turn ${String(meta.toTurn)}, after that session's files were rewound (record ${String(meta.rewindEventId)}).`);
+    const finished = ops.find((entry) => entry.row.id === meta.rewindEventId);
+    const intended = finished?.payload == null ? undefined : ops.find((entry) => entry.row.id === finished.payload!.intendedEventId);
+    lines.push(`This session continues session ${String(meta.parentSessionId)} from turn ${String(meta.toTurn)}, after that session's files were rewound `
+      + `(record ${String(meta.rewindEventId)}${finished === undefined ? ", not found" : `: ${rewindSummary(finished, intended)}`}).`);
   }
   return lines.map(escapeTerminalControls);
 }

@@ -157,6 +157,9 @@ describe("chat footer, exit summary and confinement notice", () => {
     expect(chatUsageTotals(usage)).toMatchObject({ inputTokens: 1200, outputTokens: 50, costUsd: 0.0123, costComplete: false });
     expect(renderTurnFooter({ recorded: true, turn: 2, ending: "complete", usage, context: { promptTokens: 1200, windowTokens: 200000 } }))
       .toBe("── reply recorded · turn 2 complete · 1,200 tokens in, 50 out · cost about $0.01 or more (estimated) · context 1% of 200,000 (estimated)");
+    // HP-08: a vetoed turn (after plan_exit) says who ended it, not only the code.
+    expect(renderTurnFooter({ recorded: false, turn: 3, ending: "blocked", usage: { requests: 1, syntheticRequests: 1 }, context: null }))
+      .toContain("turn 3 ended by AMC before its next step (blocked)");
     expect(renderTurnFooter({ recorded: false, turn: 1, ending: "cancelled", usage: { requests: 1, syntheticRequests: 1 }, context: null }))
       .toBe("── no reply recorded · turn 1 cancelled · stand-in model: no tokens used, no cost");
   });
