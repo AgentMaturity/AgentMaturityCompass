@@ -1523,3 +1523,11 @@ body[data-session="none"] .topbar-actions > :not(#guideOpenLink) { display: none
 .governor-cell.on { font-size: 18px; font-weight: 700; }
 .governor-cell.on.status-warn { color: var(--warn); }
 .governor-cell.on.muted { color: var(--ink); }
+.governor-word { font-size: 12px; font-weight: 600; }
+/* At phone width the approvals table reads as cards, so Approve and Deny are on screen without a sideways scroll. */
+@media (max-width: 600px) {
+  .approvals-table thead { display: none; }
+  .approvals-table, .approvals-table tbody, .approvals-table tr, .approvals-table td { display: block; width: 100%; }
+  .approvals-table tr { border-top: 1px solid var(--border); padding: 8px 0; }
+  .approvals-table td { padding: 2px 0; word-break: break-word; }
+}

@@ -52,6 +52,18 @@ describe("session audit for the console", () => {
     expect(sessions[0]).toMatchObject({ sessionId: "cli-chat-0001", sealed: false, actions: [{ tool: "fs.write", outcome: "OK", approvedBy: "owner" }] });
   });
 
+  it("M7: lists a bounded page, newest first, continued by cursor, and reuses the verified list until the store changes", async () => {
+    chat();
+    const first = listAuditSessions(workspace, "default", { limit: 1 });
+    expect(first.sessions).toHaveLength(1);
+    expect(first.total).toBe(1);
+    expect(first.nextCursor).toBeNull();
+    expect(listAuditSessions(workspace).sessions[0], "same built entry while nothing changed").toBe(first.sessions[0]);
+    const res = { setHeader: vi.fn(), writeHead: vi.fn(), end: vi.fn(), statusCode: 200 } as unknown as ServerResponse;
+    await handleEvidenceRoute("/api/v1/evidence/sessions", "GET", { url: "/api/v1/evidence/sessions?limit=5", method: "GET" } as IncomingMessage, res, workspace);
+    expect((res.setHeader as ReturnType<typeof vi.fn>).mock.calls).toContainEqual(["Cache-Control", "no-store"]);
+  });
+
   it("exports the signed record that verify-export accepts, and refuses bad or unknown ids", () => {
     const id = chat();
     const file = sessionAuditExport(workspace, id, "json");

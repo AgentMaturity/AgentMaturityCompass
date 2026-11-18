@@ -1786,7 +1786,7 @@ async function renderApprovals() {
         </p>
         ${approvalActivityState.status === "PENDING" && rows.length === 0 && activity?.integrity?.valid ? `<p>Nothing is waiting for a decision. <button id="approvalShowAll" type="button" class="secondary">Show decided requests</button></p>` : ""}
       `}
-      <div class="scroll"><table><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Mode</th><th>Status</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
+      <div class="scroll"><table class="approvals-table"><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Mode</th><th>Status</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
     `)}
   `;
   const body = document.getElementById("apprRows");

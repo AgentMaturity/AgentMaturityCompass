@@ -6239,6 +6239,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           agentId: found.agentId,
           approvalRequestId: approvalId
         });
+        res.setHeader("Cache-Control", "no-store"); // the call shown to a decider is not kept by the browser or a proxy
         json(res, 200, {
           request: inbox.request, requestDigestSha256: inbox.requestDigestSha256, ...(await import("../evidence/sessionAudit.js")).approvalCallField(options.workspace, inbox.request, inbox.status, auth),
           decisions: inbox.decisions,

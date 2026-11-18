@@ -6,8 +6,9 @@
  * The call shown for an approval is the one the session recorded before the person was asked, and only when its
  * arguments hash to the digest the signed request binds (`callMatchesRequest`); otherwise it says why it is not shown.
  */
-import { realpathSync } from "node:fs";
+import { realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
+import { join } from "node:path";
 import { listApprovalDecisions, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { buildSessionExport } from "../observability/sessionExport.js";
@@ -87,18 +88,48 @@ function actionsOf(workspace: string, agentId: string | null, rows: readonly Evi
   return [...calls.values()];
 }
 
-/** The workspace's native sessions, newest first, with what each one did. */
-export function listAuditSessions(workspace: string, agentId = "default"): { readonly sessions: readonly AuditSession[]; readonly total: number } {
+/** The store's files: when none changed, the verified list built from them is reused instead of loading the history again. */
+function storeKey(workspace: string): string {
+  return ["evidence.sqlite", "evidence.sqlite-wal", join("jsonl", "events.jsonl"), "session-store.json"].map((file) => {
+    try { const stat = statSync(join(workspace, ".amc", file)); return `${stat.size}:${stat.mtimeMs}`; } catch { return "-"; }
+  }).join("|");
+}
+const built = new Map<string, { readonly key: string; readonly sessions: readonly AuditSession[] }>();
+
+/** Every native session, newest first, from one verified read of the history; each session's rows grouped in one pass. */
+function buildAuditSessions(workspace: string, agentId: string): readonly AuditSession[] {
   const history = loadSessionEventHistory({ workspace });
   const rowsBy = new Map<string, EvidenceEvent[]>();
-  for (const row of history.events) rowsBy.set(row.session_id, [...(rowsBy.get(row.session_id) ?? []), row]);
-  const native = summarizeNativeSessions(workspace, agentId, history).filter((summary) => summary.source === "native");
-  return { total: native.length, sessions: native.slice(0, MAX_SESSIONS).map((summary) => {
+  for (const row of history.events) {
+    const rows = rowsBy.get(row.session_id);
+    if (rows === undefined) rowsBy.set(row.session_id, [row]);
+    else rows.push(row);
+  }
+  return summarizeNativeSessions(workspace, agentId, history).filter((summary) => summary.source === "native").map((summary) => {
     const rows = rowsBy.get(summary.sessionId) ?? [];
     const actions = actionsOf(workspace, summary.agentId, rows);
     return { sessionId: summary.sessionId, agentId: summary.agentId, sealed: summary.state === "sealed", startedAt: rows[0]?.ts ?? summary.updatedAt,
       updatedAt: summary.updatedAt, turns: summary.turns, actions: actions.slice(-MAX_ACTIONS), moreActions: Math.max(0, actions.length - MAX_ACTIONS) };
-  }) };
+  });
+}
+
+/**
+ * One page of the workspace's native sessions, newest first (M7): at most `limit` (1-50) sessions and 20 actions each,
+ * continued with `cursor`. The history has no per-session index, so the list is built from one verified read and reused
+ * until the store's files change; a GET that finds them unchanged reads nothing.
+ */
+export function listAuditSessions(workspace: string, agentId = "default", page: { readonly limit?: number; readonly cursor?: string | null } = {}):
+  { readonly sessions: readonly AuditSession[]; readonly total: number; readonly nextCursor: string | null } {
+  const key = `${agentId}|${storeKey(workspace)}`;
+  let cached = built.get(workspace);
+  if (cached === undefined || cached.key !== key) {
+    cached = { key, sessions: buildAuditSessions(workspace, agentId) };
+    built.set(workspace, cached);
+  }
+  const limit = Math.min(MAX_SESSIONS, Math.max(1, Math.trunc(page.limit ?? 20) || 20));
+  const start = page.cursor !== undefined && page.cursor !== null && /^[0-9]{1,6}$/.test(page.cursor) ? Number(page.cursor) : 0;
+  const sessions = cached.sessions.slice(start, start + limit);
+  return { sessions, total: cached.sessions.length, nextCursor: start + limit < cached.sessions.length ? String(start + limit) : null };
 }
 
 /**

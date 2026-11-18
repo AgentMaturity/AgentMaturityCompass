@@ -376,7 +376,9 @@ export async function handleEvidenceRoute(
   if (pathname === '/api/v1/evidence/sessions' && method === 'GET') {
     try {
       const { listAuditSessions } = await import('../evidence/sessionAudit.js');
-      apiSuccess(res, listAuditSessions(workspace, queryParam(req.url ?? '', 'agentId') ?? 'default'));
+      const url = req.url ?? '';
+      res.setHeader('Cache-Control', 'no-store');
+      apiSuccess(res, listAuditSessions(workspace, queryParam(url, 'agentId') ?? 'default', { limit: Number(queryParam(url, 'limit') ?? 20), cursor: queryParam(url, 'cursor') }));
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'Sessions could not be read');
     }
@@ -390,7 +392,7 @@ export async function handleEvidenceRoute(
       const { sessionAuditExport } = await import('../evidence/sessionAudit.js');
       const file = sessionAuditExport(workspace, decodeURIComponent(sessionExport[1]!), format);
       if (file.status !== 200) { apiError(res, file.status, file.error); return true; }
-      res.writeHead(200, { 'Content-Type': file.contentType, 'Content-Disposition': `attachment; filename="${file.fileName}"`, 'X-Content-Type-Options': 'nosniff' });
+      res.writeHead(200, { 'Content-Type': file.contentType, 'Content-Disposition': `attachment; filename="${file.fileName}"`, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store' });
       res.end(file.body);
     } catch (err) {
       apiError(res, 500, err instanceof Error ? err.message : 'The session could not be exported');

@@ -25,8 +25,9 @@ export async function renderGovernorOutcomes(agentId) {
     : data && data.policy === "untrusted"
       ? "The Action Policy here does not verify, so every governed action is blocked until it is restored or signed again."
       : "What happens when the agent asks to really do each kind of action, by the signed Action Policy in force here.";
-  const rows = outcomes.map((row) => `<tr><th scope="row">${esc(plainCode(row.actionClass))}</th>${COLUMNS.map(([key, , cls]) =>
-    `<td class="governor-cell${row.outcome === key ? ` ${cls} on` : ""}">${row.outcome === key ? "●" : ""}</td>`).join("")}</tr>`).join("");
+  const rows = outcomes.map((row) => `<tr><th scope="row">${esc(plainCode(row.actionClass))}</th>${COLUMNS.some(([key]) => key === row.outcome)
+    ? COLUMNS.map(([key, label, cls]) => `<td class="governor-cell${row.outcome === key ? ` ${cls} on` : ""}">${row.outcome === key ? `● <span class="governor-word">${esc(label)}</span>` : ""}</td>`).join("")
+    : `<td colspan="${COLUMNS.length}" class="muted">No signed Action Policy holds this back here; the tool allowlist and approvals still apply.</td>`}</tr>`).join("");
   return `<section class="card governor-outcomes"><h3>What the agent may do here</h3>
     <p class="muted">${esc(intro)} Agent: ${esc((data && data.agentId) || agentId)}.</p>
     <div class="scroll"><table class="governor-grid"><thead><tr><th>Kind of action</th>${COLUMNS.map(([, label]) => `<th>${esc(label)}</th>`).join("")}</tr></thead>

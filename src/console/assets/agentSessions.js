@@ -4,7 +4,7 @@
 import { apiDownload, apiGet, applyRoleGates, getCurrentUser } from "./api.js";
 import { esc } from "./pageKit.js";
 
-const OUTCOMES = { OK: "ran", DENIED: "refused, did not run", ERROR: "failed", CANCELLED: "cancelled", TOOL_OUTCOME_UNKNOWN: "may have run (outcome unknown)" };
+const OUTCOMES = { "no result recorded": "not finished, or no result recorded yet", OK: "ran", DENIED: "refused, did not run", ERROR: "failed", CANCELLED: "cancelled", TOOL_OUTCOME_UNKNOWN: "may have run (outcome unknown)" };
 
 function when(ts) {
   const date = new Date(ts);
@@ -55,7 +55,7 @@ export async function renderAgentSessionsInto(root, agentId, limit = 10) {
   (root.firstElementChild || root).after(section);
   let data;
   try {
-    const envelope = await apiGet(`/api/v1/evidence/sessions?agentId=${encodeURIComponent(agentId)}`);
+    const envelope = await apiGet(`/api/v1/evidence/sessions?agentId=${encodeURIComponent(agentId)}&limit=${encodeURIComponent(String(limit))}`);
     data = envelope && envelope.data ? envelope.data : envelope;
   } catch (error) {
     section.innerHTML = `<h3>Agent sessions</h3><p class="status-bad">The agent's sessions could not be read: ${esc(error && error.message ? error.message : error)}</p>`;

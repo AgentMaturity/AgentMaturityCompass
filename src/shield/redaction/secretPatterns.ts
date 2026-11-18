@@ -78,7 +78,7 @@ export const SECRET_PATTERNS: readonly SecretPattern[] = [
   // secretBlind's spelling, because bridge's missed four of the five real forms.
   // The whole block, body included (the header alone left the body readable), JSON-escaped or indented line breaks too;
   // an unterminated BEGIN runs to the end of the text. Broad on purpose: this table guards storage, exports and logs. The
-  // approval preview, where hiding too much costs more, narrows each match to the secret's own span (sessionAudit.ts).
+  // approval preview hides nothing partly: any match anywhere in a call withholds the whole call (sessionAudit.ts).
   { type: "private_key", source: "secretBlind", pattern: /-----BEGIN (RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----[\s\S]*?(?:-----END (RSA |EC |DSA |OPENSSH |ENCRYPTED )?PRIVATE KEY-----|$)/ },
   { type: "connection_string", source: "secretBlind", pattern: /(mongodb|postgres|mysql|redis|amqp):\/\/[^\s"']+/i },
   { type: "generic_api_key", source: "secretBlind", pattern: /(?:api[_-]?key|apikey|api_secret)["\s:=]+["']?[A-Za-z0-9_\-]{16,}["']?/i },
