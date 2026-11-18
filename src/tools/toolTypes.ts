@@ -38,6 +38,8 @@ export interface ToolExecution {
   readonly callId: string;
   /** Trusted native step identity; never taken from model arguments. */
   readonly ownerStep?: Readonly<{ sessionId: string; turn: number; step: number; callId: string }>;
+  /** Set only on the guards' early look before anyone is asked (UX-03); hooks are told it is a pre-approval check. */
+  readonly preApproval?: true;
   /** The originating call, for sub-calls dispatched from inside a tool. */
   readonly rootCallId: string;
   readonly name: string;

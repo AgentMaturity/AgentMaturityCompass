@@ -174,7 +174,7 @@ export class AgentDriver {
         ...(tools.supportsEffectGuard ? { supportsEffectGuard: true as const } : {}),
         schemas: () => tools.schemas(), executionMode: request => tools.executionMode(request),
         prepareStep: tools.prepareStep?.bind(tools), authorizationIntent: tools.authorizationIntent?.bind(tools),
-        bindApprovalGate: tools.bindApprovalGate?.bind(tools),
+        bindApprovalGate: tools.bindApprovalGate?.bind(tools), denialBeforeApproval: tools.denialBeforeApproval?.bind(tools),
         execute: async request => {
           await this.observeExtensions({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
           // The result's digest and size name what settled (SH-EXT-01 PostToolUse); its text never crosses.

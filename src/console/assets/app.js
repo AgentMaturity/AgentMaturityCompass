@@ -2,6 +2,9 @@ import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
 import { askInline, confirmPress, recordDetails, recordRows, showResult } from "./pageKit.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
+import { renderAgentSessionsInto } from "./agentSessions.js";
+import { approvalCallHtml, offersApprove } from "./approvalCallView.js";
+import { renderGovernorOutcomes } from "./governorOutcomes.js";
 import { toolRatesHtml } from "./runtimeRates.js";
 import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, setAdminToken, whoami } from "./api.js";
@@ -883,6 +886,7 @@ async function renderEvidence() {
       `)}
     </div>
   `;
+  void renderAgentSessionsInto(root, agentId);
 
   onAction(document.getElementById("evidenceRunScore"), "click", async (event) => {
     const button = event.currentTarget;
@@ -1531,6 +1535,7 @@ async function renderHome() {
     </details>
     </details>
   `;
+  void renderAgentSessionsInto(root, agentId, 3);
   // Every claim-bearing number on Home (trends, KPI tiles) sits under "More", so its labels sit there too.
   if (claimStrip) document.getElementById("homeMore")?.querySelector("summary")?.after(claimStrip);
   bindFirstUse();
@@ -1712,7 +1717,8 @@ async function renderApprovals() {
         requestIntegrity: data.requestIntegrity,
         chainIntegrity: data.chainIntegrity,
         contextIntegrity: data.contextIntegrity,
-        executionReady: data.executionReady
+        executionReady: data.executionReady,
+        call: data.call
       }])
     : [...(activity.requests || []), ...a4Rows];
   const integrityValid = selectedApprovalId || activity?.integrity?.valid === true;
@@ -1722,6 +1728,7 @@ async function renderApprovals() {
     ${card("Approvals Inbox", `
       ${demoActor ? '<p class="banner">Demo sessions cannot decide approvals. Sign in with an authorized identity to review and record a decision.</p>' : !approvalActorAllowed ? '<p class="banner">Your identity can review these requests but cannot record approval decisions. An authorized approver, owner or auditor must decide.</p>' : ""}
       ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : ""}
+      ${selectedApprovalId && rows[0] ? approvalCallHtml(rows[0]) : ""}
       ${selectedApprovalId ? "" : `
         <form id="approvalActivityFilters" class="row wrap">
           <label>
@@ -1774,11 +1781,12 @@ async function renderApprovals() {
         </form>
         <p id="approvalActivityIntegrity" class="${activity?.integrity?.valid ? "status-ok" : "status-bad"}">
           ${activity?.integrity?.valid
-            ? `${Number(activity.returned || 0)} of ${Number(activity.totalMatched || 0)} matching approvals | signed inventory verified`
+            ? `${Number(activity.returned || 0) + a4Rows.length} of ${Number(activity.totalMatched || 0) + a4Rows.length} matching approvals | signed inventory verified`
             : `Approval activity unavailable | ${htmlEscape((activity?.integrity?.reasonCodes || ["INTEGRITY_UNAVAILABLE"]).join(", "))}`}
         </p>
+        ${approvalActivityState.status === "PENDING" && rows.length === 0 && activity?.integrity?.valid ? `<p>Nothing is waiting for a decision. <button id="approvalShowAll" type="button" class="secondary">Show decided requests</button></p>` : ""}
       `}
-      <div class="scroll"><table><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Mode</th><th>Status</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
+      <div class="scroll"><table class="approvals-table"><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Mode</th><th>Status</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
     `)}
   `;
   const body = document.getElementById("apprRows");
@@ -1805,8 +1813,9 @@ async function renderApprovals() {
         : Number(row.decisionCount || 0)}</td>
       <td>
         ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
-            <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>
+            ${offersApprove(row, a4Rows.includes(row) || Boolean(a4.a4ProjectOf(row.intentId)) || row.approvalRequestId.startsWith("a4gate_")) ? `<button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
+            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>`
+              : selectedApprovalId ? "" : `<a href="./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}">See the call to decide</a>`}
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
           </div>` : '<span class="muted">Unavailable</span>'}
       </td>
@@ -1832,6 +1841,10 @@ async function renderApprovals() {
       search?.parentElement?.querySelector(":scope > .action-error")?.remove();
       search?.insertAdjacentHTML("afterend", `<p class="action-error status-bad" role="alert">${htmlEscape(errText(error))}</p>`);
     }
+  });
+  document.getElementById("approvalShowAll")?.addEventListener("click", async () => {
+    approvalActivityState.status = "";
+    await renderApprovals();
   });
   document.getElementById("approvalFiltersReset")?.addEventListener("click", async () => {
     Object.assign(approvalActivityState, {
@@ -3005,6 +3018,7 @@ async function renderRuntimeRuns() {
       </div>
     `)}
   `;
+  void renderAgentSessionsInto(root, agentId);
   const out = document.getElementById("runtimeOut");
   const currentRun = () => document.getElementById("runtimeRunId")?.value || latest?.runId || "";
   const currentStage = () => document.getElementById("runtimeStage")?.value || "gateway.connected";
@@ -3884,26 +3898,7 @@ async function renderPage() {
     if (page === "policypacks") return await renderPolicyPacks();
     if (page === "industrypacks") return await renderIndustryPacks();
     if (page === "governor") {
-      const actionClasses = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY"];
-      const rows = [];
-      for (const actionClass of actionClasses) {
-        const decision = await apiPost("/governor/check", {
-          agentId: currentAgent(),
-          actionClass,
-          riskTier: "med",
-          mode: "EXECUTE"
-        }).catch((error) => ({ error: errText(error) }));
-        rows.push({ actionClass, decision });
-      }
-      // A check only evaluates the policy; it records nothing.
-      const classWords = { READ_ONLY: "Reading only", WRITE_LOW: "Small changes", WRITE_HIGH: "Bigger changes", DEPLOY: "Releasing", SECURITY: "Security settings" };
-      const verdict = ({ decision }) => decision.error ? `could not be checked: ${htmlEscape(decision.error)}`
-        : !decision.allowed ? "not allowed"
-          : decision.effectiveMode === "SIMULATE" ? "allowed only as a dry run: AMC records what would happen and does nothing" : "allowed";
-      root.innerHTML = card("Governor", `
-        <p class="muted">What the Governor would decide for ${htmlEscape(currentAgent())} if it asked to really do each kind of action at medium risk.</p>
-        <ul>${rows.map((row) => `<li><strong>${classWords[row.actionClass]}</strong> <small class="muted">${row.actionClass}</small>: ${verdict(row)}</li>`).join("")}</ul>
-        ${jsonDetails("Full decisions, with every condition and reason:", rows)}`);
+      root.innerHTML = await renderGovernorOutcomes(currentAgent());
       return;
     }
     if (page === "toolhub") {

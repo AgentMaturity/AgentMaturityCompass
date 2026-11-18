@@ -77,7 +77,7 @@ function untrusted(reasons: readonly string[], overrides: readonly string[]): vo
  * artifact that did not verify vouches for nothing, so its claim then reads untrusted evidence and no pass.
  */
 export function finishVerify(label: string, report: VerifierReportV1,
-  opts: { json?: boolean; result?: object; details?: string[]; claim?: ClaimEnvelope }): void {
+  opts: { json?: boolean; result?: object; details?: string[]; claim?: ClaimEnvelope; passedHeadline?: string }): void {
   const code = verdictExitCode(report);
   const reasons = untrustedReasons(report);
   const claim = opts.claim && code !== 0 ? envelopeForFailedVerification(opts.claim, code === 1) : opts.claim;
@@ -88,7 +88,8 @@ export function finishVerify(label: string, report: VerifierReportV1,
     // CLI-11: an intact artifact whose signer is only unpinned did not fail; it is not trusted yet, and the pin is named.
     const refused = report.issuerAdmission.signatures.filter((signature) => signature.status !== "admitted");
     const onlyUnpinned = code === 1 && report.integrity.status === "pass" && refused.length > 0 && refused.every((signature) => signature.status === "not-pinned");
-    console.log(code === 0 ? chalk.green(`${label} verification PASSED`)
+    // UX-05: a command may say in words what it checked instead of a bare PASSED beside an unevaluated claim.
+    console.log(code === 0 ? chalk.green(opts.passedHeadline ?? `${label} verification PASSED`)
       : code === 2 ? chalk.yellow(`${label} integrity verified, UNTRUSTED`)
         : onlyUnpinned ? chalk.yellow(`${label} integrity verified, NOT TRUSTED: the signer's public key is not pinned`) : chalk.red(`${label} verification FAILED`));
     if (claim) printClaimResult(claim, {});
