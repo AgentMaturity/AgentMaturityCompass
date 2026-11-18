@@ -35,10 +35,9 @@ import { loadAMCConfig } from "../workspace.js";
 
 /** What the coding setup allows and what it does not, in the words the menu and `init --coding` show before asking. */
 export const CODING_SETUP_SUMMARY: readonly string[] = [
-  "An agent here can read files, and edit files and run commands only after you approve each one:",
-  "  you see what it will do, and nothing changes until you say yes. Each action and your answer are signed and recorded.",
-  "  Commands have no network and write only inside this folder. AMC's own files and files that usually hold secrets",
-  "  (.env, keys) stay closed to it. You become the owner, the one person who approves."
+  "An agent here reads files, and edits files or runs commands only after you see each one and say yes.",
+  "  Each action and your answer are signed and recorded. Commands have no network and write only in this folder.",
+  "  AMC's own files and files that usually hold secrets (.env, keys) stay closed to it. You are the one who approves."
 ];
 
 const sameAs = (a: unknown, b: unknown): boolean => canonicalize(a) === canonicalize(b);
@@ -96,7 +95,7 @@ async function adoptionPassphrases(workspace: string, io: CodingAdoptionIo): Pro
   if (!process.env.AMC_VAULT_PASSPHRASE) loadLocalVaultPassphrase(workspace);
   const current = process.env.AMC_VAULT_PASSPHRASE || await io.secret("Vault passphrase");
   if (!generated) return { current, next: null };
-  io.log("AMC made this folder's vault passphrase for you. The coding setup needs one you choose; you type it to start a chat here.");
+  io.log("Choose a vault passphrase. You type it to start a chat here.");
   const next = await io.newSecret("New vault passphrase");
   if (next === null) throw new Error("New vault passphrase: the two entries differ; nothing was changed.");
   return { current, next };
@@ -119,7 +118,7 @@ export async function prepareCodingAdoption(workspace: string, io: CodingAdoptio
     throw new Error(`This folder cannot move to the coding setup in place: ${blockers.join("; ")}. Nothing was changed. `
       + "Use a new folder for the coding setup, or keep this one as it is.");
   }
-  io.log("This folder is already set up with AMC. Move it to the coding setup? Your records, keys and history stay.");
+  io.log("The coding setup keeps this folder's records, keys and history.");
   for (const line of CODING_SETUP_SUMMARY) io.log(line);
   if (!(await io.confirm("Move this folder to the coding setup?"))) {
     io.log("Nothing was changed.");
