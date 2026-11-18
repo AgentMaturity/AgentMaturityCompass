@@ -79,7 +79,7 @@ describe("one run state across Agent, Drift and Work Orders", () => {
       evidenceReadiness: { status: "READY", claimEligible: true, claimBoundary: "The artifact seal is valid, but no accepted evidence supports the score." } };
     const latestRun = { runId: "run-1", ts: 0, status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
     const agent = vm.createContext({ ...dailyView, emptyState, moreInfo, htmlEscape: escape, plainCodeHtml, root, currentAgent: () => "default", card: (t: string, b: string) => `<h3>${t}</h3>${b}`,
-      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => { bars += 1; }, document: { getElementById: () => null } });
+      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => { bars += 1; }, bindFullScore: () => {}, document: { getElementById: () => null } });
     vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"), bodyOf(app, "const UNTRUSTED_SEAL_LABEL"),
       bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)"), bodyOf(app, "async function renderAgent()")].join("\n"), agent);
     await (agent.renderAgent as () => Promise<void>)();
