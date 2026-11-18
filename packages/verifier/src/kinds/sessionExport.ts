@@ -122,7 +122,7 @@ function envelopeOf(row: Row): { sessionId: unknown; seq: unknown; prevSessionEv
 function merkleRoot(hashes: readonly string[]): string {
   const digest = (...parts: Buffer[]) => Buffer.from(sha256Hex(Buffer.concat(parts)), "hex");
   if (hashes.length === 0) return sha256Hex(Buffer.alloc(0));
-  let level = hashes.map(hex => digest(Buffer.from([0]), Buffer.from(hex, "hex")));
+  let level: Buffer[] = hashes.map(hex => digest(Buffer.from([0]), Buffer.from(hex, "hex")));
   while (level.length > 1) {
     const next: Buffer[] = [];
     for (let i = 0; i < level.length; i += 2) next.push(level[i + 1] === undefined ? level[i]! : digest(Buffer.from([1]), level[i]!, level[i + 1]!));
