@@ -6240,7 +6240,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           approvalRequestId: approvalId
         });
         json(res, 200, {
-          request: inbox.request, requestDigestSha256: inbox.requestDigestSha256, ...(auth.isAdmin || hasAnyRole([...auth.roles], ["OWNER", "OPERATOR", "APPROVER", "AUDITOR"]) ? { call: (await import("../evidence/sessionAudit.js")).approvalCallFor(options.workspace, inbox.request, inbox.status) } : {}),
+          request: inbox.request, requestDigestSha256: inbox.requestDigestSha256, ...(await import("../evidence/sessionAudit.js")).approvalCallField(options.workspace, inbox.request, inbox.status, auth),
           decisions: inbox.decisions,
           quorum: inbox.quorum,
           status: inbox.status,

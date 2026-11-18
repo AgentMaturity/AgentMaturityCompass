@@ -6,7 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveApiRolePolicy } from "../src/api/accessPolicy.js";
 import { handleEvidenceRoute } from "../src/api/evidenceRouter.js";
 import type { ApprovalRequestRecord } from "../src/approvals/approvalChainStore.js";
-import { approvalCallFor, listAuditSessions, sessionAuditExport } from "../src/evidence/sessionAudit.js";
+import { homedir } from "node:os";
+import { approvalCallField, approvalCallFor, listAuditSessions, sessionAuditExport } from "../src/evidence/sessionAudit.js";
+import { redactSecrets } from "../src/shield/redaction/redactSecrets.js";
 import { verifySessionExport } from "../src/observability/sessionExport.js";
 import { openSessionEventStore } from "../src/persistence/openSessionEventStore.js";
 import { SessionService } from "../src/session/sessionService.js";
@@ -18,7 +20,8 @@ import { initWorkspace } from "../src/workspace.js";
 /** UX-04/UX-05: a CLI session's actions are listed for the console, exported for an auditor, and shown to an approver. */
 describe("session audit for the console", () => {
   let workspace: string;
-  const args = '{"path":"hello.txt","content":"hi\\n"}';
+  const defaultArgs = '{"path":"hello.txt","content":"hi\\n"}';
+  const args = defaultArgs;
   beforeEach(() => {
     for (const name of ["AMC_SESSION_STORE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_NO_SIGN"]) vi.stubEnv(name, undefined);
     vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-session-audit");
@@ -27,11 +30,11 @@ describe("session audit for the console", () => {
   });
   afterEach(() => { lockVault(workspace); vi.unstubAllEnvs(); rmSync(workspace, { recursive: true, force: true }); });
 
-  function chat(): string {
+  function chat(args: string = defaultArgs, toolName = "fs.write"): string {
     const s = new SessionService(workspace, openSessionEventStore(workspace, "sqlite"));
     s.open({ sessionId: "cli-chat-0001", agentId: "default", harnessVersion: "audit-test", compositionDigest: sha256Hex("c"), policyDigest: sha256Hex("p") });
     s.startTurn({ trigger: "user" }); s.startStep();
-    s.recordToolCall({ toolCallId: "call-1", toolName: "fs.write", args, dispatch: "native", parentToken: null });
+    s.recordToolCall({ toolCallId: "call-1", toolName, args, dispatch: "native", parentToken: null });
     s.recordApproval({ phase: "request", approvalId: "appr-1", toolCallId: "call-1", toolName: "fs.write", actionClass: "WRITE_LOW", question: "write hello.txt?" });
     s.recordApproval({ phase: "answer", approvalId: "appr-1", answer: "allow", answeredBy: "owner", approvalRequestId: null, reason: "ok" });
     s.recordToolResult({ toolCallId: "call-1", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: "wrote hello.txt" });
@@ -77,6 +80,41 @@ describe("session audit for the console", () => {
     expect(approvalCallFor(workspace, request, "APPROVED")).toMatchObject({ unavailable: expect.stringContaining("decided") });
     expect(approvalCallFor(workspace, { ...request, intentId: "elsewhere" } as ApprovalRequestRecord, "PENDING"))
       .toMatchObject({ unavailable: expect.stringContaining("no agent session") });
+  });
+
+  it("security: the call goes only to someone who may decide this request or who raised it, with no host path and secrets redacted", () => {
+    const secret = `ghp_${"A1b2C3d4E5".repeat(4).slice(0, 36)}`;
+    expect(redactSecrets(secret, () => "X").findings.length).toBeGreaterThan(0);
+    const secretArgs = JSON.stringify({ path: "notes.txt", content: `token ${secret}\nworkspace ${workspace}\nhome ${homedir()}\n` });
+    chat(secretArgs);
+    const intentHash = sha256Hex(canonicalize({ toolName: "fs.write", rawArguments: secretArgs }));
+    const request = { intentId: "appr-1", toolName: "fs.write", actionClass: "WRITE_LOW", boundHashes: { intentHash },
+      rolesAllowed: ["APPROVER", "OWNER"], initiator: "native:operator1" } as unknown as ApprovalRequestRecord;
+    const who = (roles: string[], userId: string | null = "someone", isAdmin = false) => approvalCallField(workspace, request, "PENDING", { isAdmin, userId, roles });
+    expect(who(["VIEWER"])).toEqual({});
+    expect(who(["OPERATOR"])).toEqual({});
+    expect(who(["AUDITOR"]), "a deciding role this request does not allow").toEqual({});
+    expect(who(["OPERATOR"], "operator1").call).toBeDefined();
+    const shown = who(["APPROVER"]);
+    expect(shown.call && "lines" in shown.call).toBe(true);
+    const text = JSON.stringify(shown);
+    expect(text).not.toContain(secret);
+    expect(text).toMatch(/REDACTED:/);
+    expect(text).not.toContain(workspace);
+    expect(text).not.toContain(homedir());
+    expect(shown.call && "complete" in shown.call && shown.call.complete).toBe(false);
+  });
+
+  it("security: a secret in a shell command is redacted on the approval screen", () => {
+    const secret = `ghp_${"Z9y8X7w6V5".repeat(4).slice(0, 36)}`;
+    const bashArgs = JSON.stringify({ command: `curl -H 'Authorization: token ${secret}' https://example.com` });
+    chat(bashArgs, "bash");
+    const request = { intentId: "appr-1", toolName: "bash", actionClass: "WRITE_HIGH", rolesAllowed: ["OWNER"],
+      boundHashes: { intentHash: sha256Hex(canonicalize({ toolName: "bash", rawArguments: bashArgs })) } } as unknown as ApprovalRequestRecord;
+    const shown = approvalCallField(workspace, request, "PENDING", { isAdmin: false, userId: "owner", roles: ["OWNER"] });
+    const text = JSON.stringify(shown);
+    expect(text).toContain("Command:");
+    expect(text).not.toContain(secret);
   });
 
   it("the new routes are reads: every human role may call them, and no write method is handled", async () => {

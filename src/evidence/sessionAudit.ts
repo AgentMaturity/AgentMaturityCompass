@@ -6,6 +6,8 @@
  * The call shown for an approval is the one the session recorded before the person was asked, and only when its
  * arguments hash to the digest the signed request binds (`callMatchesRequest`); otherwise it says why it is not shown.
  */
+import { realpathSync } from "node:fs";
+import { homedir } from "node:os";
 import type { ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
 import { buildSessionExport } from "../observability/sessionExport.js";
 import { renderSessionExportHtml } from "../observability/sessionExportHtml.js";
@@ -13,6 +15,7 @@ import { readEventPayload } from "../session/eventPayload.js";
 import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { summarizeNativeSessions } from "../session/latestSession.js";
 import { callMatchesRequest, describeReportedCall } from "../setup/nativeApprovalPreview.js";
+import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -122,14 +125,51 @@ function recordedCall(workspace: string, request: ApprovalRequestRecord): { tool
  * session record, because a diff against today's files would not be what was approved then.
  */
 export function approvalCallFor(workspace: string, request: ApprovalRequestRecord, status: string):
-  { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean; readonly folder: string } | { readonly unavailable: string } {
+  ShownCall | { readonly unavailable: string } {
   if (status !== "PENDING") return { unavailable: "this request is decided; what ran is in the session's record (Records, Agent sessions)" };
   try {
     const call = recordedCall(workspace, request);
     if ("unavailable" in call) return call;
     if (!callMatchesRequest(workspace, request, call)) return { unavailable: "the recorded call does not match what the signed request binds, so it is not shown" };
-    return { ...describeReportedCall(workspace, call), folder: workspace };
+    return shareable(workspace, describeReportedCall(workspace, call));
   } catch (error) {
     return { unavailable: `the call could not be shown: ${error instanceof Error ? error.message : String(error)}` };
   }
+}
+
+type ShownCall = { readonly title: string; readonly lines: readonly string[]; readonly complete: boolean; readonly folder: string };
+
+/**
+ * The call as it may leave this machine's process for a browser: host paths (the workspace, the home folder) written
+ * relative, and secrets redacted as `amc session export` redacts them; anything redacted marks the call incomplete.
+ */
+function shareable(workspace: string, call: { title: string; lines: readonly string[]; complete: boolean }): ShownCall {
+  let real = workspace;
+  try { real = realpathSync(workspace); } catch { /* the given path is all there is */ }
+  const hosts: Array<[string, string]> = [[real, "."], [workspace, "."], [homedir(), "~"]];
+  let redactions = 0;
+  const clean = (text: string): string => {
+    let out = text;
+    for (const [host, shown] of hosts) if (host.length > 1) out = out.split(host).join(shown);
+    const redacted = redactSecrets(out, (type) => `[REDACTED:${type}]`);
+    redactions += redacted.findings.length;
+    return redacted.redacted;
+  };
+  const lines = call.lines.map(clean);
+  return { title: clean(call.title), lines, complete: call.complete && redactions === 0, folder: "." };
+}
+
+/** Roles that record approval decisions at all (Studio's decide route), before the request's own rolesAllowed. */
+const DECIDING_ROLES = ["APPROVER", "OWNER", "AUDITOR"];
+
+/**
+ * The `call` field of one approval request, only for someone who may decide THIS request (a deciding role the signed
+ * request allows, or the admin token, as the decide route admits) or who raised it; everyone else gets nothing.
+ */
+export function approvalCallField(workspace: string, request: ApprovalRequestRecord, status: string,
+  viewer: { readonly isAdmin: boolean; readonly userId: string | null; readonly roles: Iterable<string> }): { readonly call?: ShownCall | { readonly unavailable: string } } {
+  const roles = [...viewer.roles];
+  const decides = viewer.isAdmin || roles.some((role) => DECIDING_ROLES.includes(role) && (request.rolesAllowed as readonly string[]).includes(role));
+  const raised = viewer.userId !== null && request.initiator !== undefined && (request.initiator === viewer.userId || request.initiator.endsWith(`:${viewer.userId}`));
+  return decides || raised ? { call: approvalCallFor(workspace, request, status) } : {};
 }
