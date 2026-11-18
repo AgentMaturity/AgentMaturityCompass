@@ -15,8 +15,10 @@ const title = (stage) => (typeof stage === "string" && stage ? stage[0].toUpperC
  * The state of the waypoint the person stands on, from the panel's own next move: stopped while the project is on hold,
  * turned down or blocked; waiting while someone else has to act; otherwise it is theirs to do.
  */
-export function moveState(project, move) {
-  if (project?.hold || move?.stop) return "stop";
+export function moveState(project, move, blocked = false) {
+  if (project?.hold || blocked) return "stop";
+  // A move with no action for this person (stop: nobody else can approve yet) waits for someone to act.
+  if (move?.stop) return "wait";
   if (move?.act?.copy || (!move?.act && /nothing is needed from you|A project owner|waiting/i.test(String(move?.now ?? "")))) return "wait";
   return "now";
 }
@@ -32,13 +34,13 @@ export function stageRoute(project, stage, current = "now") {
 
 /**
  * The eight steps of the viewed stage. At the project's own stage: earlier steps done, the current one in `current`. A
- * stage the project has passed is all done; one it has not reached is all not started.
+ * stage the project has passed is all done; one it has not reached, or any stage of a retired project, is not started.
  */
 export function stepRoute(project, stage, current = "now") {
   const stageAt = STAGES.indexOf(stage), projectAt = STAGES.indexOf(project?.stage);
   const at = stage === project?.stage ? STEPS.indexOf(project.step) : -1;
   return routeTrack(STEPS.map((step, index) => ({ label: STEP_SHORT[step], hint: STEP_PLAIN[step],
-    state: stage !== project?.stage ? (projectAt > stageAt || project?.stage === "retired" ? "done" : "todo")
+    state: stage !== project?.stage ? (projectAt > stageAt ? "done" : "todo")
       : at < 0 ? "todo" : index < at ? "done" : index > at ? "todo" : current })), { label: `The steps of ${STAGE_PLAIN[stage] ?? title(stage)}`, className: "a4-steps-route" });
 }
 

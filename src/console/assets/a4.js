@@ -299,7 +299,8 @@ function mountProject(projectId, options) {
     // kept wherever it is; Members and the rest fold, and the panel's go-to opens a fold when it points into one.
     // A stopped step (the release this Studio cannot make, a hold) has nothing to fill in: every section folds.
     const step = state.project.stage === stage && !root.querySelector('.a4-step-panel[data-state="stop"]') ? state.project.step : null;
-    const keep = [...(step === "asked" ? ['[data-card="conversation"]'] : []),
+    // The panel's words that send a person to the Members card keep it in sight.
+    const keep = [...(/Members card/.test(root.querySelector(".a4-start .a4-now")?.textContent ?? "") ? [".a4-members"] : []), ...(step === "asked" ? ['[data-card="conversation"]'] : []),
       ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]', ".a4-approvals"] : []),
       ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");
     const rest = sections.filter((section) => !section.contains(target) && !(keep && section.matches(keep)) && !(also && section.matches(also)));
@@ -610,6 +611,8 @@ function mountProject(projectId, options) {
     for (const field of root.querySelectorAll("form[data-a4-answers] textarea[name]")) {
       if (field.value.trim() || typeof values[field.name] !== "string" || !values[field.name]) continue;
       field.value = values[field.name];
+      // A filled field is never left inside a closed fold (optional questions): the person sees every sample before saving.
+      for (let fold = field.closest("details"); fold; fold = fold.parentElement?.closest("details")) fold.open = true;
       field.dispatchEvent(new Event("input", { bubbles: true }));
       filled += 1;
     }

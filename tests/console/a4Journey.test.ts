@@ -3,6 +3,7 @@
  * the panel's one step, the Build page's start form asked one question at a time, and Home's "Next:" on a practice project.
  * Drawings only: every state comes from the project, readiness and the gate records the page already reads.
  */
+import { readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 import { approvalPeople, moveState, stageRoute, stepRoute } from "../../src/console/assets/a4Journey.js";
 import * as start from "../../src/console/assets/a4Start.js";
@@ -30,9 +31,18 @@ describe("the stage and step routes", () => {
     expect(new Set(states(stepRoute(project, "adapt")))).toEqual(new Set(["todo"]));
   });
 
+  test("a retired project is never drawn as finished", () => {
+    const retired = { ...project, stage: "retired", step: "completion_approved" };
+    expect(new Set(states(stageRoute(retired, "aspire")))).toEqual(new Set(["todo"]));
+    expect(new Set(states(stepRoute(retired, "aspire")))).toEqual(new Set(["todo"]));
+    expect(view.renderProjectList([{ ...retired, agentId: "a", revisionNo: 3 }] as never)).not.toContain("is-done");
+  });
+
   test("the waypoint's state follows the panel's own move: hold and refusals stop, someone else's turn waits", () => {
     expect(moveState({ hold: true }, { now: "x", act: { label: "a" } })).toBe("stop");
-    expect(moveState({}, { now: "x", stop: true })).toBe("stop");
+    expect(moveState({}, { now: "x" }, true)).toBe("stop");
+    // No button only means nobody else can act yet: that waits, it is not a refusal.
+    expect(moveState({}, { now: "Add a second person before asking for approval.", stop: true })).toBe("wait");
     expect(moveState({}, { now: "Waiting for a second person", act: { label: "Copy link", copy: true } })).toBe("wait");
     expect(moveState({}, { now: "Approved. A project owner or builder takes this step; nothing is needed from you now." })).toBe("wait");
     expect(moveState({}, { now: "Build", act: { label: "Build", press: "build" } })).toBe("now");
@@ -88,6 +98,15 @@ describe("the project panel", () => {
     expect(html.match(/a4-primary/g)).toHaveLength(1);
     expect(html).toMatch(/<details class="more-info" data-a4-open="start:what"><summary>What is a project\?<\/summary>[\s\S]*part 2 of 8/);
     expect(html).toContain("nothing here says the agent is safe, correct or lawful");
+  });
+});
+
+describe("folds never hide what a person must see", () => {
+  test("a sample answer filled into a closed fold opens that fold; the Members card stays when the panel sends a person there", () => {
+    const source = readFileSync("src/console/assets/a4.js", "utf8");
+    const fill = source.slice(source.indexOf("function fillEmptyAnswers"), source.indexOf("async function startFromPack"));
+    expect(fill).toMatch(/field\.closest\("details"\)[\s\S]*fold\.open = true/);
+    expect(source).toMatch(/\/Members card\/\.test\([\s\S]*"\.a4-members"/);
   });
 });
 

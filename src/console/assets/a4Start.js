@@ -403,7 +403,8 @@ export function renderStartHere(ctx) {
   const kind = project.step === "reviewed" ? "completion" : project.step === "proposed" ? "direction" : null;
   const gate = stage === project.stage && kind ? liveGate(ctx, kind) : null;
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
-  const state = moveState(project, move);
+  // Stopped: on hold, or this Studio cannot make the release (deployment.same_host); never only because no button is offered.
+  const state = moveState(project, move, itemOf(ctx.readiness, "deployment.same_host")?.status === "BLOCKED");
   const here = stage === project.stage;
   const names = new Map([...list(project.members), ...list(ctx.members?.candidates)].map((row) => [row.principalKey, row.username]));
   const heading = project.stage === "retired" ? "Retired" : project.hold ? "On hold" : here && state === "stop" ? "Stopped here" : !here ? `Viewing ${STAGE_PLAIN[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
@@ -417,7 +418,7 @@ export function renderStartHere(ctx) {
         .replace('<details class="notice-chip"', '<details class="notice-chip" data-a4-open="start:self"')}</div></div>
     ${stageRoute(project, stage, state)}
     <div class="a4-step-panel" data-state="${here ? state : "todo"}">
-      <h3 id="a4StartTitle"><span class="a4-step-label">What to do now</span>${esc(heading)}</h3>
+      <h3 id="a4StartTitle"><span class="a4-step-label">What to do now<span class="visually-hidden">: </span></span>${esc(heading)}</h3>
       ${stepRoute(project, stage, state)}
       <p class="a4-now"><strong>${esc(move.now)}</strong></p>
       ${live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : ""}

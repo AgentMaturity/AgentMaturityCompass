@@ -160,7 +160,7 @@ export function approverChoiceHtml(start, { fold = false } = {}) {
 
 export function stageBanner(stage) {
   if (stage === "adapt") return chip("AI-drafted, not reviewed", TRUTH.experimental, "adapt");
-  if (stage === "activate") return chip("Recorded, not checked", TRUTH.recorded, "activate");
+  if (stage === "activate") return chip("Recorded or checked", TRUTH.recorded, "activate");
   return "";
 }
 
@@ -197,7 +197,7 @@ export function renderCreateForm(open, industryHtml = "", { home = false, start 
 export function renderProjectList(projects) {
   if (projects.length === 0) return "";
   const where = (project) => routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: STAGE_PLAIN[name],
-    state: index < STAGES.indexOf(project.stage) || project.stage === "retired" ? "done" : name === project.stage ? (project.hold ? "stop" : "now") : "todo" })),
+    state: index < STAGES.indexOf(project.stage) ? "done" : name === project.stage ? (project.hold ? "stop" : "now") : "todo" })),
   { label: `Where ${project.name} is`, className: "a4-mini-route" });
   return `<section class="card"><h3>Your agent projects</h3><ul class="a4-project-list">${projects.map((project) => `<li class="a4-project-row">
     <div class="a4-project-words"><a href="./a4Project?project=${encodeURIComponent(project.projectId)}"><strong>${esc(project.name)}</strong></a>
