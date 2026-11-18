@@ -1,7 +1,8 @@
 import { apiNativeRequest, getAdminToken } from "./api.js";
 import { nativeTasksShell, providerLabel, renderTaskScope, renderTaskIdentity, renderTaskApprovals,
   renderTaskVerification, renderTaskValidationSetup, renderTaskValidation, renderTaskList, taskStateLabel, appendTaskEvent,
-  renderTaskAttachments, collectNativeTaskTools, renderTaskToolStatus, renderTaskUsage, renderTaskPlans, nativeTaskErrorText } from "./nativeTasksView.js";
+  renderTaskAttachments, collectNativeTaskTools, renderTaskToolStatus, renderTaskUsage, renderTaskPlans, nativeTaskErrorText,
+  renderTaskRoute, renderOutcomeChips } from "./nativeTasksView.js";
 import { captureNativeSubmission, nativeSubmissionScopeMatches, nativeSubmissionAcknowledged,
   definiteNativeSubmissionRefusal, nativeSubmissionDraftMatches, readNativeTextAttachment,
   composeNativeTaskInput, nativeTaskMediaCapabilities, readNativeMediaAttachment,
@@ -223,8 +224,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     if (!config) return;
     const chosen = provider();
     const ready = chosen && (chosen.local || chosen.credential?.configured === true);
-    el("nativeTaskCredential").textContent = !chosen ? "Choose a provider. No model request runs while inspecting setup."
-      : chosen.local ? (chosen.model === "fixed" ? "Local recording demonstration; no external model or credential is used."
+    el("nativeTaskCredential").textContent = !chosen ? "Pick a model to start. Nothing runs until you press Run task."
+      : chosen.local ? (chosen.model === "fixed" ? "Stand-in model: canned replies, no outside model or key is used."
         : "Local model server on the Studio host; no credential is used. Start the server and pull the named model before running; access is not probed here.")
       : ready ? `Credential ${chosen.credential.ref} is configured (${chosen.credential.source || "configured source"}). Provider access has not been tested by setup inspection.`
       : `Configure ${chosen.credential?.ref || "the required provider credential"} on the Studio host, then choose Check setup. This page does not collect secret values.`;
@@ -241,8 +242,8 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
         || el("nativeTaskTools").value !== "workspace" || !config.scope.ready || !config.scope.tools.some(tool => tool.name === "bash");
     }
     el("nativeTaskModel").disabled = Boolean(task) || !chosen || chosen.model === "fixed" || mutation || inspecting || reconciling || Boolean(pending);
-    // The local stub has one fixed model, so its unused Model field is not shown.
-    el("nativeTaskModel").closest("label").hidden = chosen?.model === "fixed";
+    // The model name is asked only once a provider that needs one is chosen (the stand-in model has one fixed model).
+    el("nativeTaskModel").closest("label").hidden = !chosen || chosen.model === "fixed";
     el("nativeTaskTools").querySelector('option[value="workspace"]').disabled = config.demo || !config.scope.ready;
   }
   function controls() {
@@ -311,6 +312,11 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       : task?.state === "failed" ? "The task did not finish cleanly. Inspect the recorded error and evidence before choosing recovery or a new task."
       : "Stop requests cancellation of the active turn. Release for later preserves an eligible session; Close and verify ends it.";
     renderOutcome();
+    root.querySelector(".native-tasks").dataset.run = !task ? "empty" : task.state === "closed" ? "closed" : "task";
+    el("nativeTasksTitle").textContent = task ? "Your task" : "What should your agent do?";
+    const route = renderTaskRoute(task, { stale: stale || readPaused });
+    if (el("nativeTaskRoute").dataset.rendered !== route) { el("nativeTaskRoute").innerHTML = route; el("nativeTaskRoute").dataset.rendered = route; }
+    el("nativeTaskApprovalsCard").hidden = stale || !task || !(task.approvals.length || task.approvalError);
     el("nativeTaskSetup").setAttribute("aria-busy", String(inspecting));
     el("nativeTaskPromptForm").setAttribute("aria-busy", String(mutation || readingAttachments));
     if (config) scope();
@@ -324,12 +330,14 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       : finished ? `finished:${task.taskId}:${task.agentId}` : "";
     if (node.dataset.key === key) return;
     node.dataset.key = key; node.replaceChildren(); node.hidden = !key; node.classList.toggle("status-bad", key !== "" && !finished);
+    el("nativeTaskResult").hidden = !key;
+    el("nativeTaskOutcomeChips").innerHTML = finished ? renderOutcomeChips(task) : "";
     if (readFailed) node.textContent = NATIVE_TASK_READ_FAILED;
     else if (key.startsWith("failed:")) node.textContent = `This task did not finish. ${task.error || "Studio recorded no reason."}`;
     else if (finished) {
       const link = document.createElement("a");
       link.href = "#nativeTaskRecord"; link.textContent = "See what AMC recorded";
-      node.append(`Task finished${config?.demo ? " (local demonstration, not a model answer)" : ""}. The answer is in Conversation below. `, link);
+      node.append(`Task finished${config?.demo ? " (local demonstration, not a model answer)" : ""}. The answer is above. `, link);
     }
   }
   function project() {
@@ -623,6 +631,12 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
     el("nativeTaskAttachments").focus();
   });
   listen(el("nativeTaskRetry"),"click",()=>{void sendSubmission(true);});
+  // An idea only fills the box (and picks the stand-in model when nothing is chosen); the person still presses Run task.
+  listen(root.querySelector(".run-chips"),"click",event=>{
+    const chip=event.target.closest("[data-run-suggest]"); if(!chip||task||el("nativeTaskPrompt").disabled)return;
+    if (!el("nativeTaskProvider").value && config?.providers.some(item => item.id === "stub")) el("nativeTaskProvider").value = "stub";
+    el("nativeTaskPrompt").value = chip.dataset.runSuggest; controls(); el("nativeTaskPrompt").focus();
+  });
   listen(el("nativeTaskPrompt"),"keydown",event=>{if(event.key==="Enter"&&(event.ctrlKey||event.metaKey)){event.preventDefault();void submit();}});
   listen(el("nativeTaskRefresh"),"click",()=>{void refresh().catch(showError);});
   listen(el("nativeTaskReconnect"),"click",()=>{void refresh().catch(showError);});
@@ -652,7 +666,7 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       if (selected.taskId !== requestedId || selected.agentId !== initialAgent) throw new Error("The requested task identity did not match the returned history.");
       await selectTask(selected);
     }}
-    else { stale=false;project();tell(config.demo?"Demo workspace: run an explicit local demonstration with no tools.":"Choose a provider and task. Setup inspection has not contacted a model."); }
+    else { stale=false;project();tell(config.demo?"Demo workspace: run an explicit local demonstration with no tools.":"Nothing has been sent to a model yet."); }
     if (!task && new URL(window.location.href).searchParams.get("sample") === "1" && !el("nativeTaskPrompt").value && !el("nativeTaskPrompt").disabled) {
       if (!el("nativeTaskProvider").value && config.providers.some(item => item.id === "stub")) el("nativeTaskProvider").value = "stub";
       el("nativeTaskPrompt").value = NATIVE_TASK_SAMPLE_PROMPT; controls(); el("nativeTaskPrompt").focus();

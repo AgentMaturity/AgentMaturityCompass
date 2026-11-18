@@ -331,6 +331,8 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       await expect(page.locator("#nativeTaskSubmit")).toBeDisabled();
       const item = page.locator(`[data-native-task-id="${ready.taskId}"]`);
       await expect(item).toHaveCount(0);
+      // The task list sits under "Your tasks" (closed by default since the studio-ui redesign).
+      await page.locator("#nativeTaskHistory > summary").click();
       await page.locator("#nativeTaskIncludeArchived").check();
       await expect(item).toHaveCount(1); await expect(item).toContainText("Archived");
       await ui.newTask(); await item.click();
