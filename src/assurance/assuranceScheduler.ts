@@ -154,10 +154,11 @@ export async function assuranceSchedulerTick(input: { workspace: string; workspa
   // UX-30: with no agent to test, a scheduled run never starts. It writes no ledger rows (an idle Studio used to record a HIGH
   // "run aborted" every minute) and waits a full cadence before it asks again; a run that starts and then fails still records.
   const noAgent = await resolveAgentResponder({ workspace: params.workspace, agentId: resolveAgentId(params.workspace, undefined) })
-    .then(() => null, (error: unknown) => (error instanceof AgentResponderUnavailableError ? error.message : null));
-  if (noAgent !== null) {
+    .then(() => false, (error: unknown) => error instanceof AgentResponderUnavailableError);
+  if (noAgent) {
+    // A fixed reason: an error's own text can carry a provider URL with credentials or a host path, and this state is served.
     await save({ ...state, nextRunTs: nextRunTs(nowTs, policy.assurancePolicy.cadence.defaultRunHours),
-      lastOutcome: { status: "SKIPPED", reason: `no agent to test: ${noAgent}` } }, policyCurrent);
+      lastOutcome: { status: "SKIPPED", reason: "no_agent" } }, policyCurrent);
     return { ran: false, reason: "no_agent" };
   }
   // Retain the actual tick decision state through child preparation; own final state publication drops this old-target gate.

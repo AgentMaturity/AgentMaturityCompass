@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../src/assurance/agentResponder.js", async (importOriginal) => {
   const original = await importOriginal<typeof import("../src/assurance/agentResponder.js")>();
-  return { ...original, resolveAgentResponder: vi.fn(async () => { throw new original.AgentResponderUnavailableError("no agent is connected", "connect one"); }) };
+  return { ...original, resolveAgentResponder: vi.fn(async () => { throw new original.AgentResponderUnavailableError("no agent at https://user:secret@host/path?api_key=abc", "connect one"); }) };
 });
 
 const { initAssurancePolicy } = await import("../src/assurance/assurancePolicyStore.js");
@@ -39,7 +39,9 @@ describe("assurance scheduler with no agent to test", () => {
     expect(first).toEqual({ ran: false, reason: "no_agent" });
     expect(auditRows(dir)).toEqual([]);
     const state = assuranceSchedulerStatus(dir).state;
-    expect(state.lastOutcome).toMatchObject({ status: "SKIPPED", reason: expect.stringContaining("no agent to test") });
+    expect(state.lastOutcome).toEqual({ status: "SKIPPED", reason: "no_agent" });
+    const served = JSON.stringify(assuranceSchedulerStatus(dir));
+    for (const leak of ["secret", "api_key", "user:", "host/path"]) expect(served).not.toContain(leak);
     expect(state.nextRunTs).toBeGreaterThan(Date.now() + 60_000);
     expect(await assuranceSchedulerTick({ workspace: dir, workspaceReady: true })).toEqual({ ran: false, reason: "not_due" });
   });
