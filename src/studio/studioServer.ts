@@ -6214,7 +6214,8 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
         return;
       }
 
-      const approvalRequestMatch = pathname.match(/^\/approvals\/requests\/([^/]+)$/);
+      // `/view` is the same read without observing (a list shows many requests; observing one may write EXPIRED).
+      const approvalRequestMatch = pathname.match(/^\/approvals\/requests\/([^/]+?)(\/view)?$/);
       if (approvalRequestMatch && req.method === "GET") {
         if (!requireRouteRoles(["VIEWER", "OPERATOR", "APPROVER", "AUDITOR", "OWNER"])) {
           return;
@@ -6225,15 +6226,13 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           json(res, 404, { error: "approval not found" });
           return;
         }
-        const observed = await observeApprovalStatusInStudio({
+        const observed = approvalRequestMatch[2] ? null : await observeApprovalStatusInStudio({
           workspace: options.workspace,
           agentId: found.agentId,
           approvalRequestId: approvalId,
           reviewBasePath: options.publicConsoleBasePath
         });
-        if (observed.approvalEvent) {
-          emitOrgEvent(observed.approvalEvent, orgNodeIdsForAgent(found.agentId));
-        }
+        if (observed?.approvalEvent) emitOrgEvent(observed.approvalEvent, orgNodeIdsForAgent(found.agentId));
         const inbox = getApprovalInboxItem({
           workspace: options.workspace,
           agentId: found.agentId,
@@ -6248,7 +6247,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           chainIntegrity: inbox.chainIntegrity,
           contextIntegrity: inbox.contextIntegrity,
           executionReady: inbox.executionReady,
-          ...(observed.approvalDelivery ? { approvalDelivery: observed.approvalDelivery } : {})
+          ...(observed?.approvalDelivery ? { approvalDelivery: observed.approvalDelivery } : {})
         });
         return;
       }
