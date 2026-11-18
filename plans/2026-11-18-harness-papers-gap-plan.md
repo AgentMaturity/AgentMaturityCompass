@@ -149,7 +149,18 @@ approval of the three items under "For Sid".
 One lane at a time, Opus 5.5 medium, directed and signed off by Fable, each through implement,
 review, fix, integrate with the gate on `rtd/integ-1115`. Nothing is pushed without Sid.
 
-Wave 1, loop floor
+Wave 0, from the UX walk of 2026-11-18 (report: `work/lanes-1118/ux-audit/REPORT.md`, UX-01 to UX-31).
+These run before the rest of wave 1 because a new person cannot reach a working agent and an
+auditor cannot export and verify unaided.
+0a. `first-run` HP-46, UX-01 UX-28 UX-29 UX-02: bare `amc` leads to a workspace that can really act;
+    a plain sentence works in chat; a folder whose `.amc` was removed can start fresh; a skill turn
+    does not end the chat.
+0b. `auditor-path` UX-03 UX-04 UX-05 UX-06 UX-30: hook decision before the person's approval; chat
+    actions and approval content visible in the console; export of a session closed with `/exit`;
+    `amc-verify` reads the session export; one truthful verification result; Governor page states
+    what really runs; idle Studio stops writing an aborted-run record every minute.
+
+Wave 1, loop floor (lane 1 `loop-guards` merged 2026-11-18, `03e864173`)
 1. `loop-guards` HP-01 HP-02 HP-03 HP-23: turn policies as a small ordered list (step cap, token cap,
    dollar cap, wall clock, repeated-call signature, malformed cap, denial count). Repetition asks the
    person; in headless runs it stops. Every trip is an evidence event.
