@@ -46,7 +46,8 @@ describe("welcome guide steps", () => {
   test("no certification wording, no hard-coded counts, no inline handlers", () => {
     const copy = allCopy();
     expect(copy).not.toMatch(/certified|compliant|guarantee|proves your agent is safe/i);
-    expect(copy.replaceAll("&#39;", "\'")).not.toMatch(/\b\d{2,}\b/);
+    // Counts are words a person reads; a drawing's coordinates (the guide's spot picture) are not copy.
+    expect(copy.replace(/<svg[\s\S]*?<\/svg>/g, "").replaceAll("&#39;", "\'")).not.toMatch(/\b\d{2,}\b/);
     expect(copy).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 });
