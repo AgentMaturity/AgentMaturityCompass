@@ -77,6 +77,7 @@ import { firstStop, sentByPerson, TurnGuards, turnPolicies, type TurnPolicy } fr
 import { projectNativeCost } from "../budgets/nativeCostProjection.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import { NativeValidationRepair, NativeValidationRepairStop } from "./nativeValidationRepair.js";
+import { recordTurnVerification, VerifyOnStop, workspaceAfterEditChecks, type VerifyOnStopSetting } from "./turnVerification.js";
 import { AutoCompactor } from "./compaction/autoCompact.js";
 import { RunLimitTracker, type RunLimitBreach, type RunLimits } from "./runLimits.js";
 import { resolveRouteCompaction } from "./compaction/promptPressure.js";
@@ -91,6 +92,8 @@ export interface AgentDriverInit {
   readonly systemPromptEventId: string;
   readonly tools?: AgentToolSeam;
   readonly validation?: NativeValidationPlan;
+  /** HP-04 checks after edits: absent reads the workspace's signed default; false is the operator's per-run off switch. */
+  readonly verifyOnStop?: false | NativeValidationPlan;
   readonly hooks?: LoopHooks;
   readonly config?: Partial<AgentLoopConfig>;
   /**
@@ -129,6 +132,7 @@ export class AgentDriver {
 
   private readonly stepInit: StepRunnerInit;
   private readonly validation: NativeValidationPlan | undefined;
+  private readonly verifyStop: VerifyOnStop | null; private readonly verifySetting: VerifyOnStopSetting;
   /** Null when neither reviewed route metadata nor explicit settings supply a window. */
   private readonly compactor: AutoCompactor | null;
   /** Null when the run carries no limit. */
@@ -162,6 +166,9 @@ export class AgentDriver {
     const selected = init.route.pinned ?? init.llm.pin?.(init.route);
     const compaction = resolveRouteCompaction(init.config?.compaction, init.route, selected?.modelMetadata);
     this.config = { ...DEFAULT_AGENT_LOOP_CONFIG, ...init.config, compaction };
+    const checks = init.validation !== undefined || init.verifyOnStop === false ? null : init.verifyOnStop ?? workspaceAfterEditChecks(init.session.workspace);
+    this.verifySetting = init.validation !== undefined ? "validate" : init.verifyOnStop === false ? "off" : checks === null ? "no-checks" : "on";
+    this.verifyStop = checks === null ? null : new VerifyOnStop(init.session, checks, this.config.toolAbandonGraceMs);
     this.inbox = new LoopInbox(init.session, (notification) => {
       this.hooks.notify(notification);
     });
@@ -679,6 +686,9 @@ export class AgentDriver {
               target = "next-step";
               continue;
             }
+          } else if (ending.reason === "complete" && this.verifyStop !== null) {
+            const feedback = await this.verifyStop.atStop(turnRef.turn, phase.step, this.stepInit.tools, signal);
+            if (feedback !== null) { acceptRepairContext(feedback); ending = null; target = "next-step"; continue; }
           }
           break;
         }
@@ -700,7 +710,8 @@ export class AgentDriver {
       let cleanupFailure: { error: unknown } | undefined;
       try { for (const id of repairContextIds) this.inbox.cancelNextStep(id); }
       catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
-      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); }
+      // HP-04: the turn's check status, inside the turn and so under its seal.
+      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); recordTurnVerification(this.session, turnRef.turn, this.verifySetting); }
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {

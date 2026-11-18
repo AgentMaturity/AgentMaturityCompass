@@ -35,9 +35,12 @@ export const MAX_ACTIVE_CHILDREN_HELP = "root-wide active child cap including de
 export const NO_DELEGATE_STOP_HELP = "explicitly clear extra child stops from a preset; budgets, depth and approvals still apply";
 export const VALIDATION_REPAIR_HELP = "explicit bounded repair policy for selected public checks, including allowed edit paths";
 
+export const VERIFY_ON_STOP_OFF_HELP = "do not run the workspace's checks after edits (tools.afterEdits in .amc/tools.yaml) for this run; each turn still records whether it was checked, and that checks were off";
+
 export function withBreadthRunOptions(command: Command): Command {
   return withOutputFormatOption(command)
     .option("--validation-repair <json>", VALIDATION_REPAIR_HELP)
+    .option("--no-verify-on-stop", VERIFY_ON_STOP_OFF_HELP)
     .option("--interactive-ask-user", "answer ask_user through the native chat parent over dedicated Node IPC; answers are auditor-signed")
     .option("--web-search-searxng <origin>", WEB_SEARCH_SEARXNG_HELP)
     .option("--goal-rounds <n>", "run the prompt as a goal for up to N rounds of in-process delegated children (requires --delegate and --tools workspace)")

@@ -41,7 +41,7 @@ import { liveBudgetRefusalCause, liveNativeFailureGuidance } from "./agent/nativ
 import { nativeUnknownUsageNotice } from "./budgets/nativeBudgetAdmission.js";
 import { missingCredentialGuidance } from "./setup/nativeFirstUseGuide.js";
 import { echoToolSeam } from "./agent/echoTool.js";
-import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
+import { MAX_ACTIVE_CHILDREN_HELP, NO_DELEGATE_STOP_HELP, VALIDATION_REPAIR_HELP, VERIFY_ON_STOP_OFF_HELP, WEB_SEARCH_SEARXNG_HELP, resolveBreadthRun, withBreadthRunOptions } from "./cli/agentLoopBreadthOptions.js";
 import { leaseFileToken, withLeaseFileOption } from "./cli/agentLoopLeaseFile.js";
 import { continuedSession, reportContinueRefusal, resolveContinuityRun, withContinuityChatOptions, withContinuityRunOptions, type ContinuityOptions } from "./cli/agentLoopContinuityOptions.js";
 import { agentToolset, toolsetConfinementNotice, type AgentToolset } from "./agent/agentToolset.js";
@@ -112,7 +112,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
     .option("--validate <id>", "run this public check after each completed turn; repeat to select more", collectOption)
     .option("--extension <manifest>", "load this signed native extension; repeat for multiple manifests", collectOption)
     .option("--extension-pin <sha256>", "exact reviewed digest for each extension in the same order", collectOption)
-    .option("--preset <id>", "reviewed signed native composition; pinned for the chat")
+    .option("--preset <id>", "reviewed signed native composition; pinned for the chat").option("--no-verify-on-stop", VERIFY_ON_STOP_OFF_HELP)
     .option("--persona <text>", "explicit native persona override")
     .option("--delegate", "enable governed in-process child agents; requires workspace tools")
     .option("--no-delegate", "disable child delegation even when a signed preset enables it")
@@ -721,7 +721,7 @@ export function registerAgentCommands(program: Command, io: AgentLoopCliIo = def
                 })
               }),
           config: { maxStepsPerTurn: maxSteps, ...(compaction === undefined ? {} : { compaction }) },
-          ...(validation === undefined ? {} : { validation }),
+          ...(validation === undefined ? {} : { validation }), ...(opts.verifyOnStop === false ? { verifyOnStop: false as const } : {}),
           ...breadth.turn,
           credentials: {
             // Watching is for a long-lived process picking up a rotation; a

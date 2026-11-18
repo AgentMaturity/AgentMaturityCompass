@@ -32,7 +32,8 @@ export function projectNativeValidation(workspace: string, rows: readonly Eviden
     validateAcpCommittedTail(workspace, sessionId, rows, 0, null);
     let requested = false, finished = false, round = 0, finishedAt = -1;
     const argumentsByCheck = new Map<string, string>();
-    const repairStarts = rows.filter(row => row.event_type === "audit" && metaOf(row)?.kind === "native-validation-repair"
+    // A repair round, or verify-on-stop's one continuation (HP-04), opens the turn's next check run.
+    const repairStarts = rows.filter(row => row.event_type === "audit" && ["native-validation-repair", "native-verify-on-stop"].includes(String(metaOf(row)?.kind))
       && metaOf(row)?.turn === turn && metaOf(row)?.phase === "round-start");
     for (const row of relevant) {
       const meta = metaOf(row)!;
