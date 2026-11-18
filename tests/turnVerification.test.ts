@@ -7,11 +7,13 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { AgentDriver } from "../src/agent/agentDriver.js";
-import type { NativeValidationPlan } from "../src/agent/nativeValidation.js";
+import { harnessCheckLabel, type NativeValidationPlan } from "../src/agent/nativeValidation.js";
+import { runExitCode } from "../src/cli/agentLoopOutputOptions.js";
+import { deriveExecutionStatus } from "../src/execution/executionContract.js";
 import { projectNativeValidation } from "../src/agent/nativeValidationProjection.js";
 import { pipelineToolSeam } from "../src/agent/pipelineToolSeam.js";
-import { readAgentRunSummary, renderRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
-import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, turnCheckFrom, type TurnCheckContext } from "../src/agent/turnVerification.js";
+import { readAgentRunSummary, renderRunSummary, verifyAgentRun, type AgentRunSummary } from "../src/agent/runReport.js";
+import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, turnCheckFrom, type TurnCheckContext, type TurnCheckRow } from "../src/agent/turnVerification.js";
 import { resolveVerifyOnStop, workspaceAfterEditChecks, type VerifyOnStopInit } from "../src/agent/verifyOnStop.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
 import { fsTools } from "../src/tools/builtin/fsTools.js";
@@ -471,3 +473,44 @@ async function runChild(dir: string, scripts: ScriptedStream[]): Promise<Evidenc
   session.close({ reason: "completed" });
   return [...rows];
 }
+
+describe("last review: exit code and the approval label", () => {
+  const report = (row: Partial<TurnCheckRow> | null) => runExitCode({
+    summary: { driverStatus: "idle", validation: { status: "not-requested" },
+      turnChecks: row === null ? [] : [{ turn: 1, status: "changed-unchecked", changes: 1, verifyOnStop: "on", reason: "no-check", lastChangeEventId: null, checkEventId: null, eventId: "v", ...row }] } as unknown as AgentRunSummary,
+    execution: deriveExecutionStatus({ sessionId: "s", admission: "admitted", turn: "complete", receiptStates: ["completed"], verified: null }),
+    ending: { turn: 1, reason: "complete", cancelCause: null, interrupted: false }, validationRequested: false });
+
+  test("a failed workspace check, or one that could not run, exits 1 like --validate; other unchecked turns exit 0", () => {
+    expect(report({ status: "changed-and-checked-fail", reason: "nonzero-exit" })).toBe(1);
+    for (const reason of ["check-refused-before-run", "check-approval-not-given", "check-timed-out", "check-errored", "background-work-running"])
+      expect([reason, report({ reason })]).toEqual([reason, 1]);
+    expect(report({ verifyOnStop: "config-unverified", reason: "checks-config-unverified" })).toBe(1);
+    expect(report({ reason: "write-did-not-complete" })).toBe(0);
+    expect(report({ verifyOnStop: "no-checks", reason: "no-check" })).toBe(0);
+    expect(report({ verifyOnStop: "off", reason: "no-check" })).toBe(0);
+    expect(report({ status: "changed-and-checked-pass", reason: null })).toBe(0);
+    expect(report({ turn: 2, status: "changed-and-checked-fail" })).toBe(0); // another turn's status is not this run's
+    expect(report(null)).toBe(0);
+  });
+
+  test("only a call the validation path is running carries the label; a model call named validation-* never does", async () => {
+    let seen: Record<string, unknown> | undefined;
+    const harness = fixture([toolStep("validation-x", "bash", JSON.stringify({ command: CHECK })), textStep("Checked.")]);
+    const watch: AgentToolSeam = { ...harness.tools, execute: request => { seen ??= { ...harnessCheckLabel(request.callId) }; return harness.tools.execute(request); } };
+    writeFileSync(join(harness.harness.dir, "calc.txt"), "fixed\n");
+    await run(harness, false, 20, ["Run it."], undefined, watch);
+    expect(seen).toEqual({});
+    // The model ran the configured command under a validation-* id: still a change, never a check.
+    expect(checks(harness).map(row => [row.status, row.reason])).toEqual([["changed-unchecked", "no-check"]]);
+    let labelled: Record<string, unknown> | undefined;
+    const f = fixture([write("fixed\n"), textStep("Done.")]);
+    const watched: AgentToolSeam = { ...f.tools, execute: request => { labelled ??= { ...harnessCheckLabel(request.callId) }; return f.tools.execute(request); } };
+    await run(f, plan(), 20, ["Make it."], undefined, watched);
+    expect(labelled).toEqual({});
+    const during: Record<string, unknown>[] = [];
+    const g = fixture([write("fixed\n"), textStep("Done.")]);
+    await run(g, plan(), 20, ["Make it."], undefined, { ...g.tools, execute: request => { during.push({ ...harnessCheckLabel(request.callId) }); return g.tools.execute(request); } });
+    expect(during).toEqual([{}, { harnessCheck: "Workspace tests" }]);
+  });
+});

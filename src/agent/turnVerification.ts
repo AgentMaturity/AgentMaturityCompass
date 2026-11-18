@@ -248,4 +248,14 @@ function turnCheckWords(row: TurnCheckRow): string {
   const why = row.reason === null || row.reason === "no-check" ? "" : ` (${REASONS[row.reason] ?? "the check did not finish"})`;
   return `${actions}; no check ran afterwards${why}. Nothing in this record shows the result works.${off}`;
 }
+/** Unchecked because a configured check could not run (refused, timed out, errored, unverified, work still running). */
+const COULD_NOT_RUN: ReadonlySet<string> = new Set(["check-approval-not-given", "check-refused-before-run", "check-timed-out", "check-cancelled",
+  "check-unavailable", "check-errored", "checks-config-unverified", "background-work-running"]);
+/**
+ * The exit-code rule for workspace checks, mirroring `--validate` (a failed or unavailable check exits 1): a failed
+ * check, or a configured check that could not run. Changed-unchecked for any other reason is a recorded fact, not a failure.
+ */
+export const workspaceCheckFailed = (row: TurnCheckRow | undefined): boolean => row !== undefined
+  && (row.verifyOnStop === "on" || row.verifyOnStop === "config-unverified")
+  && (row.status === "changed-and-checked-fail" || (row.status === "changed-unchecked" && COULD_NOT_RUN.has(row.reason ?? "")));
 export const needsCheckWarning = (row: TurnCheckRow): boolean => row.status === "changed-unchecked" || row.status === "changed-and-checked-fail";

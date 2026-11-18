@@ -102,6 +102,18 @@ interface ValidationTurnInput {
   readonly round?: number;
 }
 
+/**
+ * Calls the validation path itself is running right now, by call id, with the check's title (HP-04 review). An approval
+ * prompt labels a call as AMC's configured check only from this map, which only this module writes, never from the
+ * call id's text or the command: a model call cannot get the label whatever it names itself or runs.
+ */
+const runningChecks = new Map<string, string>();
+/** The approval-raised IPC field for a call: `{ harnessCheck: title }` only while the validation path runs that call. */
+export function harnessCheckLabel(callId: string): { readonly harnessCheck?: string } {
+  const title = runningChecks.get(callId);
+  return title === undefined ? {} : { harnessCheck: title };
+}
+
 /** Evidence-only validation: never adds an invented assistant call to the conversation. */
 export class NativeValidationTurn {
   private readonly checks: NativeValidationCheckResult[];
@@ -128,7 +140,10 @@ export class NativeValidationTurn {
       this.checks[index] = { ...this.checks[index]!, callId };
       const rawArguments = JSON.stringify({ command: check.command, timeoutMs: check.timeoutMs });
       this.record("check-start", { checkId: check.id, callId, toolName: "bash", argumentsSha256: createHash("sha256").update(rawArguments).digest("hex") });
-      const outcome = await boundedCheck(this.input, callId, rawArguments, step, check.timeoutMs);
+      runningChecks.set(callId, check.title);
+      let outcome: ToolCallOutcome;
+      try { outcome = await boundedCheck(this.input, callId, rawArguments, step, check.timeoutMs); }
+      finally { runningChecks.delete(callId); }
       const cancelled = this.input.signal.aborted || outcome.outcome === "CANCELLED";
       const knownExit = typeof outcome.exitCode === "number" && Number.isInteger(outcome.exitCode);
       const status = cancelled || outcome.denied || outcome.timedOut || !knownExit || outcome.outcome === "TOOL_OUTCOME_UNKNOWN"
