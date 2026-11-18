@@ -548,7 +548,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(extractEnvelope(header.meta_json)?.turn).toBe(2);
       const headerMeta = parseRequestHeaderMeta(header.meta_json)!;
       expect(headerMeta.toolSchemaEventId).toBeNull(); expect(headerMeta.toolSchemaSha256).toBeNull();
-      expect(receipt.summarizer).toEqual({ requestHeaderEventId: header.id, promptVersion: 1, model: "claude-loop-test", claimKind: "self_reported", role: "assistant" });
+      expect(receipt.summarizer).toEqual({ requestHeaderEventId: header.id, promptVersion: 2, model: "claude-loop-test", claimKind: "self_reported", role: "assistant" });
       const boundary = rows.find(item => item.id === receipt.trigger.measuredAtEventId)!;
       expect(meta(boundary).usage).toMatchObject({ inputTokens: 8500 });
       expect(extractEnvelope(boundary.meta_json)?.step).toBe(2);
