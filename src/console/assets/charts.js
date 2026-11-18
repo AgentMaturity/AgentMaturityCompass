@@ -7,6 +7,19 @@ function themed(canvas) {
   return { well: token("--surface-2", "#1F2B49"), grid: token("--line", "#2C3A5C"), words: token("--muted", "#A3B0C6"), accent: token("--accent", BRAND_GREEN) };
 }
 
+// A chart is drawn once on a canvas, so a theme switch (the rail's switch or the system setting) draws each one again.
+const drawn = new Map();
+let watching = false;
+function remember(canvas, draw) {
+  if (!watching && typeof MutationObserver === "function" && typeof document !== "undefined") {
+    const again = () => { for (const [shown, redraw] of drawn) { if (shown.isConnected) redraw(); else drawn.delete(shown); } };
+    new MutationObserver(again).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    globalThis.matchMedia?.("(prefers-color-scheme: dark)")?.addEventListener?.("change", again);
+    watching = true;
+  }
+  drawn.set(canvas, draw);
+}
+
 function note(ctx, text, w, h, words) {
   ctx.fillStyle = words;
   ctx.font = "14px system-ui, sans-serif";
@@ -19,6 +32,7 @@ export function renderLine(canvas, values, color = BRAND_GREEN) {
   if (!canvas) {
     return;
   }
+  remember(canvas, () => renderLine(canvas, values, color));
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     return;
@@ -64,6 +78,7 @@ export function renderBars(canvas, values, color = BRAND_GREEN) {
   if (!canvas) {
     return;
   }
+  remember(canvas, () => renderBars(canvas, values, color));
   const ctx = canvas.getContext("2d");
   if (!ctx) {
     return;

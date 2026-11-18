@@ -98,16 +98,6 @@ body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { backgrou
 .a4-now strong { font-weight: 600; }
 .a4-step-panel .row { margin: 12px 0 4px; }
 .a4-step-panel .more-info { margin: 8px 0 0; }
-.a4-people-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; padding: 0; list-style: none; }
-.a4-person { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
-.a4-avatar { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--line-strong); font-size: 13px; font-weight: 700; color: var(--ink); background: var(--surface-2); }
-.a4-person-words { display: flex; flex-direction: column; line-height: 1.2; }
-.a4-person-words strong { font-size: 14px; overflow-wrap: anywhere; }
-.a4-person-words small { font-size: 12px; color: var(--muted); }
-.a4-person.is-done .a4-avatar { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
-.a4-person.is-wait .a4-avatar { border-style: dashed; border-color: var(--wait); color: var(--wait); background: var(--wait-soft, transparent); }
-.a4-person.is-stop .a4-avatar { border-color: var(--stop); color: var(--stop); }
-.a4-count { margin: 0; font-size: 13px; color: var(--muted); }
 .a4-about > summary, .a4-more > summary { cursor: pointer; }
 .a4-intro .route { margin: 20px 0; }
 .a4-intro-steps { padding-left: 18px; }

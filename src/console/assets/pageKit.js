@@ -191,3 +191,11 @@ export function moreInfo(summary, html, { id = "" } = {}) {
 export function emptyState({ pictureName = "empty", line, action = "" }) {
   return `<div class="empty-state">${picture(pictureName) ?? ""}<p>${esc(line)}</p>${action}</div>`;
 }
+
+const initials = (name) => String(name ?? "?").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(" ").slice(0, 2).map((part) => part[0] ?? "").join("").toUpperCase() || "?";
+
+/** A person as initials in a circle, their name and their state ("done" | "wait" | "stop" | "todo") in words. A list item. */
+export function personChip(name, state, words) {
+  return `<li class="a4-person is-${esc(state)}"><span class="a4-avatar" aria-hidden="true">${esc(initials(name))}</span>`
+    + `<span class="a4-person-words"><strong>${esc(name)}</strong><small>${esc(words)}</small></span></li>`;
+}

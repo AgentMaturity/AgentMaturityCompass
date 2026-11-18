@@ -4,7 +4,7 @@
 // Also the Build page's start form asked one question at a time (bindQuestions): the same form, fields and names.
 import { STAGE_PLAIN, STAGE_SHORT, STEP_PLAIN, STEP_SHORT, say } from "./a4Plain.js";
 import { esc } from "./a4Html.js";
-import { moreInfo, routeTrack } from "./pageKit.js";
+import { moreInfo, personChip, routeTrack } from "./pageKit.js";
 
 const STAGES = ["aspire", "assemble", "adapt", "activate"];
 const STEPS = ["asked", "understood", "explained", "proposed", "direction_approved", "built", "reviewed", "completion_approved"];
@@ -86,10 +86,6 @@ export function laterFold(ctx, summary, html) {
   return early || !html ? html : moreInfo(summary, html).replace('<details class="more-info"', `<details class="more-info" data-a4-open="later:${esc(summary)}"`);
 }
 
-const initials = (name) => String(name ?? "?").replace(/[^\p{L}\p{N}]+/gu, " ").trim().split(" ").slice(0, 2).map((part) => part[0] ?? "").join("").toUpperCase() || "?";
-const personChip = (name, state, words) => `<li class="a4-person is-${state}"><span class="a4-avatar" aria-hidden="true">${esc(initials(name))}</span>`
-  + `<span class="a4-person-words"><strong>${esc(name)}</strong><small>${esc(words)}</small></span></li>`;
-
 /**
  * An approval as people: who decided and how (from the gate's own decisions; one that no longer counts says so), the
  * approvals still missing as unnamed places (readiness gives a count, not names), and, unless the one person may approve
@@ -123,8 +119,9 @@ export function approvalPeople(gate, readiness, names = new Map(), myName = null
  * The Build page's start form, one question at a time: each `fieldset[data-a4-q]` in turn with Back and Next, the last
  * with the form's own submit. Every field stays in the one form, so what Start sends is unchanged; a field the form's
  * check focuses, or Enter on an earlier question, brings its question back into view. Station cards narrow the pack list.
+ * `submitAnywhere` (an Industry Pack's questions) keeps the form's own submit in sight and lets it send at any question.
  */
-export function bindQuestions(form) {
+export function bindQuestions(form, { submitAnywhere = false } = {}) {
   const questions = [...form.querySelectorAll("fieldset[data-a4-q]")];
   if (questions.length < 2) return;
   const nav = form.ownerDocument.createElement("div");
@@ -136,6 +133,7 @@ export function bindQuestions(form) {
   const submitRow = submit?.closest(".row") ?? null;
   form.insertBefore(nav, submitRow);
   if (submit) nav.insertBefore(submit, nav.querySelector(".a4-q-count"));
+  if (submitAnywhere) nav.querySelector("[data-a4-q-next]").className = "secondary a4-q-next";
   if (submitRow && submitRow.children.length === 0) submitRow.hidden = true;
   let at = 0;
   const show = (index, focus = true) => {
@@ -144,7 +142,7 @@ export function bindQuestions(form) {
     const last = at === questions.length - 1;
     nav.querySelector("[data-a4-q-back]").hidden = at === 0;
     nav.querySelector("[data-a4-q-next]").hidden = last;
-    if (submit) submit.hidden = !last;
+    if (submit && !submitAnywhere) submit.hidden = !last;
     nav.querySelector(".a4-q-count").textContent = `Question ${at + 1} of ${questions.length}`;
     if (focus) questions[at].querySelector("input:not([type=hidden]):not([disabled]), select")?.focus({ preventScroll: true });
   };
@@ -156,7 +154,7 @@ export function bindQuestions(form) {
   form.addEventListener("keydown", (event) => {
     if (event.key === "Enter" && at < questions.length - 1 && event.target.matches("input:not([type=radio]):not([type=checkbox])")) { event.preventDefault(); show(at + 1); }
   });
-  form.addEventListener("submit", (event) => { if (at < questions.length - 1) { event.preventDefault(); event.stopImmediatePropagation(); show(at + 1); } }, true);
+  if (!submitAnywhere) form.addEventListener("submit", (event) => { if (at < questions.length - 1) { event.preventDefault(); event.stopImmediatePropagation(); show(at + 1); } }, true);
   form.addEventListener("focusin", (event) => {
     const holder = event.target.closest?.("fieldset[data-a4-q]");
     if (holder && holder.hidden) show(questions.indexOf(holder), false);

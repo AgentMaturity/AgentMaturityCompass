@@ -1,13 +1,14 @@
 import { renderNeutralImportReview } from "./neutralImportReview.js";
 import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
-import { askInline, confirmPress, moreInfo, recordDetails, recordRows, showResult } from "./pageKit.js";
+import { askInline, confirmPress, emptyState, moreInfo, noticeChip, recordDetails, recordRows, showResult } from "./pageKit.js";
+import { approvalCardHtml, approvalPeopleHtml, bindStationFilter, gapListHtml, layerBarsHtml, packCatalogHtml, pageIntroHtml, runCardsHtml, scoreDialHtml, statRowHtml, surfaceTilesHtml } from "./dailyView.js";
 import { activationRouteHtml, approvalsTileHtml, firstStepActionHtml, homeStartHtml, syncWaiting } from "./homeView.js";
 import { renderNativeTasksPage } from "./nativeTasks.js";
 import { toolRatesHtml } from "./runtimeRates.js";
 import { fleetInventoryHtml, wireFleetInventory } from "./fleetInventory.js";
 import { apiGet, apiPost, applyRoleGates, getAdminToken, getCurrentUser, login, logout, onClaims, pendingApprovalCount, setAdminToken, whoami } from "./api.js";
 import { installClaimStrip } from "./components/claimBadge.js";
-import { industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
+import { QUESTIONNAIRE_NOTICE, industryPackDetailHtml, industryPackResultHtml } from "./industryPackView.js";
 import { renderBars, renderLine } from "./charts.js";
 import { decorateNav, primaryActionHref, primaryActionLabel, renderTopbar } from "./shell.js";
 import { loginCardHtml, loginFailureText, safeNextPage } from "./loginView.js";
@@ -384,36 +385,6 @@ function statusPill(status) {
   return `<span class="pill ${className}">${plainCodeHtml(normalized)}</span>`;
 }
 
-function renderSurfaceRail(surfaceResp, latestRun) {
-  const definitions = Array.isArray(surfaceResp?.surfaces) && surfaceResp.surfaces.length > 0
-    ? surfaceResp.surfaces
-    : FALLBACK_SURFACES;
-  const bySurface = new Map(definitions.map((item) => [item.surface, item]));
-  const order = Array.isArray(surfaceResp?.order) && surfaceResp.order.length > 0
-    ? surfaceResp.order
-    : FALLBACK_SURFACES.map((item) => item.surface);
-  return `
-    <div class="surface-rail">
-      ${order
-        .map((surface) => {
-          const definition = bySurface.get(surface) || { surface, headline: surface, description: "" };
-          const summary = latestRun?.surfaces?.[surface] || null;
-          return `
-            <div class="surface-tile">
-              <div class="row spaced">
-                <strong>${htmlEscape(definition.surface)}</strong>
-                ${statusPill(summary?.status || "pending")}
-              </div>
-              <div class="surface-headline">${htmlEscape(definition.headline || "")}</div>
-              <p class="muted">${htmlEscape(summary?.summary || definition.description || "")}</p>
-            </div>
-          `;
-        })
-        .join("")}
-    </div>
-  `;
-}
-
 function renderEvidenceRows(rows, type, agentId) {
   if (!Array.isArray(rows) || rows.length === 0) {
     return `<tr><td colspan="4" class="muted">No ${htmlEscape(type)} records found.</td></tr>`;
@@ -666,56 +637,32 @@ async function renderEvidence() {
         ? "UNSIGNED"
         : "INVALID";
 
+  const signatureNotice = "A signature shows who wrote each record and that it has not changed, not that it is true.";
   root.innerHTML = `
-    <section class="card studio-hero evidence-hero">
-      <div>
-        <div class="studio-kicker">agent lifecycle</div>
-        <h2 class="studio-title">Recorded<strong>evidence_</strong></h2>
-        <p class="studio-sub">
-          What AMC has recorded about this agent. A signature shows who wrote each record and that it has not changed, not that it is true.
-        </p>
-        ${missedSections ? `<p class="status-bad">${missedSections} section(s) could not load and show as empty below. Refresh the page to try again.</p>` : ""}
-        <div class="studio-actions">
-          <button id="evidenceRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>
-          <button id="evidenceSnapshot" data-roles="OWNER" class="secondary">Snapshot Enforce resources</button>
-          <a class="secondary" href="./passport?agent=${encodeURIComponent(agentId)}" style="display:inline-flex;align-items:center;border:1px solid var(--border-strong);border-radius:6px;padding:9px 13px;font-family:var(--mono);font-size:12px;color:var(--ink)">Passport</a>
-        </div>
-      </div>
-      <div class="studio-terminal">
-        <div class="studio-terminal-bar">
-          <span class="studio-dot r"></span><span class="studio-dot y"></span><span class="studio-dot g"></span>
-          <span class="studio-terminal-title">amc evidence</span>
-        </div>
-        <div class="studio-terminal-body">
-          <div class="studio-command">$ amc</div>
-          <div class="studio-terminal-line"><strong>Agent</strong><span>${htmlEscape(agentId)}</span></div>
-          <div class="studio-terminal-line"><strong>Latest run</strong><span>${htmlEscape(shortId(latestRun?.runId, 16))}</span></div>
-          <div class="studio-terminal-line"><strong>Full score latency</strong><span>${latestRun?.elapsedMs === null || latestRun?.elapsedMs === undefined ? "-" : `${Number(latestRun.elapsedMs)}ms`}</span></div>
-          <div class="studio-terminal-line"><strong>Evidence coverage</strong><span>${latestRun ? `${(Number(latestRun.evidence?.evidenceCoverage || 0) * 100).toFixed(1)}%` : "-"}</span></div>
-          <div class="studio-terminal-line"><strong>Resource state</strong><span>${plainCodeHtml(resourceStatusData?.state || "NOT_INITIALIZED")}</span></div>
-          <div class="studio-terminal-line"><strong>Resource gates</strong><span>${htmlEscape(resourceValidationData?.status || "unknown")}</span></div>
-          <div class="studio-terminal-line"><strong>Signature</strong><span>${htmlEscape(resourceSignature)}</span></div>
-        </div>
-      </div>
-    </section>
-
-    <div class="studio-kpi-grid">
-      <section class="card studio-kpi"><div class="muted">Surfaces Complete</div><div class="tile-value">${surfaceComplete}/8</div></section>
-      <section class="card studio-kpi"><div class="muted">Lifecycle Runs</div><div class="tile-value">${lifecycleRuns.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Episodes</div><div class="tile-value">${episodes.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Failure Clusters</div><div class="tile-value">${failureClusters.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Fixer RCA</div><div class="tile-value">${fixerReports.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Memory Lessons</div><div class="tile-value">${reasoningMemoryItems.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Imports</div><div class="tile-value">${neutralImports.length}</div></section>
-      <section class="card studio-kpi"><div class="muted">Strategies</div><div class="tile-value">${strategyRuns.length}</div></section>
-    </div>
-
-    <div class="studio-section-label">8 surfaces</div>
-    ${renderSurfaceRail(surfacesData, latestRun)}
-
-    <div class="studio-section-label">evidence chain</div>
-    <div class="studio-chart-grid">
-      ${card("Latest Lifecycle Artifact", latestRun ? `
+    ${pageIntroHtml("What AMC has recorded", `Signed records about agent ${agentId}. Open a kind to see them.`, {
+      id: "evidenceIntro",
+      chips: noticeChip("Signature limits", signatureNotice),
+      actions: `<button id="evidenceRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>
+        <a class="button secondary" href="./passport?agent=${encodeURIComponent(agentId)}">Passport</a>`
+    })}
+    ${missedSections ? `<p class="status-bad">${missedSections} section(s) could not load and show as empty below. Refresh the page to try again.</p>` : ""}
+    ${statRowHtml([["parts done of 8", surfaceComplete], ["score runs", lifecycleRuns.length], ["episodes", episodes.length], ["failure clusters", failureClusters.length],
+      ["root-cause reports", fixerReports.length], ["lessons", reasoningMemoryItems.length], ["imports", neutralImports.length], ["model comparisons", strategyRuns.length]])}
+    <h3 class="section-title">The eight parts</h3>
+    ${surfaceTilesHtml(Array.isArray(surfacesData?.surfaces) && surfacesData.surfaces.length ? surfacesData.surfaces : FALLBACK_SURFACES,
+      Array.isArray(surfacesData?.order) && surfacesData.order.length ? surfacesData.order : FALLBACK_SURFACES.map((item) => item.surface), latestRun?.surfaces)}
+    <h3 class="section-title">Records by kind</h3>
+    <div class="records-folds">
+    ${moreInfo("This run", `
+        <div class="studio-terminal-line"><strong>Agent</strong><span>${htmlEscape(agentId)}</span></div>
+        <div class="studio-terminal-line"><strong>Latest run</strong><span>${htmlEscape(shortId(latestRun?.runId, 16))}</span></div>
+        <div class="studio-terminal-line"><strong>Full score latency</strong><span>${latestRun?.elapsedMs === null || latestRun?.elapsedMs === undefined ? "-" : `${Number(latestRun.elapsedMs)}ms`}</span></div>
+        <div class="studio-terminal-line"><strong>Evidence coverage</strong><span>${latestRun ? `${(Number(latestRun.evidence?.evidenceCoverage || 0) * 100).toFixed(1)}%` : "-"}</span></div>
+        <div class="studio-terminal-line"><strong>Resource state</strong><span>${plainCodeHtml(resourceStatusData?.state || "NOT_INITIALIZED")}</span></div>
+        <div class="studio-terminal-line"><strong>Resource gates</strong><span>${htmlEscape(resourceValidationData?.status || "unknown")}</span></div>
+        <div class="studio-terminal-line"><strong>Signature</strong><span>${htmlEscape(resourceSignature)}</span></div>
+        <p class="muted">${htmlEscape(signatureNotice)}</p>`)}
+      ${moreInfo("Latest score record", latestRun ? `
         <div class="lifecycle-summary">
           <div><span class="muted">Lifecycle</span><code>${htmlEscape(latestRun.lifecycleRunId)}</code></div>
           <div><span class="muted">Run</span><code>${htmlEscape(latestRun.runId)}</code></div>
@@ -732,7 +679,7 @@ async function renderEvidence() {
           resourceManifests: latestRun.evidence?.resourceManifests
         })}
       ` : "<p class='muted'>No lifecycle artifact has been generated for this agent yet.</p>")}
-      ${card("Decision Observability", latestObservability ? `
+      ${moreInfo("Decision tracing", latestObservability ? `
         <div class="lifecycle-summary">
           <div><span class="muted">Record</span><code>${htmlEscape(shortId(latestObservability.observabilityId, 18))}</code></div>
           <div><span class="muted">Components</span><strong>${Number(latestObservability.summary?.componentCount || 0)}</strong></div>
@@ -746,7 +693,7 @@ async function renderEvidence() {
           decisionChain: (latestObservability.decisionChain || []).slice(0, 8)
         })}
       ` : "<p class='muted'>No decision observability record yet. Run `amc` to capture component attribution, experience signals, and decision outcomes.</p>")}
-      ${card("Repeated failures", latestTraceIndex ? `
+      ${moreInfo(`Repeated failures (${failureClusters.length})`, latestTraceIndex ? `
         <div class="lifecycle-summary">
           <div><span class="muted">Index</span><code>${htmlEscape(shortId(latestTraceIndex.indexId, 18))}</code></div>
           <div><span class="muted">Entries</span><strong>${Number(latestTraceIndex.summary?.entryCount || 0)}</strong></div>
@@ -762,7 +709,7 @@ async function renderEvidence() {
           </tr>
         `).join("") || "<tr><td colspan='4' class='muted'>No repeated failure clusters.</td></tr>"}</tbody></table></div>
       ` : "<p class='muted'>No trace failure index yet. Run `amc` with trace-backed evidence to mine recurring failure modes.</p>")}
-      ${card("Fixer RCA", `
+      ${moreInfo(`Root causes (${fixerReports.length})`, `
         <div class="lifecycle-summary">
           <div><span class="muted">Latest</span><code>${htmlEscape(shortId(latestFixerReport?.reportId, 18))}</code></div>
           <div><span class="muted">Root causes</span><strong>${Number(latestFixerReport?.rootCauses?.length || 0)}</strong></div>
@@ -782,7 +729,7 @@ async function renderEvidence() {
           <button id="evidenceGenerateRca" data-roles="OWNER,OPERATOR" class="secondary">Find root causes</button>
         </div>
       `)}
-      ${card("Reasoning Memory", `
+      ${moreInfo(`Lessons kept (${reasoningMemoryItems.length})`, `
         <div class="scroll"><table><thead><tr><th>Memory</th><th>Type</th><th>Confidence</th><th>Expires</th><th>Actions</th></tr></thead><tbody>${reasoningMemoryItems.map((item) => `
           <tr>
             <td><code>${htmlEscape(shortId(item.memoryId, 18))}</code></td>
@@ -797,7 +744,7 @@ async function renderEvidence() {
           <button id="evidenceWriteMemory" data-roles="OWNER,OPERATOR" class="secondary">Write memory</button>
         </div>
       `)}
-      ${card("Enforce resource records", `
+      ${moreInfo("Enforce resource records", `
         <div class="lifecycle-summary">
           <div><span class="muted">Active</span><strong>${htmlEscape(shortId(resourceStatusData?.active?.manifestId, 18))}</strong></div>
           <div><span class="muted">Previous</span><strong>${htmlEscape(shortId(resourceStatusData?.previous?.manifestId, 18))}</strong></div>
@@ -819,6 +766,7 @@ async function renderEvidence() {
           history: resourceHistoryEntries.slice(0, 6)
         })}</div>
         <div class="row wrap">
+          <button id="evidenceSnapshot" data-roles="OWNER" class="secondary">Snapshot Enforce resources</button>
           <button id="evidenceVerifyResources" class="secondary">Verify now</button>
           <button id="evidenceValidateResources" class="secondary">Check the gates</button>
           <button id="evidenceApplyDryRun" data-roles="OWNER" class="secondary">Preview apply</button>
@@ -827,7 +775,7 @@ async function renderEvidence() {
           <button id="evidenceRollbackResources" data-roles="OWNER" ${resourceStatusData?.rollbackTarget?.manifestId ? "" : "disabled"}>Roll back to previous</button>
         </div>
       `)}
-      ${card("Neutral Import", `
+      ${moreInfo(`Imports (${neutralImports.length})`, `
         <div class="row wrap">
           <input id="neutralImportPath" placeholder="/path/to/traces-or-run-dir" style="min-width:280px" />
           <button id="neutralImportDryRun" data-roles="OWNER,OPERATOR" class="secondary">Review import</button>
@@ -854,7 +802,7 @@ async function renderEvidence() {
           </tr>
         `).join("") || "<tr><td colspan='5' class='muted'>No neutral imports yet.</td></tr>"}</tbody></table></div>
       `)}
-      ${card("Model strategy comparison", `
+      ${moreInfo(`Model comparisons (${strategyRuns.length})`, `
         <div id="strategyCompareOut" aria-live="polite">${recordRows({
           recent: strategyRuns.map((row) => ({
             strategyRunId: row.strategyRunId,
@@ -874,22 +822,19 @@ async function renderEvidence() {
           </tr>
         `).join("") || "<tr><td colspan='5' class='muted'>No strategy comparisons yet.</td></tr>"}</tbody></table></div>
       `)}
-    </div>
-
-    <div class="studio-chart-grid">
-      ${card("Episode Records", `
+      ${moreInfo(`Episodes (${episodes.length})`, `
         <div class="scroll"><table><thead><tr><th>Episode</th><th>Run</th><th>Source</th><th>Created</th></tr></thead><tbody>${renderEvidenceRows(episodes, "episode", agentId)}</tbody></table></div>
       `)}
-      ${card("Signed decision records", `
+      ${moreInfo(`Decision records (${receipts.length})`, `
         <div class="scroll"><table><thead><tr><th>Receipt</th><th>Run</th><th>Decision</th><th>Created</th></tr></thead><tbody>${renderEvidenceRows(receipts, "decision", agentId)}</tbody></table></div>
       `)}
-      ${card("Observability Records", `
+      ${moreInfo(`Tracing records (${observabilityRecords.length})`, `
         <div class="scroll"><table><thead><tr><th>Record</th><th>Run</th><th>Status</th><th>Created</th></tr></thead><tbody>${renderEvidenceRows(observabilityRecords, "observability", agentId)}</tbody></table></div>
       `)}
-      ${card("Finding records", `
+      ${moreInfo(`Finding records (${proofs.length})`, `
         <div class="scroll"><table><thead><tr><th>Record</th><th>Run</th><th>Surface</th><th>Status</th></tr></thead><tbody>${renderEvidenceRows(proofs, "proof", agentId)}</tbody></table></div>
       `)}
-      ${card("Lifecycle Receipts", `
+      ${moreInfo(`Lifecycle receipts (${lifecycleReceipts.length})`, `
         <div class="scroll"><table><thead><tr><th>Receipt</th><th>Run</th><th>Type</th><th>Status</th></tr></thead><tbody>${renderEvidenceRows(lifecycleReceipts, "lifecycle-receipt", agentId)}</tbody></table></div>
       `)}
     </div>
@@ -1628,25 +1573,31 @@ async function renderAgent() {
   // A run whose seal fails shows nothing taken from its file: no score, coverage, readiness, chart or pass state.
   const sealFails = runSealFails(row.latestRun);
   const layers = report?.layerScores || [];
-  root.innerHTML = `
-    ${card(`Agent ${agentId}`, `<p>${runStateSummary(agentId, row.latestRun)}</p>${runStateWarning(row.latestRun)}` + (report
-      ? `
-      <p>Overall: <strong>${sealFails ? "N/A" : (layers.reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, layers.length)).toFixed(3)}</strong></p>
-      <p>IntegrityIndex: <strong>${sealFails ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(sealFails ? UNTRUSTED_SEAL_LABEL : String(report.trustLabel ?? ""))})</p>
+  const overall = layers.reduce((s, x) => s + x.avgFinalLevel, 0) / Math.max(1, layers.length);
+  const trust = sealFails ? UNTRUSTED_SEAL_LABEL : String(report?.trustLabel ?? "");
+  // The score in ink with its labels, the layers as ink bars and the first gaps; the run's full wording one click away.
+  const score = report && !sealFails ? `<div class="agent-score">${scoreDialHtml(overall, { notes: [trust, report.evidenceReadiness?.label] })}
+      <div class="agent-score-side">${statRowHtml([["Integrity, out of 1", Number(report.integrityIndex || 0).toFixed(3)], ["Evidence coverage", `${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%`],
+          ["Claims", report.evidenceReadiness?.claimEligible === true ? "Allowed" : "Blocked"]])}
+        ${layerBarsHtml(layers)}</div></div>
+      <h3 class="section-title">What to improve next</h3>${gapListHtml(report)}` : "";
+  const details = `<p>${runStateSummary(agentId, row.latestRun)}</p>` + (report ? `
+      <p>Overall: <strong>${sealFails ? "N/A" : overall.toFixed(3)}</strong></p>
+      <p>IntegrityIndex: <strong>${sealFails ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(trust)})</p>
       <p>Evidence Coverage: ${sealFails ? "N/A" : `${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%`}</p>
       <p>Artifact Status: <strong>${htmlEscape(sealFails ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
       <p>Evidence Readiness: <strong>${plainCodeHtml(sealFails ? "UNVERIFIED" : String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
       <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !sealFails ? "ELIGIBLE" : "BLOCKED"}</strong></p>
       <p class="muted">${htmlEscape(sealFails ? "This run's record does not pass its seal check, so none of these numbers can back a claim."
-        : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>
-      ${sealFails ? "" : `<canvas id="layerBars" width="520" height="170" role="img" aria-label="Layer maturity bar chart for the selected agent."></canvas>`}
-      `
-      : ""
-    ))}
+        : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>` : "");
+  root.innerHTML = `${pageIntroHtml("How your agent is doing", `Agent ${agentId}: its latest score, and what to improve next.`, { id: "agentIntro" })}
+    <section class="card agent-card">
+      ${report ? "" : emptyState({ pictureName: "check", line: "No score yet." })}
+      ${runStateWarning(row.latestRun)}
+      ${score}
+      ${report ? moreInfo("About this score", details) : details}
+    </section>
   `;
-  if (report && !sealFails) {
-    renderBars(document.getElementById("layerBars"), layers.map((rowItem) => rowItem.avgFinalLevel), "#4AEF79");
-  }
 }
 
 async function renderEqualizer() {
@@ -1744,11 +1695,16 @@ async function renderApprovals() {
   const integrityValid = selectedApprovalId || activity?.integrity?.valid === true;
   const statusOptions = ["", "PENDING", "QUORUM_MET", "DENIED", "EXPIRED", "CANCELLED", "CONSUMED"];
   const actionClasses = ["", "READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY", "FINANCIAL", "NETWORK_EXTERNAL", "DATA_EXPORT", "IDENTITY"];
+  const showing = approvalActivityState.status;
   root.innerHTML = `
-    ${card("Approvals Inbox", `
-      ${demoActor ? '<p class="banner">Demo sessions cannot decide approvals. Sign in with an authorized identity to review and record a decision.</p>' : !approvalActorAllowed ? '<p class="banner">Your identity can review these requests but cannot record approval decisions. An authorized approver, owner or auditor must decide.</p>' : ""}
-      ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : ""}
-      ${selectedApprovalId ? "" : `
+    ${pageIntroHtml(selectedApprovalId ? "One approval request" : "Decisions waiting for people", selectedApprovalId ? "Who decided, and what is left." : "Approve or deny a request, and see who decided.", { id: "approvalsIntro" })}
+    ${demoActor ? '<p class="banner">Demo sessions cannot decide approvals. Sign in with an authorized identity to review and record a decision.</p>' : !approvalActorAllowed ? '<p class="banner">Your identity can review these requests but cannot record approval decisions. An authorized approver, owner or auditor must decide.</p>' : ""}
+    ${selectedApprovalId ? `<p><a href="./approvals?agent=${encodeURIComponent(agentId)}">View all pending approvals</a></p>` : `
+      <div class="row wrap appr-show" role="group" aria-label="Which requests">
+        <button type="button" class="secondary" data-appr-show="PENDING" aria-pressed="${showing === "PENDING"}">Waiting</button>
+        <button type="button" class="secondary" data-appr-show="" aria-pressed="${showing === ""}">All</button>
+      </div>
+      ${moreInfo("Search and filter", `
         <form id="approvalActivityFilters" class="row wrap">
           <label>
             <span class="muted">Request ID</span>
@@ -1798,47 +1754,59 @@ async function renderApprovals() {
           <button id="approvalSearch" type="submit">Search</button>
           <button id="approvalFiltersReset" type="button" class="secondary">Reset</button>
         </form>
-        <p id="approvalActivityIntegrity" class="${activity?.integrity?.valid ? "status-ok" : "status-bad"}">
-          ${activity?.integrity?.valid
-            ? `${Number(activity.returned || 0)} of ${Number(activity.totalMatched || 0)} matching approvals | signed inventory verified`
-            : `Approval activity unavailable | ${htmlEscape((activity?.integrity?.reasonCodes || ["INTEGRITY_UNAVAILABLE"]).join(", "))}`}
-        </p>
-      `}
-      <div class="scroll"><table><thead><tr><th>Request</th><th>${selectedApprovalId ? "Intent" : "Risk"}</th><th>Action</th><th>Mode</th><th>Status</th><th>Quorum</th><th>Decisions</th><th>Decision</th></tr></thead><tbody id="apprRows"></tbody></table></div>
-    `)}
+      `)}
+      <p id="approvalActivityIntegrity" class="${activity?.integrity?.valid ? "muted" : "status-bad"}">
+        ${activity?.integrity?.valid
+          ? `${Number(activity.returned || 0)} of ${Number(activity.totalMatched || 0)} matching requests shown. The signed list checks out.`
+          : `Approval activity unavailable: ${htmlEscape((activity?.integrity?.reasonCodes || ["INTEGRITY_UNAVAILABLE"]).join(", "))}`}
+      </p>
+    `}
+    <div id="apprRows" class="appr-list"></div>
   `;
   const body = document.getElementById("apprRows");
-  body.innerHTML = integrityValid ? rows.map((row) => {
+  const decisionControls = (row) => {
     const canDecide = approvalActorAllowed && row.status === "PENDING" &&
       row.requestIntegrity?.valid === true &&
       row.chainIntegrity?.valid === true &&
       row.contextIntegrity?.valid === true;
-    const requestLabel = row.approvalRequestId.length > 30
-      ? `${row.approvalRequestId.slice(0, 18)}...${row.approvalRequestId.slice(-8)}`
-      : row.approvalRequestId;
-    return `
-    <tr${row.approvalRequestId === selectedApprovalId ? ' class="selected"' : ""}>
-      <td>${selectedApprovalId
-        ? htmlEscape(row.approvalRequestId)
-        : `<a title="${htmlEscape(row.approvalRequestId)}" href="./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}">${htmlEscape(requestLabel)}</a>`}</td>
-      <td>${htmlEscape(row.intentId || row.riskTier || "-")}</td>
-      <td>${plainCodeHtml(row.actionClass)}</td>
-      <td>${htmlEscape(row.effectiveMode || "-")}</td>
-      <td>${plainCodeHtml(row.status || "-")}</td>
-      <td>${Number(row.quorum?.received || 0)}/${Number(row.quorum?.required || 0)} (${plainCodeHtml(row.quorum?.status || "PENDING")})</td>
-      <td>${row.decisions
-        ? row.decisions.map((d) => `${htmlEscape(d.username)}:${htmlEscape(d.decision)}`).join(", ") || "-"
-        : Number(row.decisionCount || 0)}</td>
-      <td>
-        ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
+    if (canDecide) {
+      return `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
             <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
             <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
-          </div>` : '<span class="muted">Unavailable</span>'}
-      </td>
-    </tr>
-  `;
-  }).join("") : "";
+          </div>`;
+    }
+    return approvalActorAllowed && row.status === "PENDING"
+      ? '<p class="muted">Its record does not check out, so it cannot be decided here.</p>' : "";
+  };
+  const requestDetails = (row) => moreInfo("Request details", recordRows({
+    approvalRequestId: row.approvalRequestId, agentId: row.agentId || agentId, intentId: row.intentId, toolName: row.toolName,
+    actionClass: row.actionClass, riskTier: row.riskTier, effectiveMode: row.effectiveMode, status: row.status,
+    quorum: `${Number(row.quorum?.received || 0)} of ${Number(row.quorum?.required || 0)} (${plainCode(row.quorum?.status || "PENDING")})`,
+    decisions: row.decisions ? row.decisions.map((d) => `${d.username}: ${plainCode(d.decision)}${d.reason ? ` (${d.reason})` : ""}`) : Number(row.decisionCount || 0),
+    createdTs: row.createdTs, expiresTs: row.expiresTs
+  }, { record: false }));
+  body.innerHTML = integrityValid ? (rows.map((row) => approvalCardHtml(row, {
+    controls: decisionControls(row),
+    selected: row.approvalRequestId === selectedApprovalId,
+    href: selectedApprovalId ? "" : `./approvals?agent=${encodeURIComponent(row.agentId || agentId)}&approval=${encodeURIComponent(row.approvalRequestId)}`,
+    details: requestDetails(row)
+  })).join("") || emptyState({ line: showing === "PENDING" && !selectedApprovalId ? "Nothing waits for a decision." : "No requests match." })) : "";
+  // The list rows carry counts only; each request's own record names who decided (read only, first 20 cards).
+  if (!selectedApprovalId) {
+    for (const row of rows.slice(0, 20)) {
+      apiGet(`/approvals/requests/${encodeURIComponent(row.approvalRequestId)}`).then((detail) => {
+        const holder = body.querySelector(`[data-appr-people="${CSS.escape(row.approvalRequestId)}"]`);
+        if (holder) holder.innerHTML = approvalPeopleHtml(row, detail);
+      }).catch(() => { /* the count stays; the request page shows the people */ });
+    }
+  }
+  for (const button of root.querySelectorAll("[data-appr-show]")) {
+    button.addEventListener("click", async () => {
+      approvalActivityState.status = button.getAttribute("data-appr-show");
+      await renderApprovals();
+    });
+  }
   document.getElementById("approvalActivityFilters")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     approvalActivityState.query = document.getElementById("approvalActivityQuery")?.value.trim() || "";
@@ -2471,38 +2439,16 @@ async function renderIndustryPacks() {
   const entitlement = response.entitlement || {};
   const packs = response.packs || [];
   root.innerHTML = `
-    ${card("Industry Packs", `
-      <div class="grid">
-        <div>
-          <div class="muted">Access</div>
-          <div class="tile-value">Active</div>
-        </div>
-        <div>
-          <div class="muted">Price</div>
-          <div class="tile-value">Free</div>
-        </div>
-      </div>
-      <p class="status-ok">${htmlEscape(entitlement.message || "Industry Packs are free. Access never changes a result.")}</p>
-    `)}
+    ${pageIntroHtml("Pick your field", "Questionnaires for regulated work. Open a pack to answer it.", {
+      id: "packsIntro",
+      chips: noticeChip("AI-drafted, not legal advice", `Pack content is experimental and self-reported. ${QUESTIONNAIRE_NOTICE}`)
+        + noticeChip("Free to use", entitlement.message || "Industry Packs are free. Access never changes a result.")
+    })}
     <section id="industryPackDetail" class="card" tabindex="-1" hidden></section>
-    ${card("Pack Catalog", `<div id="industryPackRows" class="scroll"></div>`)}
+    <div id="industryPackRows">${packCatalogHtml(packs)}</div>
   `;
   const rows = document.getElementById("industryPackRows");
-  rows.innerHTML = packs
-    .map((pack) => `
-      <div class="card">
-        <div class="row spaced">
-          <strong>${htmlEscape(pack.name || pack.packId)}</strong>
-          <span>${htmlEscape(pack.riskLevel || "active")}</span>
-        </div>
-        <p class="muted">${htmlEscape(pack.description || "")}</p>
-        <div class="row spaced">
-          <span class="muted">${htmlEscape(pack.domain || "")} · ${Number(pack.questionCount || 0)} questions${pack.contentStatus ? ` · ${htmlEscape(pack.contentStatus)}, self-reported` : ""}</span>
-          <button class="secondary" data-industry-pack="${htmlEscape(pack.packId)}" aria-label="Open ${htmlEscape(pack.name || pack.packId)}">Open</button>
-        </div>
-      </div>
-    `)
-    .join("");
+  bindStationFilter(rows);
   const detail = document.getElementById("industryPackDetail");
   // ?pack=<id> (an agent project's "Answer this pack's questions" link) opens that pack once the catalog is bound.
   const wanted = new URLSearchParams(location.search).get("pack");
@@ -2518,6 +2464,7 @@ async function renderIndustryPacks() {
         detail.innerHTML = `<p class="status-bad">${htmlEscape(errText(error))}</p>`;
       }
       detail.hidden = false;
+      rows.hidden = true; // one pack at a time; Close brings the catalog back
       // M2: start at the pack's heading, wherever in the catalog it was opened from.
       const heading = document.getElementById("industryPackHeading") || detail;
       heading.scrollIntoView({ block: "start" });
@@ -2530,10 +2477,16 @@ function bindIndustryPackDetail(detail, opener) {
   onAction(document.getElementById("industryPackClose"), "click", () => {
     detail.hidden = true;
     detail.replaceChildren();
+    document.getElementById("industryPackRows")?.removeAttribute("hidden");
     opener.focus();
   });
   const form = document.getElementById("industryPackForm");
   const out = document.getElementById("industryPackResult");
+  // One question at a time, Score always in reach: the same form and fields, so what Score sends is unchanged.
+  if (form) {
+    for (const fieldset of form.querySelectorAll(".pack-questions fieldset")) fieldset.dataset.a4Q = "";
+    import("./a4Journey.js").then(({ bindQuestions }) => bindQuestions(form, { submitAnywhere: true })).catch(() => { /* every question stays in sight */ });
+  }
   form?.addEventListener("reset", () => out.replaceChildren());
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -2981,55 +2934,42 @@ async function renderRuntimeRuns() {
     : null;
   const events = Array.isArray(latestDetail?.events) ? latestDetail.events : [];
   root.innerHTML = `
-    <section class="hero-panel compact">
-      <div>
-        <p class="eyebrow">Live runs</p>
-        <h2>Runtime Runs</h2>
-        <p>Runs of your connected agents as they happen: status, events, alerts and receipts. A run that stopped can be picked up again.</p>
-      </div>
-      <div class="hero-actions">
-        <span class="pill ${Number(status.running || 0) > 0 ? "ok" : "warn"}">${Number(status.running || 0)} running</span>
-        <span class="pill">${Number(status.degraded || 0)} degraded</span>
-      </div>
+    ${pageIntroHtml("What is running now", "Your connected agents' runs, as they happen.", { id: "runtimeIntro" })}
+    ${statRowHtml([["running", Number(status.running || 0)], ["need a look", Number(status.degraded || 0)], ["finished", Number(status.completed || 0)], ["in all", Number(status.total || 0)]])}
+    <section class="card">
+      ${runs.length ? runCardsHtml(runs, formatTime) : emptyState({ pictureName: "empty", line: "No live runs yet.", action: '<a class="button" href="./integrations">Connect an agent</a>' })}
     </section>
-    <div class="grid two">
-      ${card("Record a run by hand (advanced)", `
+    <div class="records-folds">
+      ${moreInfo("What is a live run?", "<p>Runs of your connected agents as they happen: status, events, alerts and receipts. A run that stopped can be picked up again.</p>")}
+      ${moreInfo("Tool calls, last day", toolRatesHtml(apiPayload(ratesEnvelope)))}
+      ${moreInfo(`Latest events (${events.length})`, `
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Stage</th><th>Message</th><th>Receipt</th></tr></thead>
+          <tbody>${renderRuntimeEventRows(events) || "<tr><td colspan='6' class='muted'>No events yet.</td></tr>"}</tbody>
+        </table>
+      </div>`)}
+      ${moreInfo("All runs as a table", `
+      <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.runId)} (${htmlEscape(latest.status)})` : "-"}</span></div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Run</th><th>Status</th><th>Stage</th><th>Events</th><th>Alerts</th><th>Policy</th><th>Updated</th></tr></thead>
+          <tbody>${renderRuntimeRunRows(runs) || "<tr><td colspan='7' class='muted'>No runtime runs yet.</td></tr>"}</tbody>
+        </table>
+      </div>`)}
+      ${moreInfo("Record a run by hand", `
         <div class="row wrap">
           <label>Run name <input id="runtimeRunId" placeholder="run id" value="${htmlEscape(latest?.runId || `studio-${Date.now()}`)}" /></label>
           <label>Stage <input id="runtimeStage" placeholder="stage" value="${htmlEscape(latest?.currentStage || "gateway.connected")}" /></label>
-          <button id="runtimeCreateBtn" data-roles="OWNER,OPERATOR">Create</button>
+          <button id="runtimeCreateBtn" data-roles="OWNER,OPERATOR" class="secondary">Create</button>
         </div>
         <div class="row wrap">
           <button id="runtimeTraceBtn" data-roles="OWNER,OPERATOR" class="secondary">Append Trace</button>
           <button id="runtimeDegradeBtn" data-roles="OWNER,OPERATOR" class="secondary">Degrade</button>
           <button id="runtimeCompleteBtn" data-roles="OWNER,OPERATOR" class="secondary">Complete</button>
         </div>
-        <pre id="runtimeOut" class="scroll muted"></pre>
-      `)}
-      ${card("State", `
-        <div class="studio-terminal-line"><strong>Total</strong><span>${Number(status.total || 0)}</span></div>
-        <div class="studio-terminal-line"><strong>Running</strong><span>${Number(status.running || 0)}</span></div>
-        <div class="studio-terminal-line"><strong>Degraded</strong><span>${Number(status.degraded || 0)}</span></div>
-        <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.runId)} (${htmlEscape(latest.status)})` : "-"}</span></div>
-      `)}
-      ${card("Tool calls", toolRatesHtml(apiPayload(ratesEnvelope)))}
+        <pre id="runtimeOut" class="scroll muted"></pre>`)}
     </div>
-    ${card("Runtime Runs", `
-      <div class="scroll">
-        <table>
-          <thead><tr><th>Run</th><th>Status</th><th>Stage</th><th>Events</th><th>Alerts</th><th>Policy</th><th>Updated</th></tr></thead>
-          <tbody>${renderRuntimeRunRows(runs) || "<tr><td colspan='7' class='muted'>No runtime runs yet.</td></tr>"}</tbody>
-        </table>
-      </div>
-    `)}
-    ${card("Latest Event Stream", `
-      <div class="scroll">
-        <table>
-          <thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Stage</th><th>Message</th><th>Receipt</th></tr></thead>
-          <tbody>${renderRuntimeEventRows(events) || "<tr><td colspan='6' class='muted'>No events yet.</td></tr>"}</tbody>
-        </table>
-      </div>
-    `)}
   `;
   const out = document.getElementById("runtimeOut");
   const currentRun = () => document.getElementById("runtimeRunId")?.value || latest?.runId || "";
