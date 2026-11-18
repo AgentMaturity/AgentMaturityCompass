@@ -94,7 +94,7 @@ async function checkSessionExport(path: string, extracted: ExtractedSessionExpor
       `  session ${verdict.sessionId}: ${verdict.eventCount} rows, descriptor ${verdict.descriptorSha256}`,
       `  monitor key ${pem === null ? "none" : sha256Hex(pem)}`
     ];
-    return { verdict, pem, details, warnings: [] };
+    return { verdict, pem, details, warnings: [], sealed: true, rows: verdict.eventCount ?? 0 };
   }
   const { verifySessionExport } = await import("./observability/sessionExport.js");
   const checked = verifySessionExport(doc, { expectedFingerprint: pin, acceptUnverifiableContent });
@@ -105,8 +105,15 @@ async function checkSessionExport(path: string, extracted: ExtractedSessionExpor
   const accepted = unverifiable > 0 && acceptUnverifiableContent ? " (accepted as display-only)" : "";
   const details = [`rows checked: ${verdict.rowsChecked}; tail ${verdict.tail}; content verified ${verified}, unverifiable (redacted, truncated or spilled) ${unverifiable}${accepted}, unavailable ${unavailable}`];
   const warnings = extracted.error === null && verdict.tail === "unproven"
-    ? ["session is open or released: the tail is not sealed, so a truncated row list cannot be detected"] : [];
-  return { verdict, pem, details, warnings };
+    ? ["the session is not sealed (a chat closed with /exit stays open so it can be continued): events after the last one shown would not be noticed"] : [];
+  return { verdict, pem, details, warnings, sealed: verdict.tail === "sealed", rows: verdict.rowsChecked };
+}
+
+/** UX-05: one plain line on what a passing check covered and what it did not. */
+export function sessionExportCheckedLine(rows: number, sealed: boolean): string {
+  return `Session export checked: ${rows} recorded events are unchanged and signed by the monitor key you pinned; `
+    + (sealed ? "the session is sealed, so none is missing at the end. " : "the session is NOT sealed, so events after the last one shown would not be noticed. ")
+    + "Not checked: a public log anchor, and whether what the records say is true.";
 }
 
 export function registerSessionExportCommands(session: Command): void {
@@ -149,12 +156,12 @@ export function registerSessionExportCommands(session: Command): void {
       const text = bytes.toString("utf8");
       const extracted = Buffer.from(text, "utf8").equals(bytes)
         ? parseSessionExportFile(path, text) : { doc: null, error: "the file is not valid UTF-8" };
-      const { verdict, pem, details, warnings } = await checkSessionExport(path, extracted, pin, opts.acceptUnverifiableContent === true);
+      const { verdict, pem, details, warnings, sealed, rows } = await checkSessionExport(path, extracted, pin, opts.acceptUnverifiableContent === true);
       const context = trustFromFlags({ ...opts, expectMonitor: pin }, ["ledger-row"]);
       const report = buildVerifierReport({ artifact: { kind: "session-export", path, sha256: sha256Hex(bytes) }, context,
         integrityErrors: verdict.errors, anchoring: { status: "not-applicable", detail: null }, warnings,
         signatures: [admitKey({ publicKeyPem: pem, purpose: "ledger-row", signature: "session rows and seal", context })] });
       finishVerify("Session export", report, { json: opts.json, result: { ...verdict, ok: report.trusted, report }, details,
-        claim: artifactClaim("session:verify-export") });
+        claim: artifactClaim("session:verify-export"), passedHeadline: sessionExportCheckedLine(rows, sealed) });
     });
 }

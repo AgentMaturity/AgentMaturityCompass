@@ -143,7 +143,8 @@ describe("session export verifies offline", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace, false);
     expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(SessionExportError);
-    expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(/SESSION_NOT_SEALED/);
+    // UX-05: the refusal says why in words and names the command that exports it as a page.
+    expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(/not sealed.*\/exit.*amc session export .* --out session-[0-9a-z-]{8}\.html/);
   });
 
   test("the CLI verifies a sealed bundle, viewer and canonical viewer JSON offline and refuses tampering", () => {
