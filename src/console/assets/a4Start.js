@@ -115,6 +115,17 @@ function rawMove(ctx) {
 }
 
 /**
+ * The second request the panel waits on, while it waits for approvers: Assemble's apply, Adapt's plan activation or
+ * Activate's release (its engine request id from readiness), else "". Readiness carries no names: a4.js reads the
+ * request's people from GET /approvals/requests/:id/view, which writes nothing.
+ */
+export function pendingSecondRequest(ctx) {
+  const codes = codesOf(ctx.readiness, ctx.stage === "adapt" ? "plan_review_opened" : ctx.stage === "activate" ? "release_effect" : "effect_gate");
+  const id = String(prefixed(codes, "APPROVAL_REQUEST:")[0] ?? "").split(":")[0];
+  return id && prefixed(codes, "APPROVAL_STATUS:")[0] === "PENDING" ? id : "";
+}
+
+/**
  * Activate once its plan is approved: the release is a second request (release_effect, read from the engine request's
  * status), opened by a project owner, approved by the project's approvers on the Release card, then released by an owner.
  */
@@ -409,6 +420,8 @@ export function renderStartHere(ctx) {
   const kind = project.step === "reviewed" ? "completion" : project.step === "proposed" ? "direction" : null;
   const gate = stage === project.stage && kind ? liveGate(ctx, kind) : null;
   const live = gate && (gate.status === "PENDING" || gate.status === "QUORUM_MET") ? gate : null;
+  // Once the step's own approval has its quorum, the people shown are the second request's, never the first's again.
+  const second = stage === project.stage && live?.status === "QUORUM_MET" ? pendingSecondRequest(ctx) : "";
   // Stopped: on hold, or this Studio cannot make the release (deployment.same_host); never only because no button is offered.
   // One state for the project's own stage (projectState, as Home and the Build page draw it); at that stage the person's own
   // move says whether it is theirs to do now or someone else's.
@@ -431,7 +444,7 @@ export function renderStartHere(ctx) {
       <h3 id="a4StartTitle"><span class="a4-step-label">What to do now<span class="visually-hidden">: </span></span>${esc(heading)}</h3>
       ${stepRoute(project, stage, state, here && stopped && !project.hold ? "built" : null)}
       <p class="a4-now"${move.keep ? ` data-a4-keep="${esc(move.keep)}"` : ""}><strong>${esc(move.now)}</strong></p>
-      ${live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : ""}
+      ${second ? `<div class="a4-second-people" data-a4-second="${esc(second)}"></div>` : live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : ""}
       <div class="row wrap">${primary(move.act, move.also)}</div>${move.people ? peopleFormHtml(ctx) : ""}
       ${move.how ? fold("How to release it", `<p class="muted">${esc(move.how).replace(/`([^`]+)`/g, "<code>$1</code>")}</p>`, "how") : ""}
       ${move.why ? fold("Tell me more", `<p class="muted">${esc(move.why)}</p>`, "why") : ""}

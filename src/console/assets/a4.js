@@ -17,6 +17,22 @@ import { API, claimSink, errorText, guarded, listOf, me, notice, one, params, pr
   showClaims, showError, storePack, storedPack, tell, uuid } from "./a4Send.js";
 import { bindCreateForm, renderListPage } from "./a4ListPage.js";
 import { syncWaiting } from "./homeView.js";
+import { approvalPeopleHtml } from "./dailyView.js";
+
+// A second request's people, read with the route that writes nothing; the last answer is drawn at once on each render.
+const secondPeople = new Map();
+function showSecondPeople() {
+  const holder = root?.querySelector("[data-a4-second]"), id = holder?.getAttribute("data-a4-second");
+  if (!id) return;
+  if (secondPeople.has(id)) holder.innerHTML = secondPeople.get(id);
+  apiGet(`/approvals/requests/${encodeURIComponent(id)}/view`).then((detail) => {
+    const status = typeof detail?.status === "string" ? detail.status : detail?.status?.status;
+    const html = approvalPeopleHtml({ status, quorum: detail?.quorum }, detail);
+    secondPeople.set(id, html);
+    const now = root?.querySelector(`[data-a4-second="${CSS.escape(id)}"]`);
+    if (now) now.innerHTML = html;
+  }).catch(() => { /* the sentence above still says who it waits for; the card below shows the request */ });
+}
 
 const page = document.body.dataset.page;
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -271,6 +287,7 @@ function mountProject(projectId, options) {
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
+    showSecondPeople();
     renderPresenceChips();
     foldAway();
     for (const details of root.querySelectorAll("details[data-a4-open]")) {

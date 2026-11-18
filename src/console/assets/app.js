@@ -134,14 +134,16 @@ function onAction(target, type, handler) {
 }
 
 /** "Run the full score" (button `id`): runs `amc` through Studio, then draws the page again with `rerender`. */
-function bindFullScore(id, rerender) {
+// Bare `amc` scores the agent named by --agent, else AMC_AGENT_ID in Studio's environment, else the workspace's current
+// agent, else "default" (resolveAgentId in src/fleet/paths.ts), so the console always names the agent the page shows.
+function bindFullScore(id, rerender, agentId = currentAgent()) {
   onAction(document.getElementById(id), "click", async (event) => {
     const button = event.currentTarget;
     const original = button.textContent;
     button.textContent = "running...";
     button.disabled = true;
     try {
-      await apiPost("/cli/exec", { command: "amc", format: "json", timeout: 120000 });
+      await apiPost("/cli/exec", { command: "amc", format: "json", timeout: 120000, args: { agent: agentId } });
       setStatus("Full score generated.");
       await rerender();
     } catch (error) {
@@ -1583,14 +1585,15 @@ async function renderAgent() {
   root.innerHTML = `${pageIntroHtml("How your agent is doing", `Agent ${agentId}: its latest score, and what to improve next.`, { id: "agentIntro" })}
     <section class="card agent-card">
       ${report ? "" : emptyState({ pictureName: "check", line: "No score yet.",
-        // `amc` scores the workspace's default agent, so the button is offered only there; other agents name `amc run`.
+        // The button sends --agent, so it scores this agent; it is offered on "default" only because this page reads a
+        // run through /runs/:id/report, which looks in the workspace's current agent's records, not this agent's.
         action: agentId === "default" ? '<button id="agentRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>' : "" })}
       ${runStateWarning(row.latestRun)}
       ${score}
       ${report ? moreInfo("About this score", details) : details}
     </section>
   `;
-  bindFullScore("agentRunScore", renderAgent);
+  bindFullScore("agentRunScore", renderAgent, agentId);
 }
 
 async function renderEqualizer() {
@@ -2677,7 +2680,7 @@ async function renderOutcomes() {
   `;
   const trendRows = Array.isArray(history.rows) ? history.rows : [];
   const values = trendRows.length > 0 ? trendRows.map((row) => Number(row.valueScore || 0)) : [Number(report.valueScore || 0)];
-  renderLine(document.getElementById("outcomeTrend"), values, "#0ea5e9");
+  renderLine(document.getElementById("outcomeTrend"), values);
 }
 
 async function renderExperiments() {
@@ -3086,7 +3089,8 @@ async function renderFleetLifecycle() {
       <div>
         <p class="eyebrow">Fleet + Evidence</p>
         <h2>Fleet</h2>
-        <p>Your agents: who owns each one, what it runs on, when AMC last saw it, its budget and cost, and whether it is frozen. Below that: fleet runs, how the agents depend on each other, and cascade risks.</p>
+        <p>Your agents, who owns each one, and whether it is frozen.</p>
+        ${moreInfo("What else is here", "<p>Your agents: who owns each one, what it runs on, when AMC last saw it, its budget and cost, and whether it is frozen. Below that: fleet runs, how the agents depend on each other, and cascade risks.</p>")}
       </div>
       <div class="hero-actions">
         <span class="pill">${runs.length} runs</span>
@@ -3409,15 +3413,14 @@ async function renderOrg() {
         : `<div class="card status-ok">Evidence coverage healthy: OBSERVED ${(observed * 100).toFixed(1)}%, median correlation ${corr.toFixed(3)}.</div>`;
     }
     const layerValues = (node.layerScores || []).map((row) => Number(row.median || 0));
-    renderBars(document.getElementById("orgLayerBars"), layerValues, "#4AEF79");
+    renderBars(document.getElementById("orgLayerBars"), layerValues);
     renderLine(
       document.getElementById("orgDistLine"),
       [
         Number(node.headlineDistribution?.p10 || 0),
         Number(node.headlineDistribution?.p50 || 0),
         Number(node.headlineDistribution?.p90 || 0)
-      ],
-      "#b45309"
+      ]
     );
     const riskList = document.getElementById("orgRiskList");
     if (riskList) {
@@ -3797,8 +3800,8 @@ async function renderWorkOrders() {
   const agentId = currentAgent();
   const status = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`);
   root.innerHTML = card("Work Orders", `
-    <p class="muted">A work order is a signed task for an agent: what it may do, at what risk, in simulate or execute mode.
-    This console does not list them; run <code>amc workorder list --agent ${htmlEscape(agentId)}</code> in a terminal.</p>
+    <p class="muted">List them in a terminal: <code>amc workorder list --agent ${htmlEscape(agentId)}</code></p>
+    ${moreInfo("What is a work order?", "<p>A work order is a signed task for an agent: what it may do, at what risk, in simulate or execute mode. This console does not list them.</p>")}
     ${jsonDetails(runStateSummary(agentId, status.latestRun), status)}
     ${runStateWarning(status.latestRun)}
   `);
