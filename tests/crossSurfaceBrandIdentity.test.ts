@@ -32,17 +32,15 @@ describe("cross-surface AMC brand identity", () => {
       expect(source).toContain("var(--amc-accent)");
     }
 
-    const applicationSources = [
-      read("src/console/assets/styles.css"),
-      read("src/brand/visualIdentity.ts")
-    ];
-    for (const source of applicationSources) {
-      expect(source).toContain("#0a0a0a");
-      expect(source).toContain("#4AEF79");
-      expect(source).toContain("#a0a0a0");
-      expect(source).toContain("Inter");
-      expect(source).toContain("Space Mono");
-    }
+    const identityTs = read("src/brand/visualIdentity.ts");
+    for (const token of ["#0a0a0a", "#4AEF79", "#a0a0a0", "Inter", "Space Mono"]) expect(identityTs).toContain(token);
+    // The Compass Console (studio-ui redesign) has a light and a dark theme on system fonts, so it works offline under
+    // its content security policy. Its dark theme keeps the brand green; the light theme uses a darker green that
+    // reads at 4.5:1 on white.
+    const consoleStyles = read("src/console/assets/styles.css");
+    expect(consoleStyles).toContain("--accent: #4AEF79;");
+    expect(consoleStyles).toContain("--accent: #15803D;");
+    expect(consoleStyles).toContain('--sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;');
     for (const path of ["website/style.css", "website/docs/docs.css"]) {
       expect(read(path), path).not.toMatch(/letter-spacing:\s*-\.?\d/i);
     }

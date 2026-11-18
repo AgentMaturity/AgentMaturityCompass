@@ -32,7 +32,7 @@
 .a4-now { font-size: 1.05rem; }
 .a4-who { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
 /* One primary action per screen: on a project page every other action button takes the secondary look. */
-body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { background: rgba(255,255,255,.035); border: 1px solid var(--border-strong); color: var(--ink); }
+body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { background: var(--surface); border: 1px solid var(--border-strong); color: var(--ink); }
 @media (max-width: 640px) { .a4-stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* The start page (2026-11-14): the four steps in human words with the A4 name small; "More options" and the terminal

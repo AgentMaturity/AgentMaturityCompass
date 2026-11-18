@@ -14,7 +14,7 @@
 .native-task-conversation h3 { margin:0; }
 .native-task-transcript { margin:18px 0; }
 .native-task-event { border:1px solid var(--border); border-radius:8px; margin:12px 0; padding:14px; overflow-wrap:anywhere; }
-.native-task-event-user { background:rgba(74,239,121,.035); }
+.native-task-event-user { background:var(--accent-soft); }
 .native-task-event-tool, .native-task-event-tool-update { border-left:3px solid var(--border-strong); }
 .native-task-event-heading { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; }
 .native-task-event pre { margin:10px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; max-height:420px; overflow:auto; }
