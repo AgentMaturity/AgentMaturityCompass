@@ -11,15 +11,19 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import inquirer from "inquirer";
+import { usersConfigPath } from "../auth/authApi.js";
 import { getAgentPaths } from "../fleet/paths.js";
+import { loadActionPolicy } from "../governor/actionPolicyStore.js";
 import { runningStudioBridgeBase } from "../studio/studioBridge.js";
 import { defaultPortOrFree } from "../studio/studioLifecycle.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { inspectSignIn, type SignInReport } from "./agentSignIn.js";
+import { codingAdoptionBlockers } from "./codingAdoption.js";
 import { NATIVE_FIRST_USE_PROVIDERS } from "./nativeFirstUseGuide.js";
 import { detectProviderKeys, type DetectedProviderKey } from "./quickSetup.js";
 
-const FRONT_DOOR_CHOICES = ["watch-claude", "watch-codex", "sign-in-claude", "sign-in-codex", "chat", "demo-chat", "build", "console", "score"] as const;
+const FRONT_DOOR_CHOICES = ["watch-claude", "watch-codex", "sign-in-claude", "sign-in-codex", "coding-chat", "coding-setup", "chat", "demo-chat", "build",
+  "console", "score"] as const;
 export type FrontDoorChoice = (typeof FRONT_DOOR_CHOICES)[number];
 
 export interface FrontDoorState {
@@ -28,6 +32,8 @@ export interface FrontDoorState {
   readonly studioRunning: boolean;
   readonly hasRun: boolean;
   readonly lastChoice: FrontDoorChoice | null;
+  /** UX-01: this folder has `init --coding`'s setup ("ready"), or is a menu workspace that can move to it ("can-set-up"). */
+  readonly coding?: "ready" | "can-set-up";
 }
 
 export interface MenuOption {
@@ -57,6 +63,8 @@ export function menuOptions(state: FrontDoorState): MenuOption[] {
   const key = state.providerKeys[0];
   return [
     ...state.signIn.map(agentOption).filter((option): option is MenuOption => option !== null),
+    ...(state.coding === "ready" ? [{ value: "coding-chat" as const, name: "Work here with an agent that edits files and runs commands (asks you first)" }]
+      : state.coding === "can-set-up" ? [{ value: "coding-setup" as const, name: "Set up an agent that edits files and runs commands here (asks you first)" }] : []),
     ...(key === undefined ? [] : [{ value: "chat" as const, name: `Chat with a model (${key.apiKeyEnv} found)` }]),
     { value: "demo-chat", name: "Try a demo chat (no account or key needed)" },
     { value: "build", name: "Build an agent for my industry (A4 Forge preview)" },
@@ -65,10 +73,13 @@ export function menuOptions(state: FrontDoorState): MenuOption[] {
   ];
 }
 
-const BEST: readonly FrontDoorChoice[] = ["watch-claude", "watch-codex", "chat", "demo-chat"];
+const BEST: readonly FrontDoorChoice[] = ["watch-claude", "watch-codex", "coding-chat", "chat", "demo-chat"];
 
-/** Choices that start AMC's background services or open a browser: a remembered one is never the pre-selected line. */
-const STARTS_SERVICES: readonly FrontDoorChoice[] = ["watch-claude", "watch-codex", "build", "console"];
+/**
+ * Choices that start AMC's background services, open a browser, or change what an agent may do here (the coding
+ * setup): a remembered one is never the pre-selected line.
+ */
+const STARTS_SERVICES: readonly FrontDoorChoice[] = ["watch-claude", "watch-codex", "build", "console", "coding-setup"];
 
 /**
  * The last choice while it is still offered and does nothing beyond this terminal, else the most useful one that is.
@@ -81,7 +92,8 @@ export function defaultChoice(state: FrontDoorState): FrontDoorChoice {
 }
 
 const NEXT_LABEL: Partial<Record<FrontDoorChoice, string>> = {
-  "watch-claude": "Watch Claude Code", "watch-codex": "Watch Codex", chat: "Chat with a model", "demo-chat": "Try a demo chat"
+  "watch-claude": "Watch Claude Code", "watch-codex": "Watch Codex", "coding-chat": "Work here with an agent", chat: "Chat with a model",
+  "demo-chat": "Try a demo chat"
 };
 
 /** One next step under the score: the best menu choice when AMC knows what is here, else the menu itself. */
@@ -220,6 +232,10 @@ async function act(io: FrontDoorIo, choice: FrontDoorChoice, state: FrontDoorSta
     case "watch-codex": await watchAgent(io, AGENTS.codex); return "done";
     case "sign-in-claude": io.runAmc(["login", "claude"]); return "menu";
     case "sign-in-codex": io.runAmc(["login", "codex"]); return "menu";
+    // `init --coding` asks the person before it changes anything, and the menu comes back with the coding chat on it.
+    case "coding-setup": io.runAmc(["init", "--coding"], true); return "menu";
+    // The operator's own environment: after the setup the vault opens only with the passphrase the person chose.
+    case "coding-chat": io.runAmc([...chatArgs(state.providerKeys[0] ?? null), "--tools", "workspace", "--approval-mode", "default"]); return "done";
     case "chat": io.runAmc(chatArgs(state.providerKeys[0] ?? null), true); return "done";
     case "demo-chat": io.runAmc(chatArgs(null), true); return "done";
     case "build": await buildAgent(io, state.studioRunning); return "done";
@@ -259,6 +275,17 @@ function hasRun(workspace: string, agentId: string): boolean {
   }
 }
 
+/** Whether `init --coding`'s setup is here, or this menu workspace can move to it; neither when a file cannot be read. */
+function codingState(workspace: string): Pick<FrontDoorState, "coding"> {
+  try {
+    const write = loadActionPolicy(workspace).actions.find((rule) => rule.actionClass === "WRITE_LOW");
+    if (write?.executeOnApproval === true && existsSync(usersConfigPath(workspace))) return { coding: "ready" };
+    return codingAdoptionBlockers(workspace).length === 0 ? { coding: "can-set-up" } : {};
+  } catch {
+    return {};
+  }
+}
+
 /** Loopback only: the state file is unsigned workspace content, so a host that is not this machine is never a hook target. */
 function studioOrigin(workspace: string): string | null {
   return runningStudioBridgeBase(workspace);
@@ -278,7 +305,7 @@ export function terminalFrontDoorIo(params: { workspace: string; agentId: string
   return {
     log: (line) => console.log(line),
     detect: () => ({ signIn: inspectSignIn(), providerKeys: detectProviderKeys(operatorEnv), studioRunning: studioOrigin(workspace) !== null,
-      hasRun: hasRun(workspace, agentId), lastChoice: readLastChoice(workspace) }),
+      hasRun: hasRun(workspace, agentId), lastChoice: readLastChoice(workspace), ...codingState(workspace) }),
     select: async (message, options, selected) => (await inquirer.prompt<{ choice: FrontDoorChoice }>([{ type: "select", name: "choice", message,
       choices: options.map((option) => ({ name: option.name, value: option.value })), default: selected }])).choice,
     confirm: async (message) => (await inquirer.prompt<{ yes: boolean }>([{ type: "confirm", name: "yes", message, default: true }])).yes,
