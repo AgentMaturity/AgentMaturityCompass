@@ -31,7 +31,7 @@ function showSecondPeople() {
     secondPeople.set(id, html);
     const now = root?.querySelector(`[data-a4-second="${CSS.escape(id)}"]`);
     if (now) now.innerHTML = html;
-  }).catch(() => { /* the sentence above still says who it waits for; the card below shows the request */ });
+  }).catch(() => root?.querySelector(`[data-a4-second="${CSS.escape(id)}"] [data-a4-second-fallback]`)?.removeAttribute("hidden"));
 }
 
 const page = document.body.dataset.page;

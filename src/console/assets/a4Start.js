@@ -430,6 +430,8 @@ export function renderStartHere(ctx) {
   const shared = projectState(project, here ? ctx.readiness : ctx.headReadiness ?? null);
   const state = shared === "stop" ? "stop" : here ? moveState(project, move, stopped) : shared;
   const names = new Map([...list(project.members), ...list(ctx.members?.candidates)].map((row) => [row.principalKey, row.username]));
+  // What the panel showed before the second request's people: kept hidden under them, shown if their read fails (a4.js).
+  const firstPeople = live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : "";
   const heading = project.stage === "retired" ? "Retired" : project.hold ? "On hold" : here && state === "stop" ? "Stopped here" : !here ? `Viewing ${STAGE_SHORT[stage] ?? title(stage)}` : STEP_PLAIN[project.step] ?? title(project.step);
   const part = here && at >= 0 ? `<p class="muted">${esc(STAGE_PLAIN[stage] ?? title(stage))}: part ${at + 1} of ${STEPS.length}, ${esc(STEP_PLAIN[project.step] ?? project.step)}
       <small class="muted">(${esc(title(stage))}, ${esc(STEP_TITLES[project.step] ?? project.step)})</small>.</p>` : "";
@@ -444,7 +446,7 @@ export function renderStartHere(ctx) {
       <h3 id="a4StartTitle"><span class="a4-step-label">What to do now<span class="visually-hidden">: </span></span>${esc(heading)}</h3>
       ${stepRoute(project, stage, state, here && stopped && !project.hold ? "built" : null)}
       <p class="a4-now"${move.keep ? ` data-a4-keep="${esc(move.keep)}"` : ""}><strong>${esc(move.now)}</strong></p>
-      ${second ? `<div class="a4-second-people" data-a4-second="${esc(second)}"></div>` : live && !move.effect ? approvalPeople(live, ctx.readiness, names, ctx.me?.username) : ""}
+      ${second ? `<div class="a4-second-people" data-a4-second="${esc(second)}"><div hidden data-a4-second-fallback>${firstPeople}</div></div>` : firstPeople}
       <div class="row wrap">${primary(move.act, move.also)}</div>${move.people ? peopleFormHtml(ctx) : ""}
       ${move.how ? fold("How to release it", `<p class="muted">${esc(move.how).replace(/`([^`]+)`/g, "<code>$1</code>")}</p>`, "how") : ""}
       ${move.why ? fold("Tell me more", `<p class="muted">${esc(move.why)}</p>`, "why") : ""}

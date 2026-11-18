@@ -8,10 +8,18 @@ import { describe, expect, test } from "vitest";
 import * as start from "../../src/console/assets/a4Start.js";
 import { approvalPeopleHtml } from "../../src/console/assets/dailyView.js";
 
-const readiness = (code: string, status: string) => ({ status: "WAITING", allowed: {}, gates: { completion: { gateId: "g7", status: "QUORUM_MET" } },
+// The step each stage is at while its second request waits (src/a4/a4Gates.ts: a gate's quorum does not move the step;
+// consuming it does): Assemble's apply and Adapt's plan activation open on the completion gate, at "reviewed"; Activate's
+// release opens on the direction gate (src/a4/spec/activate.ts, release_effect) and consumes it, so the step is "proposed".
+const STEP: Record<string, string> = { assemble: "reviewed", adapt: "reviewed", activate: "proposed" };
+const GATE: Record<string, string> = { reviewed: "completion", proposed: "direction" };
+const readiness = (code: string, status: string, step: string) => ({ status: "WAITING", allowed: {},
+  gates: { [GATE[step] ?? "completion"]: { gateId: "g7", status: "QUORUM_MET", required: 2, approvals: 2,
+    decisions: [{ decisionId: "d1", username: "first", decision: "APPROVE" }] } },
   items: [{ id: code, status: "WAITING", mandatory: false, reasonCodes: ["APPROVAL_REQUEST:r9:d1", `APPROVAL_STATUS:${status}`], acknowledged: null, nextAction: null }] });
-const ctx = (stage: string, code: string, status = "PENDING") => ({ stage, project: { projectId: "a4p_1", agentId: "helper", stage, step: "reviewed", hold: false, members: [] },
-  gates: [{ gateId: "g7", excludedKeys: [] }], members: { candidates: [] }, questions: [], readiness: readiness(code, status),
+const ctx = (stage: string, code: string, status = "PENDING", step = STEP[stage] ?? "reviewed") => ({ stage,
+  project: { projectId: "a4p_1", agentId: "helper", stage, step, hold: false, members: [] },
+  gates: [{ gateId: "g7", excludedKeys: [] }], members: { candidates: [] }, questions: [], readiness: readiness(code, status, step),
   me: { userId: "u2", username: "second", roles: ["APPROVER"] }, allowed: { requestChanges: { allowed: true, reasonCodes: [] } } });
 
 describe("a second request's people in the A4 panel", () => {
@@ -23,10 +31,21 @@ describe("a second request's people in the A4 panel", () => {
     expect(start.pendingSecondRequest(ctx("assemble", "plan_review_opened") as never)).toBe("");
   });
 
-  test("the panel holds a place for the second request's people instead of the first approval's", () => {
-    const html = start.renderStartHere(ctx("assemble", "effect_gate") as never);
-    expect(html).toContain('data-a4-second="r9"');
-    expect(html).not.toContain('aria-label="Who approves"');
+  test("the panel holds a place for the second request's people at the step each stage is really at", () => {
+    for (const [stage, code] of [["assemble", "effect_gate"], ["adapt", "plan_review_opened"], ["activate", "release_effect"]]) {
+      const html = start.renderStartHere(ctx(stage, code) as never);
+      expect(html, stage).toContain('data-a4-second="r9"');
+      // The first approval's people are only a hidden fallback for a failed read of the second request.
+      expect(html.replace(/<div hidden data-a4-second-fallback>[\s\S]*?<\/div><\/div>/, ""), stage).not.toContain('aria-label="Who approves"');
+    }
+    // Activate's release before its plan is proposed: no gate and no second request yet, so no place either.
+    expect(start.renderStartHere(ctx("activate", "release_effect", "PENDING", "asked") as never)).not.toContain("data-a4-second");
+  });
+
+  test("Activate shows the plan approval's people as the fallback; a failed read reveals it", () => {
+    const html = start.renderStartHere(ctx("activate", "release_effect") as never);
+    expect(html).toMatch(/<div hidden data-a4-second-fallback><ul class="a4-people-row" aria-label="Who approves">[\s\S]*first/);
+    expect(readFileSync("src/console/assets/a4.js", "utf8")).toMatch(/\.catch\(\(\) => root\?\.querySelector\(`\[data-a4-second="[^`]*\] \[data-a4-second-fallback\]`\)\?\.removeAttribute\("hidden"\)\)/);
   });
 
   test("a4.js fills it from the read that writes nothing, drawn as people", () => {
