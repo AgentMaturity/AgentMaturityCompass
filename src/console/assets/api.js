@@ -258,6 +258,28 @@ export async function apiNativeRequest(path, options = {}) {
   return result.data.data;
 }
 
+/** A file a read route returns as a download (Content-Disposition), saved by the browser under the name it gives. */
+export async function apiDownload(path) {
+  const response = await fetch(withBase(path), { credentials: "include", headers: buildHeaders(), cache: "no-store" });
+  const text = await response.text();
+  if (!response.ok) {
+    let error = `HTTP ${response.status}`;
+    try { error = JSON.parse(text).error || error; } catch { /* not JSON */ }
+    throw new ConsoleApiError(error, response.status, "HTTP_ERROR");
+  }
+  const named = /filename="([A-Za-z0-9._-]+)"/.exec(response.headers.get("content-disposition") || "");
+  const name = named ? named[1] : "amc-export";
+  const url = URL.createObjectURL(new Blob([text], { type: response.headers.get("content-type") || "application/octet-stream" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return name;
+}
+
 export async function apiPost(path, body) {
   const headers = { "content-type": "application/json" };
   // Only existing approval decisions share the native browser intent boundary.

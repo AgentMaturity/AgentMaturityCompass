@@ -122,3 +122,25 @@ export function actionPolicyGuard(workspace: string): ToolGuard {
       ? `Action Policy now permits only SIMULATE for ${execution.actionClass}` : undefined;
   };
 }
+
+/** What the native runtime does with one class of action in this workspace (UX-06), from the verdict the guard uses. */
+export type ActionOutcome = "runs" | "asks a person" | "dry run" | "blocked" | "no signed policy";
+
+/**
+ * For each class, what really happens to a call that asks to run it: read from the signed Action Policy in force through
+ * the same verdict `actionPolicyGuard` and `actionPolicyMode` apply, with and without a person's approval
+ * (`executeOnApproval`). A read returns real results even as a dry run, so a readable READ_ONLY class runs.
+ */
+export function actionPolicyOutcomes(workspace: string, agentId: string, classes: readonly ActionClass[]):
+  Array<{ readonly actionClass: ActionClass; readonly outcome: ActionOutcome; readonly reasons: readonly string[] }> {
+  return classes.map((actionClass) => {
+    const call = { name: "governor-outcome", agentId, actionClass, requestedMode: "EXECUTE" as const };
+    const alone = actionPolicyVerdict(workspace, call);
+    if (alone === null) return { actionClass, outcome: "no signed policy", reasons: ["No signed Action Policy applies in this workspace."] };
+    if (alone.denial !== null) return { actionClass, outcome: "blocked", reasons: [alone.denial] };
+    const reasons = alone.reasons ?? [];
+    if (alone.mode === "EXECUTE" || actionClass === "READ_ONLY") return { actionClass, outcome: "runs", reasons };
+    const approved = actionPolicyVerdict(workspace, { ...call, approved: true });
+    return { actionClass, outcome: approved?.denial === null && approved.mode === "EXECUTE" ? "asks a person" : "dry run", reasons };
+  });
+}

@@ -1512,3 +1512,14 @@ body[data-session="none"] .topbar-actions > :not(#guideOpenLink) { display: none
   .shell::before { content: ""; position: fixed; inset: 0 auto 0 0; width: 270px; background: rgba(10,10,10,.96); border-right: 1px solid var(--border); z-index: -1; }
 }
 .a4-form { max-width: 680px; }
+
+/* UX-04/UX-06: agent sessions, the call behind an approval, and the Governor grid. */
+.agent-session { border-top: 1px solid var(--border); padding: 10px 0; }
+.agent-session h4 { margin: 0 0 4px; font-size: 14px; }
+.agent-session-actions { margin: 6px 0; padding-left: 18px; }
+.approval-call-lines { white-space: pre-wrap; word-break: break-word; max-height: 28rem; }
+.governor-grid th, .governor-grid td { text-align: center; padding: 8px 10px; }
+.governor-grid tbody th { text-align: left; font-weight: 600; }
+.governor-cell.on { font-size: 18px; font-weight: 700; }
+.governor-cell.on.status-warn { color: var(--warn); }
+.governor-cell.on.muted { color: var(--ink); }
