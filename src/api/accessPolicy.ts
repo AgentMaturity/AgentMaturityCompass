@@ -181,6 +181,11 @@ export function resolveApiRolePolicy(pathname: string, rawMethod: string): ApiRo
     if (/^\/api\/v1\/operator\/review-packets\/[^/]+\/download$/.test(pathname)) {
       return { access: "attest", roles: [...ATTESTER_ROLES] };
     }
+    // UX-05: a session export carries every row's signed metadata, which can hold content (a Gemini part's call arguments
+    // and reply text). It goes to the roles a review packet goes to; any reader may still list sessions.
+    if (/^\/api\/v1\/evidence\/sessions\/[^/]+\/export$/.test(pathname)) {
+      return { access: "attest", roles: [...ATTESTER_ROLES] };
+    }
     return { access: "read", roles: [...HUMAN_READ_ROLES] };
   }
 

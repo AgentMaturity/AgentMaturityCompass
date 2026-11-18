@@ -197,9 +197,24 @@ describe("session audit for the console", () => {
     expect(renderSessionExportHtml(doc)).not.toContain(KEY_BODY);
   });
 
-  it("the new routes are reads: every human role may call them, and no write method is handled", async () => {
+  it("security (H1): a Gemini session's export carries reply text in signed metadata, so only AUDITOR and OWNER may export", () => {
+    const s = new SessionService(workspace, openSessionEventStore(workspace, "sqlite"));
+    s.open({ sessionId: "gemini-0001", agentId: "default", harnessVersion: "audit-test", compositionDigest: sha256Hex("c"), policyDigest: sha256Hex("p") });
+    s.startTurn({ trigger: "user" }); s.startStep();
+    const reply = "the private reply text 42";
+    s.recordAssistantBlock({ blockKind: "text", content: reply,
+      gemini: { version: 1, responseId: "resp-1", partIndex: 0, partJson: JSON.stringify({ text: reply }), headerEventId: "hdr-1" } } as never);
+    s.endStep({ stopReason: "end_turn", usage: null }); s.endTurn({ reason: "complete" }); s.sealTurn(); s.disposeWithoutClosing();
+    const file = sessionAuditExport(workspace, "gemini-0001", "json");
+    expect(file.status === 200 && file.body).toContain(reply.replaceAll(" ", " "));
+    const exportPath = "/api/v1/evidence/sessions/gemini-0001/export";
+    expect(resolveApiRolePolicy(exportPath, "GET").roles.sort()).toEqual(["AUDITOR", "OWNER"]);
+    for (const role of ["VIEWER", "OPERATOR", "APPROVER"]) expect(resolveApiRolePolicy(exportPath, "GET").roles).not.toContain(role);
+  });
+
+  it("the new routes are reads: the list for every human role, the export for AUDITOR and OWNER, and no write method is handled", async () => {
+    expect(resolveApiRolePolicy("/api/v1/evidence/sessions", "GET").roles).toContain("VIEWER");
     for (const path of ["/api/v1/evidence/sessions", "/api/v1/evidence/sessions/cli-chat-0001/export"]) {
-      expect(resolveApiRolePolicy(path, "GET").roles).toContain("VIEWER");
       expect(resolveApiRolePolicy(path, "POST").roles).not.toContain("VIEWER");
     }
     chat();

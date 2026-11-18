@@ -102,8 +102,9 @@ export function listAuditSessions(workspace: string, agentId = "default"): { rea
 
 /**
  * One session as a file for an auditor: the signed record (`json`, what `amc-verify` and `amc session verify-export`
- * read) or the readable page (`html`). Record only: message and tool text are not embedded, so the file holds what the
- * console already shows any signed-in reader (tool names, outcomes, approval questions and answers) plus digests.
+ * read) or the readable page (`html`). Payloads are not embedded, but every row's signed metadata is, and some carries
+ * content (a Gemini part's call arguments and reply text, an approval question, a provider's error message), so the
+ * route is for AUDITOR and OWNER only (src/api/accessPolicy.ts), as a review packet is.
  */
 export function sessionAuditExport(workspace: string, sessionId: string, format: "json" | "html"):
   { readonly status: 200; readonly fileName: string; readonly contentType: string; readonly body: string } | { readonly status: 400 | 404; readonly error: string } {

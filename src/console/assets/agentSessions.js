@@ -1,7 +1,7 @@
 // Agent sessions (UX-04, UX-05): every chat or run of the native agent, from the terminal or this console, with each
 // action it took and who approved it, and an "Export for auditor" button any signed-in reader may press. The export is
 // the signed record (no message text); an auditor checks it with amc-verify or amc session verify-export.
-import { apiDownload, apiGet } from "./api.js";
+import { apiDownload, apiGet, applyRoleGates, getCurrentUser } from "./api.js";
 import { esc } from "./pageKit.js";
 
 const OUTCOMES = { OK: "ran", DENIED: "refused, did not run", ERROR: "failed", CANCELLED: "cancelled", TOOL_OUTCOME_UNKNOWN: "may have run (outcome unknown)" };
@@ -27,11 +27,18 @@ function sessionHtml(session) {
     <p class="muted">Session ${id}. ${esc(state)}</p>
     ${actions}
     <div class="studio-actions">
-      <button type="button" data-export="json" data-session="${id}">Export for auditor</button>
-      <button type="button" class="secondary" data-export="html" data-session="${id}">Readable page</button>
+      <button type="button" data-export="json" data-roles="AUDITOR,OWNER" data-session="${id}">Export for auditor</button>
+      <button type="button" class="secondary" data-export="html" data-roles="AUDITOR,OWNER" data-session="${id}">Readable page</button>
     </div>
+    ${mayExport() ? "" : `<p class="muted">Only an auditor or an owner can export a session: the signed record can include what the agent wrote and the arguments it used.</p>`}
     <p class="muted agent-session-result" role="status"></p>
   </article>`;
+}
+
+/** The server refuses an export to any other role (src/api/accessPolicy.ts); an admin-token session is decided there. */
+function mayExport() {
+  const roles = getCurrentUser()?.roles;
+  return !Array.isArray(roles) || roles.includes("AUDITOR") || roles.includes("OWNER");
 }
 
 function savedText(name, format) {
@@ -59,6 +66,7 @@ export async function renderAgentSessionsInto(root, agentId, limit = 10) {
     <p class="muted">Every chat or run of the agent, from a terminal or this console. Each action is listed with its result and who approved it. "Export for auditor" saves the signed record of one session; an auditor can check it with amc-verify, without AMC.</p>
     ${sessions.length === 0 ? `<p>No agent sessions yet. They appear here after a chat (amc agent-loop chat) or a task.</p>` : sessions.map(sessionHtml).join("")}
     ${data && data.total > sessions.length ? `<p class="muted">${data.total - sessions.length} older session(s) not shown.</p>` : ""}`;
+  applyRoleGates(section);
   section.addEventListener("click", async (event) => {
     const button = event.target.closest("button[data-export]");
     if (!button) return;
