@@ -21,7 +21,9 @@ export interface ContinuityOptions extends RunOptions {
 }
 
 const CONTINUE_HELP = "continue the most recent released native session for this agent in this workspace (the same flags as its original run are required)";
-const STOP_HELP = "repeatable run limit: max-turns:N (highest session turn number that may open), max-tokens:N (provider-reported tokens over the session) or timeout-ms:N (wall clock from start); a breach is a signed cancel with cause limit";
+const STOP_HELP = "repeatable run limit: max-turns:N (highest session turn number that may open), max-tokens:N (provider-reported tokens over the session), "
+  + "timeout-ms:N (wall clock from start) or max-cost-usd:D (indicative cost over the session; stops if a request has no known cost); a breach is a signed cancel with cause limit. "
+  + "Stricter turn guards: repeated-calls:N (2-5, default 5 identical calls in a row end the turn), malformed-responses:N (1-3, default 3), denials:N (1-5, default 5 refusals in one turn)";
 
 function collect(value: string, previous: string[] = []): string[] { return [...previous, value]; }
 

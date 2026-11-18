@@ -366,6 +366,8 @@ export interface ComposedTurnOutcome {
   readonly keptOpen?: boolean;
   /** Set when an operator run limit ended this run's work; the signed `loop/cancel` row carries the same cause. */
   readonly runLimit?: RunLimitBreach;
+  /** The turn guard (repeated call, malformed responses, denials) that ended a turn of this run, if any. */
+  readonly guardStop?: RunLimitBreach;
 }
 
 /**
@@ -730,7 +732,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
       // would name sections the prompt does not contain.
       promptSections: prompt.assemble().sections.map((section) => section.name),
       ...(resumed === null ? {} : { resumed }),
-      ...(loop.agent.runLimitEnding === null ? {} : { runLimit: loop.agent.runLimitEnding })
+      ...(loop.agent.runLimitEnding === null ? {} : { runLimit: loop.agent.runLimitEnding }),
+      ...(loop.agent.turnGuardEnding === null ? {} : { guardStop: loop.agent.turnGuardEnding })
     };
   } finally {
     if (steerTimer !== null) clearTimeout(steerTimer);
