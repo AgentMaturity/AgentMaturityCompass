@@ -6,9 +6,11 @@
  * check rows) and written as one signed `native-turn-verification` row before `turn/end`, so it sits inside the
  * turn's seal. `agent-loop verify` recomputes it from the same rows and fails integrity when they disagree.
  *
- * What counts as a change: any tool call whose result is not a refusal, except the tools named in READ_ONLY_TOOLS. An
- * `fs.write` or `fs.edit` that ended in an error wrote nothing (it refuses before writing, and writes atomically), so it
- * is not counted either; `apply_patch` is, because it can stop part way.
+ * What counts as a change: any tool call whose result is not a refusal (DENIED, recorded before the body ran), except
+ * the tools named in READ_ONLY_TOOLS. A tool error still counts: the result row carries no field that says no effect
+ * happened, so "it errored" is never read as "it wrote nothing". When in doubt the turn changed files: a call id that
+ * repeats in the turn, a result with no open call of that id, and a call with no result all count as changes after
+ * any check.
  * A shell command (`bash`, a terminal or a background job), a delegated child, a workflow and every MCP or unknown
  * tool count as "may have changed files": the record cannot show cheaply and truthfully that they did not. A call
  * with no recorded result counts too. What counts as a check: only a harness-run check (an operator `--validate`
@@ -46,8 +48,6 @@ export const TURN_VERIFICATION_KIND = "native-turn-verification";
 export const VERIFY_ON_STOP_KIND = "native-verify-on-stop";
 const STATUSES: ReadonlySet<string> = new Set(["no-changes", "changed-and-checked-pass", "changed-and-checked-fail", "changed-unchecked"]);
 const SETTINGS: ReadonlySet<string> = new Set(["on", "off", "no-checks", "validate"]);
-/** File tools that either write the whole file or nothing: an ERROR from them means nothing was written. */
-const ATOMIC_FILE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit"]);
 /** Built-in tools that cannot change workspace files. Everything else may. */
 const READ_ONLY_TOOLS: ReadonlySet<string> = new Set(["fs.read", "glob", "grep", "ls", "plan", "todo", "tool_search", "web_fetch",
   "web_search", "ask_user", "session.spill_read", "skill.load", "get_goal", "job_list", "job_output", "terminal_list", "terminal_read", "echo"]);
@@ -59,18 +59,25 @@ function metaOf(row: EvidenceEvent): Record<string, unknown> {
 
 /** One turn's status from the rows committed so far. */
 export function computeTurnVerification(rows: readonly EvidenceEvent[], turn: number): TurnVerification {
-  const open = new Map<string, { readonly eventId: string; readonly atomic: boolean }>();
+  // Keyed by the model's call id, the only id both rows carry; any ambiguity in it counts as a change nothing checked.
+  const open = new Map<string, { readonly eventId: string; readonly readOnly: boolean }>();
+  const seen = new Set<string>();
   const checks: { readonly start: number; readonly status: unknown; readonly eventId: string; readonly reason: string | null }[] = [];
   let changes = 0, lastChangeAt = -1, lastChangeEventId: string | null = null, checkStart = -1;
   rows.forEach((row, at) => {
     const meta = metaOf(row);
     if (meta.turn !== turn) return;
-    if (row.event_type === "tool/call" && typeof meta.toolCallId === "string" && !READ_ONLY_TOOLS.has(String(meta.toolName))) {
-      open.set(meta.toolCallId, { eventId: row.id, atomic: ATOMIC_FILE_TOOLS.has(String(meta.toolName)) });
-    } else if (row.event_type === "tool/result" && typeof meta.toolCallId === "string" && open.has(meta.toolCallId)) {
-      const call = open.get(meta.toolCallId)!;
-      open.delete(meta.toolCallId);
-      if (meta.denied !== true && meta.outcome !== "DENIED" && !(call.atomic && meta.outcome === "ERROR")) { changes++; lastChangeAt = at; lastChangeEventId = row.id; }
+    const unclear = (): void => { changes++; lastChangeAt = Infinity; lastChangeEventId = row.id; };
+    if (row.event_type === "tool/call") {
+      const id = meta.toolCallId;
+      if (typeof id !== "string" || seen.has(id)) { unclear(); return; }
+      seen.add(id);
+      open.set(id, { eventId: row.id, readOnly: READ_ONLY_TOOLS.has(String(meta.toolName)) });
+    } else if (row.event_type === "tool/result") {
+      const call = typeof meta.toolCallId === "string" ? open.get(meta.toolCallId) : undefined;
+      if (call === undefined) { unclear(); return; }
+      open.delete(meta.toolCallId as string);
+      if (!call.readOnly && meta.denied !== true && meta.outcome !== "DENIED") { changes++; lastChangeAt = Math.max(lastChangeAt, at); lastChangeEventId = row.id; }
     }
     else if (row.event_type === "audit" && meta.kind === "native-validation" && meta.phase === "requested") checkStart = at;
     else if (row.event_type === "audit" && meta.kind === "native-validation" && meta.phase === "finished") {
@@ -80,7 +87,7 @@ export function computeTurnVerification(rows: readonly EvidenceEvent[], turn: nu
     }
   });
   // A change with no recorded result may still be running or may have landed: nothing checked it afterwards.
-  for (const call of open.values()) { changes++; lastChangeAt = Infinity; lastChangeEventId = call.eventId; }
+  for (const call of open.values()) if (!call.readOnly) { changes++; lastChangeAt = Infinity; lastChangeEventId = call.eventId; }
   if (changes === 0) return { status: "no-changes", changes, lastChangeEventId, checkEventId: null, reason: null };
   const after = checks.filter(check => check.start > lastChangeAt).at(-1);
   if (after === undefined) {

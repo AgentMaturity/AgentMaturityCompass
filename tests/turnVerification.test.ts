@@ -11,7 +11,7 @@ import type { NativeValidationPlan } from "../src/agent/nativeValidation.js";
 import { projectNativeValidation } from "../src/agent/nativeValidationProjection.js";
 import { pipelineToolSeam } from "../src/agent/pipelineToolSeam.js";
 import { readAgentRunSummary, renderRunSummary, verifyAgentRun } from "../src/agent/runReport.js";
-import { computeTurnVerification, describeTurnCheck, projectTurnChecks, workspaceAfterEditChecks } from "../src/agent/turnVerification.js";
+import { computeTurnVerification, describeTurnCheck, projectTurnChecks, recordTurnVerification, workspaceAfterEditChecks } from "../src/agent/turnVerification.js";
 import { bashTool } from "../src/tools/builtin/bashTool.js";
 import { fsTools } from "../src/tools/builtin/fsTools.js";
 import { ReadBeforeEditLedger } from "../src/tools/builtin/readBeforeEdit.js";
@@ -85,14 +85,14 @@ describe("turn check status (always recorded)", () => {
     expect((await verifyAgentRun(f.harness.dir, f.harness.sessionId)).integrityOk).toBe(true);
   });
 
-  test("a refused command and a file write that errored are not changes; a failing command still is", async () => {
+  test("a refused command is not a change; a file write that errored and a failing command still are", async () => {
     const f = fixture([toolStep("b1", "bash", JSON.stringify({ command: "touch x.txt" })), textStep("Could not.")], async () => "deny");
     await run(f, false);
     expect(checks(f)[0]?.status).toBe("no-changes");
-    // fs.write refuses before writing and writes atomically: its ERROR means nothing landed.
+    // Security finding 1: an ERROR is not evidence that nothing was written; the result row has no such marker.
     const g = fixture([toolStep("w1", "fs.write", JSON.stringify({ path: "../outside.txt", content: "x" })), textStep("Could not.")]);
     await run(g, false);
-    expect(checks(g)[0]?.status).toBe("no-changes");
+    expect(checks(g)[0]?.status).toBe("changed-unchecked");
     // A shell command that exits non-zero may still have written: it counts.
     const h = fixture([toolStep("b2", "bash", JSON.stringify({ command: "touch y.txt; exit 3" })), textStep("Hm.")]);
     await run(h, false);
@@ -195,6 +195,33 @@ describe("the verifier recomputes the status", () => {
     expect(report.sessionChainErrors.join("\n")).toContain("Turn 2's recorded check status (changed-and-checked-pass) does not match its recorded actions (no-changes)");
   });
 
+  test("the verifier agrees with the writer on a turn with a repeated call id, and refuses a forged no-changes", async () => {
+    const f = fixture([textStep("Hello.")]);
+    await run(f, false);
+    const session = f.harness.session;
+    const turnWith = (status: string | null): void => {
+      session.startTurn({ trigger: "user" } as never);
+      session.startStep();
+      session.recordToolCall({ toolCallId: "dup", toolName: "fs.write", dispatch: "native", parentToken: null, args: "{}" } as never);
+      session.recordToolCall({ toolCallId: "dup", toolName: "fs.read", dispatch: "native", parentToken: null, args: "{}" } as never);
+      session.recordToolResult({ toolCallId: "dup", outcome: "OK", exitCode: null, timedOut: false, denied: false, content: "ok" });
+      session.endStep({ stopReason: "end_turn", usage: null });
+      const turn = session.turnsStarted;
+      if (status === null) recordTurnVerification(session, turn, "off");
+      else session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: { kind: "native-turn-verification", version: 1, turn,
+        status, changes: 0, lastChangeEventId: null, checkEventId: null, reason: null, verifyOnStop: "off" } });
+      session.endTurn({ reason: "complete" } as never);
+      session.sealTurn();
+    };
+    turnWith(null);
+    expect(checks(f).at(-1)?.status).toBe("changed-unchecked");
+    turnWith("no-changes");
+    f.harness.finish();
+    const report = await verifyAgentRun(f.harness.dir, f.harness.sessionId);
+    expect(report.sessionChainErrors.filter(error => error.includes("recorded check status"))).toEqual([
+      expect.stringContaining("Turn 3's recorded check status (no-changes) does not match its recorded actions (changed-unchecked)")]);
+  });
+
   test("the status is computed from row order", () => {
     const row = (id: string, eventType: string, m: Record<string, unknown>): EvidenceEvent => ({ id, event_type: eventType, meta_json: JSON.stringify({ turn: 1, ...m }) } as EvidenceEvent);
     const checked = [row("c", "tool/call", { toolCallId: "a", toolName: "bash" }), row("r", "tool/result", { toolCallId: "a", outcome: "OK" }),
@@ -204,6 +231,18 @@ describe("the verifier recomputes the status", () => {
     expect(computeTurnVerification([...checked.slice(2), ...checked.slice(0, 2)], 1)).toMatchObject({ status: "changed-unchecked", reason: "check-before-last-change" });
     // A change with no result yet, after the check: not checked.
     expect(computeTurnVerification([...checked, row("c2", "tool/call", { toolCallId: "b", toolName: "mcp__x__y" })], 1).status).toBe("changed-unchecked");
+    // Security finding 2: a repeated call id cannot pair a write's result with another call and hide the write.
+    const write = row("w", "tool/call", { toolCallId: "a", toolName: "fs.write" });
+    const read = row("x", "tool/call", { toolCallId: "a", toolName: "fs.read" });
+    const ok = row("o", "tool/result", { toolCallId: "a", outcome: "OK" });
+    expect(computeTurnVerification([...checked.slice(2), write, read, ok, row("o2", "tool/result", { toolCallId: "a", outcome: "OK" })], 1).status).toBe("changed-unchecked");
+    // A result with no open call of its id (out of order, or for another turn's call) counts as a change.
+    expect(computeTurnVerification([row("o", "tool/result", { toolCallId: "z", outcome: "OK" }), ...checked.slice(2)], 1).status).toBe("changed-unchecked");
+    // A write whose result never came, before a check: still unchecked.
+    expect(computeTurnVerification([row("w", "tool/call", { toolCallId: "w", toolName: "fs.write" }), ...checked.slice(2)], 1).status).toBe("changed-unchecked");
+    // An erroring write with no marker is a change; a DENIED one is not.
+    expect(computeTurnVerification([row("w", "tool/call", { toolCallId: "w", toolName: "fs.write" }), row("e", "tool/result", { toolCallId: "w", outcome: "ERROR" })], 1).status).toBe("changed-unchecked");
+    expect(computeTurnVerification([row("w", "tool/call", { toolCallId: "w", toolName: "fs.write" }), row("e", "tool/result", { toolCallId: "w", outcome: "DENIED", denied: true })], 1).status).toBe("no-changes");
     // Reads never count.
     expect(computeTurnVerification([row("c", "tool/call", { toolCallId: "a", toolName: "fs.read" }), row("r", "tool/result", { toolCallId: "a", outcome: "OK" })], 1).status).toBe("no-changes");
   });
