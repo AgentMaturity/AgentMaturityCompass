@@ -2,9 +2,10 @@
  * Cheap loop guards (HP-01, HP-23) and the ordered turn-policy list (HP-03).
  *
  * Three per-turn guards, each a count the driver checks after `step/end`:
- *   - repeated call: the same tool with the same arguments (keys sorted) called again and again in a row. From the
- *     `refuseAt`-th identical call the call is NOT run and the model is told why; at `stopAt` the turn ends.
- *     A write-class call that succeeds clears the streak (the workspace changed, so the next call is a new question).
+ *   - repeated call: the same tool with the same arguments (keys sorted, text NFC) called again within one turn, in
+ *     any order. From the `refuseAt`-th identical call the call is NOT run and the model is told why; at `stopAt` the
+ *     turn ends. A write-class call that succeeds clears the counts of every other call (the workspace may have
+ *     changed), never its own; a steer clears them all. Polling tools (`polls` in nativeToolCapabilities) are not counted.
  *   - malformed responses: consecutive steps whose tool calls could not be used (arguments that are not a JSON
  *     object, or a tool the request never offered). A step whose calls are all well formed clears the streak.
  *   - denials: calls refused by a guard, a policy or an approver in one turn. The loop's own refusals (unoffered
@@ -18,8 +19,9 @@ import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 import type { ActionClass, EvidenceEvent } from "../types.js";
 import { readTurnEndMeta } from "../session/turnLifecycleMeta.js";
-import type { RunLimitBreach, RunLimits, RunLimitTracker, RunCostView } from "./runLimits.js";
+import type { RunLimitBreach, RunLimits, RunLimitTracker } from "./runLimits.js";
 import type { ToolCallOutcome } from "./toolSeam.js";
+import { isPollingNativeTool } from "./nativeToolCapabilities.js";
 
 /** The defaults. `--stop` may only lower them (src/agent/runLimits.ts). */
 export const TURN_GUARD_DEFAULTS = Object.freeze({ repeatRefuseAt: 3, repeatedCalls: 5, malformedResponses: 3, denials: 5 });
@@ -36,11 +38,22 @@ export interface GuardedCall {
 /** The arguments' canonical form (keys sorted), or null when they are not a JSON object. `""` reads as `{}`, as the pipeline reads it. */
 export function canonicalArguments(raw: string): string | null {
   try {
-    const parsed: unknown = JSON.parse(raw === "" ? "{}" : raw);
+    // NFC: two spellings of the same text are the same call.
+    const parsed: unknown = JSON.parse(raw === "" ? "{}" : raw, (_key, value: unknown) => typeof value === "string" ? value.normalize("NFC") : value);
     return typeof parsed === "object" && parsed !== null && !Array.isArray(parsed) ? canonicalize(parsed) : null;
   } catch {
     return null;
   }
+}
+
+/** What `beforeCall` hands back: the loop's own answer (or null to dispatch), and the call's place in the count. */
+export interface GuardDecision { readonly answer: ToolCallOutcome | null; readonly ticket: GuardTicket | null }
+/** A counted call: its signature and when it was counted (for the write reset). */
+export interface GuardTicket { readonly signature: string; readonly seq: number }
+
+/** A configured guard bound, held to [floor, default]: a typed caller cannot loosen what the parser refuses. */
+function clamp(value: number | undefined, floor: number, ceiling: number): number {
+  return value === undefined || !Number.isFinite(value) ? ceiling : Math.max(floor, Math.min(ceiling, Math.trunc(value)));
 }
 
 export class TurnGuards {
@@ -48,60 +61,65 @@ export class TurnGuards {
   private readonly stopAt: number;
   private readonly malformedAt: number;
   private readonly denialsAt: number;
-  private signature: string | null = null;
-  private streak = 0;
+  /** Per turn: how often each signature was called since the last reset, and the sequence of its latest call. */
+  private readonly counts = new Map<string, { count: number; seq: number }>();
+  private seq = 0;
   private stepMalformed = false;
   private malformedSteps = 0;
   private readonly denied: string[] = [];
   private tripped: RunLimitBreach | null = null;
-  private last: RunLimitBreach | null = null;
 
   constructor(limits: RunLimits = {}) {
-    this.stopAt = limits.repeatedCalls ?? TURN_GUARD_DEFAULTS.repeatedCalls;
+    this.stopAt = clamp(limits.repeatedCalls, 2, TURN_GUARD_DEFAULTS.repeatedCalls);
     this.refuseAt = Math.min(TURN_GUARD_DEFAULTS.repeatRefuseAt, this.stopAt);
-    this.malformedAt = limits.malformedResponses ?? TURN_GUARD_DEFAULTS.malformedResponses;
-    this.denialsAt = limits.denials ?? TURN_GUARD_DEFAULTS.denials;
+    this.malformedAt = clamp(limits.malformedResponses, 1, TURN_GUARD_DEFAULTS.malformedResponses);
+    this.denialsAt = clamp(limits.denials, 1, TURN_GUARD_DEFAULTS.denials);
   }
 
-  /** At each turn start. The malformed streak counts steps of one turn, like the others. */
+  /** At each turn start. Every count is per turn; the stop is kept until the next turn starts (the run report reads it). */
   reset(): void {
-    this.signature = null;
-    this.streak = 0;
+    this.clearRepeats();
     this.stepMalformed = false;
     this.malformedSteps = 0;
     this.denied.length = 0;
     this.tripped = null;
   }
 
-  /** The stop this turn owes, if any. */
+  /** A person's message reached the turn (a steer): the model may now have a reason to repeat a call. */
+  clearRepeats(): void { this.counts.clear(); }
+
+  /** The guard stop of the current (or just ended) turn, if any. */
   get trip(): RunLimitBreach | null { return this.tripped; }
 
-  /** The last guard stop of this driver, kept across turns for the run report. */
-  get lastTrip(): RunLimitBreach | null { return this.last; }
-
-  /** In model order, before dispatch: the loop's own answer to a repeated call, or null to dispatch as usual. */
-  beforeCall(call: GuardedCall): ToolCallOutcome | null {
+  /** In model order, before dispatch. Polling tools (whose result changes with no call between) are not counted. */
+  beforeCall(call: GuardedCall): GuardDecision {
     const args = call.unoffered === true ? null : canonicalArguments(call.arguments);
-    if (args === null) { this.stepMalformed = true; return null; }
-    const signature = sha256Hex(canonicalize([call.name, args]));
-    this.streak = signature === this.signature ? this.streak + 1 : 1;
-    this.signature = signature;
-    if (this.streak < this.refuseAt) return null;
-    if (this.streak >= this.stopAt) this.stop({ kind: "limit", condition: "repeated-call", bound: this.stopAt, tools: [call.name.slice(0, MAX_NAME)] });
-    return { outcome: "DENIED", denied: true, exitCode: null, timedOut: false,
-      content: `[amc] You made this exact call (same tool, same arguments) ${this.streak} times in a row, so it was not run. `
+    if (args === null) { this.stepMalformed = true; return { answer: null, ticket: null }; }
+    if (isPollingNativeTool(call.name)) return { answer: null, ticket: null };
+    const signature = sha256Hex(canonicalize([call.name, args])), seq = ++this.seq;
+    const count = (this.counts.get(signature)?.count ?? 0) + 1;
+    this.counts.set(signature, { count, seq });
+    const ticket = { signature, seq };
+    if (count < this.refuseAt) return { answer: null, ticket };
+    if (count >= this.stopAt) this.stop({ kind: "limit", condition: "repeated-call", bound: this.stopAt, tools: [call.name.slice(0, MAX_NAME)] });
+    return { ticket, answer: { outcome: "DENIED", denied: true, exitCode: null, timedOut: false,
+      content: `[amc] You have made this exact call (same tool, same arguments) ${count} times in this turn, so it was not run. `
         + (this.tripped === null ? "Change the arguments, try a different approach, or stop and say what is blocking you."
-          : "The turn is ending; say what is blocking you.") };
+          : "The turn is ending; say what is blocking you.") } };
   }
 
-  /** After a dispatched call settles. `actionClass` null (unknown) never clears the streak: unknown is not a write. */
-  afterCall(name: string, outcome: ToolCallOutcome, actionClass: ActionClass | null): void {
+  /**
+   * After a dispatched call settles. A write-class call that succeeded clears the counts of every OTHER signature counted
+   * before it started (the workspace may have changed), never its own: the same successful write repeated still counts.
+   * `actionClass` null (unknown) is not a write.
+   */
+  afterCall(name: string, outcome: ToolCallOutcome, actionClass: ActionClass | null, ticket: GuardTicket | null): void {
     if (outcome.denied) {
       this.denied.push(name.slice(0, MAX_NAME));
       if (this.denied.length >= this.denialsAt) this.stop({ kind: "limit", condition: "denials", bound: this.denialsAt, tools: this.denied });
-    } else if (outcome.outcome === "OK" && actionClass !== null && actionClass !== "READ_ONLY") {
-      this.signature = null;
-      this.streak = 0;
+    } else if (ticket !== null && outcome.outcome === "OK" && actionClass !== null && actionClass !== "READ_ONLY") {
+      // Only counts made before this write started: its own entry was counted at its start (seq === ticket.seq), so it stays.
+      for (const [signature, entry] of this.counts) if (entry.seq < ticket.seq) this.counts.delete(signature);
     }
   }
 
@@ -116,7 +134,6 @@ export class TurnGuards {
     if (this.tripped !== null) return;
     const tools = breach.tools === undefined ? undefined : [...new Set(breach.tools)].sort().slice(0, 16);
     this.tripped = Object.freeze({ ...breach, ...(tools === undefined ? {} : { tools }) });
-    this.last = this.tripped;
   }
 }
 
@@ -128,11 +145,11 @@ export type TurnPolicy = () => TurnStop | null;
  * The checks the driver runs after each `step/end`, in order; the first stop wins. Token and cost limits come first,
  * so a run that is over budget is reported as over budget, not as stuck.
  */
-export function turnPolicies(limits: RunLimitTracker | null, guards: TurnGuards, cost: () => RunCostView): readonly TurnPolicy[] {
+export function turnPolicies(limits: RunLimitTracker | null, guards: TurnGuards): readonly TurnPolicy[] {
   const run = (cause: RunLimitBreach | null): TurnStop | null => cause === null ? null : { cause, scope: "run" };
   return [
     () => run(limits?.breach ?? null),
-    () => run(limits?.recordCost(cost) ?? null),
+    () => run(limits?.recordCost() ?? null),
     () => guards.trip === null ? null : { cause: guards.trip, scope: "turn" }
   ];
 }
@@ -149,7 +166,7 @@ export function firstStop(policies: readonly TurnPolicy[]): TurnStop | null {
 export function describeTurnStop(cause: { readonly condition: string; readonly bound: number; readonly unmeasured?: true; readonly tools?: readonly string[] }): string {
   const tools = cause.tools === undefined || cause.tools.length === 0 ? "" : ` (${cause.tools.map(name => JSON.stringify(name)).join(", ")})`;
   switch (cause.condition) {
-    case "repeated-call": return `The agent made the same tool call ${cause.bound} times in a row${tools}, so AMC ended the turn.`;
+    case "repeated-call": return `The agent made the same tool call ${cause.bound} times in one turn${tools}, so AMC ended the turn.`;
     case "malformed-responses": return `The model sent ${cause.bound} responses in a row whose tool calls AMC could not use, so AMC ended the turn.`;
     case "denials": return `${cause.bound} tool calls were refused in one turn${tools}, so AMC ended the turn. Nothing refused was run.`;
     case "max-cost-usd": return cause.unmeasured === true

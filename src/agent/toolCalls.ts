@@ -333,11 +333,14 @@ class RunState {
   private start(index: number, call: ToolUseContentBlock): void {
     this.started = Math.max(this.started, index + 1);
     // In model order: a repeated call is answered by the loop and reaches no seam, like an unoffered one.
-    const { guards, tools } = this.input, repeated = guards?.beforeCall(call) ?? null;
+    const { guards, tools } = this.input, guard = guards?.beforeCall(call) ?? null;
     this.inFlight.set(
       index,
-      (call.unoffered === true ? Promise.resolve(unofferedOutcome(tools, call.name)) : repeated !== null ? Promise.resolve(repeated)
-        : tools.execute(requestFor(this.input, call)).then(outcome => { guards?.afterCall(call.name, outcome, tools.actionClassOf?.(call.name) ?? null); return outcome; })).then(
+      (call.unoffered === true ? Promise.resolve(unofferedOutcome(tools, call.name)) : guard?.answer ? Promise.resolve(guard.answer)
+        : tools.execute(requestFor(this.input, call)).then(outcome => {
+          guards?.afterCall(call.name, outcome, tools.actionClassOf?.(call.name) ?? null, guard?.ticket ?? null);
+          return outcome;
+        })).then(
         (outcome) => {
           this.slots[index] = outcome;
           return index;

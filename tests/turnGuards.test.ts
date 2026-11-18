@@ -8,7 +8,8 @@ import { canonicalTurnCancelCause, readTurnEndMeta } from "../src/session/turnLi
 import type { ToolCallOutcome } from "../src/agent/toolSeam.js";
 import type { ActionClass, EvidenceEvent } from "../src/types.js";
 import type { StreamChunk } from "../src/llm/streamChunk.js";
-import { loopHarness, ok, StubToolSeam, textStep, toolStep, toolStepMulti, type LoopHarness } from "./helpers/agentLoopHarness.js";
+import { AgentDriver } from "../src/agent/agentDriver.js";
+import { LOOP_MODEL, LOOP_PROVIDER, loopHarness, ok, StubToolSeam, textStep, toolStep, toolStepMulti, type LoopHarness } from "./helpers/agentLoopHarness.js";
 
 const denied = (content = "[amc] policy denied: no"): ToolCallOutcome => ({ outcome: "DENIED", content, exitCode: null, timedOut: false, denied: true });
 
@@ -47,44 +48,97 @@ describe("TurnGuards (unit)", () => {
     expect(canonicalArguments("not json")).toBeNull();
   });
 
-  it("refuses the third identical call in a row and stops at the fifth", () => {
+  it("refuses the third identical call in a turn and stops at the fifth", () => {
     const guards = new TurnGuards();
     const call = { name: "read", arguments: '{"path":"a"}' };
-    expect(guards.beforeCall(call)).toBeNull();
-    expect(guards.beforeCall({ ...call, arguments: '{ "path" : "a" }' })).toBeNull();
-    expect(guards.beforeCall(call)?.content).toMatch(/3 times in a row, so it was not run/);
-    expect(guards.beforeCall(call)?.denied).toBe(true);
+    expect(guards.beforeCall(call).answer).toBeNull();
+    expect(guards.beforeCall({ ...call, arguments: '{ "path" : "a" }' }).answer).toBeNull();
+    expect(guards.beforeCall(call).answer?.content).toMatch(/3 times in this turn, so it was not run/);
+    expect(guards.beforeCall(call).answer?.denied).toBe(true);
     expect(guards.trip).toBeNull();
     guards.beforeCall(call);
     expect(guards.trip).toEqual({ kind: "limit", condition: "repeated-call", bound: 5, tools: ["read"] });
     guards.reset();
     expect(guards.trip).toBeNull();
-    expect(guards.lastTrip?.condition).toBe("repeated-call");
-    expect(guards.beforeCall(call)).toBeNull();
+    expect(guards.beforeCall(call).answer).toBeNull();
   });
 
-  it("a different call in between, or a successful write, clears the streak; an unknown class does not", () => {
+  it("counts per signature, so A,B,A,B alternation trips; an unoffered call in between shields nothing", () => {
     const guards = new TurnGuards();
-    const read = { name: "read", arguments: "{}" };
+    const a = { name: "read", arguments: '{"p":"a"}' }, b = { name: "read", arguments: '{"p":"b"}' };
+    for (let i = 0; i < 4; i++) { guards.beforeCall(a); guards.beforeCall(b); guards.beforeCall({ name: "ghost", arguments: "{}", unoffered: true }); }
+    expect(guards.trip).toBeNull();
+    expect(guards.beforeCall(a).answer).not.toBeNull();
+    expect(guards.trip).toMatchObject({ condition: "repeated-call" });
+  });
+
+  it("reads text arguments NFC-normalised, and does not count polling tools", () => {
+    const guards = new TurnGuards({ repeatedCalls: 2 });
+    guards.beforeCall({ name: "read", arguments: JSON.stringify({ p: "caf\u00e9" }) });
+    expect(guards.beforeCall({ name: "read", arguments: JSON.stringify({ p: "cafe\u0301" }) }).answer).not.toBeNull();
+    const polling = new TurnGuards({ repeatedCalls: 2 });
+    for (let i = 0; i < 10; i++) expect(polling.beforeCall({ name: "job_output", arguments: '{"job_id":"j1"}' })).toEqual({ answer: null, ticket: null });
+    expect(polling.trip).toBeNull();
+  });
+
+  it("clamps a configured bound to the defaults, so a typed caller cannot loosen it", () => {
+    const loose = new TurnGuards({ repeatedCalls: Infinity, malformedResponses: 99, denials: Number.NaN });
+    const call = { name: "read", arguments: "{}" };
+    for (let i = 0; i < 5; i++) loose.beforeCall(call);
+    expect(loose.trip).toMatchObject({ condition: "repeated-call", bound: 5 });
+    const denials = new TurnGuards({ denials: 1e9 });
+    for (let i = 0; i < 5; i++) denials.afterCall("x", denied(), "WRITE_HIGH", null);
+    expect(denials.trip).toMatchObject({ condition: "denials", bound: 5 });
+    const zero = new TurnGuards({ repeatedCalls: 0 });
+    zero.beforeCall(call);
+    expect(zero.trip).toBeNull();
+  });
+
+  it("a steer clears the repeat counts", () => {
+    const guards = new TurnGuards();
+    const call = { name: "read", arguments: "{}" };
+    guards.beforeCall(call); guards.beforeCall(call);
+    guards.clearRepeats();
+    expect(guards.beforeCall(call).answer).toBeNull();
+  });
+
+  it("a successful write clears the other counts but never its own; a failed write or an unknown class clears nothing", () => {
+    const guards = new TurnGuards();
+    const read = { name: "read", arguments: "{}" }, write = { name: "write", arguments: '{"x":1}' };
     guards.beforeCall(read); guards.beforeCall(read);
-    guards.beforeCall({ name: "write", arguments: "{}" });
-    guards.afterCall("write", ok("done"), "WRITE_LOW");
-    expect(guards.beforeCall(read)).toBeNull();
-    expect(guards.beforeCall(read)).toBeNull();
-    guards.afterCall("read", ok("x"), null);
-    expect(guards.beforeCall(read)).not.toBeNull();
+    let ticket = guards.beforeCall(write).ticket;
+    guards.afterCall("write", ok("done"), "WRITE_LOW", ticket);
+    expect(guards.beforeCall(read).answer).toBeNull();
+    expect(guards.beforeCall(read).answer).toBeNull();
+    // Unknown class is not a write: the read count (2) stands.
+    ticket = guards.beforeCall({ name: "mystery", arguments: "{}" }).ticket;
+    guards.afterCall("mystery", ok("x"), null, ticket);
+    expect(guards.beforeCall(read).answer).not.toBeNull();
+    // The same successful write, repeated, still counts.
+    ticket = guards.beforeCall(write).ticket;
+    guards.afterCall("write", ok("done"), "WRITE_LOW", ticket);
+    expect(guards.beforeCall(write).answer).not.toBeNull();
     // A failed write is not a change of state.
     const again = new TurnGuards();
-    const write = { name: "write", arguments: '{"x":1}' };
-    for (let i = 0; i < 2; i++) { again.beforeCall(write); again.afterCall("write", { ...ok("no"), outcome: "ERROR" }, "WRITE_LOW"); }
-    expect(again.beforeCall(write)).not.toBeNull();
+    again.beforeCall(read); again.beforeCall(read);
+    again.afterCall("write", { ...ok("no"), outcome: "ERROR" }, "WRITE_LOW", again.beforeCall(write).ticket);
+    expect(again.beforeCall(read).answer).not.toBeNull();
+  });
+
+  it("a write that started after a call does not clear that call's count (settle order in a parallel pool)", () => {
+    const guards = new TurnGuards();
+    const read = { name: "read", arguments: "{}" };
+    const slowWrite = guards.beforeCall({ name: "fetch", arguments: "{}" }).ticket;
+    guards.beforeCall(read); guards.beforeCall(read);
+    guards.afterCall("fetch", ok("done"), "NETWORK_EXTERNAL", slowWrite);
+    expect(guards.beforeCall(read).answer).not.toBeNull();
   });
 
   it("counts denials per turn, names the tools sorted, and leaves its own refusals out", () => {
     const guards = new TurnGuards({ denials: 2 });
-    guards.afterCall("zeta", denied(), "WRITE_HIGH");
+    guards.afterCall("zeta", denied(), "WRITE_HIGH", null);
     expect(guards.trip).toBeNull();
-    guards.afterCall("alpha", denied(), "WRITE_HIGH");
+    guards.afterCall("alpha", denied(), "WRITE_HIGH", null);
     expect(guards.trip).toEqual({ kind: "limit", condition: "denials", bound: 2, tools: ["alpha", "zeta"] });
   });
 
@@ -105,9 +159,9 @@ describe("TurnGuards (unit)", () => {
     const guards = new TurnGuards({ malformedResponses: 1 });
     guards.beforeCall({ name: "x", arguments: "[]" }); guards.endStep();
     const tracker = new RunLimitTracker({ maxTotalTokens: 1 });
-    expect(firstStop(turnPolicies(null, guards, () => { throw new Error("cost must not be read"); }))).toMatchObject({ scope: "turn", cause: { condition: "malformed-responses" } });
+    expect(firstStop(turnPolicies(null, guards))).toMatchObject({ scope: "turn", cause: { condition: "malformed-responses" } });
     tracker.recordUsage({ inputTokens: 5, outputTokens: 5, cacheRead: null, cacheWrite: null, reasoningTokens: null });
-    expect(firstStop(turnPolicies(tracker, guards, () => { throw new Error("cost must not be read"); }))).toMatchObject({ scope: "run", cause: { condition: "max-tokens" } });
+    expect(firstStop(turnPolicies(tracker, guards))).toMatchObject({ scope: "run", cause: { condition: "max-tokens" } });
   });
 });
 
@@ -126,14 +180,17 @@ describe("run limits: cost and stricter-only guard forms", () => {
   it("the cost limit fails closed on any request without a known cost and stops past the bound", () => {
     const view = (status: "complete" | "partial" | "unavailable" | "invalid", attributedSubtotalUsd: number | null, unknownRequests = 0) =>
       () => ({ status, attributedSubtotalUsd, partialRequests: 0, unknownRequests });
-    expect(new RunLimitTracker({}).recordCost(() => { throw new Error("not read without a limit"); })).toBeNull();
-    expect(new RunLimitTracker({ maxCostUsd: 1 }).recordCost(view("complete", 0.4))).toBeNull();
-    expect(new RunLimitTracker({ maxCostUsd: 1 }).recordCost(view("unavailable", null))).toBeNull();
-    expect(new RunLimitTracker({ maxCostUsd: 1 }).recordCost(view("complete", 1.01))).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 1 });
+    const tracker = (cost: ReturnType<typeof view>) => new RunLimitTracker({ maxCostUsd: 1 }, 0, false, cost);
+    expect(new RunLimitTracker({}, 0, false, () => { throw new Error("not read without a limit"); }).recordCost()).toBeNull();
+    expect(tracker(view("complete", 0.4)).recordCost()).toBeNull();
+    expect(tracker(view("unavailable", null)).recordCost()).toBeNull();
+    expect(tracker(view("complete", 1.01)).recordCost()).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 1 });
+    // Checked at admission too: a session already past the limit opens no turn.
+    expect(tracker(view("complete", 1.01)).turnAllowed(7)).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 1 });
     for (const status of ["partial", "invalid"] as const) {
-      expect(new RunLimitTracker({ maxCostUsd: 1 }).recordCost(view(status, 0.1))).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 1, unmeasured: true });
+      expect(tracker(view(status, 0.1)).recordCost()).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 1, unmeasured: true });
     }
-    expect(new RunLimitTracker({ maxCostUsd: 1 }).recordCost(view("unavailable", null, 1))?.unmeasured).toBe(true);
+    expect(tracker(view("unavailable", null, 1)).recordCost()?.unmeasured).toBe(true);
     expect(describeRunLimit({ kind: "limit", condition: "max-cost-usd", bound: 0.5, unmeasured: true })).toMatch(/no known cost/);
   });
 
@@ -146,8 +203,19 @@ describe("run limits: cost and stricter-only guard forms", () => {
     expect(canonicalTurnCancelCause({ kind: "limit", condition: "denials", bound: 5, tools: ["b", "a", "b"] })).toEqual({ kind: "limit", condition: "denials", bound: 5, tools: ["a", "b"] });
   });
 
+  it("guard-only --stop with --goal-rounds or --workflow-plan is refused with words that say why", async () => {
+    const { resolveContinuityRun } = await import("../src/cli/agentLoopContinuityOptions.js");
+    for (const extra of [{ goalRounds: "3" }, { workflowPlan: "plan.json" }]) {
+      const errors: string[] = [];
+      const io = { log: () => undefined, error: (line: string) => { errors.push(line); }, fail: () => undefined };
+      const run = resolveContinuityRun(io, { stop: ["denials:2"], ...extra } as never, { workspace: "/w", agentId: "a", wantsDelegation: false, toolMode: "workspace" });
+      expect(run).toBeNull();
+      expect(errors.join(" ")).toMatch(/make the root turn's guards stricter.*runs no root turn.*keeps the default guards/);
+    }
+  });
+
   it("says each stop in plain words", () => {
-    expect(describeTurnStop({ condition: "repeated-call", bound: 5, tools: ["read_file"] })).toBe('The agent made the same tool call 5 times in a row ("read_file"), so AMC ended the turn.');
+    expect(describeTurnStop({ condition: "repeated-call", bound: 5, tools: ["read_file"] })).toBe('The agent made the same tool call 5 times in one turn ("read_file"), so AMC ended the turn.');
     expect(describeTurnStop({ condition: "denials", bound: 5, tools: ["bash"] })).toMatch(/refused in one turn \("bash"\).*Nothing refused was run/);
     expect(describeTurnStop({ condition: "max-cost-usd", bound: 2, unmeasured: true })).toMatch(/no known cost/);
     for (const condition of ["malformed-responses", "max-cost-usd", "max-tokens", "max-turns", "deadline", "unknown"]) expect(describeTurnStop({ condition, bound: 1 })).toMatch(/stopped|ended/);
@@ -174,7 +242,7 @@ describe("turn guards in the driver", () => {
     expect(harness.driver.turnGuardEnding).toMatchObject({ condition: "repeated-call" });
     expect(harness.driver.runLimitEnding).toBeNull();
     expect(projectTurnStops(events, harness.sessionId)).toEqual([expect.objectContaining({ turn: 1, condition: "repeated-call",
-      text: 'The agent made the same tool call 5 times in a row ("spin"), so AMC ended the turn.' })]);
+      text: 'The agent made the same tool call 5 times in one turn ("spin"), so AMC ended the turn.' })]);
     harness.finish();
     const verdict = await verifyLedgerIntegrity(harness.dir);
     expect(verdict.chain.ok, verdict.chain.errors.join("; ")).toBe(true);
@@ -195,13 +263,67 @@ describe("turn guards in the driver", () => {
     expect(tools.calls).toHaveLength(2);
   });
 
-  it("identical successful writes are not repeats", async () => {
-    const tools = new ClassedSeam({ write: async () => ok("written") }, { write: "WRITE_LOW" });
-    const harness = harnessFor({ scripts: [...[0, 1, 2, 3, 4, 5].map(i => toolStep(`w${i}`, "write", '{"x":1}')), textStep("done")], tools });
+  it("read, edit, read is not a repeat, however often the edits change", async () => {
+    const tools = new ClassedSeam({ read: async () => ok("text"), edit: async () => ok("edited") }, { read: "READ_ONLY", edit: "WRITE_LOW" });
+    const scripts = [0, 1, 2, 3, 4, 5].flatMap(i => [toolStep(`r${i}`, "read", '{"p":"a"}'), toolStep(`e${i}`, "edit", `{"n":${i}}`)]);
+    const harness = harnessFor({ scripts: [...scripts, textStep("done")], tools });
     harness.driver.followup("Go.");
     await harness.driver.whenIdle();
-    expect(tools.calls).toHaveLength(6);
+    expect(tools.calls).toHaveLength(12);
     expect(lastEnd(harness.events())?.reason).toBe("complete");
+  });
+
+  it("the same successful write-class call repeated (bash cat, a hundred times) ends the turn at the fifth", async () => {
+    const tools = new ClassedSeam({ bash: async () => ok("log line") }, { bash: "WRITE_HIGH" });
+    const harness = harnessFor({ scripts: [...Array.from({ length: 100 }, (_, i) => toolStep(`b${i}`, "bash", '{"command":"cat out.log"}')), textStep("never")], tools });
+    harness.driver.followup("Go.");
+    await harness.driver.whenIdle();
+    expect(tools.calls).toHaveLength(2);
+    expect(lastEnd(harness.events())?.cancelCause).toEqual({ kind: "limit", condition: "repeated-call", bound: 5, tools: ["bash"] });
+  });
+
+  it("A,B,A,B read-only alternation ends the turn", async () => {
+    const tools = new ClassedSeam({ read: async () => ok("x") }, { read: "READ_ONLY" });
+    const scripts = Array.from({ length: 10 }, (_, i) => toolStep(`c${i}`, "read", i % 2 === 0 ? '{"p":"a"}' : '{"p":"b"}'));
+    const harness = harnessFor({ scripts: [...scripts, textStep("never")], tools });
+    harness.driver.followup("Go.");
+    await harness.driver.whenIdle();
+    expect(lastEnd(harness.events())?.cancelCause).toMatchObject({ condition: "repeated-call", bound: 5 });
+    expect(tools.calls).toHaveLength(4);
+  });
+
+  it("polling a silent job past the threshold is not a repeat", async () => {
+    const tools = new ClassedSeam({ job_output: async () => ok("(no new output)") }, { job_output: "READ_ONLY" });
+    const poll = '{"job_id":"j1","cursor":120,"wait":true,"timeout_ms":30000}';
+    const harness = harnessFor({ scripts: [...Array.from({ length: 8 }, (_, i) => toolStep(`p${i}`, "job_output", poll)), textStep("the job finished")], tools });
+    harness.driver.followup("Wait for the build.");
+    await harness.driver.whenIdle();
+    expect(tools.calls).toHaveLength(8);
+    expect(lastEnd(harness.events())?.reason).toBe("complete");
+  });
+
+  it("a steer delivered into the turn starts the counts again", async () => {
+    const tools = new ClassedSeam({ read: async () => ok("x") }, { read: "READ_ONLY" });
+    let steered = false;
+    const harness = harnessFor({ scripts: [toolStep("a", "read", "{}"), toolStep("b", "read", "{}"), toolStep("c", "read", "{}"), textStep("done")], tools,
+      hooks: { notify: (n) => { if (n.kind === "step-end" && n.step === 2 && !steered) { steered = true; harness.driver.steer("I changed the file; read it again."); } } } });
+    harness.driver.followup("Go.");
+    await harness.driver.whenIdle();
+    expect(tools.calls).toHaveLength(3);
+    expect(lastEnd(harness.events())?.reason).toBe("complete");
+  });
+
+  it("the guard stop is per turn: a later turn that completes reports none", async () => {
+    const tools = new StubToolSeam({ spin: async () => ok("same") });
+    const harness = harnessFor({ scripts: [toolStep("a", "spin", "{}"), toolStep("b", "spin", "{}"), textStep("second turn done")],
+      tools, runLimits: { limits: { repeatedCalls: 2 } } });
+    harness.driver.followup("one");
+    await harness.driver.whenIdle();
+    expect(harness.driver.turnGuardEnding).toMatchObject({ condition: "repeated-call" });
+    harness.driver.followup("two");
+    await harness.driver.whenIdle();
+    expect(lastEnd(harness.events())?.reason).toBe("complete");
+    expect(harness.driver.turnGuardEnding).toBeNull();
   });
 
   it("ends the turn after three malformed responses in a row", async () => {
@@ -234,5 +356,33 @@ describe("turn guards in the driver", () => {
     expect(lastEnd(harness.events())?.cancelCause).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 5, unmeasured: true });
     expect(harness.driver.runLimitEnding).toMatchObject({ condition: "max-cost-usd" });
     expect(() => harness.driver.followup("more")).toThrow(/run limit reached/);
+  });
+
+  it("a resumed session with an earlier request of unknown cost sends no further request under a cost limit", async () => {
+    const tools = new StubToolSeam({});
+    const harness = harnessFor({ scripts: [textStep("first run, no limit"), textStep("must not be sent")], tools });
+    harness.driver.followup("one");
+    await harness.driver.whenIdle();
+    const headers = rows(harness.events(), "request/header").length;
+    const resumed = new AgentDriver({ session: harness.session, llm: harness.llm, tools, systemPromptEventId: harness.systemPromptEventId,
+      route: { providerId: LOOP_PROVIDER, model: LOOP_MODEL, params: { max_tokens: 256 } }, runLimits: { limits: { maxCostUsd: 5 } } });
+    resumed.followup("two");
+    await resumed.whenIdle();
+    expect(rows(harness.events(), "request/header")).toHaveLength(headers);
+    expect(resumed.runLimitEnding).toEqual({ kind: "limit", condition: "max-cost-usd", bound: 5, unmeasured: true });
+  });
+
+  it("after a step that throws, the next turn is refused by the cost limit before any request", async () => {
+    const tools = new StubToolSeam({});
+    const boom = (): AsyncIterable<StreamChunk> => ({ [Symbol.asyncIterator]: () => ({ next: () => Promise.reject(new Error("stream broke")) }) });
+    const harness = harnessFor({ scripts: [boom, textStep("must not be sent")], tools, retry: { mode: "normal", maxRetries: 0 }, runLimits: { limits: { maxCostUsd: 5 } } });
+    harness.driver.followup("one");
+    await harness.driver.whenIdle();
+    expect(lastEnd(harness.events())?.reason).toBe("error");
+    const headers = rows(harness.events(), "request/header").length;
+    expect(() => harness.driver.followup("two")).not.toThrow();
+    await harness.driver.whenIdle();
+    expect(rows(harness.events(), "request/header")).toHaveLength(headers);
+    expect(harness.driver.runLimitEnding).toMatchObject({ condition: "max-cost-usd", unmeasured: true });
   });
 });

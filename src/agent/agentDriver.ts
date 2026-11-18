@@ -1,6 +1,6 @@
 import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { recordDeliveredContext } from "../prompt/context/nativeCompositionContext.js";
-import { cancelCauseOf, contextNotification, describeToolOutcome, fenceToolContext, originFor, withResolvers } from "./agentDriverSupport.js";
+import { cancelCauseOf, contextNotification, describeToolOutcome, fenceToolContext, originFor, triggerForNextTurn, withResolvers } from "./agentDriverSupport.js";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
  *
@@ -43,7 +43,7 @@ import { cancelCauseOf, contextNotification, describeToolOutcome, fenceToolConte
  * write.
  */
 import type { SessionEventRef, SessionService } from "../session/sessionService.js";
-import type { TokenUsage, TurnCancelCause, TurnTrigger } from "../session/sessionTypes.js";
+import type { TokenUsage, TurnCancelCause } from "../session/sessionTypes.js";
 import { isTurnCancelCause } from "../session/sessionTypes.js";
 import { canonicalTurnCancelCause } from "../session/turnLifecycleMeta.js";
 import { LoopInbox } from "./inbox.js";
@@ -201,8 +201,10 @@ export class AgentDriver {
     const window = compaction.contextWindowTokens;
     this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
     this.limits = init.runLimits === undefined ? null
-      : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true);
-    this.policies = turnPolicies(this.limits, this.guards, () => projectNativeCost(this.session.readEvents(), this.session.sessionId)); // ponytail: re-reads the session each step, only while a cost limit is set
+      // ponytail: the cost limit re-reads the session at each step and turn, only while one is set.
+      : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true,
+        () => projectNativeCost(this.session.readEvents(), this.session.sessionId));
+    this.policies = turnPolicies(this.limits, this.guards);
     if (this.limits?.deadlineMs !== undefined) {
       // Armed from construction: the deadline bounds the whole run, idle time included, like a child's timeout-ms.
       this.deadline = setTimeout(() => this.limitReached(this.limits!.deadlineReached()), this.limits.deadlineMs);
@@ -231,7 +233,7 @@ export class AgentDriver {
   /** The limit that ended this run's work, or null: what a host reports instead of a silent stop. */
   get runLimitEnding(): RunLimitBreach | null { return this.limitEnding; }
   /** The last turn-guard stop (repeated call, malformed responses, denials); it ended a turn, not the run. */
-  get turnGuardEnding(): RunLimitBreach | null { return this.guards.lastTrip; }
+  get turnGuardEnding(): RunLimitBreach | null { return this.guards.trip; }
 
   private async observeExtensions(event: NativeExtensionHookEvent, signal?: AbortSignal): Promise<void> {
     // Observer failures, including reporting failures, cannot veto the signed turn or its seal.
@@ -542,7 +544,7 @@ export class AgentDriver {
       return false;
     }
 
-    const turnRef = this.session.startTurn({ trigger: this.triggerForNextTurn(phase.turn) });
+    const turnRef = this.session.startTurn({ trigger: triggerForNextTurn(this.inbox, phase.turn) });
     this.head = turnRef;
     phase.turn = turnRef.turn;
     this.guards.reset();
@@ -592,6 +594,8 @@ export class AgentDriver {
           return false;
         }
 
+        // A person's message reaching the turn is a reason to repeat a call: the repeat counts start again.
+        if (decision.messages.some(message => message.origin !== "tool")) this.guards.clearRepeats();
         signal.throwIfAborted();
         this.head = this.session.startStep();
         phase.step = step;
@@ -781,19 +785,5 @@ export class AgentDriver {
     if (decision.kind === "enter") assertOrderedClaimDecision(orderedClaims, decision.messages);
     if (decision.kind === "enter") assertAudioClaimDecision(audioClaims, decision.messages);
     return decision;
-  }
-
-  /**
-   * Which lane opened this turn.
-   *
-   * The distinction the spine's vocabulary asks for is the one a reader wants:
-   * `user` is the prompt that started the conversation, `followup` is a later
-   * prompt, `steer` is a turn opened by steering alone, and `resume` is a driver
-   * that woke with nothing queued.
-   */
-  private triggerForNextTurn(lastTurn: number): TurnTrigger {
-    if (this.inbox.nextTurn.length > 0) return lastTurn === 0 ? "user" : "followup";
-    if (this.inbox.nextStep.length > 0) return "steer";
-    return "resume";
   }
 }

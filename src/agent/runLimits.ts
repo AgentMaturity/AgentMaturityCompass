@@ -144,12 +144,15 @@ function totalTokensOf(usage: TokenUsage | null): number | null {
   return Number.isSafeInteger(total) && total >= 0 ? total : null;
 }
 
+const NO_COST: RunCostView = Object.freeze({ status: "unavailable", attributedSubtotalUsd: null, partialRequests: 0, unknownRequests: 0 });
+
 /** The driver's bookkeeping for one run. Pure except for the clock it is told. */
 export class RunLimitTracker {
   private tokens: number;
   private breached: RunLimitBreach | null = null;
 
-  constructor(private readonly limits: RunLimits, priorTokens = 0, priorUnmeasured = false) {
+  /** `cost` reads the session's cost projection; it is called only while a cost limit is set. */
+  constructor(private readonly limits: RunLimits, priorTokens = 0, priorUnmeasured = false, private readonly cost: () => RunCostView = () => NO_COST) {
     this.tokens = priorTokens;
     // A history with steps that reported no usage is one the token bound cannot see: fail closed.
     if (priorUnmeasured && limits.maxTotalTokens !== undefined) {
@@ -163,13 +166,13 @@ export class RunLimitTracker {
   get deadlineMs(): number | undefined { return this.limits.deadlineMs; }
 
   /**
-   * Account the session's cost after a step. Fails closed: any request without an attributed cost (no price, no reported
-   * usage, a stub route, a failed attempt) is a cost the bound cannot see, so the run stops as unmeasured. `cost` is a thunk
-   * so the projection is only read when a cost limit is set.
+   * Account the session's cost, after each step and before each turn opens. Fails closed: any request without an attributed
+   * cost (no price, no reported usage, a stub route, a failed attempt) is a cost the bound cannot see, so the run stops as
+   * unmeasured.
    */
-  recordCost(cost: () => RunCostView): RunLimitBreach | null {
+  recordCost(): RunLimitBreach | null {
     if (this.breached !== null || this.limits.maxCostUsd === undefined) return this.breached;
-    const view = cost();
+    const view = this.cost();
     const bound = this.limits.maxCostUsd;
     const seen = view.status === "complete" || (view.status === "unavailable" && view.partialRequests + view.unknownRequests === 0);
     if (!seen) this.breached = { kind: "limit", condition: "max-cost-usd", bound, unmeasured: true };
@@ -177,9 +180,9 @@ export class RunLimitTracker {
     return this.breached;
   }
 
-  /** Whether session turn `turn` may open. */
+  /** Whether session turn `turn` may open. A session already past its cost limit (or with a request of unknown cost) opens none. */
   turnAllowed(turn: number): RunLimitBreach | null {
-    if (this.breached !== null) return this.breached;
+    if (this.recordCost() !== null) return this.breached;
     if (this.limits.maxTurns !== undefined && turn > this.limits.maxTurns) {
       this.breached = { kind: "limit", condition: "max-turns", bound: this.limits.maxTurns };
     }
