@@ -55,7 +55,7 @@ import { recordProviderOutage } from "../actions/actionRecovery.js";
 import { DataFlowRefused } from "../dataflow/purposePolicy.js";
 import type { PreparedCall } from "../llm/adapter/llmRuntime.js";
 import type { SettledStream } from "../llm/adapter/streamRecorder.js";
-import { isLlmError } from "../llm/llmFailure.js";
+import { isLlmError, LLM_FAILURE_CODE } from "../llm/llmFailure.js";
 import type { LlmFailure } from "../llm/llmFailure.js";
 import { isRetryableFailure } from "../llm/retryPolicy.js";
 import type { ResolvedRetryPolicy } from "../llm/retryPolicy.js";
@@ -213,6 +213,16 @@ function noteFinalFailure(session: SessionService, outcomeEventId: string, reaso
   }
 }
 
+/** A turn that ends on a context-window overflow: the final request failure is recorded as an outage incident then. */
+export function noteOverflowOutage(session: SessionService, error: unknown): void {
+  if (!isLlmError(error) || error.code !== LLM_FAILURE_CODE.CONTEXT_WINDOW_EXCEEDED) return;
+  let failure: { readonly id: string } | undefined;
+  // Never replaces the provider's error: a failed read is reported, as a failed incident write is.
+  try { failure = session.readEvents().filter(row => row.event_type === "request/failure").at(-1); }
+  catch (readFailure: unknown) { process.stderr.write(`[amc] the provider-outage incident could not be recorded: ${readFailure instanceof Error ? readFailure.message : String(readFailure)}\n`); }
+  if (failure !== undefined) noteFinalFailure(session, failure.id, "the request was too large for the model's context window, and the turn ended on it");
+}
+
 /** Everything one step's model request needs, minus the turn machine. */
 export interface StepRequestInit {
   readonly session: SessionService;
@@ -304,7 +314,9 @@ export async function dispatchStepRequest(
       });
       init.notify({ kind: "retry", turn, step, attempt, decision: verdict.decision, delayMs: verdict.delayMs });
       if (verdict.decision === "give-up") {
-        noteFinalFailure(init.session, settled.outcomeEventId, verdict.reason);
+        // A context-window overflow may still be compacted and asked once more (HP-05); the driver records the outage
+        // only when the turn ends on it (noteOverflowOutage).
+        if (error.code !== LLM_FAILURE_CODE.CONTEXT_WINDOW_EXCEEDED) noteFinalFailure(init.session, settled.outcomeEventId, verdict.reason);
         throw error;
       }
       await init.retry.sleep(verdict.delayMs ?? 0, signal);

@@ -59,6 +59,8 @@ export interface RunLimitBreach {
   readonly bound: number;
   readonly unmeasured?: true;
   readonly tools?: readonly string[];
+  /** With `unmeasured`: the request whose usage was unknown, when it was not a model step. */
+  readonly unmeasuredBy?: "compaction-summary";
 }
 
 /** Node timers cannot represent a larger delay without overflowing to 1ms. */
@@ -114,6 +116,7 @@ function parseSpecialLimit(condition: string, limits: { -readonly [K in keyof Ru
 export function describeRunLimit(breach: RunLimitBreach): string {
   const condition = breach.condition === "deadline" ? "timeout-ms" : breach.condition;
   const unmeasured = breach.condition === "max-cost-usd" ? " (a model request has no known cost, so the cost limit could not see it)"
+    : breach.unmeasuredBy === "compaction-summary" ? " (a compaction summary request's usage was unknown, so the token budget could not see it)"
     : " (a step reported no usage, so the token budget could not see it)";
   return `${condition}:${breach.bound}${breach.unmeasured === true ? unmeasured : ""}`;
 }
@@ -190,12 +193,13 @@ export class RunLimitTracker {
   }
 
   /** Account one step's usage; a breach is returned once and remembered. */
-  recordUsage(usage: TokenUsage | null): RunLimitBreach | null {
+  /** `by`: the request was not a model step but a compaction summary (named in the stop when its usage is unknown). */
+  recordUsage(usage: TokenUsage | null, by?: "compaction-summary"): RunLimitBreach | null {
     if (this.breached !== null) return this.breached;
     if (this.limits.maxTotalTokens === undefined) return null;
     const total = totalTokensOf(usage);
     if (total === null) {
-      this.breached = { kind: "limit", condition: "max-tokens", bound: this.limits.maxTotalTokens, unmeasured: true };
+      this.breached = { kind: "limit", condition: "max-tokens", bound: this.limits.maxTotalTokens, unmeasured: true, ...(by === undefined ? {} : { unmeasuredBy: by }) };
       return this.breached;
     }
     this.tokens += total;

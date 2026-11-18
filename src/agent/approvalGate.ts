@@ -160,6 +160,7 @@ export function gateToolCallsOnApproval(
     ...(inner.hasOwnedWork === undefined ? {} : { hasOwnedWork: () => inner.hasOwnedWork!() }),
     ...(inner.actionClassOf === undefined ? {} : { actionClassOf: (toolName: string) => inner.actionClassOf!(toolName) }),
     ...(inner.denialBeforeApproval === undefined ? {} : { denialBeforeApproval: (request: ToolCallRequest) => inner.denialBeforeApproval!(request) }),
+    asksBeforeRunning: (toolName: string): boolean => isGated(options, toolName, classOf(toolName)),
     schemas: (): readonly ToolSchema[] | null => inner.schemas(),
     executionMode: (request: ToolCallRequest): "parallel" | "exclusive" =>
       inner.executionMode(request),

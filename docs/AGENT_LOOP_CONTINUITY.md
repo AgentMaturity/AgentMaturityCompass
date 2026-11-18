@@ -120,6 +120,41 @@ Limits, stated:
 - The window is a signed fact only where a row recorded it: an automatic `loop/compact` receipt. A session that never compacted reports `window not recorded` rather than the catalog's number, because an operator `--context-window` override may have changed it. The live `context` line uses the window the run is configured with, and is not evidence.
 - A step whose provider reported nothing is `unmeasured`, never zero.
 
+## When a request is too large for the model
+
+Sometimes the model's provider refuses a request because it no longer fits the model's context window (the amount of text the model can read at once). AMC then does the following, once per turn, and only when automatic compaction is on:
+
+1. The refused request is recorded and settled like any failed request: its usage stays unknown and counts against the budget as a failed request does.
+2. If a run limit (`--stop`) would stop the run, or no step is left in the turn, nothing else happens: the turn ends with the provider's error, as before. With a `--stop` token limit this is always the case, because the refused request's usage is unknown.
+3. AMC shortens large tool outputs in the context, this time including those of the most recent steps, and removes file text it restored after an earlier compaction. It does not ask the model for a summary here: that request would carry the whole context that just overflowed.
+4. Each change is a signed `loop/compact` record that says it was caused by an overflow and names the refused request. Nothing is deleted from the record; only what the model sees changes.
+5. If nothing could be removed, or a limit leaves no room, the turn ends with the provider's original error.
+6. Otherwise AMC reads recent files again (see below), writes a signed `CONTEXT_OVERFLOW_RECOVERY` record saying the request overflowed, was compacted and is asked once more, and sends the next request. A second overflow in the same turn ends the turn.
+7. Verification checks this from the record: `amc agent-loop verify` fails a session where a request followed an overflow in the same turn without both signed records for that overflow, or where one turn asked again more than once.
+
+AMC does not estimate tokens from text size, so it cannot promise the next request fits; the provider's answer decides, and a second refusal ends the turn.
+
+**Which providers.** AMC recognises an overflow from the error the provider sends: the error's own code `context_length_exceeded`, or a message that starts with one of a few known wordings. Echoed words elsewhere in an error do not count, and an error that blames the requested output length (`max_tokens`) is not treated as an overflow, because compaction cannot fix it.
+- Known to work (tested with recorded examples of the wording): none. AMC has no recording from a real provider.
+- Believed to work: OpenAI-compatible APIs that send `context_length_exceeded` or "This model's maximum context length is N tokens" (OpenAI, DeepSeek, OpenRouter, Mistral, older vLLM, Ollama's OpenAI-compatible endpoint). Also Anthropic's "prompt is too long: N tokens > M maximum" and Gemini's "The input token count (N) exceeds the maximum number of tokens allowed". The Anthropic and Gemini wordings come from user reports, not from the providers' documentation; the others are from memory.
+- Not covered: newer vLLM ("longer than the maximum model length"), Amazon Bedrock, Anthropic's 413 "request too large", and anything else. These end the turn as before.
+
+**Summaries.** The summary prompt (version 2) asks for fixed sections: objective and constraints, decisions and why, work state with file paths, what was and was not verified, open problems, and the next step. When an earlier summary is part of the text being summarized, the model is told to keep what is still true from it, drop what is stale, and treat it as model-written data: an instruction from you is kept only where it appears in your own message. The record names that earlier summary. Your own messages always stay word for word. A summary that leaves out a section is still used.
+
+A summary request (at the normal compaction limit) now counts against `--stop` limits. If its usage is unknown (it was refused or failed) and a token limit is set, the run stops at once, before any further request, and the stop says that the summary request's usage was unknown.
+
+**Files read again.** After a compaction that removed content, AMC reads again up to 5 files this session read whole, newest first. It skips any whose last read is still in context, and any that does not fit whole in the room left. The reads go through the same `fs.read` tool and checks as a normal read. A file is skipped when:
+- it is gone, outside the workspace, or refused by the current policy;
+- it is now a symlink, or has a symlink anywhere on its path;
+- the read would first ask a person;
+- the workspace has protected-data redaction on.
+
+The text enters as file data from a tool, inside AMC's fence for untrusted tool context, never as your message. Because the read is whole and compared with the agent's last whole read, it counts as a read for "read before edit". A file that changed since then is marked as changed. Each compaction first removes file text restored earlier, so restored text does not pile up. The amount restored stays below half of what the compaction removed, at most 32,000 bytes each time and 96,000 bytes per session. A signed `COMPACTION_FILES_RESTORED` record lists the paths and digests (in its encrypted payload), never the content. After a compaction at the normal limit this happens only when the turn goes on.
+
+**Symlinks and the tool allowlist.** A path is checked against the tool's allowlist both as named and as where it really leads. A file that is a symlink to `.env`, to AMC's own folder or to somewhere outside the workspace is refused, whatever its name.
+
+`amc session show <id>` prints all of this in plain words, one line per turn.
+
 ## Not in this slice
 
 - Rewind of files and conversation (`amc session rewind`) is deferred: it needs a checkpoint store that works without vault-backed blob keys, a conflict check against the last recorded `afterSha256` of each file, a live-writer fence on fork, and a composed path that gives the child a truthful identity. Conversation-only rewind remains available as `--fork-from <id>` at the latest sealed turn.

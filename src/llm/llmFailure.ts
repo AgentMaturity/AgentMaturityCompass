@@ -248,44 +248,51 @@ export function isLlmError(value: unknown): value is LlmError {
   return value instanceof LlmError;
 }
 
-/** Structured codes and plain phrases that name a context bound being exceeded. */
-const STRUCTURED_CONTEXT_OVERFLOW = new RegExp(
-  String.raw`(?:^|[^a-z0-9])context[\s_-](?:length|window)[\s_-]` +
-    String.raw`(?:exceed(?:ed|s)?|overflow(?:ed)?|limit[\s_-]exceeded)(?:$|[^a-z0-9])`,
-  "i"
-);
+/**
+ * Messages that name the prompt as too large for the model's context window. Matched on the PARSED `message` field of
+ * the provider's error object and anchored at its start, never on the raw body: a body that merely echoes such words
+ * (a tool name, quoted user text) must not count (HP-05 review M2). Sources, none of them official documentation:
+ * - OpenAI-compatible ("This model's maximum context length is N tokens", DeepSeek, vLLM before the rename, Mistral's
+ *   "... maximum context length", OpenRouter's "This endpoint's ...") and the OpenAI Responses wording: from memory.
+ * - Anthropic ("prompt is too long: N tokens > M maximum", HTTP 400 `invalid_request_error`) and Gemini ("The input
+ *   token count (N) exceeds the maximum number of tokens allowed (M)."): observed in field reports, not documented.
+ * Anthropic's 413 `request_too_large` and image-size errors are not overflow (another status or another message).
+ */
+const OVERFLOW_MESSAGES: readonly RegExp[] = Object.freeze([
+  /^(?:this|the) (?:model|endpoint)'s maximum context length is \d+ tokens\b/i,
+  /^your input exceeds the context window\b/i,
+  /^prompt is too long: \d+ tokens > \d+ maximum\b/i,
+  /^the input token count \(\d+\) exceeds the maximum number of tokens allowed\b/i,
+  /^prompt contains \d+ tokens\b.{0,80}\btoo large for model with \d+ maximum context length\b/i,
+  /^the input length exceeds the context length\b/i
+]);
+/** The excess is the requested output, which compaction cannot shrink: not a recoverable overflow. */
+const OUTPUT_EXCESS = /\b(?:max_tokens|max_completion_tokens|max_output_tokens|output tokens?)\b/i;
 
-/** Request-size wording that ties "too large" directly to model context capacity. */
-const TOO_LARGE_FOR_CONTEXT = new RegExp(
-  String.raw`\b(?:request|prompt|input|messages?)\s+(?:is\s+|are\s+)?` +
-    String.raw`too\s+(?:large|long)\s+for\s+(?:(?:this|the)\s+)?` +
-    String.raw`(?:model(?:'s)?\s+)?context(?:\s+window)?\b`,
-  "i"
-);
-
-/** "Exceeds" wording is safe only when its object is explicitly the model context. */
-const EXCEEDS_MODEL_CONTEXT = new RegExp(
-  String.raw`\b(?:input|prompt|request|messages?)\b.{0,40}` +
-    String.raw`\b(?:exceed(?:s|ed)?|overflows?|is\s+larger\s+than)\b.{0,40}` +
-    String.raw`\b(?:the\s+)?(?:model(?:'s)?\s+)?context(?:\s+(?:length|window))?\b`,
-  "i"
-);
+/** `code`, `type` and `message` of a provider's error object (`{error:{...}}`, `[{error:{...}}]` or flat); a non-JSON body is the message. */
+function providerErrorFields(detail: string): { readonly code: string; readonly message: string } {
+  let parsed: unknown;
+  try { parsed = JSON.parse(detail); } catch { return { code: "", message: detail.trim() }; }
+  const first = Array.isArray(parsed) ? parsed[0] : parsed;
+  const outer = first !== null && typeof first === "object" ? first as Record<string, unknown> : {};
+  const error = outer.error !== null && typeof outer.error === "object" ? outer.error as Record<string, unknown> : outer;
+  const text = (value: unknown): string => typeof value === "string" ? value : "";
+  return { code: text(error.code), message: text(error.message).trim() };
+}
 
 /**
- * Recognize the context-overflow wording OpenAI-compatible providers use.
+ * Whether a provider's 400 says the prompt overflowed the context window, from the parsed error fields: the structured
+ * `context_length_exceeded` code or one of {@link OVERFLOW_MESSAGES}, unless the excess is the requested output.
  *
- * @param detail provider code, type and message text joined into one string.
+ * @param detail the response body as received (JSON or plain text).
  */
 export function isContextWindowExceededDetail(detail: string): boolean {
-  return (
-    STRUCTURED_CONTEXT_OVERFLOW.test(detail) ||
-    /\b(?:maximum|max)(?:\s+(?:allowed|supported))?\s+context\s+(?:length|window)\b/i.test(detail) ||
-    TOO_LARGE_FOR_CONTEXT.test(detail) ||
-    /\b(?:input|prompt|request)\s+(?:is\s+)?too\s+(?:long|large)\s+for\s+(?:this|the)\s+model\b/i.test(
-      detail
-    ) ||
-    EXCEEDS_MODEL_CONTEXT.test(detail)
-  );
+  const { code, message } = providerErrorFields(detail);
+  if (OUTPUT_EXCESS.test(message)) return false;
+  const completion = /\((\d+) in the messages, (\d+) in the completion\)/i.exec(message);
+  const window = /maximum context length is (\d+)/i.exec(message);
+  if (completion !== null && window !== null && Number(completion[2]) >= Number(window[1])) return false;
+  return code === "context_length_exceeded" || OVERFLOW_MESSAGES.some(pattern => pattern.test(message));
 }
 
 /**

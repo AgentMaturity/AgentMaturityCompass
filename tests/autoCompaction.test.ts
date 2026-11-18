@@ -240,13 +240,15 @@ function assertMeasured(f: Fixture, rows: readonly EvidenceEvent[]): void {
     expect(receipt.v).toBe(2);
     if (receipt.v !== 2) throw new Error("automatic fixture produced a v1 receipt");
     expect(receipt.trigger.kind).toBe("automatic");
-    expect(receipt.trigger.formula).toBe("inputTokens+cacheRead+cacheWrite");
+    const trigger = receipt.trigger;
+    if (trigger.kind !== "automatic") throw new Error("threshold fixture produced an overflow receipt");
+    expect(trigger.formula).toBe("inputTokens+cacheRead+cacheWrite");
     expect(receipt.measurement).toBe("payload-bytes-not-tokens");
-    const measured = rows.find(candidate => candidate.id === receipt.trigger.measuredAtEventId)!;
+    const measured = rows.find(candidate => candidate.id === trigger.measuredAtEventId)!;
     expect(measured.event_type).toBe("step/end");
     const usage = meta(measured).usage as TokenUsage;
-    expect(receipt.trigger.promptTokens).toBe(usage.inputTokens + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0));
-    expect(receipt.trigger.ratio).toBe(receipt.trigger.promptTokens / WINDOW);
+    expect(trigger.promptTokens).toBe(usage.inputTokens + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0));
+    expect(trigger.ratio).toBe(trigger.promptTokens / WINDOW);
     const bytes = receipt.sources.map(source => {
       const original = rows.find(candidate => candidate.id === source.sourceEventId)!;
       expect(original.event_hash).toBe(source.sourceEventHash);
@@ -310,7 +312,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       const rows = f.h.events();
       expect(compactRows(rows)).toHaveLength(1);
       const receipt = compactionReceipt(compactRows(rows)[0]!);
-      expect(receipt.v === 2 ? receipt.trigger.reserveTokens : null).toBe(16384);
+      expect(receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.reserveTokens : null).toBe(16384);
       await verifyRecorded(f, 4);
     });
   });
@@ -323,7 +325,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(compactRows(rows)).toHaveLength(prompt < 8500 ? 0 : 1);
       if (prompt === 8500) {
         const receipt = compactionReceipt(compactRows(rows)[0]!);
-        expect(receipt.v === 2 ? receipt.trigger.reserveTokens : null).toBe(1500);
+        expect(receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.reserveTokens : null).toBe(1500);
       }
       await verifyRecorded(f, 4);
     });
@@ -337,7 +339,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       if (prompt >= 8000) {
         const receipt = compactionReceipt(compactRows(rows)[0]!);
         expect(receipt.v).toBe(2);
-        if (receipt.v === 2) expect(receipt.trigger.ratio).toBe(0.8);
+        if (receipt.v === 2 && receipt.trigger.kind === "automatic") expect(receipt.trigger.ratio).toBe(0.8);
         expect(receipt.sources.map(source => source.originEventId)).toEqual([old.id]);
       }
       assertMeasured(f, rows);
@@ -510,7 +512,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       const first = f.h.events(), firstReceipts = compactRows(first);
       expect(firstReceipts.map(row => compactionReceipt(row).sources[0]!.originEventId)).toEqual(ids.slice(0, 3).map(id => toolResult(first, id).id));
       expect(new Set(firstReceipts.map(row => {
-        const receipt = compactionReceipt(row); return receipt.v === 2 ? receipt.trigger.measuredAtEventId : "unexpected-v1";
+        const receipt = compactionReceipt(row); return receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.measuredAtEventId : "unexpected";
       })).size).toBe(3);
       expect(toolSource(first, "turn1-4").sourceEventId).toBe(toolResult(first, "turn1-4").id);
       expect(f.notifications.some(item => item.kind === "compaction" && /already compacted 3 time/.test(item.message))).toBe(true);
@@ -548,8 +550,8 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(extractEnvelope(header.meta_json)?.turn).toBe(2);
       const headerMeta = parseRequestHeaderMeta(header.meta_json)!;
       expect(headerMeta.toolSchemaEventId).toBeNull(); expect(headerMeta.toolSchemaSha256).toBeNull();
-      expect(receipt.summarizer).toEqual({ requestHeaderEventId: header.id, promptVersion: 1, model: "claude-loop-test", claimKind: "self_reported", role: "assistant" });
-      const boundary = rows.find(item => item.id === receipt.trigger.measuredAtEventId)!;
+      expect(receipt.summarizer).toEqual({ requestHeaderEventId: header.id, promptVersion: 2, model: "claude-loop-test", claimKind: "self_reported", role: "assistant" });
+      const boundary = rows.find(item => item.id === (receipt.trigger.kind === "automatic" ? receipt.trigger.measuredAtEventId : ""))!;
       expect(meta(boundary).usage).toMatchObject({ inputTokens: 8500 });
       expect(extractEnvelope(boundary.meta_json)?.step).toBe(2);
       const before = foldSurfaceEntries(rows.slice(0, rows.findIndex(item => item.id === row.id)));

@@ -1,6 +1,6 @@
 import type { NativeExtensionHookEvent } from "../extensions/nativeExtensionHookSchema.js";
 import { recordDeliveredContext } from "../prompt/context/nativeCompositionContext.js";
-import { cancelCauseOf, contextNotification, describeToolOutcome, fenceToolContext, originFor, triggerForNextTurn, withResolvers } from "./agentDriverSupport.js";
+import { cancelCauseOf, contextNotification, fenceToolContext, observedToolSeam, originFor, triggerForNextTurn, withResolvers } from "./agentDriverSupport.js";
 /**
  * The turn/step machine — AMC running an agent (plan P3.2).
  *
@@ -53,7 +53,7 @@ import type { NativeInputPart } from "../attachments/nativeOrderedInput.js";
 import { assertOrderedClaimDecision, recordNativeOrderedMessage } from "./nativeOrderedMessage.js";
 import type { NativeAudioPart } from "../attachments/nativeAudioInput.js";
 import { assertAudioClaimDecision, recordNativeAudioMessage } from "./nativeAudioMessage.js";
-import { DEFAULT_RETRY_RUNTIME } from "./requestRetry.js";
+import { DEFAULT_RETRY_RUNTIME, noteOverflowOutage } from "./requestRetry.js";
 import {
   DEFAULT_AGENT_LOOP_CONFIG,
   NO_HOOKS,
@@ -169,20 +169,7 @@ export class AgentDriver {
     this.stepInit = {
       session: init.session,
       llm: init.llm,
-      tools: tools.extensionHooks ? { ...tools,
-        // Keep the WP31 effect-guard capability: a spread alone drops class-defined members.
-        ...(tools.supportsEffectGuard ? { supportsEffectGuard: true as const } : {}),
-        schemas: () => tools.schemas(), executionMode: request => tools.executionMode(request),
-        prepareStep: tools.prepareStep?.bind(tools), authorizationIntent: tools.authorizationIntent?.bind(tools),
-        bindApprovalGate: tools.bindApprovalGate?.bind(tools), denialBeforeApproval: tools.denialBeforeApproval?.bind(tools),
-        execute: async request => {
-          await this.observeExtensions({ kind: "tool-start", turn: request.turn, step: request.step, toolName: request.toolName }, request.signal);
-          // The result's digest and size name what settled (SH-EXT-01 PostToolUse); its text never crosses.
-          let settled: { ok: boolean; outputSha256: string; outputBytes: number } | undefined;
-          try { const outcome = await tools.execute(request); settled = describeToolOutcome(outcome); return outcome; }
-          finally { await this.observeExtensions({ kind: "tool-end", turn: request.turn, step: request.step, toolName: request.toolName, callId: request.callId, ...settled }, request.signal); }
-        }
-      } : tools,
+      tools: tools.extensionHooks ? observedToolSeam(tools, (event, signal) => this.observeExtensions(event, signal)) : tools,
       route: selected === undefined ? init.route : { ...init.route, pinned: selected },
       systemPromptEventId: init.systemPromptEventId,
       config: this.config,
@@ -199,7 +186,11 @@ export class AgentDriver {
       guards: this.guards = new TurnGuards(init.runLimits?.limits)
     };
     const window = compaction.contextWindowTokens;
-    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit);
+    this.compactor = window === null ? null : new AutoCompactor({ ...compaction, contextWindowTokens: window }, this.stepInit, usage => {
+      // A summary request's usage counts against the token limit; unknown usage stops the run before any further request.
+      const breach = this.limits?.recordUsage(usage, "compaction-summary");
+      if (breach) this.limitReached(breach);
+    });
     this.limits = init.runLimits === undefined ? null
       // ponytail: the cost limit re-reads the session at each step and turn, only while one is set.
       : new RunLimitTracker(init.runLimits.limits, init.runLimits.priorTokens ?? 0, init.runLimits.priorUnmeasured === true,
@@ -604,6 +595,7 @@ export class AgentDriver {
 
         let stopReason: string | null = null;
         let usage: TokenUsage | null = null;
+        let overflow: unknown = null; // HP-05: a context-window refusal this turn may compact for once
         try {
           for (const message of decision.messages) {
             if (message.audioParts !== undefined) {
@@ -633,7 +625,8 @@ export class AgentDriver {
           if (ending === null || ending.reason !== "max_tokens") ending = outcome.ending;
         } catch (error: unknown) {
           stopReason = signal.aborted ? "cancelled" : "error";
-          throw error;
+          if (signal.aborted || repair?.active || this.compactor?.canRecover(error, turnRef.turn) !== true) throw error;
+          overflow = error;
         } finally {
           // ALWAYS. This is what keeps a cancelled turn balanced at step
           // granularity, and it is the shape crash repair also produces.
@@ -648,13 +641,19 @@ export class AgentDriver {
         // The ordered turn policies read what `step/end` just committed: a run limit cancels the turn and closes
         // admission; a guard ends only this turn, keeping queued work. Both before any further request.
         const stop = signal.aborted ? null : firstStop(this.policies);
+        if (overflow !== null && stop !== null) throw overflow; // a limit leaves the overflow terminal, as before
         if (stop?.scope === "run") this.limitCancel(stop.cause);
         else if (stop?.scope === "turn") this.cancel(stop.cause, { by: "turn-guard", keepInbox: true });
         signal.throwIfAborted();
+        if (overflow !== null) {
+          await this.compactor!.recoverOverflow(turnRef.turn, step, overflow, signal, () => firstStop(this.policies) === null && step < this.config.maxStepsPerTurn);
+          target = "next-step";
+          continue;
+        }
         // Between steps only, after `step/end` committed the usage it measures. A
         // summary step it runs takes the next step number, so keep ours in line.
         if (!repair?.active && this.compactor !== null && this.head !== null) {
-          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal);
+          phase.step += await this.compactor.afterStep(turnRef.turn, step, this.head.eventId, usage, signal, ending === null);
         }
         // A listener that objects to the turn stopping says so by steering; the
         // inbox is re-read after it runs, so listener ORDER cannot change the
@@ -693,6 +692,7 @@ export class AgentDriver {
       if (error instanceof NativeValidationRepairStop || repair?.signal.aborted) ending = { reason: "complete" };
       else {
         ending = { reason: "error", error };
+        noteOverflowOutage(this.session, error); // a final overflow only: a recovered one is not a provider outage
         this.notifyError(error);
         throw error;
       }

@@ -1,5 +1,5 @@
 import { nativeSandboxPermitMatches, type NativeSandboxValidationPermit } from "../sandbox/nativeSandboxBinding.js";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { protectedPathReason } from "./protectedPaths.js";
 import {
   BINARY_ARGUMENTS,
@@ -21,6 +21,7 @@ import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition, type ToolsConfig } from "./toolsSchema.js";
 import { captureConfigSignatureAuthority } from "../keys/configSignatureAuthority.js";
 
@@ -320,40 +321,51 @@ function normalizePattern(pattern: string): string {
   return pattern.replaceAll("\\", "/");
 }
 
+/**
+ * Whether a path may be used under the allow and deny patterns, decided on the path as named AND on its real location
+ * (the real path of its deepest existing ancestor plus the rest), with the workspace in real-path form on that side.
+ * A name that passes but resolves, through a symlink anywhere on the way, to a protected or outside location or to one
+ * the patterns refuse (a link to `.env`) is refused: the second check can only refuse more (HP-05 review H2).
+ */
 export function pathAllowedByPatterns(workspace: string, candidatePath: string, allow: string[] = [], deny: string[] = []): {
   ok: boolean;
   reason?: string;
   resolvedPath: string;
 } {
   const resolvedPath = resolve(candidatePath);
+  const named = locationRefusal(workspace, resolvedPath, allow, deny);
+  if (named !== null) return { ok: false, reason: named, resolvedPath };
+  let real: string, realRoot: string;
+  try {
+    real = physicalPathWithMissingSuffix(resolvedPath);
+    realRoot = realpathSync.native(workspace);
+  } catch {
+    return { ok: false, reason: `path '${relative(workspace, resolvedPath) || "."}' could not be resolved to a real location`, resolvedPath };
+  }
+  const target = locationRefusal(realRoot, real, allow, deny);
+  if (target !== null) return { ok: false, reason: `path '${relative(workspace, resolvedPath) || "."}' resolves to a location that is refused: ${target}`, resolvedPath };
+  return { ok: true, resolvedPath };
+}
+
+function locationRefusal(workspace: string, resolvedPath: string, allow: string[], deny: string[]): string | null {
   // The floor, before any allow or deny list is consulted. Named and exported
   // now (see protectedPaths.ts) so it can be printed and audited, and still
   // unconditional: a config that omits it does not lower it.
   const protectedReason = protectedPathReason(workspace, resolvedPath);
-  if (protectedReason !== null) {
-    return { ok: false, reason: protectedReason, resolvedPath };
-  }
+  if (protectedReason !== null) return protectedReason;
 
   const relativePath = relative(workspace, resolvedPath);
   const rel = relativePath ? normalize(relativePath).replace(/\\/g, "/") : "";
   const relWithDot = rel ? (rel.startsWith(".") ? rel : `./${rel}`) : "./";
 
-  if (allow.length > 0) {
-    const allowed = allow.some((pattern) => globToRegex(normalizePattern(pattern)).test(relWithDot));
-    if (!allowed) {
-      return { ok: false, reason: `path '${relWithDot}' not in allowlist`, resolvedPath };
-    }
+  if (allow.length > 0 && !allow.some((pattern) => globToRegex(normalizePattern(pattern)).test(relWithDot))) {
+    return `path '${relWithDot}' not in allowlist`;
   }
-
-  if (deny.length > 0) {
-    // Case-insensitive, so a deny holds against `.AMC` on a case-insensitive volume; it can only deny more.
-    const denied = deny.some((pattern) => globToRegex(normalizePattern(pattern), "i").test(relWithDot));
-    if (denied) {
-      return { ok: false, reason: `path '${relWithDot}' blocked by denylist`, resolvedPath };
-    }
+  // Case-insensitive, so a deny holds against `.AMC` on a case-insensitive volume; it can only deny more.
+  if (deny.length > 0 && deny.some((pattern) => globToRegex(normalizePattern(pattern), "i").test(relWithDot))) {
+    return `path '${relWithDot}' blocked by denylist`;
   }
-
-  return { ok: true, resolvedPath };
+  return null;
 }
 
 export function hostAllowedForTool(tool: ToolDefinition, hostname: string): boolean {

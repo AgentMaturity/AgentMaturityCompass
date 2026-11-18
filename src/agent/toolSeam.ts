@@ -112,6 +112,8 @@ export interface AgentToolSeam {
   bindApprovalGate?(gate: BoundApprovalGate): void;
   /** The signed action class of a visible tool, or null when the seam cannot name it (an approval mode then gates it). */
   actionClassOf?(toolName: string): ActionClass | null;
+  /** Approval-gated seams: whether a call of this tool would be put to a person before it runs (HP-05 file restore never asks). */
+  asksBeforeRunning?(toolName: string): boolean;
 }
 
 /**
