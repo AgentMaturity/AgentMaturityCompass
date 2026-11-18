@@ -33,7 +33,7 @@ export function assertSessionContinuationConfiguration(rows: readonly Readonly<E
 }
 
 /** The `skill:` context ids the session's first signed context record names (its opening turn), in order. */
-export function openingSkillContexts(rows: readonly Readonly<EvidenceEvent>[]): string[] {
+function openingSkillContexts(rows: readonly Readonly<EvidenceEvent>[]): string[] {
   for (const row of rows) {
     const meta = JSON.parse(row.meta_json) as { phase?: unknown; sources?: unknown };
     if (meta.phase !== "context" || !Array.isArray(meta.sources)) continue;
