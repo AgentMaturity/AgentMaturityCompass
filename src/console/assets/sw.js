@@ -1,4 +1,4 @@
-const CACHE_NAME = "amc-console-v18";
+const CACHE_NAME = "amc-console-v19";
 
 function scopeBasePath() {
   const scope = new URL(self.registration.scope);
@@ -40,6 +40,10 @@ function staticAssets() {
     assetPath("assets/app.js"),
     assetPath("assets/api.js"),
     assetPath("assets/shell.js"),
+    assetPath("assets/iconSet.js"),
+    assetPath("assets/pageKit.js"),
+    assetPath("assets/homeView.js"),
+    assetPath("assets/pageTransition.js"),
     assetPath("assets/loginView.js"),
     assetPath("assets/welcomeGuide.js"),
     assetPath("assets/focusableScroll.js"),
