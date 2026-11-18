@@ -31,6 +31,8 @@ export const releaseBlocked = (readiness) => list(readiness?.items).some((item) 
  * stopped while on hold or while this Studio cannot make the release; waiting at an approval step unless the one person
  * on a practice project approves it alone (Aspire, and Assemble's first approval: docs/A4_FORGE.md); otherwise now.
  * `readiness` is the project's head-stage readiness (null when it was not read: then only the hold and the step count).
+ * @param {any} project
+ * @param {any} [readiness]
  */
 export function projectState(project, readiness = null) {
   if (project?.hold || readiness?.status === "ON_HOLD" || releaseBlocked(readiness)) return "stop";
@@ -59,6 +61,10 @@ export function stageRoute(project, stage, current = "now") {
  * stage the project has passed is all done; one it has not reached, or any stage of a retired project, is not started.
  * `stopAt` names a later step that is stopped instead (Activate's Build, the release this Studio cannot make): the current
  * step is then drawn as not started, never as refused itself.
+ * @param {any} project
+ * @param {string} stage
+ * @param {string} [current]
+ * @param {string | null} [stopAt]
  */
 export function stepRoute(project, stage, current = "now", stopAt = null) {
   const stageAt = STAGES.indexOf(stage), projectAt = STAGES.indexOf(project?.stage);
