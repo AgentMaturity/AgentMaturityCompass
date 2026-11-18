@@ -11,14 +11,13 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import inquirer from "inquirer";
-import { usersConfigPath } from "../auth/authApi.js";
 import { getAgentPaths } from "../fleet/paths.js";
-import { loadActionPolicy } from "../governor/actionPolicyStore.js";
 import { runningStudioBridgeBase } from "../studio/studioBridge.js";
 import { defaultPortOrFree } from "../studio/studioLifecycle.js";
 import { writeFileAtomic } from "../utils/fs.js";
 import { inspectSignIn, type SignInReport } from "./agentSignIn.js";
-import { codingAdoptionBlockers } from "./codingAdoption.js";
+import { codingAdoptionBlockers, hasCodingSetup } from "./codingAdoption.js";
+import { codingMoveInterrupted } from "./codingMove.js";
 import { vaultExists, vaultOpensWith } from "../vault/vault.js";
 import { NATIVE_FIRST_USE_PROVIDERS } from "./nativeFirstUseGuide.js";
 import { detectProviderKeys, type DetectedProviderKey } from "./quickSetup.js";
@@ -34,7 +33,7 @@ export interface FrontDoorState {
   readonly hasRun: boolean;
   readonly lastChoice: FrontDoorChoice | null;
   /** UX-01: this folder has `init --coding`'s setup ("ready"), or is a menu workspace that can move to it ("can-set-up"). */
-  readonly coding?: "ready" | "can-set-up";
+  readonly coding?: "ready" | "can-set-up" | "interrupted";
 }
 
 export interface MenuOption {
@@ -65,7 +64,8 @@ export function menuOptions(state: FrontDoorState): MenuOption[] {
   return [
     ...state.signIn.map(agentOption).filter((option): option is MenuOption => option !== null),
     ...(state.coding === "ready" ? [{ value: "coding-chat" as const, name: "Work here with an agent that edits files and runs commands (asks you first)" }]
-      : state.coding === "can-set-up" ? [{ value: "coding-setup" as const, name: "Set up an agent that edits files and runs commands here (asks you first)" }] : []),
+      : state.coding === "can-set-up" ? [{ value: "coding-setup" as const, name: "Set up an agent that edits files and runs commands here (asks you first)" }]
+        : state.coding === "interrupted" ? [{ value: "coding-setup" as const, name: "Finish or undo the coding setup that was interrupted (asks you first)" }] : []),
     ...(key === undefined ? [] : [{ value: "chat" as const, name: `Chat with a model (${key.apiKeyEnv} found)` }]),
     { value: "demo-chat", name: "Try a demo chat (no account or key needed)" },
     { value: "build", name: "Build an agent for my industry (A4 Forge preview)" },
@@ -279,8 +279,9 @@ function hasRun(workspace: string, agentId: string): boolean {
 /** Whether `init --coding`'s setup is here, or this menu workspace can move to it; neither when a file cannot be read. */
 function codingState(workspace: string): Pick<FrontDoorState, "coding"> {
   try {
-    const write = loadActionPolicy(workspace).actions.find((rule) => rule.actionClass === "WRITE_LOW");
-    if (write?.executeOnApproval === true && existsSync(usersConfigPath(workspace))) return { coding: "ready" };
+    // A half-moved folder is never shown as ready: its only line finishes or undoes the move.
+    if (codingMoveInterrupted(workspace)) return { coding: "interrupted" };
+    if (hasCodingSetup(workspace)) return { coding: "ready" };
     return codingAdoptionBlockers(workspace).length === 0 ? { coding: "can-set-up" } : {};
   } catch {
     return {};

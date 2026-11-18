@@ -36,7 +36,8 @@ import { signToolsConfig, toolsConfigPath } from "../toolhub/toolhubValidators.j
 import { defaultToolsConfig, toolsConfigSchema, type ToolDefinition } from "../toolhub/toolsSchema.js";
 import { originForEntry } from "../tools/builtin/nativeToolBreadth/originPolicy.js";
 import { ensureDir, pathExists, writeFileAtomic } from "../utils/fs.js";
-import { prepareCodingAdoption, recordCodingAdoption, sealAdoptionPassphrase } from "./codingAdoption.js";
+import { terminalAdoptionIo, type CodingAdoptionIo } from "./codingAdoption.js";
+import { runCodingMove } from "./codingMove.js";
 import { sha256Hex } from "../utils/hash.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { applyAMCConfigProfile, initWorkspace, loadAMCConfig, saveAMCConfig } from "../workspace.js";
@@ -189,7 +190,8 @@ export function applyStarterProfile(workspace: string, kind: StarterProfileKind,
 /** Coding: a chat that asks before each edit or command. Regulated: a run under the two-approver preset. */
 const nextCommandFor = (kind: StarterProfileKind): string => kind === "coding"
   ? "amc agent-loop chat --provider stub --tools workspace --approval-mode default"
-  : 'amc agent-loop run "..." --provider stub --tools workspace --preset regulated';
+  // The stand-in calls a tool only when asked in this form (UX-28), so the line reaches the regulated approval wait.
+  : `amc agent-loop run '{"tool":"fs.write","arguments":{"path":"hello.txt","content":"hi"}}' --provider stub --tools workspace --preset regulated`;
 
 /** What init prints: readiness, the owner, the monitor fingerprint, the plan (`--regulated`) and the next command. */
 function starterReport(workspace: string, kind: StarterProfileKind, firewallMode: RuntimeFirewallMode,
@@ -322,9 +324,16 @@ function printReport(workspace: string, report: StarterProfileReport): void {
  * first, so a refusal leaves an existing workspace untouched; only then does `force` delete .amc, as `amc init --force` does.
  * Returns null when the person said no.
  */
-export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false, webHosts: readonly string[] = []): Promise<StarterProfileReport | null> {
+export async function runStarterInit(workspace: string, kind: StarterProfileKind, force = false, webHosts: readonly string[] = [],
+  adoptionIo: CodingAdoptionIo = terminalAdoptionIo): Promise<StarterProfileReport | null> {
   const amcDir = join(workspace, ".amc");
-  if (kind === "coding" && !force && pathExists(amcDir)) return adoptCodingSetup(workspace, webHosts);
+  if (kind === "coding" && !force && pathExists(amcDir)) {
+    return runCodingMove(workspace, webHosts, adoptionIo, { apply: async (owner, keepFirewall) => {
+      const report = await applyStarterProfileAsync(workspace, "coding", owner, webHosts, { keepFirewall });
+      printReport(workspace, report);
+      return report;
+    } });
+  }
   const owner = await starterSecrets(kind);
   if (force) refuseForceOverCommittedKeys(workspace);
   if (force && pathExists(amcDir)) {
@@ -355,14 +364,3 @@ export function refuseForceOverCommittedKeys(workspace: string): void {
     + "To move a folder the amc menu set up to the coding setup, run amc init --coding without --force. To start over, use a new folder.");
 }
 
-/** UX-01: the coding setup over a workspace bare `amc` made, keeping its keys, evidence and history. */
-async function adoptCodingSetup(workspace: string, webHosts: readonly string[]): Promise<StarterProfileReport | null> {
-  const adoption = await prepareCodingAdoption(workspace);
-  if (adoption === null) return null;
-  const owner = await starterSecrets("coding");
-  sealAdoptionPassphrase(workspace, adoption);
-  const report = await applyStarterProfileAsync(workspace, "coding", owner, webHosts, { keepFirewall: adoption.keepFirewall });
-  recordCodingAdoption(workspace, owner.username, adoption);
-  printReport(workspace, report);
-  return report;
-}

@@ -175,7 +175,7 @@ describe("amc init --regulated (P1-40)", () => {
     expect(bash(ws)?.nativeSandbox?.egress, "deny-by-default egress").toBeUndefined();
     expect(activeUserRecord(ws, report.owner.userId)).not.toBeNull();
     expect(report.readiness.ready, report.readiness.blockers.join("; ")).toBe(true);
-    expect(report.nextCommand).toBe('amc agent-loop run "..." --provider stub --tools workspace --preset regulated');
+    expect(report.nextCommand).toBe(`amc agent-loop run '{"tool":"fs.write","arguments":{"path":"hello.txt","content":"hi"}}' --provider stub --tools workspace --preset regulated`);
   });
 
   it("compiles and signs a Layer 0 plan, names the facts it waits for and activates nothing", () => {
