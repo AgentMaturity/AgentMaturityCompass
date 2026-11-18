@@ -86,7 +86,7 @@ describe("Home's pieces", () => {
 
   test("the approvals tile: nothing when AMC cannot tell, an empty state at zero, the count with the way there", () => {
     expect(approvalsTileHtml(null)).toBe("");
-    expect(approvalsTileHtml(0)).toContain("Nothing waits for you right now.");
+    expect(approvalsTileHtml(0)).toContain("No approval requests are open.");
     expect(approvalsTileHtml(1)).toContain("1 approval request is open");
     expect(approvalsTileHtml(3)).toContain("3 approval requests are open");
     expect(approvalsTileHtml(3)).toContain('href="./approvals"');

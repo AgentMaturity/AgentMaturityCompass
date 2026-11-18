@@ -114,6 +114,8 @@ export class ConsoleApiError extends Error {
 }
 
 async function request(path, options) {
+  // A change (an approval decided, a request filed) makes the kept count of open approvals stale: ask again next time.
+  if ((options?.method || "GET") !== "GET") forgetPendingCount();
   const finished = trackRequest();
   try {
     const result = await requestOnce(path, options);
@@ -257,6 +259,11 @@ export function pendingApprovalCount() {
     return count;
   }, () => null);
   return pending;
+}
+
+function forgetPendingCount() {
+  pending = null;
+  try { sessionStorage.removeItem(PENDING_KEY); } catch { /* no storage */ }
 }
 
 async function countPending(agent) {

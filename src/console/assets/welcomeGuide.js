@@ -35,13 +35,13 @@ export const GUIDE_STEPS = [
         <li><strong>AMC records it.</strong> Every action goes into a tamper-evident log, so changes later would show.</li>
         <li><strong>You get results.</strong> A score, the gaps to work on, and evidence you can share.</li>
       </ol>
-      <p>Not sure where to start? "Try a demo task" on Home shows it working with no setup. Every other page is under
-      "All features" in the menu.</p>`
+      <p>Not sure where to start? The "Run a task" tile on Home ("Try a demo task" in the demo) shows it working with
+      no setup. Every other page is under "More" in the menu.</p>`
   },
   {
     title: "Words you will see",
     body: `<dl class="welcome-guide-glossary">${GLOSSARY.map(([term, text]) => `<dt>${esc(term)}</dt><dd>${esc(text)}</dd>`).join("")}</dl>
-      <p class="muted">You can open this guide again any time with "How AMC works" at the top of the page.</p>`
+      <p class="muted">You can open this guide again any time with the ? button ("How AMC works") at the top of the page.</p>`
   }
 ];
 

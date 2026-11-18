@@ -212,18 +212,22 @@ export function renderTopbar(doc, me, onSignOut, agent) {
 
 /**
  * The status dot follows #ucBanner, which app.js fills: no dot while it is empty; "Needs attention" in red when it holds
- * a problem, a kill switch or a freeze, and then the banner itself stays in sight; otherwise the banner's first words
- * ("Local workspace") with the full status one click away.
+ * a problem, a kill switch or a freeze, and "Status unknown" when it holds no plain status line (AMC could not read its
+ * status), and then the banner itself stays in sight; otherwise the banner's first words ("Local workspace") with the
+ * full status one click away.
  */
 function syncStatus(doc) {
   const banner = doc.getElementById?.("ucBanner");
   const pill = doc.getElementById?.("topbarStatus");
   if (!banner || !pill) return;
-  const alert = !banner.hidden && Boolean(banner.querySelector(".danger, .status-bad"));
-  const line = String(banner.querySelector(".uc-line")?.textContent ?? "").split(" · ")[0].trim();
+  const problem = Boolean(banner.querySelector(".danger, .status-bad"));
+  const plain = banner.querySelector(".uc-line");
+  // Only the healthy plain line folds away; anything else (a problem, or a status AMC could not read) stays in sight.
+  const alert = !banner.hidden && (problem || !plain);
+  const line = String(plain?.textContent ?? "").split(" · ")[0].trim();
   pill.hidden = banner.hidden;
   pill.dataset.state = alert ? "stop" : "ok";
-  pill.querySelector(".status-words").textContent = alert ? "Needs attention" : line.split(/\s+/).slice(0, 2).join(" ") || "Status";
+  pill.querySelector(".status-words").textContent = problem ? "Needs attention" : alert ? "Status unknown" : line.split(/\s+/).slice(0, 2).join(" ") || "Status";
   banner.classList.toggle("uc-pinned", alert);
   pill.setAttribute("aria-expanded", String(alert || banner.classList.contains("uc-open")));
   if (doc.body?.dataset) doc.body.dataset.statusPill = "1";

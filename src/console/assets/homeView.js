@@ -22,7 +22,7 @@ export function homeStartHtml({ agentId = "default", demoMode = false } = {}) {
  */
 export function approvalsTileHtml(count) {
   if (count === null || count === undefined) return "";
-  if (count === 0) return emptyState({ line: "Nothing waits for you right now." });
+  if (count === 0) return emptyState({ line: "No approval requests are open." });
   return `<div class="wait-tile">${icon("approvals", { size: 24 })}<div class="wait-tile-words"><strong>${count === 1 ? "1 approval request is open" : `${esc(count)} approval requests are open`}</strong>`
     + `<span>Someone must approve or decline before the work goes on.</span></div><a class="button secondary" href="./approvals">Open approvals</a></div>`;
 }

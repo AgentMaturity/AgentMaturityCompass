@@ -2150,6 +2150,11 @@ body[data-session="none"] .topbar-actions > :not(#guideOpenLink) { display: none
   main {
     padding: 14px 16px 104px;
   }
+  /* The demo's first action and its "local demo session" note are on Home's tile and in the banner on a phone. */
+  .topbar .pill,
+  .topbar #topbarPrimaryAction {
+    display: none;
+  }
   .topbar {
     margin-bottom: 18px;
     padding-bottom: 10px;

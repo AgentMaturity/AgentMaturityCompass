@@ -319,6 +319,12 @@ describe("renderTopbar", () => {
     expect(pill().querySelector(".status-words")!.textContent).toBe("Needs attention");
     expect(pill().dataset.state).toBe("stop");
     expect(banner.classList.contains("uc-pinned")).toBe(true);
+    // A status AMC could not read (the offline snapshot, "Unavailable") has no plain line: it fails closed, in sight.
+    banner.innerHTML = "<strong>Unified Clarity</strong> <span class=\"muted\">Unavailable.</span>";
+    draw(doc, { username: "a" });
+    expect(pill().querySelector(".status-words")!.textContent).toBe("Status unknown");
+    expect(pill().dataset.state).toBe("stop");
+    expect(banner.classList.contains("uc-pinned")).toBe(true);
     const styles = readFileSync("src/console/assets/styles.css", "utf8");
     expect(styles).toContain("body[data-status-pill] #ucBanner:not(.uc-pinned):not(.uc-open) {");
   });
