@@ -39,6 +39,13 @@ function okJson(description: string, schemaRef: string, example?: Record<string,
   };
 }
 
+/** GET one approval request: the observing read and its `/view` twin, which writes nothing, answer alike. */
+function approvalDetailGet(summary: string): Record<string, unknown> {
+  return { get: { summary, tags: ["Studio", "Approvals", "Enforce"], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+    security: [{ adminToken: [] }, { sessionCookie: [] }], responses: { "200": okJson("Canonical approval request", "#/components/schemas/ApprovalDetailResponse"),
+      "401": errJson("Unauthorized"), "404": errJson("Approval request not found") } } };
+}
+
 function errJson(description = "Request failed"): Record<string, unknown> {
   return {
     description,
@@ -297,20 +304,8 @@ function studioEndpoints(): Record<string, Record<string, OpenApiOperation>> {
         },
       },
     },
-    "/approvals/requests/{id}": {
-      get: {
-        summary: "Get a canonical approval request",
-        tags: ["Studio", "Approvals", "Enforce"],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        security: [{ adminToken: [] }, { sessionCookie: [] }],
-        responses: {
-          "200": okJson("Canonical approval request", "#/components/schemas/ApprovalDetailResponse"),
-          "401": errJson("Unauthorized"),
-          "404": errJson("Approval request not found")
-        }
-      }
-    },
-    "/approvals/requests/{id}/view": { get: { summary: "Get a canonical approval request without observing its expiry (writes nothing)", tags: ["Studio", "Approvals", "Enforce"], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }], security: [{ adminToken: [] }, { sessionCookie: [] }], responses: { "200": okJson("Canonical approval request", "#/components/schemas/ApprovalDetailResponse"), "401": errJson("Unauthorized"), "404": errJson("Approval request not found") } } },
+    "/approvals/requests/{id}": approvalDetailGet("Get a canonical approval request"),
+    "/approvals/requests/{id}/view": approvalDetailGet("Get a canonical approval request without observing its expiry (writes nothing)"),
     "/approvals/requests/{id}/decide": {
       post: {
         summary: "Record a canonical approval decision",
