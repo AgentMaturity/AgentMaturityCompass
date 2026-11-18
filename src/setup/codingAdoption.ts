@@ -34,7 +34,7 @@ import { interactiveOperator, operatorRefusalText } from "../vault/operatorConte
 import { loadAMCConfig } from "../workspace.js";
 
 /** What the coding setup allows and what it does not, in the words the menu and `init --coding` show before asking. */
-export const CODING_SETUP_SUMMARY: readonly string[] = [
+const CODING_SETUP_SUMMARY: readonly string[] = [
   "An agent here reads files, and edits files or runs commands only after you see each one and say yes.",
   "  Each action and your answer are signed and recorded. Commands have no network and write only in this folder.",
   "  AMC's own files and files that usually hold secrets (.env, keys) stay closed to it. You are the one who approves."
@@ -73,7 +73,7 @@ export interface CodingAdoptionIo {
   readonly secret: (message: string) => Promise<string>;
 }
 
-export const terminalAdoptionIo: CodingAdoptionIo = {
+const terminalAdoptionIo: CodingAdoptionIo = {
   log: (line) => console.log(line),
   confirm: async (message) => (await inquirer.prompt<{ yes: boolean }>([{ type: "confirm", name: "yes", message, default: false }])).yes,
   secret: async (message) => (await inquirer.prompt<{ value: string }>([{ type: "password", name: "value", message, mask: "*" }])).value,

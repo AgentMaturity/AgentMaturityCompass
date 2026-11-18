@@ -301,7 +301,6 @@ import { forgetVaultPassphrase, unlockWithRememberedPassphrase } from "./vault/p
 import { adoptVaultPassphraseFile, bootstrapVaultPassphrase, unlockWithPassphraseFile, vaultPassphraseFromEnv } from "./vault/passphraseFile.js";
 import { askToUnlockForSigning, confirmRememberedUnlock, interactiveOperator } from "./vault/operatorContext.js";
 import { VAULT_UNLOCK_PATHS } from "./vault/vaultLockedError.js";
-import { keysetAnchoring } from "./keys/keyset.js";
 import { runFrontDoor, scoreNextStep, shouldShowFrontDoor, terminalFrontDoorIo } from "./setup/frontDoor.js";
 import { ensureInstantVaultMode, type InstantVaultMode } from "./cli/instantVaultMode.js";
 import { generatedPassphraseForInit, generatedPassphraseRoute, newVaultPassphraseChoices, promptNewSecret, rememberInitPassphrase, rememberOrShowOnce, shownOncePassphraseLines, skipVaultPassphrase } from "./cli/initPassphrase.js";
@@ -2117,9 +2116,7 @@ function existingVaultLeftAlone(workspace: string): boolean {
   if (!vaultStatusNow(workspace).exists || (process.env.AMC_VAULT_PASSPHRASE ?? "").length > 0) return false;
   console.log(chalk.yellow("This folder already has an AMC vault, so it is already set up. Nothing was changed."));
   console.log(chalk.gray(`  Commands that sign need that vault's passphrase: ${VAULT_UNLOCK_PATHS}.`));
-  // UX-29: where this machine committed the key set, --force is refused (it would leave a folder AMC cannot set up again).
-  if (keysetAnchoring(workspace).state !== "committed") console.log(chalk.gray("  To start over instead (this discards the vault and every record in .amc): amc init --force"));
-  else console.log(chalk.gray("  For an agent that edits files and runs commands after you approve each one: amc init --coding"));
+  console.log(chalk.gray("  For an agent that edits files and runs commands after you approve each one: amc init --coding"));
   return true;
 }
 
@@ -2191,18 +2188,16 @@ program
   .option("--regulated", "Starter profile: deny-by-default egress, firewall block, approvals on, a signed Layer 0 plan (P1-40)")
   .option("--web-allow-host <host>", "--coding only: also grant web_fetch and web_search this exact host or origin in the signed tools policy; repeatable (P2-13)", (v: string, p: string[] = []) => [...p, v])
   .action(async (opts: { trustBoundary?: "isolated" | "shared"; profile: "dev" | "ci" | "prod"; force: boolean; skipVault: boolean; minimal: boolean; coding?: boolean; regulated?: boolean; webAllowHost?: string[] }) => {
-    const { starterProfileFlag, runStarterInit } = await import("./setup/starterProfiles.js");
+    const { starterProfileFlag, runStarterInit, refuseForceOverCommittedKeys } = await import("./setup/starterProfiles.js");
     try {
       adoptVaultPassphraseFile(); // AMC_VAULT_PASSPHRASE_FILE seals the new vault as AMC_VAULT_PASSPHRASE does
-      const starter = starterProfileFlag(opts);
+      const starter = starterProfileFlag(opts); if (opts.force) refuseForceOverCommittedKeys(process.cwd()); // UX-29: before .amc is deleted
       if (starter) { await runStarterInit(process.cwd(), starter, opts.force, opts.webAllowHost); return; }
     } catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
     const skip = opts.skipVault && !opts.minimal ? skipVaultPassphrase() : { generated: null }; // LIVE-VAULT-04: refused before any write
     if ("refused" in skip) { console.error(chalk.red(skip.refused)); process.exit(1); }
-    // Force mode: delete existing .amc directory before re-init, unless that would leave a folder AMC refuses (UX-29)
+    // Force mode: delete existing .amc directory before re-init
     if (opts.force) {
-      try { (await import("./setup/starterProfiles.js")).refuseForceOverCommittedKeys(process.cwd()); }
-      catch (error) { console.error(chalk.red(toErrorMessage(error))); process.exit(1); }
       const { rmSync, existsSync } = await import("fs");
       const { join: pathJoin } = await import("path");
       const amcDir = pathJoin(process.cwd(), ".amc");
