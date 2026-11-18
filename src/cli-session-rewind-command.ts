@@ -11,7 +11,7 @@ import chalk from "chalk";
 import { escapeTerminalControls } from "./utils/terminalEscape.js";
 
 /** Printed every time: what a rewind never puts back. */
-export const REWIND_NOT_COVERED = [
+const REWIND_NOT_COVERED = [
   "A rewind never undoes: changes made by shell commands or background jobs, files outside this workspace,",
   "anything sent or done elsewhere (network calls, MCP tools, messages sent), files too large to keep a copy of,",
   "file permissions, and folders the session created."

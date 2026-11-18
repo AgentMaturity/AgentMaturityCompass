@@ -25,7 +25,7 @@ export const MAX_CHECKPOINT_FILE_BYTES = 8 * 1024 * 1024;
 export const MAX_CHECKPOINT_SESSION_BYTES = 64 * 1024 * 1024;
 
 /** stored: bytes kept; absent: the file did not exist; the other three: no pre-image, so the file cannot be rewound. */
-export type CheckpointStatus = "stored" | "absent" | "too-large" | "session-limit" | "not-stored";
+type CheckpointStatus = "stored" | "absent" | "too-large" | "session-limit" | "not-stored";
 
 export interface FileCheckpointWriter {
   recordProjectedEvidence(row: { readonly eventType: "audit"; readonly payload: string; readonly meta: Record<string, unknown> }): unknown;

@@ -61,13 +61,13 @@ export const SPILL_INBOX_MESSAGE_META_KEY = "messageId";
 export type SpillCommitmentSubject =
   | { readonly subject: "user/attachment"; readonly filename: string }
   | { readonly subject: typeof SPILL_INBOX_SUBJECT; readonly messageId: string }
-  | { readonly subject: typeof SPILL_CHECKPOINT_SUBJECT; readonly callId: string };
+  | { readonly subject: "file/checkpoint"; readonly callId: string };
 
 /**
  * HP-06: a file's prior bytes, kept before a native file tool changed it (src/tools/builtin/fileCheckpoint.ts). The
  * commitment names the tool call only; the path stays in the NATIVE_FILE_CHECKPOINT row's payload.
  */
-export const SPILL_CHECKPOINT_SUBJECT = "file/checkpoint" as const;
+const SPILL_CHECKPOINT_SUBJECT = "file/checkpoint" as const;
 
 /** The subject's contribution to the commitment row's signed meta. */
 export function spillCommitmentMeta(subject: SpillCommitmentSubject): Record<string, unknown> {

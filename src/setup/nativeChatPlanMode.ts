@@ -15,7 +15,7 @@ export function chatPlanRefusal(input: { readonly tools: string; readonly delega
 
 export const PLAN_MODE_ON = "Plan mode is on. From your next task, the agent can only read: anything that would change a file or run a command is refused. "
   + "When it hands you a plan (plan_exit, if your tools policy lists it), that turn ends. Type /plan again to turn plan mode off, then tell it to go ahead.";
-export const PLAN_MODE_OFF = "Plan mode is off. From your next task, the agent's tools are back, under the same approvals as before.";
+const PLAN_MODE_OFF = "Plan mode is off. From your next task, the agent's tools are back, under the same approvals as before.";
 
 /** The `/plan` command: the new state and what to say, or the refusal and the unchanged state. */
 export function togglePlanMode(on: boolean, refusal: string | null): { readonly on: boolean; readonly message: string; readonly refused: boolean } {

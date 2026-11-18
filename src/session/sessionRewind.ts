@@ -52,7 +52,7 @@ export const REWIND_CONFLICT_WORDS: Readonly<Record<RewindConflictReason, string
   "other-session": "another session changed the same file afterwards"
 });
 
-export interface RewindFile {
+interface RewindFile {
   readonly path: string;
   /** What the file must hold now: the session's last recorded afterSha256 (null: the session deleted it). */
   readonly fromSha256: string | null;
@@ -61,7 +61,7 @@ export interface RewindFile {
   readonly checkpointEventId: string | null;
   readonly commitmentEventId: string | null;
 }
-export interface RewindConflict { readonly path: string; readonly reason: RewindConflictReason }
+interface RewindConflict { readonly path: string; readonly reason: RewindConflictReason }
 
 export interface RewindPlan {
   readonly sessionId: string;
@@ -172,7 +172,7 @@ export interface RewindOutcome {
 }
 
 /** Who ran the rewind, as this machine names them. A local fact, not a sign-in. */
-export function rewindActor(): { readonly user: string; readonly host: string; readonly how: "terminal-no-sign-in" } {
+function rewindActor(): { readonly user: string; readonly host: string; readonly how: "terminal-no-sign-in" } {
   return { user: userInfo().username, host: hostname(), how: "terminal-no-sign-in" };
 }
 
