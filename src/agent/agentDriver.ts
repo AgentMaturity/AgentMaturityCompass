@@ -710,8 +710,7 @@ export class AgentDriver {
       let cleanupFailure: { error: unknown } | undefined;
       try { for (const id of repairContextIds) this.inbox.cancelNextStep(id); }
       catch (error) { cleanupFailure = { error }; ending = { reason: "error", error }; this.notifyError(error); }
-      // HP-04: the turn's check status, inside the turn and so under its seal.
-      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); recordTurnVerification(this.session, turnRef.turn, this.verifySetting); }
+      try { repair?.finish(ending?.reason ?? "incomplete"); validation?.finish(signal.aborted ? "cancelled" : `turn-${ending?.reason ?? "incomplete"}`); recordTurnVerification(this.session, turnRef.turn, this.verifySetting); } // HP-04: inside the turn, under its seal
       catch (error) { ending = { reason: "error", error }; this.notifyError(error); }
       await this.closeTurn(turnRef.turn, ending, signal);
       if (cleanupFailure !== undefined) {

@@ -27,7 +27,7 @@ import { escapeTerminalControls } from "../utils/terminalEscape.js";
 import { freezeNativeValidationPlan, NativeValidationTurn, type NativeValidationPlan } from "./nativeValidation.js";
 import type { AgentToolSeam } from "./toolSeam.js";
 
-export type TurnVerificationStatus = "no-changes" | "changed-and-checked-pass" | "changed-and-checked-fail" | "changed-unchecked";
+type TurnVerificationStatus = "no-changes" | "changed-and-checked-pass" | "changed-and-checked-fail" | "changed-unchecked";
 /** on: checks after edits run; off: the operator turned them off for this run; validate: `--validate` checks run instead. */
 export type VerifyOnStopSetting = "on" | "off" | "no-checks" | "validate";
 export interface TurnVerification {
@@ -45,8 +45,8 @@ export interface TurnCheckRow extends TurnVerification {
   readonly eventId: string;
 }
 
-export const TURN_VERIFICATION_KIND = "native-turn-verification";
-export const VERIFY_ON_STOP_KIND = "native-verify-on-stop";
+const TURN_VERIFICATION_KIND = "native-turn-verification";
+const VERIFY_ON_STOP_KIND = "native-verify-on-stop";
 /** The closed set of reason codes; a stored row with any other value reads as "unknown-reason" (and fails verify). */
 const REASON_CODES: ReadonlySet<string> = new Set(["no-check", "check-before-last-change", "nonzero-exit", "check-cancelled", "check-execution-denied",
   "check-deadline-exceeded", "check-execution-unavailable", "check-prior-check-unavailable", "check-unavailable", "unknown-reason"]);
