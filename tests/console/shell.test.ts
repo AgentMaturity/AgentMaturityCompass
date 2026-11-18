@@ -159,13 +159,18 @@ describe("canonical navigation", () => {
     renderCanonicalNav?: (nav: FakeElement) => void };
   const hrefs = (html: string) => [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]!);
 
-  test("canonicalNavHtml lists the primary links in plain words, then All features under short headings", () => {
+  // The studio-ui redesign: the rail's order (Approvals before Records), an icon and a label per link, the first five
+  // as the phone tab bar, and every other page under "More" with a filter.
+  test("canonicalNavHtml lists the primary links in plain words, then More with every other page under short headings", () => {
     const html = api.canonicalNavHtml?.([]) ?? "";
     expect(hrefs(html)[0]).toBe("./home");
     const primary = (api.CANONICAL_NAV ?? []).filter((link) => !link.group).map((link) => link.label);
-    expect(primary).toEqual(["Home", "Build an agent", "Run a task", "My agent", "Records", "Approvals", "Industry Packs", "Live runs", "Sign in"]);
-    expect(html).toContain('<a href="./a4" id="a4NavLink">Build an agent</a>');
-    expect(html).toContain('<details class="nav-features"><summary>All features</summary><p class="nav-section">');
+    expect(primary).toEqual(["Home", "Build an agent", "Run a task", "My agent", "Approvals", "Records", "Industry Packs", "Live runs", "Sign in"]);
+    expect(html).toMatch(/<a href="\.\/a4" id="a4NavLink" class="nav-tab" title="Build an agent"><svg [^>]*aria-hidden="true"[^>]*>[\s\S]*?<\/svg><span class="nav-label">Build an agent<\/span>/);
+    expect(html.match(/class="nav-tab"/g) ?? []).toHaveLength(5);
+    expect(html).toContain('<details class="nav-features nav-more"><summary>');
+    expect(html).toContain('<span class="nav-label">More</span></summary><div class="more-panel"><input type="search" class="more-filter"');
+    expect(html).toContain('<div class="more-group"><p class="nav-section">Rules and limits</p>');
     for (const heading of ["Rules and limits", "Watch and review", "Teams and many agents", "Workspace"]) expect(html).toContain(`<p class="nav-section">${heading}</p>`);
     expect(html).not.toMatch(/>Login|>A4<|>Native Tasks</);
     // Sentence case: no label is all lowercase or all uppercase.
@@ -178,7 +183,7 @@ describe("canonical navigation", () => {
   test("a page's own links go under More pages, once each, never duplicating a canonical link", () => {
     const html = api.canonicalNavHtml?.([{ href: "./home", label: "Home" }, { href: "./assuranceRun", label: "Run Detail" },
       { href: "./assuranceRun.html", label: "Run Detail again" }, { href: "./evidence?agent=x", label: "Evidence" }]) ?? "";
-    expect(html).toContain('<details class="nav-features" open><summary>More pages</summary><a href="./assuranceRun">Run Detail</a></details>');
+    expect(html).toMatch(/<details class="nav-features nav-pages" open><summary><svg [\s\S]*?<\/svg><span class="nav-label">More pages<\/span><\/summary><a href="\.\/assuranceRun" title="Run Detail">[\s\S]*?<span class="nav-label">Run Detail<\/span><\/a><\/details>/);
     expect(hrefs(html).filter((href) => href === "./home")).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./assuranceRun"))).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./evidence"))).toHaveLength(1);
@@ -246,26 +251,23 @@ describe("canonical navigation", () => {
   });
 });
 
-// LIVE-UX-17: the only Logout button was on the Leases page; the top bar offers Sign out once someone is signed in.
+// LIVE-UX-17 then the studio-ui redesign: the top bar is one slim row (the page's name, the status dot, How AMC works).
+// Sign out moved to the person at the foot of the rail (renderNavSession), and the buttons that repeated the rail
+// (Records, Run a task) are gone; the demo workspace keeps its one first action, "Try a demo task".
 describe("topbarHtml", () => {
   const topbar = topbarHtml as unknown as (options: Record<string, unknown>) => string;
 
-  test("shows Sign out, as a plain button, only when a user is signed in", () => {
-    const signedIn = topbar({ me: { username: "a" } });
-    expect(signedIn).toMatch(/<button id="signOutBtn" type="button"[^>]*>Sign out<\/button>/);
-    expect(topbar({ me: null })).not.toContain("Sign out");
-    expect(topbar({})).not.toContain("Sign out");
-  });
-
-  test("keeps the workspace label escaped and the existing shortcuts, with no inline handler", () => {
-    const html = topbar({ workspace: "<acme>", demoMode: false, me: { username: "a" } });
-    expect(html).toContain("/ &lt;acme&gt; workspace");
-    expect(html).toContain('href="./evidence"');
-    expect(html).toContain('href="./native-tasks?agent=default&amp;sample=1">Run a task</a>');
-    expect(html).not.toContain("Open Standard");
-    expect(html).toContain("session protected");
-    expect(topbar({ demoMode: true })).toContain("local demo session");
-    for (const variant of [html, topbar({ me: null }), topbar({ demoMode: true })]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
+  test("names the page, escaped, and repeats nothing the rail has", () => {
+    const html = topbar({ title: "<Approvals>", demoMode: false, me: { username: "a" } });
+    expect(html).toContain('<div class="topbar-title">&lt;Approvals&gt;</div>');
+    expect(topbar({})).toContain('<div class="topbar-title">Compass Console</div>');
+    for (const gone of ["Sign out", 'href="./evidence"', "Run a task", "topbarPrimaryAction", "Open Standard"]) expect(html).not.toContain(gone);
+    expect(html).toContain('<button type="button" id="topbarStatus" class="status-pill" aria-controls="ucBanner" aria-expanded="false" hidden>');
+    expect(html).toMatch(/id="guideOpenLink" href="\.\/home\?guide=1" title="How AMC works"><svg [\s\S]*?<\/svg><span class="visually-hidden">How AMC works<\/span><\/a>/);
+    const demo = topbar({ demoMode: true, agent: "a b" });
+    expect(demo).toContain("local demo session");
+    expect(demo).toContain('id="topbarPrimaryAction" href="./native-tasks?agent=a%20b&amp;sample=1">Try a demo task</a>');
+    for (const variant of [html, topbar({ me: null }), demo]) expect(variant).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 
   test("app.js renders the top bar through renderTopbar, refreshes it after sign-in and wires Sign out to logout then the login page", () => {
@@ -283,18 +285,42 @@ describe("topbarHtml", () => {
 describe("renderTopbar", () => {
   const draw = renderTopbar as unknown as (doc: FakeDocument, me: unknown, onSignOut?: () => void, agent?: string) => void;
 
-  test("puts one top bar first in main, redraws it in place, keeps the agent and wires Sign out", () => {
+  test("puts one top bar first in main, redraws it in place and keeps the agent for the demo's first action", () => {
     const doc = new FakeDocument();
+    doc.location.pathname = "/w/demo/console/home";
     pageWithNav(doc, ["./home"]);
-    let signedOut = 0;
     draw(doc, null, undefined, "bot-1");
-    draw(doc, { username: "a" }, () => { signedOut += 1; });
+    draw(doc, { username: "a" }, () => undefined);
     const bars = doc.querySelectorAll(".topbar");
     expect(bars).toHaveLength(1);
     expect(bars[0]!.dataset.agent).toBe("bot-1");
     expect(bars[0]!.querySelector("#topbarPrimaryAction")!.getAttribute("href")).toContain("agent=bot-1");
-    for (const listener of bars[0]!.querySelector("#signOutBtn")!.listeners.get("click") ?? []) listener({} as never);
-    expect(signedOut).toBe(1);
+  });
+
+  test("the status dot follows #ucBanner: none while it is hidden, two words when it is fine, Needs attention and the banner kept in sight on a problem", () => {
+    const doc = new FakeDocument();
+    pageWithNav(doc, ["./home"]);
+    const banner = doc.getElementById("ucBanner")!;
+    banner.hidden = true;
+    draw(doc, { username: "a" });
+    const pill = () => doc.getElementById("topbarStatus")!;
+    expect(pill().hidden).toBe(true);
+    banner.hidden = false;
+    banner.innerHTML = '<p class="uc-line">Local workspace · Results ready · Records check out</p>';
+    draw(doc, { username: "a" });
+    expect(pill().hidden).toBe(false);
+    expect(pill().querySelector(".status-words")!.textContent).toBe("Local workspace");
+    expect(banner.classList.contains("uc-pinned")).toBe(false);
+    for (const listener of pill().listeners.get("click") ?? []) listener({} as never);
+    expect(banner.classList.contains("uc-open")).toBe(true);
+    expect(pill().getAttribute("aria-expanded")).toBe("true");
+    banner.innerHTML = '<div class="danger"><strong>Freeze active:</strong> 1 pause is stopping some agent actions.</div>';
+    draw(doc, { username: "a" });
+    expect(pill().querySelector(".status-words")!.textContent).toBe("Needs attention");
+    expect(pill().dataset.state).toBe("stop");
+    expect(banner.classList.contains("uc-pinned")).toBe(true);
+    const styles = readFileSync("src/console/assets/styles.css", "utf8");
+    expect(styles).toContain("body[data-status-pill] #ucBanner:not(.uc-pinned):not(.uc-open) {");
   });
 
   test("draws nothing on a page without a menu, and api.js draws it whenever it learns who is signed in", () => {

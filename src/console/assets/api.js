@@ -1,7 +1,7 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
-import { renderNavSession, renderTopbar, showShellNotice } from "./shell.js";
+import { renderNavSession, renderTopbar, setNavBadge, showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
 import { trackRequest } from "./actionFeedback.js";
 import { plainErrorText } from "./plainError.js";
@@ -229,8 +229,47 @@ export async function whoami() {
     renderNavSession(document, state.me, signOut);
     // Pages with their own script get the top bar here (C-15); app.js redraws its own, so an existing bar is left alone.
     if (!document.querySelector("main .topbar")) renderTopbar(document, state.me, signOut);
+    pendingApprovalCount().then((count) => setNavBadge(document, "./approvals", count), () => undefined);
   }
   return state.me;
+}
+
+const APPROVER_ROLES = ["APPROVER", "OWNER", "AUDITOR"];
+const PENDING_KEY = "amc-pending-approvals";
+let pending = null;
+
+/**
+ * How many approval requests are open (PENDING) for the current agent and the A4 projects' agents, the requests the
+ * Approvals inbox lists by default. Null when this person cannot decide approvals, the current agent's approval log does
+ * not verify, or AMC could not tell: then nothing is shown. Kept for a minute in this tab, so moving between pages does
+ * not ask again. Reads only.
+ */
+export function pendingApprovalCount() {
+  const me = state.me;
+  if (!me || me.userId === "local-demo" || !(me.roles || []).some((role) => APPROVER_ROLES.includes(role))) return Promise.resolve(null);
+  const agent = new URLSearchParams(window.location.search).get("agent") || "default";
+  try {
+    const kept = JSON.parse(sessionStorage.getItem(PENDING_KEY) || "null");
+    if (kept && kept.user === me.userId && kept.agent === agent && Date.now() - kept.at < 60_000) return Promise.resolve(kept.count);
+  } catch { /* no storage: ask Studio */ }
+  pending ??= countPending(agent).then((count) => {
+    try { sessionStorage.setItem(PENDING_KEY, JSON.stringify({ user: me.userId, agent, at: Date.now(), count })); } catch { /* no storage */ }
+    return count;
+  }, () => null);
+  return pending;
+}
+
+async function countPending(agent) {
+  const projects = await apiNativeRequest("/api/v1/a4/projects").catch(() => null);
+  const rows = Array.isArray(projects?.projects) ? projects.projects : Array.isArray(projects) ? projects : [];
+  const others = [...new Set(rows.map((row) => row?.agentId).filter((id) => typeof id === "string" && id && id !== agent))].slice(0, 10);
+  const open = (found) => (found?.requests || []).filter((row) => row?.status === "PENDING").length;
+  const query = (id) => apiGet(`/approvals/requests?agentId=${encodeURIComponent(id)}&status=PENDING&limit=50`);
+  const own = await query(agent);
+  if (own?.integrity?.valid !== true) return null;
+  // As in the inbox, another agent's requests count only where its approval log verifies.
+  const theirs = await Promise.all(others.map((id) => query(id).then((found) => (found?.integrity?.valid === true ? open(found) : 0), () => 0)));
+  return theirs.reduce((sum, count) => sum + count, open(own));
 }
 
 export async function apiGet(path, options) {
