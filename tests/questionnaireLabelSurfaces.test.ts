@@ -51,7 +51,8 @@ describe("library results carry the content status", () => {
 
 describe("rendered surfaces show it", () => {
   test("Studio's pack list and the dashboard's pack cards render the content status", () => {
-    expect(read("src/console/assets/app.js")).toMatch(/questions\$\{pack\.contentStatus \? ` · \$\{htmlEscape\(pack\.contentStatus\)\}, self-reported` : ""\}/);
+    // The console's pack cards are drawn by dailyView.js (studio-ui lane); each card still names the content status.
+    expect(read("src/console/assets/dailyView.js")).toMatch(/questions\$\{pack\.contentStatus \? `, \$\{esc\(pack\.contentStatus\)\}, self-reported` : ""\}/);
     expect(read("src/dashboard/templates/components/domains.js")).toMatch(/\$\{pack\.contentStatus \? `<span>\$\{esc\(pack\.contentStatus\)\}, self-reported<\/span>` : ''\}/);
     expect(read("src/dashboard/build.ts")).toContain("contentStatus: pack.contentStatus");
   });

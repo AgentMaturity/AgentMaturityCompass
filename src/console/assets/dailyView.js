@@ -184,7 +184,7 @@ export function packCatalogHtml(packs) {
   const cards = all.map((pack) => `<article class="pack-card" data-station="${esc(pack.domain ?? "")}">
       <div class="pack-card-head">${icon(STATIONS.includes(pack.domain) ? pack.domain : "packs", { size: 22 })}<strong>${esc(pack.name || pack.packId)}</strong></div>
       <p class="pack-card-line">${esc(shortLine(pack.description))}</p>
-      <div class="pack-card-foot"><span class="muted">${esc(RISK_WORDS[pack.riskLevel] ?? cap(pack.riskLevel || "active"))}, ${esc(num(pack.questionCount))} questions</span>
+      <div class="pack-card-foot"><span class="muted">${esc(RISK_WORDS[pack.riskLevel] ?? cap(pack.riskLevel || "active"))}, ${esc(num(pack.questionCount))} questions${pack.contentStatus ? `, ${esc(pack.contentStatus)}, self-reported` : ""}</span>
         <button class="secondary" data-industry-pack="${esc(pack.packId)}" aria-label="Open ${esc(pack.name || pack.packId)}">Open</button></div>
     </article>`).join("");
   return `<div class="station-tiles" role="group" aria-label="Show packs for one field">${stations}</div><div class="pack-grid">${cards}</div>`;
