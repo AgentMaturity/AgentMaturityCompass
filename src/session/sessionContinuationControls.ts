@@ -15,15 +15,32 @@ function refuse(code: ContinuationControlRefusal, message: string): never {
 /** Called only on authenticated original rows, before recovery or a writer claim. */
 export function assertSessionContinuationConfiguration(rows: readonly Readonly<EvidenceEvent>[], expected: {
   readonly compositionDigest?: string; readonly policyDigest?: string;
+  /** The digest in its form before UX-02 (skill contexts counted), for the skills the session's first turn loaded. */
+  readonly legacyCompositionDigest?: (openingSkills: readonly string[]) => string;
 }): void {
   const opening = rows[0]?.event_type === "session/open" ? JSON.parse(rows[0].meta_json) as Record<string, unknown> : null;
   if (!opening || typeof opening.compositionDigest !== "string" || typeof opening.policyDigest !== "string") {
     refuse("UNSUPPORTED_FORMAT", "The signed session does not contain a supported native configuration.");
   }
-  if ((expected.compositionDigest !== undefined && opening.compositionDigest !== expected.compositionDigest)
+  // A session a skill turn opened before UX-02 signed a digest that counts that skill: the same settings, recomputed in
+  // that form with the skills its signed first-turn context record names, must match it exactly.
+  const skills = expected.legacyCompositionDigest === undefined ? [] : openingSkillContexts(rows);
+  const legacy = skills.length > 0 && expected.legacyCompositionDigest!(skills) === opening.compositionDigest;
+  if ((expected.compositionDigest !== undefined && opening.compositionDigest !== expected.compositionDigest && !legacy)
     || (expected.policyDigest !== undefined && opening.policyDigest !== expected.policyDigest)) {
     refuse("CONFIGURATION_MISMATCH", "Resume requires the original execution settings and signed policy. Restore them or deliberately start a separate task; this session cannot silently adopt changed controls.");
   }
+}
+
+/** The `skill:` context ids the session's first signed context record names (its opening turn), in order. */
+export function openingSkillContexts(rows: readonly Readonly<EvidenceEvent>[]): string[] {
+  for (const row of rows) {
+    const meta = JSON.parse(row.meta_json) as { phase?: unknown; sources?: unknown };
+    if (meta.phase !== "context" || !Array.isArray(meta.sources)) continue;
+    return meta.sources.flatMap((source: { kind?: unknown; id?: unknown }) =>
+      source?.kind === "context" && typeof source.id === "string" && source.id.startsWith("skill:") ? [source.id] : []);
+  }
+  return [];
 }
 
 /**

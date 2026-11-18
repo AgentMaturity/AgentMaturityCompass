@@ -2,7 +2,17 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Command } from "commander";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+/** LOW-14: a session opened the old way signed a digest that counts its skill (the form tests/composedTurnIdentity pins). */
+const opening = vi.hoisted(() => ({ oldForm: false }));
+vi.mock("../src/kernel/composedTurnIdentity.js", async (original) => {
+  const real = await original<typeof import("../src/kernel/composedTurnIdentity.js")>();
+  return { ...real, compositionDigestOf: (options: Parameters<typeof real.compositionDigestOf>[0], profile: Parameters<typeof real.compositionDigestOf>[1], legacy?: readonly string[]) => {
+    const skills = profile.contextPlugins.map((plugin) => plugin.name).filter((name) => name.startsWith("skill:"));
+    return opening.oldForm && legacy === undefined && skills.length > 0 ? real.compositionDigestOf(options, profile, skills) : real.compositionDigestOf(options, profile, legacy);
+  } };
+});
 import { registerAgentCommands } from "../src/cli-agent-commands.js";
 import { verifyAgentRun, type AgentRunSummary } from "../src/agent/runReport.js";
 import { readNativeSessionEvents } from "../src/session/readNativeSessionEvents.js";
@@ -24,7 +34,7 @@ describe("one session holds skill turns and plain turns (UX-02)", () => {
       "---\nname: tidy_notes\ndescription: Summarise a notes file.\n---\nRead $ARGUMENTS and summarise it in three bullet points.\n");
     cwd = process.cwd(); process.chdir(dir);
   });
-  afterEach(() => { process.chdir(cwd); rmSync(dir, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true }); });
+  afterEach(() => { opening.oldForm = false; process.chdir(cwd); rmSync(dir, { recursive: true, force: true }); rmSync(home, { recursive: true, force: true }); });
 
   async function turn(prompt: string, sessionId: string | null, keepOpen = true): Promise<{ summary: AgentRunSummary; errors: string[] }> {
     const out: string[] = [], errors: string[] = [];
@@ -54,5 +64,18 @@ describe("one session holds skill turns and plain turns (UX-02)", () => {
 
     const verified = await verifyAgentRun(dir, sessionId);
     expect(verified.ok, JSON.stringify(verified)).toBe(true);
+  });
+
+  it("a session a skill turn opened before this change still resumes with plain and skill turns (LOW-14)", async () => {
+    opening.oldForm = true;
+    const first = await turn("/tidy_notes notes.txt", null);
+    opening.oldForm = false;
+    expect(first.errors).toEqual([]);
+    const sessionId = first.summary.sessionId;
+    expect((await turn("hello again", sessionId)).errors).toEqual([]);
+    const last = await turn("/tidy_notes notes.txt", sessionId, false);
+    expect(last.errors).toEqual([]);
+    expect(last.summary.endings.map(ending => ending.reason)).toEqual(["complete", "complete", "complete"]);
+    expect((await verifyAgentRun(dir, sessionId)).ok).toBe(true);
   });
 });
