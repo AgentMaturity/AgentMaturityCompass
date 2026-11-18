@@ -28,14 +28,14 @@ export const GUIDE_STEPS = [
   {
     title: "What AMC is",
     body: `<div class="welcome-guide-picture">${picture("check") ?? ""}</div>
-      <p class="welcome-guide-lead">AMC helps you build, run and check AI agents.</p>
+      <p class="welcome-guide-lead">Build, run and check AI agents for regulated work.</p>
       ${moreInfo("How does it check?", `<p>AMC (Agent Maturity Compass) checks how far you can trust an AI agent.</p>
       <p>It does not take the agent's word for it. It looks at signed records of what the agent actually did, and gives
       you a score and a list of gaps to fix.</p>`)}`
   },
   {
     title: "How it works, in three moves",
-    body: `${routeTrack([{ label: "Connect or run", state: "todo" }, { label: "AMC records", state: "todo" }, { label: "You see results", state: "todo" }], { label: "How AMC works", className: "welcome-guide-route" })}
+    body: `${routeTrack([{ label: "Connect or run", state: "todo" }, { label: "AMC records", state: "todo" }, { label: "You see results", state: "todo" }], { label: "How AMC works", className: "welcome-guide-route", diagram: true })}
       <p>New here? Press "Run a task" on Home ("Try a demo task" in the demo).</p>
       ${moreInfo("Tell me more", `<ol class="welcome-guide-list">
         <li><strong>Connect or run.</strong> Connect your agent, or run a task right here.</li>

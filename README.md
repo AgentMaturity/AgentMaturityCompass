@@ -25,7 +25,7 @@
   <a href="docs/DOMAIN_PACKS.md">Industry Packs</a> ·
   <a href="docs/FIRST_FIVE_MINUTES.md">First Five Minutes</a> ·
   <a href="docs/FIRST_FIVE_MINUTES.md#words-you-will-meet">Glossary</a> ·
-  <a href="#run-a-native-agent-task">Native Tasks</a> ·
+  <a href="#run-a-native-agent-task">Run a task</a> ·
   <a href="https://agentmaturity.co/playground.html">Web Playground</a> ·
   <a href="docs/GETTING_STARTED.md">Docs</a> ·
   <a href="https://github.com/AgentMaturity/AgentMaturityCompass/discussions">Community</a> ·
@@ -119,7 +119,7 @@ amc agent-loop guide
 
 The guide reports the next setup or task command without changing the workspace or calling a model. Follow [Your first native AMC workflow](docs/NATIVE_AGENT_WORKFLOW.md) for provider credentials, interactive tasks, reviewed file permissions and approvals. [Native SDK](docs/NATIVE_SDK.md) covers application integration; [code navigation](docs/ARCHITECTURE_NAVIGATION.md) follows the implementation through Graphify's focused maps. Local source and installed-package acceptance do not imply a public release or measured superiority over another harness.
 
-In Studio, open **Native Tasks** to run the same native AMC runtime from the browser. Select an agent, inspect the tool scope, submit a task, review approvals and continue or cancel its recorded session. The [Studio task guide](docs/NATIVE_STUDIO_TASKS.md) explains setup and recovery. The local recording demonstration needs no provider key.
+In Compass Console, open **Run a task** to run the same native AMC runtime from the browser. Select an agent, inspect the tool scope, submit a task, review approvals and continue or cancel its recorded session. The [Studio task guide](docs/NATIVE_STUDIO_TASKS.md) explains setup and recovery. The stand-in model (canned replies) needs no provider key.
 
 ## Assess agent maturity
 

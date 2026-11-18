@@ -9,6 +9,11 @@ import { ICON_NAMES, icon, picture } from "../../src/console/assets/iconSet.js";
 import { activationRouteHtml, approvalsTileHtml, firstStepActionHtml, homeStartHtml } from "../../src/console/assets/homeView.js";
 
 describe("routeTrack", () => {
+  test("a diagram (an explanation, not progress) says no state words", () => {
+    const html = routeTrack([{ label: "A", state: "todo" }, { label: "B", state: "todo" }], { diagram: true });
+    expect(html).not.toContain("visually-hidden");
+    expect(html).toContain('<span class="route-label">A</span>');
+  });
   test("an ordered list; the first step in progress is the current one; each state is said in words", () => {
     const html = routeTrack([{ label: "Describe it", state: "done" }, { label: "Build it", state: "wait", hint: "A <second> person" },
       { label: "Fit rules", state: "todo" }, { label: "Release it", state: "bogus" }], { label: "Where it is" });

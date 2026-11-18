@@ -151,7 +151,7 @@ function releaseMove(ctx) {
 
 /**
  * Assemble between Build and Review. Studio reads the build session for the page (allowed.review carries BUILD_SESSION_OPEN,
- * BUILD_RUNNING or SESSION_OWNER_REQUIRED while Review would refuse): the one action opens that session on Native Tasks, whose
+ * BUILD_RUNNING or SESSION_OWNER_REQUIRED while Review would refuse): the one action opens that session on Run a task, whose
  * "Back to the agent project" returns here.
  */
 function sessionMove(ctx) {
@@ -170,10 +170,10 @@ function sessionMove(ctx) {
   // Studio's words when a residency check refused the session's request (the project read's buildRefusal), then the way on.
   const refused = typeof ctx.project.buildRefusal === "string" ? ctx.project.buildRefusal : null;
   if (codes.includes("BUILD_FAILED") && refused) return { now: `The build session stopped. ${refused} Once an owner has signed the changed registry, open the build `
-    + "session on Native Tasks: press Release for later if it is offered, then Resume session and send a follow-up.", act: { label: "Open the build session", href } };
-  if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Native Tasks: press Release for later if it is offered, then Resume session. "
+    + "session on Run a task: press Release for later if it is offered, then Resume session and send a follow-up.", act: { label: "Open the build session", href } };
+  if (codes.includes("BUILD_FAILED")) return { now: "The build session did not finish. Open it on Run a task: press Release for later if it is offered, then Resume session. "
     + "Then send a follow-up, or press Close and verify and come back for Review.", act: { label: "Open the build session", href } };
-  return { now: "Close the build session: it opens on Native Tasks. Press Close and verify there, then Back to the agent project. Review comes next.",
+  return { now: "Close the build session: it opens on Run a task. Press Close and verify there, then Back to the agent project. Review comes next.",
     act: { label: "Close the build session", href } };
 }
 /** Storage admission's hold and the commands that end it (src/residency/admissionWords.ts). */

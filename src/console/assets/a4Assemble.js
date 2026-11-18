@@ -163,7 +163,7 @@ function renderBuild(ctx) {
   const build = isObject(spec.build) ? spec.build : null;
   // Only the owner's session starts the same task again (the task id is the owner's principal and the recorded request id).
   // Review needs each session closed: its owner closes it with "Close and verify" on the native tasks page.
-  const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">Open on Native Tasks</a>`;
+  const taskLink = (session) => `<a href="./native-tasks?agent=${encodeURIComponent(session.start?.agentId ?? ctx.project.agentId)}&task=${encodeURIComponent(session.taskId)}&project=${encodeURIComponent(ctx.project.projectId)}">Open on Run a task</a>`;
   // A session that never started is built again with Build (BUILD_RETRYABLE): the same request id would only answer the failed task.
   const retry = list(ctx.allowed?.review?.reasonCodes).includes("BUILD_RETRYABLE");
   const sessions = list(build?.sessions).map((session) => [`${short(session.taskId)} ${taskLink(session)}`, esc(session.ownerUsername),

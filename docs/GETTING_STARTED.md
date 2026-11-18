@@ -374,7 +374,7 @@ It signs with the workspace vault. When a passphrase is remembered, it first ask
 logins (for example after `amc init --coding`) use `amc user add` instead (`--force` replaces every login). Add more logins with `amc user add --username <name> --role <roles>`
 (see [RBAC](RBAC.md)).
 
-After you sign in, Home asks "What would you like to do?" and offers three tiles: **Build an agent**, **Run a task** and **Check my agent**. **Run a task** opens Native Tasks with a sample prompt; in the demo workspace the tile reads **Try a demo task**. Below the tiles come **Waiting for you**, your latest agent project as a route with **Continue**, and your first steps as a route; everything else is one click away. The **?** button at the top, "How AMC works", opens a three-step guide; it does not open by itself.
+After you sign in, Home asks "What would you like to do?" and offers three tiles: **Build an agent**, **Run a task** and **Check my agent**. **Run a task** opens the Run a task page with a sample prompt; in the demo workspace the tile reads **Try a demo task**. Below the tiles come **Waiting for you**, your latest agent project as a route with **Continue**, and your first steps as a route; everything else is one click away. The **?** button at the top, "How AMC works", opens a three-step guide; it does not open by itself.
 
 Studio gives you:
 - Live dashboard with agent scores
