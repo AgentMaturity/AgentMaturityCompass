@@ -1990,23 +1990,54 @@ body[data-session="none"] .topbar-actions > :not(#guideOpenLink) { display: none
   margin-bottom: 8px;
 }
 
-.welcome-guide-glossary dt {
-  font-weight: 700;
-  margin-top: 8px;
+.welcome-guide-picture {
+  display: grid;
+  place-items: center;
+  margin: 8px 0;
+  color: var(--ink);
 }
 
-.welcome-guide-glossary dd {
-  margin: 2px 0 0;
+.welcome-guide-lead {
+  margin: 0 0 4px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.welcome-guide-glossary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.welcome-guide-term > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.welcome-guide-term[open] {
+  flex-basis: 100%;
+}
+
+.welcome-guide-term[open] > summary {
+  border-color: var(--accent);
+}
+
+.welcome-guide-term > p {
+  margin: 6px 0 0;
   color: var(--muted);
 }
 
 .welcome-guide-nav {
   margin-top: 18px;
-}
-
-.auth-lead {
-  font-size: 16px;
-  line-height: 1.5;
 }
 
 .auth-help ol {
@@ -2018,10 +2049,66 @@ body[data-session="none"] .topbar-actions > :not(#guideOpenLink) { display: none
   overflow-wrap: anywhere;
 }
 
-.auth-advanced-title {
-  margin: 18px 0 4px;
-  font-size: 14px;
+/* Sign in: one centred card, the logo, two fields, one button; the rest are quiet links under it. */
+.auth-card {
+  max-width: 440px;
+  margin: 24px auto 0;
+  padding: 32px 28px 24px;
+}
+
+.auth-card h2 {
+  margin: 12px 0 6px;
+  font-size: 24px;
+}
+
+.auth-logo {
+  display: block;
+}
+
+.auth-lead {
+  margin: 0 0 20px;
   color: var(--muted);
+}
+
+.auth-card #loginForm input {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.auth-card #loginBtn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+}
+
+.auth-card details > summary {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auth-more {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+body[data-page="login"] main {
+  display: flex;
+  flex-direction: column;
+}
+
+/* A failed sign-in says why right under the card, not above it. */
+body[data-page="login"] #status {
+  order: 2;
+  width: 100%;
+  max-width: 440px;
+  margin: 12px auto 0;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+}
+
+body[data-page="login"] #status:empty {
+  display: none;
 }
 
 /* ── Narrow screens: the rail becomes a tab bar; "More" opens every page as a sheet ───────── */
