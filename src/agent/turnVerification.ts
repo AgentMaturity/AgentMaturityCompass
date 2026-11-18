@@ -182,7 +182,7 @@ export function projectTurnChecks(rows: readonly EvidenceEvent[]): TurnCheckRow[
 }
 
 /** The check setting a `turn/start` row carries, or null for a turn opened by an older build (which is not checked). */
-export const turnStartSetting = (row: EvidenceEvent): VerifyOnStopSetting | null => {
+const turnStartSetting = (row: EvidenceEvent): VerifyOnStopSetting | null => {
   const value = metaOf(row).verifyOnStop;
   return row.event_type === "turn/start" && SETTINGS.has(String(value)) ? value as VerifyOnStopSetting : null;
 };
