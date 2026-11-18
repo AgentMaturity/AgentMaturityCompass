@@ -15,8 +15,7 @@ import { readEventPayload } from "../session/eventPayload.js";
 import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
 import { summarizeNativeSessions } from "../session/latestSession.js";
 import { callMatchesRequest, describeReportedCall } from "../setup/nativeApprovalPreview.js";
-import { redactSecrets } from "../shield/redaction/redactSecrets.js";
-import { SECRET_PATTERNS } from "../shield/redaction/secretPatterns.js";
+import { redactSecrets, secretRegions } from "../shield/redaction/redactSecrets.js";
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -126,7 +125,7 @@ function recordedCall(workspace: string, request: ApprovalRequestRecord): { tool
  * session record, because a diff against today's files would not be what was approved then.
  */
 export function approvalCallFor(workspace: string, request: ApprovalRequestRecord, status: string):
-  ShownCall | { readonly unavailable: string } {
+  ShownCall | { readonly unavailable: string } | { readonly withheld: readonly string[] } {
   if (status !== "PENDING") return { unavailable: "this request is decided; what ran is in the session's record (Records, Agent sessions)" };
   try {
     const call = recordedCall(workspace, request);
@@ -135,6 +134,8 @@ export function approvalCallFor(workspace: string, request: ApprovalRequestRecor
     // Redact every argument value whole BEFORE it is split into lines or cut for display, so a secret spanning lines
     // (a private key body) or one a cut would split is never partly shown.
     const redacted = redactArguments(call.rawArguments);
+    // A secret AMC cannot narrow to its own span is not sent at all: the person decides where they see their own command.
+    if (redacted.withheld.size > 0) return { withheld: [...redacted.withheld].map((type) => type.replaceAll("_", " ")) };
     const shown = shareable(workspace, describeReportedCall(workspace, redacted.call === null ? call : { toolName: call.toolName, arguments: redacted.call }));
     const digest = typeof request.authorizationIntent?.argumentsDigest === "string" ? request.authorizationIntent.argumentsDigest : request.boundHashes.intentHash;
     const hidden = [...redacted.hidden].map(([type, count]) => `${count} ${type.replaceAll("_", " ")}${count === 1 ? "" : "s"}`);
@@ -171,44 +172,82 @@ const DECIDING_ROLES = ["APPROVER", "OWNER", "AUDITOR"];
  * request allows, or the admin token, as the decide route admits) or who raised it; everyone else gets nothing.
  */
 export function approvalCallField(workspace: string, request: ApprovalRequestRecord, status: string,
-  viewer: { readonly isAdmin: boolean; readonly userId: string | null; readonly roles: Iterable<string> }): { readonly call?: ShownCall | { readonly unavailable: string } } {
+  viewer: { readonly isAdmin: boolean; readonly userId: string | null; readonly roles: Iterable<string> }): { readonly call?: ReturnType<typeof approvalCallFor> } {
   const roles = [...viewer.roles];
   const decides = viewer.isAdmin || roles.some((role) => DECIDING_ROLES.includes(role) && (request.rolesAllowed as readonly string[]).includes(role));
   const raised = viewer.userId !== null && request.initiator !== undefined && (request.initiator === viewer.userId || request.initiator.endsWith(`:${viewer.userId}`));
   return decides || raised ? { call: approvalCallFor(workspace, request, status) } : {};
 }
 
-/** Arguments that run or choose a target: only shape-limited redaction, and never across a command separator. */
+/** Arguments that run or choose a target: each secret is narrowed to its own span (`secretSpan`), nothing more. */
 const EXECUTED = new Set(["command", "find", "replace", "patch", "path", "url", "argv", "args", "edits", "workdir", "cwd"]);
-const SEPARATOR = /[;&|`$()<>]/;
+const TOKEN_RUN = /[A-Za-z0-9_\-+\/=.~]{8,}/g;
+const KEY_BEGIN = /-----BEGIN [A-Z ]*PRIVATE KEY-----/;
 
-/** Token- and key-shaped secrets only; a match holding a separator (or a line break outside a key body) stays visible. */
-function shapeRedact(text: string, hidden: Map<string, number>): string {
-  let out = text;
-  for (const entry of SECRET_PATTERNS) {
-    if (entry.type === "connection_string") continue; // its character class runs across shell separators
-    out = out.replace(new RegExp(entry.pattern.source, `${entry.pattern.flags.replace("g", "")}g`), (match) => {
-      if (SEPARATOR.test(match) || (entry.type !== "private_key" && /[\r\n]/.test(match))) return match;
-      hidden.set(entry.type, (hidden.get(entry.type) ?? 0) + 1);
-      return `[REDACTED:${entry.type}]`;
-    });
+/**
+ * The part of one detected region that is the secret itself, never a shell separator, a line break outside a key body,
+ * a quote or anything after the secret's own shape ends; null when no such span can be told apart.
+ * - private key: the base64/whitespace body after the BEGIN marker, up to the first character that is not one;
+ * - a URL's userinfo (connection strings, passwords in URLs): the password between ":" and "@" only;
+ * - anything else (tokens, keys, Basic and Bearer credentials, secret fields): the last token-shaped run of the region,
+ *   which every detector puts at its end (the value after `key=`, `Bearer `, `Basic `, or the whole token).
+ */
+function secretSpan(text: string, region: { type: string; start: number; end: number }): { start: number; end: number } | null {
+  const slice = text.slice(region.start, region.end);
+  if (region.type === "private_key") {
+    const begin = KEY_BEGIN.exec(slice);
+    if (begin === null) return null;
+    const from = region.start + begin.index + begin[0].length;
+    // Key-body lines only (base64, optionally indented); a space inside a line, a quote or a separator ends the body.
+    const body = /^(?:\r?\n[ \t]*[A-Za-z0-9+/=]+)*/.exec(text.slice(from))![0];
+    return { start: from, end: from + body.length };
   }
-  return out;
+  if (region.type === "fold_overflow") return null;
+  const userinfo = /\/\/[^:@\s/]*:([^@\s/;&|`$()<>"']+)@/.exec(slice);
+  if (userinfo !== null) {
+    const at = region.start + userinfo.index + userinfo[0].length - 1;
+    return { start: at - userinfo[1]!.length, end: at };
+  }
+  if (region.type === "connection_string" || region.type === "password_in_url") return null;
+  const runs = [...slice.matchAll(TOKEN_RUN)];
+  const last = runs.at(-1);
+  return last === undefined ? null : { start: region.start + last.index, end: region.start + last.index + last[0].length };
+}
+
+/** Every shared detector on one executed value, each match narrowed to its secret's span; `withheld` when one cannot be. */
+function spanRedact(text: string, hidden: Map<string, number>, withheld: Set<string>): string {
+  const spans: Array<{ type: string; start: number; end: number }> = [];
+  for (const region of secretRegions(text)) {
+    if (region.type === "connection_string" && !/:\/\/[^:@\s/]*:[^@\s/]+@/.test(text.slice(region.start, region.end))) continue; // no password in it
+    const span = secretSpan(text, region);
+    if (span === null) { withheld.add(region.type); continue; }
+    // A key header with no key-shaped body after it holds no secret to hide (and hiding what follows could hide a command).
+    if (region.type === "private_key" && text.slice(span.start, span.end).replace(/\s/g, "").length < 40) continue;
+    spans.push({ type: region.type, ...span });
+  }
+  let out = "", cursor = 0;
+  for (const span of spans.sort((a, b) => a.start - b.start || b.end - a.end)) {
+    if (span.end <= cursor) continue;
+    out += text.slice(cursor, Math.max(cursor, span.start)) + `[REDACTED:${span.type}]`;
+    cursor = Math.max(cursor, span.end);
+    hidden.set(span.type, (hidden.get(span.type) ?? 0) + 1);
+  }
+  return out + text.slice(cursor);
 }
 
 /**
  * Each string in the parsed arguments, redacted whole before anything splits or cuts it: arguments that run or choose a
- * target get only shape-limited redaction (`shapeRedact`), others (file content) the full export redactor. Null (shown
+ * target get only span-limited redaction (`spanRedact`), others (file content) the full export redactor. Null (shown
  * as unreadable) when they are not a JSON object.
  */
-function redactArguments(raw: string): { readonly call: Record<string, unknown> | null; readonly hidden: Map<string, number> } {
-  const hidden = new Map<string, number>();
+function redactArguments(raw: string): { readonly call: Record<string, unknown> | null; readonly hidden: Map<string, number>; readonly withheld: Set<string> } {
+  const hidden = new Map<string, number>(), withheld = new Set<string>();
   let parsed: unknown;
-  try { parsed = JSON.parse(raw === "" ? "{}" : raw); } catch { return { call: null, hidden }; }
-  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { call: null, hidden };
+  try { parsed = JSON.parse(raw === "" ? "{}" : raw); } catch { return { call: null, hidden, withheld }; }
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) return { call: null, hidden, withheld };
   const walk = (value: unknown, executed: boolean): unknown => {
     if (typeof value === "string") {
-      if (executed) return shapeRedact(value, hidden);
+      if (executed) return spanRedact(value, hidden, withheld);
       const result = redactSecrets(value, (type) => `[REDACTED:${type}]`);
       for (const finding of result.findings) hidden.set(finding.type, (hidden.get(finding.type) ?? 0) + 1);
       return result.redacted;
@@ -217,5 +256,5 @@ function redactArguments(raw: string): { readonly call: Record<string, unknown> 
     if (value !== null && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, walk(item, executed)]));
     return value;
   };
-  return { call: Object.fromEntries(Object.entries(parsed).map(([key, value]) => [key, walk(value, EXECUTED.has(key))])), hidden };
+  return { call: Object.fromEntries(Object.entries(parsed).map(([key, value]) => [key, walk(value, EXECUTED.has(key))])), hidden, withheld };
 }

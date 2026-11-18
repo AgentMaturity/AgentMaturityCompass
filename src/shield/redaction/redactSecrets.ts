@@ -33,7 +33,7 @@ export interface SecretRedactionResult {
  */
 const globalise = (pattern: RegExp): RegExp => new RegExp(pattern.source, `${pattern.flags}g`);
 
-interface Region { readonly type: string; readonly start: number; readonly end: number }
+export interface Region { readonly type: string; readonly start: number; readonly end: number }
 
 /**
  * What the table alone does not read, as regions of the original text: the value of a secret-named XML element or HTML
@@ -59,6 +59,15 @@ function foldedRegions(text: string): Region[] {
       const end = last + (text.codePointAt(last)! > 0xffff ? 2 : 1);
       if (text.slice(start, end) !== match[0]) regions.push({ type: entry.type, start, end });
     }
+  }
+  return regions;
+}
+
+/** Every secret region of `text` (start, end, type), from the table and the folded readings; overlapping regions kept. */
+export function secretRegions(text: string): Region[] {
+  const regions = foldedRegions(text);
+  for (const entry of SECRET_PATTERNS as readonly SecretPattern[]) {
+    for (const match of text.matchAll(globalise(entry.pattern))) regions.push({ type: entry.type, start: match.index, end: match.index + match[0].length });
   }
   return regions;
 }

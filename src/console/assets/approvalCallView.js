@@ -20,6 +20,7 @@ export function approvalCallHtml(row) {
   const kind = `${esc(plainCode(row.actionClass || ""))} (risk ${esc(RISK[row.riskTier] || row.riskTier || "not stated")})`;
   const head = `<p><strong>Tool:</strong> ${esc(row.toolName || "not recorded")} · <strong>Kind of action:</strong> ${kind}</p>`;
   if (!call) return `<section class="card approval-call"><h3>What you are approving</h3>${head}<p class="muted">Your role sees the request, not the call it would run.</p></section>`;
+  if (Array.isArray(call.withheld)) return `<section class="card approval-call"><h3>What you are approving</h3>${head}<p class="status-bad">This call contains something that looks like a secret (${esc(call.withheld.join(", "))}) that AMC cannot show here without hiding part of the command, so it is not shown and cannot be approved from this page. Decide it at the terminal where the agent runs, where you see the whole command; you can still deny it here.</p></section>`;
   if (call.unavailable) return `<section class="card approval-call"><h3>What you are approving</h3>${head}<p class="status-bad">The call cannot be shown: ${esc(call.unavailable)}.</p></section>`;
   return `<section class="card approval-call"><h3>What you are approving: ${esc(call.title)}</h3>${head}
     <p><strong>Working folder:</strong> ${call.folder === "." ? "this workspace (the folder AMC runs in); paths below are inside it" : esc(call.folder)}</p>

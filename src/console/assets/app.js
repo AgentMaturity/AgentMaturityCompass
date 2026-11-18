@@ -1813,8 +1813,8 @@ async function renderApprovals() {
         : Number(row.decisionCount || 0)}</td>
       <td>
         ${canDecide ? `<div class="row" data-agent="${htmlEscape(row.agentId || agentId)}" data-intent="${htmlEscape(row.intentId || "")}" data-digest="${htmlEscape(row.requestDigestSha256 || "")}">
-            <button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
-            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>
+            ${Array.isArray(row.call?.withheld) ? "" : `<button data-approve="${htmlEscape(row.approvalRequestId)}">Approve</button>
+            <button class="secondary" data-sim="${htmlEscape(row.approvalRequestId)}" title="Allow it only as a dry run: AMC records what would happen and does nothing">Dry run only</button>`}
             <button class="danger" data-deny="${htmlEscape(row.approvalRequestId)}">Deny</button>
           </div>` : '<span class="muted">Unavailable</span>'}
       </td>
