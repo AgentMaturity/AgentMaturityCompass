@@ -312,7 +312,12 @@ export async function renderNativeTasksPage({ root, initialAgent = "default" }) 
       : task?.state === "failed" ? "The task did not finish cleanly. Inspect the recorded error and evidence before choosing recovery or a new task."
       : "Stop requests cancellation of the active turn. Release for later preserves an eligible session; Close and verify ends it.";
     renderOutcome();
-    root.querySelector(".native-tasks").dataset.run = !task ? "empty" : task.state === "closed" ? "closed" : "task";
+    // "empty" (the greeting only) means no task AND nothing to recover: an unconfirmed submission, a paused or stale
+    // read, or a failed setup read keeps Refresh status and Reconnect in sight. A closed task, or one waiting for
+    // Resume, takes no follow-up, so its box goes (never while a submission is unconfirmed: Retry lives there).
+    root.querySelector(".native-tasks").dataset.run = pending ? (task ? "task" : "recover")
+      : !task ? (stale || readPaused || (!config && !inspecting) ? "recover" : "empty")
+      : task.state === "closed" ? "closed" : task.state === "released" || task.canResume ? "resume" : "task";
     el("nativeTasksTitle").textContent = task ? "Your task" : "What should your agent do?";
     const route = renderTaskRoute(task, { stale: stale || readPaused });
     if (el("nativeTaskRoute").dataset.rendered !== route) { el("nativeTaskRoute").innerHTML = route; el("nativeTaskRoute").dataset.rendered = route; }

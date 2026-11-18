@@ -12,8 +12,8 @@
 .native-tasks:not([data-run="empty"]) .run-lead { display:none; }
 .native-tasks[data-run="empty"] :is(.native-task-conversation, .native-task-record, .run-route-wrap) { display:none; }
 .native-tasks:not([data-run="empty"]) :is(.run-chips, .composer-pickers) { display:none; }
-/* A closed task takes no follow-up: the box goes; New task is the next step. */
-.native-tasks[data-run="closed"] .composer { display:none; }
+/* A closed task takes no follow-up (New task is the next step), nor does one waiting for Resume: the box goes. */
+.native-tasks:is([data-run="closed"], [data-run="resume"]) .composer { display:none; }
 .run-route-wrap .route { margin:8px 0 16px; }
 .native-task-notice { min-height:1.5em; margin:8px 0; color:var(--muted); font-size:13px; text-align:center; }
 .native-tasks:not([data-run="empty"]) .native-task-notice { text-align:left; }
