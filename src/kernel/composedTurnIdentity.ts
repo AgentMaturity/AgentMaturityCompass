@@ -6,6 +6,7 @@
  */
 import { createHash } from "node:crypto";
 import { agentPromptProfile, type AgentPromptProfile } from "../prompt/agentPromptProfile.js";
+import { SKILL_CONTEXT_PREFIX } from "../skills/skillPrompt.js";
 import { amcVersion } from "../version.js";
 import { credentialsServices } from "./services/credentialsServices.js";
 import { llmServices } from "./services/llmServices.js";
@@ -78,7 +79,9 @@ export function compositionDigestOf(options: ComposedTurnOptions, profile: Agent
     sources: options.compositionSources ?? [],
     prompt: {
       sections: profile.sections.map((section) => section.name),
-      contexts: profile.contextPlugins.map((plugin) => plugin.name),
+      // A `/skill` loads for one turn and that turn's signed composition record names it. Counting it here would make
+      // a skill turn and a plain turn different compositions, so chat (one resumed run per turn) could never hold both (UX-02).
+      contexts: profile.contextPlugins.map((plugin) => plugin.name).filter((name) => !name.startsWith(SKILL_CONTEXT_PREFIX)),
       variables: Object.keys(profile.variables).sort(),
       pinned: options.systemPrompt !== undefined
     },
