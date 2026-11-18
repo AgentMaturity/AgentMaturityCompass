@@ -7,7 +7,7 @@
  * The coding setup itself is `init --coding`'s, unchanged: its signed Action Policy runs an edit or a command only after
  * the person approves that one call. This adds no other way for an action to run. It refuses, changing nothing, when:
  * - the process is not a person at a terminal (an agent marker, agent mode, or no terminal: interactiveOperator);
- * - the workspace has accounts, an approval policy, or tools, action-policy or config files that differ from what the
+ * - the workspace has accounts, or an approval policy, tools, action-policy or config files that differ from what the
  *   menu wrote (moving them to the coding setup would replace someone's choices), or this computer did not create its
  *   keys (a clone or a copy);
  * - the vault passphrase does not open the vault;
@@ -20,7 +20,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import inquirer from "inquirer";
 import YAML from "yaml";
-import { approvalPolicyPath } from "../approvals/approvalPolicyEngine.js";
+import { approvalPolicyPath, defaultApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import { approvalPolicySchema } from "../approvals/approvalPolicySchema.js";
 import { usersConfigPath } from "../auth/authApi.js";
 import { actionPolicyPath, defaultActionPolicy } from "../governor/actionPolicyStore.js";
 import { actionPolicySchema } from "../governor/actionPolicySchema.js";
@@ -53,7 +54,8 @@ export function codingAdoptionBlockers(workspace: string): string[] {
   if (keysetAnchoring(workspace).state !== "committed") return ["this computer did not create its keys (a copy or a clone)"];
   const blockers: string[] = [];
   if (existsSync(usersConfigPath(workspace))) blockers.push("it already has accounts (.amc/users.yaml)");
-  if (existsSync(approvalPolicyPath(workspace))) blockers.push("it already has an approval policy (.amc/approval-policy.yaml)");
+  const approval = approvalPolicyPath(workspace); // `amc up` writes the default one
+  if (existsSync(approval) && !sameAs(approvalPolicySchema.parse(parsedYaml(approval)), defaultApprovalPolicy())) blockers.push("its approval policy was changed (.amc/approval-policy.yaml)");
   const tools = toolsConfigPath(workspace);
   if (existsSync(tools) && !sameAs(toolsConfigSchema.parse(parsedYaml(tools)), defaultToolsConfig())) blockers.push("its tool list was changed (.amc/tools.yaml)");
   const action = actionPolicyPath(workspace);

@@ -8,6 +8,7 @@ const answers = vi.hoisted(() => ({ yes: true, passphrase: "my own vault passphr
 vi.mock("inquirer", () => ({ default: { prompt: vi.fn(async (questions: Array<{ name: string }>) =>
   Object.fromEntries(questions.map((q) => [q.name, q.name === "yes" ? answers.yes : answers.passphrase]))) } }));
 
+import { defaultApprovalPolicy, initApprovalPolicy } from "../src/approvals/approvalPolicyEngine.js";
 import { loadActionPolicy } from "../src/governor/actionPolicyStore.js";
 import { usersConfigPath } from "../src/auth/authApi.js";
 import { ensureInstantVaultMode } from "../src/cli/instantVaultMode.js";
@@ -62,8 +63,16 @@ const auditTypes = (dir: string): string[] => {
 };
 
 describe("moving a menu workspace to the coding setup (UX-01)", () => {
-  it("a menu workspace has nothing in the way", () => {
-    expect(codingAdoptionBlockers(menuWorkspace())).toEqual([]);
+  it("a menu workspace has nothing in the way, also after amc up wrote the default approval policy; a changed one is named", () => {
+    const dir = menuWorkspace();
+    expect(codingAdoptionBlockers(dir)).toEqual([]);
+    vi.stubEnv("AMC_VAULT_PASSPHRASE", readFileSync(localVaultPassphrasePath(dir), "utf8").trim());
+    initApprovalPolicy(dir);
+    expect(codingAdoptionBlockers(dir)).toEqual([]);
+    const changed = defaultApprovalPolicy();
+    initApprovalPolicy(dir, { ...changed, approvalPolicy: { ...changed.approvalPolicy, actionClasses: { ...changed.approvalPolicy.actionClasses,
+      WRITE_LOW: { ...changed.approvalPolicy.actionClasses.WRITE_LOW!, requiredApprovals: 2 } } } });
+    expect(codingAdoptionBlockers(dir)).toEqual(["its approval policy was changed (.amc/approval-policy.yaml)"]);
   });
 
   it("keeps the keys, the earlier records and a verifying chain; edits and commands then run on approval", async () => {
