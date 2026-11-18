@@ -69,7 +69,7 @@ export async function renderAuditPage(params) {
   params.root.innerHTML = [
     ...warnings,
     params.card(
-      "Audit Dashboard",
+      "Audit",
       `
       <div class="grid">
         ${tiles.map((tile) => `<div><div class="muted">${esc(tile.label)}</div><div class="tile-value">${tile.value}</div></div>`).join("")}

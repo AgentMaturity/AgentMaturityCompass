@@ -108,6 +108,9 @@ const railFootHtml = () => `<div class="rail-foot"><div class="theme-switch" rol
   + `${icon(value === "auto" ? "auto" : value === "light" ? "sun" : "moon", { size: 18 })}<span class="nav-label">${label}</span></button>`).join("")}</div>`
   + `<button type="button" class="rail-collapse" aria-pressed="false" title="Fold the menu">${icon("sidebar", { size: 18 })}<span class="nav-label">Fold the menu</span></button></div>`;
 
+/** In the folded rail a page's own links show their initials ("Context graph": CG), as each file icon looks the same. */
+const initialsOf = (label) => String(label).split(/\s+/).filter((word) => /^[A-Za-z]/.test(word)).slice(0, 2).map((word) => word[0].toUpperCase()).join("") || "?";
+
 /** The canonical menu, "More" with every other page, the page's own links it lacks under "More pages", and the rail's foot. */
 export function canonicalNavHtml(extra = []) {
   const seen = new Set(CANONICAL_NAV.map((link) => pathOf(link.href)));
@@ -119,7 +122,7 @@ export function canonicalNavHtml(extra = []) {
     + `<div class="more-panel"><input type="search" class="more-filter" placeholder="Find a page" aria-label="Find a page" />${sections.map((section) =>
       `<div class="more-group"><p class="nav-section">${esc(section)}</p>${features.filter((link) => link.section === section).map(navLink).join("")}</div>`).join("")}</div></details>`;
   const pages = own.length ? `<details class="nav-features nav-pages" open><summary>${icon("file")}<span class="nav-label">More pages</span></summary>`
-    + `${own.map((link) => navLink({ ...link, icon: "file" })).join("")}</details>` : "";
+    + `${own.map((link) => navLink({ ...link, icon: "file" }).replace("<span class=\"nav-label\">", `<span class="nav-initials" aria-hidden="true">${esc(initialsOf(link.label))}</span><span class="nav-label">`)).join("")}</details>` : "";
   // The person comes last in the document too, so the keyboard reaches it where it is drawn: at the foot of the rail.
   const top = CANONICAL_NAV.filter((link) => !link.group && !link.person).map(navLink).join("");
   return top + more + pages + railFootHtml() + CANONICAL_NAV.filter((link) => link.person).map(navLink).join("");

@@ -1,10 +1,11 @@
 // C-22: a chart with nothing to draw says so in words, and one whose values are all 0 says that, so a box is never blank.
-// The charts follow the console's theme (styles.css tokens): the well, the grid lines, the words and the accent.
+// The charts follow the console's theme (styles.css tokens): the well, the grid lines and the words. A series is drawn in
+// ink, never in the accent: a score is not a process state, and green beside it would read as "good".
 const BRAND_GREEN = "#4AEF79";
 export function themed(canvas) {
   const style = typeof getComputedStyle === "function" ? getComputedStyle(canvas) : null;
   const token = (name, fallback) => style?.getPropertyValue(name).trim() || fallback;
-  return { well: token("--surface-2", "#1F2B49"), grid: token("--line", "#2C3A5C"), words: token("--muted", "#A3B0C6"), accent: token("--accent", BRAND_GREEN) };
+  return { well: token("--surface-2", "#1F2B49"), grid: token("--line", "#2C3A5C"), words: token("--muted", "#A3B0C6"), ink: token("--ink", "#F1F5F9") };
 }
 
 // A chart is drawn once on a canvas, so a theme switch (the rail's switch or the system setting) draws each one again.
@@ -40,7 +41,7 @@ export function renderLine(canvas, values, color = BRAND_GREEN) {
   const w = canvas.width;
   const h = canvas.height;
   const theme = themed(canvas);
-  const ink = color === BRAND_GREEN ? theme.accent : color;
+  const ink = color === BRAND_GREEN ? theme.ink : color;
   ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = theme.well;
   ctx.fillRect(0, 0, w, h);
@@ -100,7 +101,7 @@ export function renderBars(canvas, values, color = BRAND_GREEN) {
   const max = Math.max(1, ...values);
   const gap = 4;
   const barW = (w - gap * (values.length + 1)) / values.length;
-  ctx.fillStyle = color === BRAND_GREEN ? theme.accent : color;
+  ctx.fillStyle = color === BRAND_GREEN ? theme.ink : color;
   values.forEach((value, idx) => {
     const barH = ((value || 0) / max) * (h - 16);
     const x = gap + idx * (barW + gap);

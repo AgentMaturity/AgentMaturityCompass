@@ -407,6 +407,15 @@ describe("studio-ui inherit slice: one name per page, one 'Signed in as', a true
     }
   });
 
+  test("a page's own links carry their initials, shown in the folded rail where every file icon looks the same", () => {
+    const html = canonicalNavHtml([{ href: "./contextGraph", label: "x" }, { href: "./trust", label: "Trust" }]);
+    expect(html).toContain('<span class="nav-initials" aria-hidden="true">CG</span><span class="nav-label">Context graph</span>');
+    expect(html).toContain('<span class="nav-initials" aria-hidden="true">T</span><span class="nav-label">Trust</span>');
+    const styles = readFileSync("src/console/assets/styles.css", "utf8");
+    expect(styles).toContain(':root[data-rail="collapsed"] nav .nav-pages a .icon { display: none; }');
+    expect(styles).not.toContain(':root[data-rail="collapsed"] nav .nav-pages a { display: none; }');
+  });
+
   test("the pages' 'Signed in as' status line is marked so it shows once (the rail says it), other lines are not", () => {
     expect(isSessionLine("Signed in as owner")).toBe(true);
     expect(isSessionLine("Signed in as owner (view only)")).toBe(true);

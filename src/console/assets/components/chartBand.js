@@ -61,7 +61,7 @@ export function renderChartBand(canvas, points, forecast, color) {
   const px = (x) => ((x - minX) / dx) * (width - 20) + 10;
   const py = (y) => height - (((y - minY) / dy) * (height - 20) + 10);
 
-  ctx.strokeStyle = color || theme.accent;
+  ctx.strokeStyle = color || theme.ink;
   ctx.lineWidth = 2;
   ctx.beginPath();
   series.forEach((p, idx) => {

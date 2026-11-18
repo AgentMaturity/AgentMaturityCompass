@@ -459,6 +459,9 @@ nav a.nav-person .nav-desc {
 :root[data-rail="collapsed"] .theme-option { border-radius: 8px; }
 :root[data-rail="collapsed"] nav a.nav-divide::before { left: 6px; right: 6px; }
 :root[data-rail="collapsed"] nav .nav-pages a { justify-content: center; padding: 0; }
+nav .nav-initials { display: none; }
+:root[data-rail="collapsed"] nav .nav-pages a .icon { display: none; }
+:root[data-rail="collapsed"] nav .nav-pages a .nav-initials { display: inline-grid; place-items: center; min-width: 28px; height: 24px; border: 1px solid var(--line-strong); border-radius: 6px; font-size: 12px; font-weight: 650; }
 
 :root[data-rail="collapsed"] .nav-badge {
   position: absolute;

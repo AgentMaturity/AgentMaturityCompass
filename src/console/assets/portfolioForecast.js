@@ -40,7 +40,7 @@ export async function renderPortfolioForecastPage(params) {
   const data = hostPath === null ? await workspaceForecast() : await apiGet(hostPath).catch(workspaceForecast);
   const rows = Array.isArray(data.rows) ? data.rows : [];
   root.innerHTML = `
-    ${card("Portfolio Forecast", `
+    ${card("Portfolio forecast", `
       <p class="muted">Unified Clarity across accessible workspaces.</p>
       <div class="scroll">
         <table>

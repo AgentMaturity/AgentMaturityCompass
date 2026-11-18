@@ -200,7 +200,7 @@ function renderDrilldown(params, data) {
   ].filter(Boolean).join("");
 
   params.root.innerHTML = [
-    localCard(params, "Evidence Drilldown", body),
+    localCard(params, "Evidence drilldown", body),
     localCard(params, "Evidence Preview", evidence),
     localCard(params, "Criterion Preview", criteria),
     localCard(params, "Scorable Studio Drilldown", studio),
@@ -216,7 +216,7 @@ export async function renderEvidenceDrilldownPage(params) {
   const questionId = qs("question") || qs("questionId");
 
   if (!runId || !questionId) {
-    params.root.innerHTML = localCard(params, "Evidence Drilldown", `
+    params.root.innerHTML = localCard(params, "Evidence drilldown", `
       <p class="muted">Select a Score finding to open its evidence drilldown.</p>
       <p>Required query parameters: <code>run</code> and <code>question</code>. Optional: <code>agent</code>.</p>
       <p>This empty state is intentional; no signed evidence is trusted until a run/question route is provided.</p>
@@ -225,7 +225,7 @@ export async function renderEvidenceDrilldownPage(params) {
   }
 
   const route = `/api/v1/score/evidence-drilldown/${encodeURIComponent(runId)}/${encodeURIComponent(questionId)}?agentId=${encodeURIComponent(agentId)}`;
-  params.root.innerHTML = localCard(params, "Evidence Drilldown", `<p class="muted">Loading <code>${esc(route)}</code>…</p>`);
+  params.root.innerHTML = localCard(params, "Evidence drilldown", `<p class="muted">Loading <code>${esc(route)}</code>…</p>`);
   try {
     const data = await params.apiGet(route);
     renderDrilldown(params, data);

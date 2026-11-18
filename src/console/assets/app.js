@@ -2591,7 +2591,7 @@ async function renderIntegrations() {
     ? `${integrationChannels.filter((channel) => channel.enabled).length} enabled channel(s). Test events use the signed routing configuration.`
     : "Run amc integrations init in this workspace before dispatching a test event.";
   root.innerHTML = `
-    ${card("Integration Hub", `
+    ${card("Connections", `
       <p>Signature: <strong>${integrationReady ? "VALID" : "NOT CONFIGURED"}</strong></p>
       <div class="row wrap">
         <span class="pill">${integrationChannels.length} channels</span>
@@ -3161,7 +3161,7 @@ async function renderFirewall() {
     <section class="hero-panel compact">
       <div>
         <p class="eyebrow">Enforce + Shield + Watch</p>
-        <h2>Runtime Firewall</h2>
+        <h2>Firewall</h2>
         <p>Protect live agent traffic with one mode: observe, warn, or block.</p>
       </div>
       <div class="hero-actions">
@@ -3581,7 +3581,7 @@ async function renderOrgCommitments() {
   const org = await apiGet("/org");
   const tree = Array.isArray(org.tree) ? org.tree : [];
   root.innerHTML = `
-    ${card("Org E/O/C Planner", `
+    ${card("Team commitments", `
       <p class="muted">E/O/C stands for Education, Ownership and Commitment: pick a team, the kind of plan and how long it runs, and AMC drafts what that team commits to improve.</p>
       <div class="row wrap">
         <label><span class="muted">Team or group</span>
@@ -3799,7 +3799,7 @@ function runStateWarning(latestRun) {
 async function renderWorkOrders() {
   const agentId = currentAgent();
   const status = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`);
-  root.innerHTML = card("Work Orders", `
+  root.innerHTML = card("Work orders", `
     <p class="muted">List them in a terminal: <code>amc workorder list --agent ${htmlEscape(agentId)}</code></p>
     ${moreInfo("What is a work order?", "<p>A work order is a signed task for an agent: what it may do, at what risk, in simulate or execute mode. This console does not list them.</p>")}
     ${jsonDetails(runStateSummary(agentId, status.latestRun), status)}

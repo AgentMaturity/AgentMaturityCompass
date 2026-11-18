@@ -29,7 +29,7 @@ export async function renderAssuranceRunPage(params) {
   }
 
   if (!runId) {
-    params.root.innerHTML = params.card("Assurance Run", "<p class='muted'>No test runs yet. Start one from the Assurance page.</p>");
+    params.root.innerHTML = params.card("Assurance run", "<p class='muted'>No test runs yet. Start one from the Assurance page.</p>");
     return;
   }
 

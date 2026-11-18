@@ -37,7 +37,7 @@ async function loadPassportData(params) {
 }
 
 export async function renderPassportPage(params) {
-  params.root.innerHTML = params.card("Agent Passport", "<p aria-busy=\"true\">Reading the passports…</p>");
+  params.root.innerHTML = params.card("Passport", "<p aria-busy=\"true\">Reading the passports…</p>");
   const data = await loadPassportData(params);
   const passport = data.cache;
   const warnings = [];
@@ -70,7 +70,7 @@ export async function renderPassportPage(params) {
   params.root.innerHTML = [
     ...warnings,
     params.card(
-      "Agent Passport",
+      "Passport",
       `
       <p class="muted">A signed summary of an agent's latest score that you can hand to someone else.</p>
       ${noticeChip("Self-issued", "Every passport is self-issued: this workspace signs it about its own agent, using its own clock. \"Verified\" means this workspace's own checks passed, not that anyone outside checked it.")}

@@ -28,7 +28,7 @@ function renderDimensionBars(rows) {
       return `
       <div class="card">
         <strong>${esc(row.dimensionId)}</strong>
-        <div class="bar"><span style="width:${measuredPct}; background:var(--accent)"></span></div>
+        <div class="bar"><span style="width:${measuredPct}; background:var(--ink)"></span></div>
         <small>Measured ${measured.toFixed(2)}</small>
         <div class="bar"><span style="width:${targetPct}; background:var(--muted)"></span></div>
         <small>Target ${target.toFixed(2)} | Unknown ${Number(row.unknownCount || 0)}</small>
@@ -56,17 +56,17 @@ async function main() {
   ]);
   const gap = gapEnvelope?.gap;
   if (gapEnvelope?.refused) {
-    root.innerHTML = card("Mechanic Workbench", `<p role="alert">${esc(gapEnvelope.refused)}</p>`);
+    root.innerHTML = card("Mechanic", `<p role="alert">${esc(gapEnvelope.refused)}</p>`);
     return;
   }
   if (!gap) {
-    root.innerHTML = card("Mechanic Workbench", "<p>No score yet, so there is no gap to show. Run a score first (amc run in the workspace folder); this page then compares it with your <a href='./equalizer'>target levels</a>.</p>");
+    root.innerHTML = card("Mechanic", "<p>No score yet, so there is no gap to show. Run a score first (amc run in the workspace folder); this page then compares it with your <a href='./equalizer'>target levels</a>.</p>");
     return;
   }
 
   root.innerHTML = `
     ${card(
-      "Mechanic Workbench",
+      "Mechanic",
       `
       <p class="muted">Measured levels next to the levels you want.</p>
       ${moreInfo("How this page works", `<p>Continuous recurrence uses recurring evidence checkpoints. This dashboard compares measured maturity vs desired targets,

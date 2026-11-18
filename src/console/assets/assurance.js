@@ -87,7 +87,7 @@ export async function renderAssurancePage(params) {
     ...warnings,
     renderWaiverBanner(waiverStatus?.active || certLatest?.waiver || null),
     params.card(
-      "Assurance Dashboard",
+      "Assurance",
       `
       <p class="muted">Assurance runs attack-style test packs against your agent's controlled interfaces and scores how well it holds up.</p>
       ${renderScoreGauge({ label: "Risk Assurance Score", score, status: scoreStatus })}

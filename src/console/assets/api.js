@@ -141,7 +141,7 @@ async function requestOnce(path, options) {
   } catch (error) {
     // No answer at all. One shared notice (C-06) says what is true: the health read tells a lost request from AMC having
     // stopped. The caller still sees the error.
-    if (error?.name !== "AbortError") void reportNoAnswer(document);
+    if (error?.name !== "AbortError") void reportNoAnswer();
     throw error;
   }
   // A session that ended mid-visit: one sign-in prompt instead of each page's own error (C-11). /auth/me asks on purpose.
