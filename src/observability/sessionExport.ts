@@ -238,6 +238,8 @@ function verifyDocument(value: SessionExportDocument, options: SessionExportVeri
   verifySessionRows([value.monitorPublicKeyPem], rows, errors);
   const sealed = value.record !== null && value.record.ended_ts !== null;
   if (sealed) verifySeal([value.monitorPublicKeyPem], value.record, rows, value.sessionId, errors);
+  // The signed rows show a close: a document that carries no seal for it had the seal removed (a downgrade to "open").
+  else if (rows.at(-1)?.event_type === "session/close") errors.push("the rows show the session was closed, but the export carries no seal: the seal was removed");
   const content = { verified: 0, unverifiable: 0, unavailable: 0 };
   if (value.content !== null) {
     const byId = new Map(rows.map((row) => [row.id, row]));

@@ -161,7 +161,9 @@ export function plainSummary(report: VerifierReport): string {
   const signer = { pass: "a key your trust list names", fail: "not a key your trust list names for this", "not-evaluated": "not checked" }[report.issuerAdmission.status];
   const anchoring = report.anchoring.status === "anchored" ? "recorded in a public log" : "not checked against a public log";
   const content = report.satisfaction.status === "pass" ? "its stated result follows from its evidence" : "whether what it says is true was not checked";
-  return `Result: the record is ${integrity}; signer: ${signer}; ${anchoring}; ${content}.`;
+  const complete = report.completeness.status === "not-evaluated" && report.integrity.status === "pass"
+    ? ` Not a pass: ${report.completeness.reasons.join("; ") || "completeness was not established"}.` : "";
+  return `Result: the record is ${integrity}; signer: ${signer}; ${anchoring}; ${content}.${complete}`;
 }
 
 function human(report: VerifierReport): string {

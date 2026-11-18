@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getPublicKeyPem } from "../../src/crypto/keys.js";
 import { exportSessionBundle } from "../../src/evidence/sessionExport.js";
-import { buildSessionExport } from "../../src/observability/sessionExport.js";
+import { buildSessionExport, verifySessionExport } from "../../src/observability/sessionExport.js";
 import { renderSessionExportHtml } from "../../src/observability/sessionExportHtml.js";
 import { openSessionEventStore } from "../../src/persistence/openSessionEventStore.js";
 import { SessionService } from "../../src/session/sessionService.js";
@@ -66,7 +66,7 @@ describe("amc-verify reads a session export", () => {
     const report = verifyArtifact(bytes(doc), trust());
     expect(report.integrity.status).toBe("pass");
     expect(report.completeness.status).toBe("not-evaluated");
-    expect(report.warnings.join(" ")).toContain("not sealed");
+    expect(report.completeness.reasons.join(" ")).toContain("may be a cut-off copy");
   });
 
   it("fails an unsealed export with a row taken out of the middle (the chain shows it)", () => {
@@ -80,7 +80,9 @@ describe("amc-verify reads a session export", () => {
     const doc = buildSessionExport({ workspace, sessionId: session(true), includeContent: true, decryptContent: true });
     const report = verifyArtifact(Buffer.from(renderSessionExportHtml(doc)), trust());
     expect(report.integrity.status).toBe("pass");
-    expect(report.warnings.join(" ")).toContain("not the page around it");
+    expect(report.completeness.status).toBe("not-evaluated");
+    expect(report.completeness.reasons.join(" ")).toContain("the readable page was not checked against the record");
+    expect(plainSummary(report)).toContain("Not a pass");
   });
 
   it("fails a changed row, a removed row and a changed shown text", () => {
@@ -100,6 +102,48 @@ describe("amc-verify reads a session export", () => {
     const call = doc.rows.find(row => row.event_type === "tool/result")!;
     const shown = { ...doc, content: { ...doc.content, [call.id]: { ...(doc.content![call.id] as object), text: "wrote nothing" } } };
     expect(verifyArtifact(bytes(shown), trust()).integrity.status).toBe("fail");
+  });
+
+  it("security: tampered exports never pass, and agree with AMC's own verify-export", () => {
+    const sessionId = session(true);
+    const doc = buildSessionExport({ workspace, sessionId, includeContent: true, decryptContent: true });
+    const fp = doc.monitorKeyFingerprint;
+    const result = doc.rows.find(row => row.event_type === "tool/result")!;
+    const entry = doc.content![result.id] as Record<string, unknown>;
+    const withEntry = (patch: Record<string, unknown>) => ({ ...doc, content: { ...doc.content, [result.id]: { ...entry, ...patch } } });
+    const cases: Array<[string, unknown, "fail" | "not-pass"]> = [
+      ["edited text marked shortened, digest kept", withEntry({ text: "wrote nothing", truncated: true }), "not-pass"],
+      ["edited text marked redacted", withEntry({ text: "wrote nothing", redactions: 1 }), "not-pass"],
+      ["edited text claiming to be spilled", withEntry({ text: "wrote nothing", source: "spill" }), "fail"],
+      ["edited text with a matching made-up digest", withEntry({ text: "x", truncated: true, sha256: sha256Hex("x") }), "fail"],
+      ["the right text under a wrong source", withEntry({ source: entry.source === "inline" ? "blob" : "inline" }), "fail"],
+      ["an extra field", withEntry({ note: "VERIFIED" }), "fail"],
+      ["negative redactions", withEntry({ redactions: -1 }), "fail"],
+      ["seal stripped from a closed session", { ...doc, record: { ...doc.record!, ended_ts: null, session_final_event_hash: null, session_seal_sig: null } }, "fail"],
+      ["seal stripped and the close row cut", { ...doc, rows: doc.rows.slice(0, -1), record: { ...doc.record!, ended_ts: null, session_final_event_hash: null, session_seal_sig: null } }, "not-pass"],
+      ["tail cut from a sealed session", { ...doc, rows: doc.rows.slice(0, -2) }, "fail"]
+    ];
+    for (const [name, tampered, expected] of cases) {
+      const report = verifyArtifact(bytes(tampered), trust());
+      const passed = report.integrity.status === "pass" && report.completeness.status === "pass";
+      expect(passed, name).toBe(false);
+      expect(report.integrity.status, name).toBe(expected === "fail" ? "fail" : "pass");
+      // Parity with AMC's in-repo verifier: it fails the same tampering, or accepts it only as display-only/unproven.
+      const amc = verifySessionExport(tampered, { expectedFingerprint: fp, acceptUnverifiableContent: true });
+      expect(amc.ok && amc.tail === "sealed" && amc.content.unverifiable === 0, name).toBe(false);
+      if (expected === "fail") expect(amc.ok, name).toBe(false);
+    }
+    const untouched = verifyArtifact(bytes(doc), trust());
+    expect([untouched.integrity.status, untouched.completeness.status]).toEqual(["pass", "pass"]);
+    expect(verifySessionExport(doc, { expectedFingerprint: fp }).ok).toBe(true);
+  });
+
+  it("security: a doctored page around an untouched embedded record is not a pass", () => {
+    const doc = buildSessionExport({ workspace, sessionId: session(true), includeContent: false });
+    const page = renderSessionExportHtml(doc).replace("<main id=\"amc-view\"></main>", "<main><h1>VERIFIED: nothing was run</h1></main>");
+    const report = verifyArtifact(Buffer.from(page), trust());
+    expect(report.completeness.status).toBe("not-evaluated");
+    expect(plainSummary(report)).toContain("the readable page was not checked against the record");
   });
 
   it("fails closed on an unknown version and does not trust a key only the export carries", () => {

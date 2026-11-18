@@ -196,23 +196,52 @@ function checkRows(parsed: Parsed, env: Env, integrity: Finding<"integrity">[]):
   return { signer: signer === null ? null : { keyId: signer.keyId, pem: signer.publicKeyPem } };
 }
 
-/** Content entries a viewer document embeds: each must name its row's committed digest; plain text must hash to it. */
-function checkContent(parsed: Parsed, integrity: Finding<"integrity">[], warnings: string[]): void {
-  if (parsed.content === null) return;
+function spillOf(row: Row): { locator: string; commitment: unknown } | null {
+  try {
+    const meta: unknown = JSON.parse(row.meta_json);
+    const ref = isRecord(meta) ? meta.spilled : undefined;
+    return isRecord(ref) && str(ref.locator) ? { locator: ref.locator, commitment: ref.contentSha256 } : null;
+  } catch {
+    return null;
+  }
+}
+
+const CONTENT_KEYS = "redactions,sha256,source,text,truncated";
+
+/**
+ * Content entries a viewer document embeds, by the rules of AMC's `verifySessionExport` (tests/verifier/sessionExport
+ * runs both over the same exports): the exact key set; `source` as the row's payload is stored (spill only when the row's
+ * signed meta names a spill); `sha256` the row's committed digest for EVERY entry; `redactions` a non-negative integer.
+ * A field that contradicts the signed row fails integrity. Shown text that cannot be compared with its commitment
+ * (shortened, redacted or spilled) is returned by id: it was not checked, so the export is not a pass.
+ */
+function checkContent(parsed: Parsed, integrity: Finding<"integrity">[]): string[] {
+  if (parsed.content === null) return [];
   const byId = new Map(parsed.rows.map(row => [row.id, row]));
-  let displayOnly = 0;
+  const unchecked: string[] = [];
   for (const [id, entry] of Object.entries(parsed.content)) {
     const row = byId.get(id);
-    if (row === undefined || !CONTENT_EVENT_TYPES.has(row.event_type)) { integrity.push({ code: "MALFORMED", detail: `content is attached to ${id}, which is not a content event of this session` }); continue; }
-    if (!isRecord(entry)) { integrity.push({ code: "MALFORMED", detail: `the content of ${id} is not an object` }); continue; }
-    if (Object.keys(entry).length === 1 && str(entry.unavailable)) continue;
-    if (!str(entry.text) || !str(entry.sha256)) { integrity.push({ code: "MALFORMED", detail: `the content of ${id} is malformed` }); continue; }
-    if (entry.source === "spill" || entry.truncated === true || (typeof entry.redactions === "number" && entry.redactions > 0)) { displayOnly += 1; continue; }
-    if (!same(entry.sha256, row.payload_sha256) || sha256Hex(Buffer.from(entry.text, "utf8")) !== row.payload_sha256) {
+    const bad = (detail: string) => integrity.push({ code: "MALFORMED", detail: `the content of ${id} ${detail}` });
+    if (row === undefined || !CONTENT_EVENT_TYPES.has(row.event_type)) { bad("is attached to an event that is not a content event of this session"); continue; }
+    if (!isRecord(entry)) { bad("is not an object"); continue; }
+    const keys = Object.keys(entry).sort().join(",");
+    if (keys === "unavailable") { if (!str(entry.unavailable) || entry.unavailable === "") bad("has an empty unavailable marker"); continue; }
+    if (keys !== CONTENT_KEYS) { bad("carries fields the exporter never writes"); continue; }
+    if (!str(entry.text) || typeof entry.truncated !== "boolean" || !Number.isSafeInteger(entry.redactions) || (entry.redactions as number) < 0) { bad("is malformed"); continue; }
+    const spill = row.event_type === "tool/result" ? spillOf(row) : null;
+    const source = spill !== null ? "spill" : row.payload_inline !== null && row.payload_inline !== undefined ? "inline" : "blob";
+    if (entry.source !== source) { bad(`claims source ${String(entry.source)} but the recorded payload is ${source}`); continue; }
+    const committed = spill !== null ? spill.commitment : row.payload_sha256;
+    if (!str(entry.sha256) || !str(committed) || !same(entry.sha256, committed)) {
+      integrity.push({ code: "DIGEST_MISMATCH", detail: `the content of ${id} names a digest that is not the recorded one` });
+      continue;
+    }
+    if (source === "spill" || entry.truncated === true || (entry.redactions as number) > 0) { unchecked.push(id); continue; }
+    if (sha256Hex(Buffer.from(entry.text, "utf8")) !== row.payload_sha256) {
       integrity.push({ code: "DIGEST_MISMATCH", detail: `the text shown for ${id} is not the text that was recorded` });
     }
   }
-  if (displayOnly > 0) warnings.push(`${displayOnly} text entr${displayOnly === 1 ? "y was" : "ies were"} shortened or had secrets removed, so ${displayOnly === 1 ? "it" : "they"} could not be compared with the recorded text`);
+  return unchecked;
 }
 
 export function evaluateSessionExport(value: Record<string, unknown>, env: Env, fromHtml: boolean): Evaluation {
@@ -227,10 +256,17 @@ export function evaluateSessionExport(value: Record<string, unknown>, env: Env, 
   const integrity: Finding<"integrity">[] = [];
   const warnings: string[] = [];
   const { signer } = checkRows(parsed, env, integrity);
-  checkContent(parsed, integrity, warnings);
+  const unchecked = checkContent(parsed, integrity);
+  // A closed session's last signed row is its session/close: an export whose rows show that close but carry no seal had it removed.
+  const lastRow = parsed.rows[parsed.rows.length - 1]!;
+  if (!parsed.seal.ended && lastRow.event_type === "session/close") {
+    integrity.push({ code: "MALFORMED", detail: "the rows show the session was closed, but the export carries no seal: the seal was removed" });
+  }
+  const notEstablished: string[] = [];
+  if (!parsed.seal.ended) notEstablished.push("the session is not sealed (a chat closed with /exit stays open so it can be continued), so this may be a cut-off copy: events after the last one shown would not be noticed");
+  if (unchecked.length > 0) notEstablished.push(`the shown text of ${unchecked.length} event${unchecked.length === 1 ? "" : "s"} (${unchecked.slice(0, 5).join(", ")}${unchecked.length > 5 ? ", …" : ""}) was shortened, had secrets removed or was stored apart, so it was not checked against the record`);
+  if (fromHtml) notEstablished.push("the readable page was not checked against the record: only the signed data inside it was (amc session verify-export checks the page)");
   const admission = admit({ signature: "session events and seal", keyId: signer?.keyId ?? null, purpose: "ledger-row" }, env.ctx);
-  if (!parsed.seal.ended) warnings.push("this session is not sealed (a chat closed with /exit stays open so it can be continued): events after the last one shown would not be noticed");
-  if (fromHtml) warnings.push("only the signed data inside this page was checked, not the page around it; `amc session verify-export` also checks the page");
   if (value.schema === VIEWER_SCHEMA) warnings.push("the usage and cost summary in this export was not checked");
   warnings.push("not checked: the workspace's chain across other sessions, and any public log anchoring");
   const last = parsed.rows[parsed.rows.length - 1]!;
@@ -241,7 +277,7 @@ export function evaluateSessionExport(value: Record<string, unknown>, env: Env, 
     claimedAt: new Date(last.ts).toISOString(), warnings,
     scope: () => scopeResult({ subject: agentOf(parsed.rows[0]!) }, env.expect),
     freshness: () => result<"freshness">(env.ctx.asOf < last.ts ? [{ code: "NOT_YET_VALID", detail: "the session's last event is after the as-of time" }] : []),
-    completeness: () => result<"completeness">([], parsed.seal.ended ? null : "the session is not sealed, so a missing tail cannot be detected"),
+    completeness: () => result<"completeness">([], notEstablished.length === 0 ? null : `not established: ${notEstablished.join("; ")}`),
     satisfaction: () => notRecomputable("a session record shows what was recorded, not whether the work was right")
   };
 }
