@@ -53,3 +53,20 @@ test("the project read names the refused destination, why and the next step, for
   expect(read).toMatchObject({ stage: "assemble", step: "built", buildRefusal: words });
   expect((await j.p.get(bob)).body.data!.buildRefusal).toBeNull();
 });
+
+test("one project read reads the build session once (readiness and buildRefusal share it)", async () => {
+  const j = await Journey.start();
+  await j.throughAspire();
+  const { alice } = j.t;
+  const answers = Object.entries({ ...ASSEMBLE_ANSWERS, path: "native" }).map(([questionId, value]) => ({ questionId, value }));
+  for (const tail of ["answers", "understand", "answers", "understand"]) await j.p.ok(alice, `/stages/assemble/${tail}`, tail === "answers" ? { answers } : {});
+  await j.p.ok(alice, "/stages/assemble/confirm-understanding", { confirmed: true });
+  await j.p.ok(alice, "/stages/assemble/explain", { level: "practitioner" });
+  await j.p.ok(alice, "/stages/assemble/propose", { spec: {} });
+  expect((await j.complete("assemble", await j.approve("assemble", "direction"))).status).toBe(200);
+  expect((await j.p.post(alice, "/stages/assemble/build")).status).toBe(201);
+  fake.polls = 0;
+  const read = (await j.p.get(alice)).body.data!;
+  expect(fake.polls).toBe(1);
+  expect(read.buildRefusal).toBe(words);
+});
