@@ -1565,7 +1565,7 @@ async function renderAgent() {
   const row = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`);
   let report = null;
   if (row.latestRun?.runId) {
-    report = await apiGet(`/runs/${encodeURIComponent(row.latestRun.runId)}/report`);
+    report = await apiGet(`/runs/${encodeURIComponent(row.latestRun.runId)}/report?agentId=${encodeURIComponent(agentId)}`);
   }
   // A run whose seal fails shows nothing taken from its file: no score, coverage, readiness, chart or pass state.
   const sealFails = runSealFails(row.latestRun);
@@ -1590,9 +1590,8 @@ async function renderAgent() {
   root.innerHTML = `${pageIntroHtml("How your agent is doing", `Agent ${agentId}: its latest score, and what to improve next.`, { id: "agentIntro" })}
     <section class="card agent-card">
       ${report ? "" : emptyState({ pictureName: "check", line: "No score yet.",
-        // The button sends --agent, so it scores this agent; it is offered on "default" only because this page reads a
-        // run through /runs/:id/report, which looks in the workspace's current agent's records, not this agent's.
-        action: agentId === "default" ? '<button id="agentRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>' : "" })}
+        // The button sends --agent, so it scores this agent, and the page reads the run from this agent's records.
+        action: '<button id="agentRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>' })}
       ${runStateWarning(row.latestRun)}
       ${score}
       ${report ? moreInfo("About this score", details) : details}
