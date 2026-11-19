@@ -8,6 +8,7 @@
 //     [--namespace NS] [--targets FILE] [--ephemeral-secrets] [--ha] [--keep] [--only ID,ID]
 //
 // --only runs the named checks and records every other one as not run, so a partial rerun never passes.
+// --check-targets [--targets FILE] only reports whether recovery targets are configured (see checkTargets).
 //
 // helm and kubectl run through execFile-style argument arrays, never shell strings.
 // Exit 0: every check passed. Exit 1: any check failed or did not run (a check that did not
@@ -49,6 +50,29 @@ export function targetProblems(targets) {
   if (typeof targets?.agreedOn !== "string" || !DATE.test(targets.agreedOn)) problems.push("agreedOn must be YYYY-MM-DD");
   if (!TARGET_STATUSES.has(targets?.status)) problems.push(`status must be one of ${[...TARGET_STATUSES].join(", ")}`);
   return problems;
+}
+
+/** The shipped placeholder: the right schema, status "unagreed" and every target still null, so nobody has configured one yet. */
+export function targetsUnconfigured(targets) {
+  return targets?.schema === "amc.recovery-targets/1" && targets.status === "unagreed"
+    && ["rpoSeconds", "rtoSeconds", "backupCadenceSeconds", "agreedBy", "agreedOn", "partner"].every((key) => targets[key] === null);
+}
+
+/**
+ * --check-targets [--targets FILE]: prints "configured" or "not-configured" and exits 0, so the workflow can skip the run
+ * visibly when no target exists; a file that cannot be read, has another schema or is half filled exits 2 with its problems.
+ */
+function checkTargets(argv) {
+  if (argv.length !== 0 && !(argv.length === 2 && argv[0] === "--targets")) { console.error("usage error: --check-targets takes only --targets FILE"); return 2; }
+  const file = argv[1] ?? join(MATRIX_DIR, "targets.json");
+  let targets;
+  try { targets = JSON.parse(readFileSync(file, "utf8")); }
+  catch (error) { console.error(`recovery targets unreadable (${file}): ${error.message}`); return 2; }
+  if (targetsUnconfigured(targets)) { console.log("not-configured"); return 0; }
+  const problems = targetProblems(targets);
+  if (problems.length > 0) { console.error(`recovery targets are only partly filled in (${file}):\n- ${problems.join("\n- ")}`); return 2; }
+  console.log("configured");
+  return 0;
 }
 
 export function parseArgs(argv) {
@@ -181,6 +205,7 @@ export async function runChecks({ matrix, registry, ctx }) {
 }
 
 export async function main(argv, { now = new Date() } = {}) {
+  if (argv[0] === "--check-targets") return checkTargets(argv.slice(1));
   let opts;
   try { opts = parseArgs(argv); }
   catch (error) {

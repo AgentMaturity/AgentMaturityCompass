@@ -3,7 +3,9 @@ name: Reference deployment
 # P2-06: runs scripts/qualify-reference-deployment.mjs (the 22-check matrix) on a kind cluster with ephemeral
 # secrets. Image A is built from the previous release tag's commit (N-1), image B from this commit (N).
 # CI holds no real credentials. Sid runs the same harness once on the D-03 cluster (docs/PLATFORM_QUALIFICATION.md).
-# The run fails until the recovery targets are agreed (exit 2) and every check passes; the receipt is uploaded either way.
+# While targets.json is still the shipped placeholder (no target configured), the `targets` job says "not run" in a
+# notice and the job summary and the `kind` job is skipped: no deployment is qualified. A malformed or half-filled
+# file fails the `targets` job. Once targets exist, the run fails unless every check passes; the receipt is uploaded either way.
 #
 # TODO(P2-06 follow-up): pin every `uses:` to a full commit SHA and the tool archives to literal sha256 values, as in
 # deploy-pack.yml. TODO(P2-06 follow-up): a SoftHSM-backed KeyProvider once the chart can select one (P2-08).
@@ -29,7 +31,34 @@ env:
   OUT: tmp/reference-deployment
 
 jobs:
+  targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      state: ${{ steps.targets.outputs.state }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+
+      - id: targets
+        name: Recovery targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          state=$(node scripts/qualify-reference-deployment.mjs --check-targets)
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+          if [ "$state" = "not-configured" ]; then
+            msg="Not run: no recovery target is configured in qualification/reference-deployment/targets.json, so no deployment was qualified. The owner records the targets with the partner (docs/PLATFORM_QUALIFICATION.md)."
+            echo "::notice title=Reference deployment not run::$msg"
+            printf '### Reference deployment: not run\n\n%s\n' "$msg" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   kind:
+    needs: targets
+    if: needs.targets.outputs.state == 'configured'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
