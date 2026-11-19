@@ -35,6 +35,8 @@ function tableColumns(db: Database.Database, tableName: string): Set<string> {
 }
 
 function markMigrationAppliedIfMissing(db: Database.Database, version: number): void {
+  // Read first: INSERT OR IGNORE takes the write lock even when the row exists, and this runs on every ledger open.
+  if (db.prepare("SELECT 1 FROM schema_migrations WHERE version = ? LIMIT 1").get(version) !== undefined) return;
   db.prepare("INSERT OR IGNORE INTO schema_migrations(version, applied_ts) VALUES (?, ?)").run(version, Date.now());
 }
 

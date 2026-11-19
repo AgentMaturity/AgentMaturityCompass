@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 import { afterEach, expect, it, vi } from "vitest";
 import { createBackup } from "../src/ops/backup/backupEngine.js";
 import { decryptBackupPayload } from "../src/ops/backup/backupCrypto.js";
-import { verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { extractValidatedTarGzipArchive } from "../src/security/safeTarArchive.js";
 import { withoutSqliteSidecars } from "../src/ops/backup/sqliteSnapshot.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -88,3 +88,25 @@ it("drops only the sidecars of SQLite files that are themselves backed up", () =
   expect(withoutSqliteSidecars([".amc/evidence.sqlite", ".amc/evidence.sqlite-wal", ".amc/evidence.sqlite-shm", ".amc/orphan.sqlite-wal", ".amc/notes-wal"]))
     .toEqual([".amc/evidence.sqlite", ".amc/orphan.sqlite-wal", ".amc/notes-wal"]);
 });
+
+// 2026-11-19: the flake ("database is locked" in createBackup's ops audit, CI 2026-11-17) came from openLedger itself: every
+// open ran INSERT OR IGNORE on schema_migrations, which takes SQLite's write lock even when the row exists, so a plain open
+// waited behind any other writer and failed after the 5 s busy timeout. An open now only reads unless the row is missing.
+it("opens the ledger while another process holds the write lock, without waiting for it", () => {
+  const root = mkdtempSync(join(tmpdir(), "amc-wal-open-"));
+  roots.push(root);
+  const workspace = join(root, "ws");
+  mkdirSync(workspace);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  openLedger(workspace).close();
+  const holder = new Database(join(workspace, ".amc", "evidence.sqlite"));
+  try {
+    holder.exec("BEGIN IMMEDIATE");
+    const started = Date.now();
+    openLedger(workspace).close();
+    expect(Date.now() - started).toBeLessThan(2_000);
+  } finally {
+    holder.exec("ROLLBACK");
+    holder.close();
+  }
+}, 30_000);
