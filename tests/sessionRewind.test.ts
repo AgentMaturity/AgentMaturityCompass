@@ -133,8 +133,10 @@ describe("amc session rewind, end to end", () => {
     // The original rows stay; the rewind is described in plain words.
     expect(rows(parent).some((row) => row.meta_json.includes("NATIVE_FILE_CHECKPOINT"))).toBe(true);
     expect(describeSessionRewinds(workspace, parent, rows(parent)).join("\n")).toMatch(/Files rewound to turn 1 .* 1 put back, 1 created file\(s\) removed, 0 already back, 0 failed/);
-    // A second rewind to turn 2 is now a conflict on every file: nothing matches what the session last wrote.
-    expect(planSessionRewind(workspace, parent, 2).conflicts.map((conflict) => conflict.reason)).toEqual(["changed-since", "changed-since"]);
+    // A second rewind to turn 2: new.txt is already gone (counted as done), note.txt no longer holds what the session last wrote.
+    const deeper = planSessionRewind(workspace, parent, 2);
+    expect(deeper.conflicts).toEqual([{ path: "workspace/output/note.txt", reason: "changed-since" }]);
+    expect(deeper.files.map((file) => [file.path, file.action])).toEqual([["workspace/output/new.txt", "already"]]);
 
     const child = await run(["continue from here"], { forkFrom: parent });
     const childRows = rows(child);
