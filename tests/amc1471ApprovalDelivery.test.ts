@@ -1153,6 +1153,7 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
         const viewed = await getJson(`${url}/view`, token);
         expect(viewed.status).toBe(200);
         expect(JSON.parse(viewed.body)).not.toHaveProperty("approvalDelivery");
+        expect(JSON.parse(viewed.body)).not.toHaveProperty("call"); // a list never receives what to approve
         expect(JSON.parse(viewed.body).request.approvalRequestId).toBe(created.approvalRequestId);
         expect(readFileSync(requestPath, "utf8")).toBe(storedBefore);
         expect(events).toEqual([]);

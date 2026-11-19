@@ -6239,7 +6239,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
           approvalRequestId: approvalId
         });
         res.setHeader("Cache-Control", "no-store"); json(res, 200, { // the call shown to a decider is not kept by a browser or proxy
-          request: inbox.request, requestDigestSha256: inbox.requestDigestSha256, ...(await import("../evidence/sessionAudit.js")).approvalCallField(options.workspace, inbox.request, inbox.status, auth),
+          request: inbox.request, requestDigestSha256: inbox.requestDigestSha256, ...(approvalRequestMatch[2] ? {} : (await import("../evidence/sessionAudit.js")).approvalCallField(options.workspace, inbox.request, inbox.status, auth)), // `/view` never carries the call: a list shows people, not what to approve
           decisions: inbox.decisions,
           quorum: inbox.quorum,
           status: inbox.status,
