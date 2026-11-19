@@ -75,6 +75,8 @@ describe("plan_exit", () => {
     const veto = sessionRows.find(row => row.event_type === "loop/veto");
     expect(veto?.meta_json).toContain("plan-exit");
     expect(sessionRows.filter(row => row.event_type === "request/header")).toHaveLength(1);
+    // plan_exit changes no file, so the turn's recorded check status says no changes (HP-04).
+    expect(sessionRows.some(row => row.event_type === "audit" && meta(row).status === "no-changes" && extractEnvelope(row.meta_json)?.turn === 1)).toBe(true);
     expect(planning.endings?.at(-1)?.reason ?? sessionRows.find(row => row.event_type === "turn/end")?.meta_json).toMatch(/blocked/);
     // The model cannot leave plan mode: the next --plan turn of the same session is still read-only.
     // MUTATION: skip applyPlanMode and turn 2 calls fs.write.
