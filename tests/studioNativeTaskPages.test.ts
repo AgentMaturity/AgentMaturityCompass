@@ -272,3 +272,37 @@ test("a page read that races a concurrent append reads again instead of reportin
       message: expect.stringMatching(/kept changing/) }));
   } finally { spy.mockRestore(); writer.disposeWithoutClosing(); await service.close(); await orderedCleanup(); }
 }, 60_000);
+
+// 2026-11-19 (public-task-transport-browser): a released task whose evidence no longer authenticates answered every page
+// read with 409 NATIVE_EVIDENCE_UNAVAILABLE, which the page retries as a passing race and then stops reading: it stayed
+// "Status unconfirmed". With no writer it is final until the evidence is restored, so the read says so with the task.
+test("a page read of a released task whose evidence does not authenticate returns the task as unavailable, then reads again once restored", async () => {
+  const { randomUUID } = await import("node:crypto");
+  const { SessionService } = await import("../src/session/sessionService.js");
+  const { NativeTaskDescriptors, nativeTaskId } = await import("../src/studio/nativeTaskDescriptors.js");
+  const { createNativeTaskService } = await import("../src/studio/nativeTaskService.js");
+  const projection = await import("../src/studio/nativeTaskProjection.js");
+  const { orderedCleanup, orderedWorkspace } = await import("./fixtures/nativeOrderedImageHarness.js");
+  const workspace = orderedWorkspace(), writer = new SessionService(workspace);
+  const actor = { principalId: "unavailable-owner", agentId: "default", demo: true };
+  writer.open({ agentId: "default", harnessVersion: "unavailable-page", compositionDigest: "fixture", policyDigest: "fixture" });
+  writer.startTurn({ trigger: "user" }); writer.startStep(); writer.recordUserMessage("Committed before tampering.");
+  writer.endStep({ stopReason: "complete", usage: null }); writer.endTurn({ reason: "complete" }); writer.sealTurn();
+  const sessionId = writer.sessionId, requestId = randomUUID(), taskId = nativeTaskId(actor.principalId, requestId), now = Date.now();
+  new NativeTaskDescriptors(workspace).write({ kind: "amc/studio-native-task/v1", taskId, principalId: actor.principalId, agentId: "default", demo: true,
+    sessionId, provider: "stub", model: null, tools: "none", toolsDigest: null, maxSteps: 2, maxTokens: 64,
+    createdAt: now, updatedAt: now, revision: 1, pendingTurn: false, closed: false,
+    submissions: [{ clientRequestId: requestId, bodyHash: "a".repeat(64), revision: 1 }] });
+  const spy = vi.spyOn(projection, "readNativeTaskProjection").mockImplementation(() => { throw new Error("signature invalid"); });
+  const service = createNativeTaskService({ workspace, environment: { PATH: process.env.PATH } });
+  try {
+    const refused = service.poll(actor, taskId, { limit: 64 });
+    expect(refused).toMatchObject({ events: [], truncated: true, task: { state: "released", history: { status: "unavailable" } } });
+    expect(refused.task.history.message).toContain("could not be authenticated");
+    spy.mockRestore();
+    await new Promise(done => setTimeout(done, 300)); // the service re-reads evidence at most every 250 ms
+    const restored = service.poll(actor, taskId, { limit: 64 });
+    expect(restored.task.history.status).toBe("authenticated");
+    expect(restored.events.some(event => event.text?.includes("Committed before tampering."))).toBe(true);
+  } finally { spy.mockRestore(); writer.disposeWithoutClosing(); await service.close(); await orderedCleanup(); }
+}, 60_000);

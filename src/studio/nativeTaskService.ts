@@ -571,6 +571,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       if (typeof cursor === "object" && cursor !== null && !Array.isArray(cursor)) {
         const task = view(entry, true), sessionId = entry.descriptor.sessionId;
         if (!sessionId) return { task, events: [], truncated: false };
+        // Evidence that did not authenticate while nothing was writing stays so until it is restored: say that with the task
+        // (history "unavailable", no events), as a cursor read does, instead of a 409 the page reads as a passing race.
+        if (task.history.status === "unavailable" && entry.changedSince === undefined && !entry.client) return { task, events: [], truncated: true };
         try {
           // CHANGED means a writer (this task's own turn, a heartbeat) appended while the page was read; nothing failed to
           // authenticate. Read again a bounded number of times, and name that cause when the store never holds still.
