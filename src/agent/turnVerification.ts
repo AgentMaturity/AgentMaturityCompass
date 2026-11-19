@@ -61,7 +61,7 @@ export const CHECKABLE_REASONS: ReadonlySet<string> = new Set(["no-check", "chec
 const STATUSES: ReadonlySet<string> = new Set(["no-changes", "changed-and-checked-pass", "changed-and-checked-fail", "changed-unchecked"]);
 const SETTINGS: ReadonlySet<string> = new Set(["on", "off", "no-checks", "validate", "config-unverified", "child-parent-checks", "child-no-parent-checks"]);
 /** Built-in tools that can neither write a file nor start a process. Everything else may change files. */
-const READ_ONLY_TOOLS: ReadonlySet<string> = new Set(["fs.read", "glob", "grep", "ls", "plan", "plan_exit", "todo", "tool_search", "web_fetch",
+export const READ_ONLY_TOOLS: ReadonlySet<string> = new Set(["fs.read", "glob", "grep", "ls", "plan", "plan_exit", "todo", "tool_search", "web_fetch",
   "web_search", "ask_user", "session.spill_read", "skill.load", "get_goal", "job_list", "job_output", "terminal_list", "terminal_read", "echo"]);
 /** File tools whose error, as the only kind of change in a turn, is not worth asking a person to approve a check for. */
 const WRITE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit", "apply_patch"]);

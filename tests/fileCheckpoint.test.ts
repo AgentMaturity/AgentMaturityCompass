@@ -9,7 +9,9 @@ import { readEventPayload } from "../src/session/eventPayload.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { retrieveSpilledContent } from "../src/session/spill/spillEvidence.js";
 import { extractSpillRef } from "../src/session/spill/spillTypes.js";
-import { FILE_CHECKPOINT_AUDIT, fileCheckpoints, MAX_CHECKPOINT_FILE_BYTES, MAX_CHECKPOINT_SESSION_BYTES } from "../src/tools/builtin/fileCheckpoint.js";
+import { CHECKPOINT_SALT_BYTES, FILE_CHECKPOINT_AUDIT, fileCheckpoints } from "../src/tools/builtin/fileCheckpoint.js";
+import { redactingSessionFor } from "../src/dataflow/redactingSession.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import type { ToolExecution } from "../src/tools/toolTypes.js";
 import { defaultToolsConfig, type ToolDefinition } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot } from "../src/toolhub/toolhubValidators.js";
@@ -79,7 +81,7 @@ test("fs.write over a read file keeps its prior bytes encrypted behind a signed 
   const ids = f.session.readEvents().map((event) => event.id);
   expect(ids.indexOf(committed.id)).toBeGreaterThanOrEqual(0);
   expect(ids.indexOf(committed.id)).toBeLessThan(ids.indexOf(row!.id));
-  expect(retrieveSpilledContent(f.workspace, committed).toString("utf8")).toBe("before\n");
+  expect(retrieveSpilledContent(f.workspace, committed).subarray(CHECKPOINT_SALT_BYTES).toString("utf8")).toBe("before\n");
   expect(readFileSync(join(f.workspace, "workspace", "note.txt"), "utf8")).toBe("after\n");
   // No plaintext copy anywhere in the spill store.
   const stored = JSON.stringify(f.session.readEvents().map((event) => event.meta_json));
@@ -98,29 +100,38 @@ test("a created file records that it did not exist; fs.edit and apply_patch dele
   expect(rows.map((row) => [row.payload.path, row.meta.status])).toEqual([
     ["workspace/new.txt", "absent"], ["workspace/note.txt", "stored"], ["workspace/moved.txt", "absent"], ["workspace/new.txt", "stored"]]);
   expect(rows[0]!.meta.locator).toBeNull();
-  expect(retrieveSpilledContent(f.workspace, f.commitment(rows[3]!.meta.locator)).toString("utf8")).toBe("fresh\n");
+  expect(retrieveSpilledContent(f.workspace, f.commitment(rows[3]!.meta.locator)).subarray(CHECKPOINT_SALT_BYTES).toString("utf8")).toBe("fresh\n");
   expect(existsSync(join(f.workspace, "workspace", "new.txt"))).toBe(false);
 });
 
-test("a later process on the same session reuses a kept copy and counts what the session already kept", async () => {
-  // MUTATION: start each toolset with an empty tally and the second write stores "before" a second time.
+test("a later process on the same session counts what the session already kept, and no plain digest of the earlier file is in plain meta", async () => {
+  // MUTATION: start each toolset with an empty tally and the later process stores past the session's limit.
   const f = fixture();
   await f.call("fs.read", { path: "workspace/note.txt" });
   await f.call("fs.write", { path: "workspace/note.txt", content: "after\n" });
-  await f.call("fs.write", { path: "workspace/note.txt", content: "before\n" });
-  const commitments = () => f.session.readEvents().filter((row) => row.event_type === "tool/spill-commitment").length;
-  expect(commitments()).toBe(2);
-  const second = agentToolset({ workspace: f.workspace, agentId: "default", sessionId: f.session.sessionId, recorder: f.session });
-  try {
-    const call = (callId: string, toolName: string, args: object) => second.seam.execute({ callId, toolName, rawArguments: JSON.stringify(args),
-      sessionId: f.session.sessionId, turn: 1, step: 1, parentToken: null, dispatch: "native", signal: new AbortController().signal });
-    await call("second-1", "fs.read", { path: "workspace/note.txt" });
-    expect(await call("second-2", "fs.write", { path: "workspace/note.txt", content: "third\n" })).toMatchObject({ outcome: "OK" });
-  } finally { second.close(); }
-  expect(commitments()).toBe(2);
-  const last = JSON.parse(f.checkpoints().at(-1)!.meta_json) as { status: string; locator: string };
-  expect(last.status).toBe("stored");
-  expect(retrieveSpilledContent(f.workspace, f.commitment(last.locator)).toString("utf8")).toBe("before\n");
+  const commitment = f.session.readEvents().find((row) => row.event_type === "tool/spill-commitment")!;
+  // The commitment's plain meta carries the digest of salt + content, never of the content alone.
+  expect(commitment.meta_json).not.toContain(sha256Hex("before\n"));
+  const rows: Record<string, unknown>[] = [];
+  const later = fileCheckpoints(() => ({ recordProjectedEvidence: (row) => { rows.push(row.meta); },
+    retainFileCheckpoint: (bytes, callId, cap) => f.session.retainFileCheckpoint(bytes, callId, cap), readEvents: () => f.session.readEvents() }),
+  { fileBytes: 100, sessionBytes: 10 });
+  later(execution("EXECUTE", "later", f.session.sessionId), "workspace/other.txt", Buffer.from("12345"), null);
+  expect(rows.map((row) => row.status)).toEqual(["session-limit"]);
+});
+
+test("protected-data mode keeps no earlier content: the edit lands, the row says why, and no copy is committed", async () => {
+  // MUTATION: pass retainFileCheckpoint straight through the redacting session and a raw copy is kept.
+  const f = fixture((session) => redactingSessionFor(session));
+  initProcessorRegistry(f.workspace, { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+    processors: [{ processorId: "proc-care", legalName: "Fixture Care Processor",
+      contracts: [{ kind: "DPA", reference: "DPA-CARE-1", effective: "2026-01-01", expires: null, dataClasses: ["phi", "pii"] }] }],
+    purposes: [{ purposeId: "care", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-care"] }],
+    bindings: [], runPurpose: "care" });
+  await f.call("fs.read", { path: "workspace/note.txt" });
+  expect(await f.call("fs.write", { path: "workspace/note.txt", content: "after\n" })).toMatchObject({ outcome: "OK" });
+  expect(JSON.parse(f.checkpoints()[0]!.meta_json)).toMatchObject({ status: "not-stored", reason: "protected-data-mode", locator: null });
+  expect(f.session.readEvents().filter((row) => row.event_type === "tool/spill-commitment")).toHaveLength(0);
 });
 
 test("the model cannot read a checkpoint back through session.spill_read", async () => {
@@ -166,19 +177,20 @@ test("SIMULATE keeps nothing; too large, session limit and a missing key are rec
   const rows: Record<string, unknown>[] = [];
   let key = true;
   const retained: Buffer[] = [];
+  const limits = { fileBytes: 8, sessionBytes: 64 };
   const checkpoint = fileCheckpoints(() => ({
     recordProjectedEvidence: (row) => { rows.push({ ...row.meta, ...JSON.parse(row.payload) as object }); },
     retainFileCheckpoint: (bytes) => {
       if (!key) throw Object.assign(new Error("encrypted spill key unavailable"), { stage: "prepare" });
-      retained.push(bytes);
+      retained.push(Buffer.from(bytes));
       return { locator: `loc-${retained.length}` } as never;
     }
-  }));
+  }), limits);
   checkpoint(execution("SIMULATE", "c0"), "a.txt", Buffer.from("x"), Buffer.from("y"));
   expect(rows).toEqual([]);
-  checkpoint(execution("EXECUTE", "c1"), "big.bin", Buffer.alloc(MAX_CHECKPOINT_FILE_BYTES + 1), null);
-  const chunk = Buffer.alloc(MAX_CHECKPOINT_FILE_BYTES, 1);
-  for (let i = 0; i < MAX_CHECKPOINT_SESSION_BYTES / MAX_CHECKPOINT_FILE_BYTES; i++) {
+  checkpoint(execution("EXECUTE", "c1"), "big.bin", Buffer.alloc(limits.fileBytes + 1), null);
+  const chunk = Buffer.alloc(limits.fileBytes, 1);
+  for (let i = 0; i < limits.sessionBytes / limits.fileBytes; i++) {
     chunk[0] = i; checkpoint(execution("EXECUTE", `f${i}`), `f${i}`, Buffer.from(chunk), null);
   }
   chunk[0] = 255; checkpoint(execution("EXECUTE", "over"), "over", Buffer.from(chunk), null);
@@ -196,4 +208,7 @@ test("SIMULATE keeps nothing; too large, session limit and a missing key are rec
     ["over", "session-limit", null], ["again", "stored", null], ["small.txt", "not-stored", "no-encryption-key"]]);
   expect(rows.find((row) => row.path === "again")!.locator).toBe("loc-1");
   expect(retained).toHaveLength(8);
+  // Each kept object is a fresh salt followed by the bytes.
+  expect(retained[0]!.length).toBe(CHECKPOINT_SALT_BYTES + limits.fileBytes);
+  expect(retained[0]!.subarray(CHECKPOINT_SALT_BYTES)[0]).toBe(0);
 });

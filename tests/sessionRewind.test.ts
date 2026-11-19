@@ -23,7 +23,8 @@ import { lockVault } from "../src/vault/vault.js";
 import { appendOpsAuditEvent } from "../src/ops/audit.js";
 import { assertOwnerMode, setMode } from "../src/mode/mode.js";
 import { SessionService } from "../src/session/sessionService.js";
-import { executeSessionRewind, planSessionRewind, REWIND_FINISHED_AUDIT, REWIND_INTENDED_AUDIT } from "../src/session/sessionRewind.js";
+import { planSessionRewind, REWIND_FINISHED_AUDIT, REWIND_INTENDED_AUDIT } from "../src/session/sessionRewind.js";
+import { executeSessionRewind } from "../src/session/sessionRewindApply.js";
 import { describeSessionRewinds, FORK_AFTER_REWIND_AUDIT, rewindVerificationErrors } from "../src/session/sessionRewindEvidence.js";
 import { registerSessionRewindCommand } from "../src/cli-session-rewind-command.js";
 import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
@@ -125,13 +126,13 @@ describe("amc session rewind, end to end", () => {
     expect(plan.conflicts).toEqual([]);
     expect(plan.files.map((file) => [file.path, file.fromSha256, file.toSha256])).toEqual([
       ["workspace/output/note.txt", sha256Hex("v2\n"), sha256Hex("v0\n")], ["workspace/output/new.txt", sha256Hex("created\n"), null]]);
-    const outcome = executeSessionRewind(workspace, plan, { onlyClean: false });
+    const outcome = executeSessionRewind(plan, { onlyClean: false });
     expect(outcome.results.map((result) => result.status)).toEqual(["restored", "removed"]);
     expect(readFileSync(out("note.txt"), "utf8")).toBe("v0\n");
     expect(existsSync(out("new.txt"))).toBe(false);
     // The original rows stay; the rewind is described in plain words.
     expect(rows(parent).some((row) => row.meta_json.includes("NATIVE_FILE_CHECKPOINT"))).toBe(true);
-    expect(describeSessionRewinds(workspace, parent, rows(parent)).join("\n")).toMatch(/Files rewound to turn 1 .* 1 restored, 1 created file\(s\) removed, 0 failed/);
+    expect(describeSessionRewinds(workspace, parent, rows(parent)).join("\n")).toMatch(/Files rewound to turn 1 .* 1 put back, 1 created file\(s\) removed, 0 already back, 0 failed/);
     // A second rewind to turn 2 is now a conflict on every file: nothing matches what the session last wrote.
     expect(planSessionRewind(workspace, parent, 2).conflicts.map((conflict) => conflict.reason)).toEqual(["changed-since", "changed-since"]);
 
@@ -154,9 +155,9 @@ describe("amc session rewind, end to end", () => {
     const plan = planSessionRewind(workspace, parent, 1);
     expect(plan.conflicts).toEqual([{ path: "workspace/output/note.txt", reason: "changed-since" }]);
     // MUTATION: drop the CONFLICTS refusal and new.txt is removed here.
-    expect(() => executeSessionRewind(workspace, plan, { onlyClean: false })).toThrow(/nothing was written/);
+    expect(() => executeSessionRewind(plan, { onlyClean: false })).toThrow(/nothing was written/);
     expect(existsSync(out("new.txt"))).toBe(true);
-    expect(executeSessionRewind(workspace, plan, { onlyClean: true }).results.map((result) => result.path)).toEqual(["workspace/output/new.txt"]);
+    expect(executeSessionRewind(plan, { onlyClean: true }).results.map((result) => result.path)).toEqual(["workspace/output/new.txt"]);
     expect(existsSync(out("new.txt"))).toBe(false);
     expect(readFileSync(out("note.txt"), "utf8")).toBe("changed by a person\n");
   }, 120_000);
@@ -176,7 +177,7 @@ describe("amc session rewind, end to end", () => {
     // MUTATION: resolve with insideWorkspace (links followed) and the file behind the link is rewritten.
     const plan = planSessionRewind(workspace, parent, 1);
     expect(plan.conflicts).toEqual([{ path: "workspace/output/note.txt", reason: "symlink-or-protected" }]);
-    executeSessionRewind(workspace, plan, { onlyClean: true });
+    executeSessionRewind(plan, { onlyClean: true });
     expect(readFileSync(out("real-note.txt"), "utf8")).toBe("v2\n");
     expect(existsSync(out("new.txt"))).toBe(false);
   }, 120_000);
@@ -206,9 +207,9 @@ describe("amc session rewind, end to end", () => {
     // MUTATION: skip the cited-checkpoint lookup in checkFiles and this forged rewind verifies.
     const parent = await fourTurns();
     const intended = appendOpsAuditEvent({ workspace, auditType: REWIND_INTENDED_AUDIT, subjectId: parent, payload: { v: 1, sessionId: parent, toTurn: 1,
-      files: [{ checkpointEventId: "no-such-row", commitmentEventId: "no-such-row", fromSha256: sha256Hex("v2\n"), toSha256: sha256Hex("v0\n") }] } });
+      files: [{ checkpointEventId: "no-such-row", commitmentEventId: "no-such-row", action: "restore" }] } });
     appendOpsAuditEvent({ workspace, auditType: REWIND_FINISHED_AUDIT, subjectId: parent, payload: { v: 1, intendedEventId: intended.eventId,
-      intendedEventHash: intended.eventHash, sessionId: parent, toTurn: 1, outcomes: [{ status: "restored", restoredSha256: sha256Hex("v0\n") }] } });
+      intendedEventHash: intended.eventHash, sessionId: parent, toTurn: 1, outcomes: [{ status: "restored", restoredDigest: sha256Hex("v0\n") }] } });
     expect(rewindVerificationErrors(workspace, parent, rows(parent))).toEqual([expect.stringContaining("cites checkpoint row no-such-row")]);
     expect((await verifyAgentRun(workspace, parent)).integrityOk).toBe(false);
   }, 120_000);
@@ -225,7 +226,8 @@ describe("amc session rewind is a person's act", () => {
     Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: true });
     try {
       const program = new Command().exitOverride();
-      registerSessionRewindCommand(program.command("session"));
+      const answers: string[] = [];
+      registerSessionRewindCommand(program.command("session"), () => Promise.resolve(answers.shift() ?? null));
       for (const marker of AGENT_ENV_MARKERS) vi.stubEnv(marker, "");
       vi.stubEnv("CLAUDECODE", "1");
       await program.parseAsync(["session", "rewind", parent, "--to-turn", "1"], { from: "user" });
@@ -236,6 +238,15 @@ describe("amc session rewind is a person's act", () => {
       expect(logs.join("\n")).toContain("A rewind never undoes");
       expect(readFileSync(out("note.txt"), "utf8")).toBe("v2\n");
       vi.stubEnv("CLAUDECODE", "");
+      // MUTATION (M2): skip the typed confirmation and the first two answers already write.
+      for (const answer of ["yes", null]) {
+        answers.push(answer as string);
+        await program.parseAsync(["session", "rewind", parent, "--to-turn", "1"], { from: "user" });
+        expect(readFileSync(out("note.txt"), "utf8")).toBe("v2\n");
+        expect(existsSync(out("new.txt"))).toBe(true);
+      }
+      expect(errors.join("\n")).toContain("Not confirmed. Nothing was changed.");
+      answers.push("rewind");
       await program.parseAsync(["session", "rewind", parent, "--to-turn", "1"], { from: "user" });
       expect(readFileSync(out("note.txt"), "utf8")).toBe("v0\n");
       expect(logs.join("\n")).toContain(`amc agent-loop chat --fork-from ${parent}`);

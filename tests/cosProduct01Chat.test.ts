@@ -496,6 +496,8 @@ describe("P01 connected native chat behavior", () => {
       await run({ workspace, tools: "workspace", approvalMode: "default", plan: true });
       expect(fail).not.toHaveBeenCalled();
       expect(seam.commands.map(argv => argv.includes("--plan"))).toEqual([true, false, true]);
+      // L2: the printed resume line keeps plan mode when it is on at exit.
+      expect(logs.join("\n")).toMatch(/Resume in this workspace: .*--plan .*--session/);
       expect(logs.join("\n")).toContain("Plan mode is off.");
       expect(logs.join("\n")).toContain("Plan mode is on.");
       fail.mockReset(); errors = []; seam.commands = []; seam.answers = ["task", "/exit"];

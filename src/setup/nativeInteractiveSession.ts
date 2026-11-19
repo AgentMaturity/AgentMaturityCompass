@@ -9,7 +9,7 @@ import { renderNativeRunDiagnostics } from "../agent/nativeFailureGuidance.js";
 import { parseNativeChatResult, type NativeChatChildSummary } from "./nativeChatResult.js";
 import { isActionClass } from "../governor/actionCatalog.js";
 import { approvalModeGatedClasses, parseApprovalMode } from "../approvals/approvalModes.js";
-import { chatPlanRefusal, PLAN_MODE_ON, togglePlanMode } from "./nativeChatPlanMode.js";
+import { chatPlanRefusal, initialPlanMode, PLAN_MODE_ON, PLAN_MODE_RESTORED, togglePlanMode } from "./nativeChatPlanMode.js";
 import { reviewNativeMcpConfigurations, NativeMcpConfigError } from "./nativeMcpConfig.js";
 import { mergeScopedMcpSelection } from "../mcp/mcpScopes.js";
 import { renderNativeFirstUseGuide, renderNativeGuideCommand, renderNativeVerifyHint } from "./nativeFirstUseGuide.js";
@@ -341,8 +341,9 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       io.error("Choose --tools none, echo, or workspace."); io.fail(); return;
     }
     const planRefusal = chatPlanRefusal({ tools, delegate: options.delegate === true, validating: validation !== undefined });
-    let planMode = options.plan === true;
-    if (planMode && planRefusal !== null) { io.error(planRefusal); io.fail(); return; }
+    const planStart = initialPlanMode(cwd, options, planRefusal);
+    let planMode = planStart.on;
+    if (options.plan === true && planRefusal !== null) { io.error(planRefusal); io.fail(); return; }
     let maxTokens = options.maxTokens ?? defaults.maxTokens;
     let model = guide.model!;
     const defaultedMode = chatApprovalMode(options, defaults);
@@ -440,7 +441,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
     const resumeCommand = (id: string, full = false) => renderNativeGuideCommand({ cwd, argv: ["amc", "agent-loop", "chat",
       ...(full ? routeBaseArgs() : ["--agent", guide.agentId, ...passedFlags, ...(options.unsafeUnconfinedShell === true ? ["--unsafe-unconfined-shell"] : []),
         ...(options.webSearchSearxng === undefined ? [] : ["--web-search-searxng", options.webSearchSearxng]), ...mcpArgs, ...validationArgs]),
-      ...chatProfileArgs, ...nativeExtensionRunArgv(extensions), "--session", id] });
+      ...chatProfileArgs, ...(planMode ? ["--plan"] : []), ...nativeExtensionRunArgv(extensions), "--session", id] });
     const toolsetNow = () => checkToolsetReadiness(cwd, options.unsafeUnconfinedShell === true ? { unconfinedShell: "cli-flag" } : {});
     let confinementShown = false;
     const say = (line: string) => { for (const part of wrapLine(line, process.stdout.columns ?? null)) io.log(part); };
@@ -462,7 +463,7 @@ export async function runNativeInteractiveSession(options: NativeChatOptions, io
       if (extensions.list().length > 0) say(`Signed native extensions: ${extensions.list().map(item => item.id).join(", ")}. /extensions lists their commands and reviewed digests.`);
       if (validation) say(`Public task checks: ${validation.checks.map(check => check.title).join(", ")}. Existing shell permissions and approvals still apply.`);
       say(`Every turn writes AMC session evidence. Limit: ${maxSteps} model steps per turn, ${maxTokens} output tokens per request.`);
-      if (planMode) say(PLAN_MODE_ON);
+      if (planMode) say(planStart.restored ? PLAN_MODE_RESTORED : PLAN_MODE_ON);
       say(`Session: ${sessionId ?? "created on first task"}${forkFrom === null ? "" : `; next task forks ${forkFrom}`}`);
     };
     showScope();

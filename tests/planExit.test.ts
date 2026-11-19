@@ -13,6 +13,7 @@ import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { verifyAgentRun, type AgentRunSummary } from "../src/agent/runReport.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { PLAN_READY_AUDIT } from "../src/tools/builtin/planExitTool.js";
+import { initialPlanMode } from "../src/setup/nativeChatPlanMode.js";
 import type { EvidenceEvent } from "../src/types.js";
 
 /**
@@ -79,6 +80,11 @@ describe("plan_exit", () => {
     expect(sessionRows.some(row => row.event_type === "audit" && meta(row).status === "no-changes" && extractEnvelope(row.meta_json)?.turn === 1)).toBe(true);
     expect(planning.endings?.at(-1)?.reason ?? sessionRows.find(row => row.event_type === "turn/end")?.meta_json).toMatch(/blocked/);
     // The model cannot leave plan mode: the next --plan turn of the same session is still read-only.
+    // L2: a chat resuming this session (last turn in plan mode) starts in plan mode unless told --no-plan.
+    // MUTATION: make initialPlanMode ignore the session and this resume starts in write mode.
+    expect(initialPlanMode(workspace, { session: planning.sessionId }, null)).toEqual({ on: true, restored: true });
+    expect(initialPlanMode(workspace, { session: planning.sessionId, plan: false }, null)).toEqual({ on: false, restored: false });
+    expect(initialPlanMode(workspace, { session: planning.sessionId }, "no workspace tools")).toEqual({ on: false, restored: false });
     // MUTATION: skip applyPlanMode and turn 2 calls fs.write.
     await runCli([write, "--plan", "--session", planning.sessionId, "--keep-open"]);
     expect(existsSync(join(workspace, "workspace", "output", "planned.txt"))).toBe(false);
