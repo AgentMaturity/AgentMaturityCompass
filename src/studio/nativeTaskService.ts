@@ -8,7 +8,6 @@ import { sessionSpillCap } from "../session/sessionPayloadCap.js";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AMCNativeClient, AMCNativeRefusedError, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
-import { nativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
 import { SessionHistoryRefused } from "../session/sessionHistoryReader.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
@@ -39,7 +38,7 @@ import { readNativeTaskProjection, projectNativeTaskUpdate, type NativeTaskProje
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
 import { deriveExecutionStatus } from "../execution/executionContract.js";
 import { sessionReceipts } from "../execution/executionStatus.js";
-import { assertNativeStorageAdmission, nativeTurnFailureWords } from "./nativeResidency.js";
+import { assertNativeStorageAdmission, nativeTurnFailure, nativeTurnFailureWords, turnFailureWords } from "./nativeResidency.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -59,10 +58,9 @@ const PAGE_READ_ATTEMPTS = 5;
 const MOVING = "Committed history was changing while it was read, so no authenticated snapshot is shown yet. Nothing was concluded from a partial read; refresh in a moment.";
 const UNSETTLED = "Committed history kept changing while it was read, for 30 s, so no authenticated snapshot could be taken. Nothing was concluded from a partial read; refresh once writers are quiet.";
 const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
-/** AMC's own budget refused the turn's next model request, as the runtime's ACP error data names it (P0-59). */
-const BUDGET_GUIDANCE = nativeFailureGuidance("AMC_NATIVE_BUDGET_REFUSED");
-const budgetRefused = (error: unknown): boolean => error instanceof AMCNativeRefusedError
-  && ((error.data as { failureCodes?: unknown } | undefined)?.failureCodes as unknown[] | undefined)?.includes(BUDGET_GUIDANCE.code) === true;
+/** A task's error when no runtime of this process holds it: the kept refusal of its latest turn, else a possibly started one. */
+const restingError = (d: NativeTaskDescriptor): string | null => d.lastFailure?.revision === d.revision ? turnFailureWords(d.lastFailure)
+  : d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null;
 interface Entry {
   descriptor: NativeTaskDescriptor; state: NativeTaskState; error: string | null;
   client?: AMCNativeClient; session?: AMCNativeSession; turn?: AMCNativeTurn; work?: Promise<void>;
@@ -131,7 +129,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (entry) reconcileClosedClient(entry);
     if (!entry) {
       entry = { descriptor: d, state: d.closed ? "closed" : d.sessionId ? "released" : "failed",
-        error: d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null,
+        error: restingError(d),
         projectionAt: 0, touchedAt: Date.now(), runtimeStartedAt: Date.now(), startupCancelled: false, startupAbort: new AbortController(), verification: "not-verified" };
       entries.set(d.taskId, entry);
     } else if (taskBodyHash(entry.descriptor) !== taskBodyHash(d)) {
@@ -142,7 +140,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       // N+1. Refresh authenticated control state without resuming or replaying
       // any prompt, so the original lost-ack retry can reach deduplication.
       entry.descriptor = d; entry.state = d.closed ? "closed" : d.sessionId ? "released" : "failed";
-      entry.error = d.pendingTurn ? "The prior submission may have started. No request was replayed; inspect evidence and explicitly resume before a new turn." : null;
+      entry.error = restingError(d);
       entry.verification = "not-verified"; entry.projection = undefined; entry.projectionAt = 0;
     }
     return entry;
@@ -188,7 +186,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
     }
   }
-  function persist(entry: Entry, patch: Partial<Pick<NativeTaskDescriptor, "sessionId" | "pendingTurn" | "closed" | "leaseId">>): void {
+  function persist(entry: Entry, patch: Partial<Pick<NativeTaskDescriptor, "sessionId" | "pendingTurn" | "closed" | "leaseId" | "lastFailure">>): void {
     descriptors.lock(() => {
       const current = descriptors.read(entry.descriptor.taskId);
       if (!current || current.revision !== entry.descriptor.revision || current.sessionId !== entry.descriptor.sessionId) throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task descriptor changed during execution.");
@@ -498,9 +496,10 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.error = reason === "error" || reason === "interrupted" ? `The signed native turn ended with ${reason}; no successful task is claimed.` : null;
       } catch (error) {
         entry.state = "failed";
-        entry.error = budgetRefused(error) ? `${BUDGET_GUIDANCE.summary} No provider request was sent for it. ${BUDGET_GUIDANCE.nextAction}`
-          : error instanceof NativeTaskServiceError ? error.message
-          : nativeTurnFailureWords(error);
+        const failure = nativeTurnFailure(error, revision);
+        entry.error = failure ? turnFailureWords(failure) : error instanceof NativeTaskServiceError ? error.message : nativeTurnFailureWords(error);
+        // Kept on the descriptor so a restarted Studio says the same; if the task changed meanwhile, the words stay in memory only.
+        if (failure) try { persist(entry, { lastFailure: failure }); } catch { /* TASK_CHANGED: a newer revision owns the descriptor */ }
       }
       finally { entry.turn = undefined; entry.touchedAt = Date.now(); entry.work = undefined; entry.projectionAt = 0; }
     })();
