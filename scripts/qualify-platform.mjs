@@ -9,6 +9,8 @@ import { verifyPackedRun } from "./packed-evidence-verification.mjs";
 import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+/** Per-step limit. npm install of the packed tarball builds native addons and has outlasted 300 s on a Windows runner. */
+const STEP_TIMEOUT_MS = 300_000, INSTALL_TIMEOUT_MS = 900_000;
 export function qualifyPlatform({ root = process.cwd(), out = join(root, "tmp/platform-qualification/report.json"), keep = false } = {}) {
   const reportPath = resolve(out), directory = dirname(reportPath);
   // Claim the whole result directory before scratch creation or any command.
@@ -49,9 +51,9 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
   const status = spawnSync("git", ["status", "--porcelain", "--untracked-files=no"], { cwd: root, encoding: "utf8", timeout: 10_000 });
   if (status.status === 0) report.sourceDirty = status.stdout.trim().length > 0;
   const npmCli = process.env.npm_execpath;
-  const command = (id, executable, args, cwd = workspace, expectedFailure = false) => {
+  const command = (id, executable, args, cwd = workspace, expectedFailure = false, timeout = STEP_TIMEOUT_MS) => {
     const startedAt = new Date().toISOString(), started = performance.now();
-    const result = spawnSync(executable, args, { cwd, env, encoding: "utf8", timeout: 300_000, maxBuffer: 4 * 1024 * 1024, windowsHide: true });
+    const result = spawnSync(executable, args, { cwd, env, encoding: "utf8", timeout, maxBuffer: 4 * 1024 * 1024, windowsHide: true });
     const expected = !result.error && result.signal === null && (expectedFailure ? result.status !== null && result.status !== 0 : result.status === 0);
     const stdout = result.stdout ?? "", stderr = result.stderr ?? "";
     // No terminal output is trusted as a result and no environment or credential values are published.
@@ -74,7 +76,7 @@ function qualifyPlatformInOwnedDirectory({ root, out, keep, reportFd }) {
     if (!Array.isArray(packed) || packed.length !== 1 || typeof packed[0]?.filename !== "string" || !/^[^/\\]+\.tgz$/.test(packed[0].filename)) throw new Error("Invalid pack receipt");
     const tarball = join(scratch, packed[0].filename);
     report.packageSha256 = hash(readFileSync(tarball));
-    requireStep(command("fresh-install", process.execPath, [npmCli, "install", "--omit=dev", "--no-audit", "--no-fund", tarball], consumer));
+    requireStep(command("fresh-install", process.execPath, [npmCli, "install", "--omit=dev", "--no-audit", "--no-fund", tarball], consumer, false, INSTALL_TIMEOUT_MS));
     // The installed native addons this Node ABI loads, by path and digest (WP32).
     const modules = join(consumer, "node_modules");
     report.abi.nativeAddons = readdirSync(modules, { recursive: true }).map(String).filter((path) => path.endsWith(".node")).sort()

@@ -198,4 +198,20 @@ describe("platform evidence output admission through qualifyPlatform", () => {
     expect(reserved).toBeDefined(); expect(fs.closeSync).toHaveBeenCalledWith(reserved!.value);
     expect(real.readdirSync(dirname(out))).toEqual(["report.json"]);
   });
+
+  // 2026-11-18 nightly matrix: npm install of the packed tarball outlasted the 300 s step limit on a Windows runner.
+  it("gives the fresh install 900 s and every other step 300 s", () => {
+    permitSyntheticPackFailure(); const out = join(root, "results/report.json");
+    vi.mocked(spawnSync).mockImplementation((command, args) => {
+      const list = (args ?? []).map(String);
+      if (String(command) === "git" || !list.includes("pack")) return syntheticExit() as ReturnType<typeof spawnSync>;
+      real.writeFileSync(join(list[list.indexOf("--pack-destination") + 1]!, "synthetic-package-0.0.0.tgz"), "synthetic tarball");
+      return { ...syntheticExit(), status: 0, stdout: JSON.stringify([{ filename: "synthetic-package-0.0.0.tgz" }]) } as ReturnType<typeof spawnSync>;
+    });
+    const report = qualifyPlatform({ root, out });
+    expect(report.steps.map((step: { id: string }) => step.id)).toEqual(["pack", "fresh-install"]);
+    const limits = vi.mocked(spawnSync).mock.calls.filter(([command]) => String(command) !== "git")
+      .map(([, , options]) => (options as { timeout?: number }).timeout);
+    expect(limits).toEqual([300_000, 900_000]);
+  });
 });
