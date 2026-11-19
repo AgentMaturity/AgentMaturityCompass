@@ -43,7 +43,7 @@ async function main() {
   const rows = (portfolio.rows || []).map((item) => row(item)).join("");
   app.innerHTML = `
     ${card(
-      "Bench Portfolio",
+      "Benchmark portfolio",
       `
       <table>
         <thead>

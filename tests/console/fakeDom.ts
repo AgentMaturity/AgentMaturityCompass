@@ -41,6 +41,7 @@ export class FakeElement {
   get hidden(): boolean { return this.hasAttribute("hidden"); }
   set hidden(value: boolean) { this.toggleAttribute("hidden", value); }
   get open(): boolean { return this.hasAttribute("open"); }
+  set open(value: boolean) { this.toggleAttribute("open", value); }
 
   readonly classList = {
     contains: (name: string) => this.className.split(/\s+/).includes(name),

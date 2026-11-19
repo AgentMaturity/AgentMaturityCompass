@@ -1,7 +1,7 @@
 // The console's page scripts all import this module, so the shared shell (nav, status, banner) and the focusable-scroll
 // fix reach their pages from here.
 import "./shell.js";
-import { renderNavSession, renderTopbar, showShellNotice } from "./shell.js";
+import { renderNavSession, renderTopbar, reportNoAnswer, setNavBadge, showShellNotice } from "./shell.js";
 import "./focusableScroll.js";
 import { trackRequest } from "./actionFeedback.js";
 import { plainErrorText } from "./plainError.js";
@@ -114,6 +114,8 @@ export class ConsoleApiError extends Error {
 }
 
 async function request(path, options) {
+  // A change (an approval decided, a request filed) makes the kept count of open approvals stale: ask again next time.
+  if ((options?.method || "GET") !== "GET") forgetPendingCount();
   const finished = trackRequest();
   try {
     const result = await requestOnce(path, options);
@@ -137,8 +139,9 @@ async function requestOnce(path, options) {
       body: options?.body ? JSON.stringify(options.body) : undefined
     });
   } catch (error) {
-    // No answer at all: AMC stopped or the network is gone. One shared notice says so (C-06); the caller still sees the error.
-    if (error?.name !== "AbortError") showShellNotice("offline");
+    // No answer at all. One shared notice (C-06) says what is true: the health read tells a lost request from AMC having
+    // stopped. The caller still sees the error.
+    if (error?.name !== "AbortError") void reportNoAnswer();
     throw error;
   }
   // A session that ended mid-visit: one sign-in prompt instead of each page's own error (C-11). /auth/me asks on purpose.
@@ -229,8 +232,55 @@ export async function whoami() {
     renderNavSession(document, state.me, signOut);
     // Pages with their own script get the top bar here (C-15); app.js redraws its own, so an existing bar is left alone.
     if (!document.querySelector("main .topbar")) renderTopbar(document, state.me, signOut);
+    pendingApprovalCount().then((count) => setNavBadge(document, "./approvals", count), () => undefined);
   }
   return state.me;
+}
+
+const APPROVER_ROLES = ["APPROVER", "OWNER", "AUDITOR"];
+const OPEN_LIMIT = 50; // shell.js and homeView.js show a count of 50 or more as "50+"
+const PENDING_KEY = "amc-pending-approvals";
+let pending = null;
+
+/**
+ * How many approval requests are open (PENDING) for the current agent and the A4 projects' agents, the requests the
+ * Approvals inbox lists by default; not only those this person may decide. Each read stops at OPEN_LIMIT, so a count of
+ * OPEN_LIMIT or more is shown as "50+". Null when this person cannot decide approvals, the current agent's approval log does
+ * not verify, or AMC could not tell: then nothing is shown. Kept for a minute in this tab, so moving between pages does
+ * not ask again. Reads only.
+ */
+export function pendingApprovalCount() {
+  const me = state.me;
+  if (!me || me.userId === "local-demo" || !(me.roles || []).some((role) => APPROVER_ROLES.includes(role))) return Promise.resolve(null);
+  const agent = new URLSearchParams(window.location.search).get("agent") || "default";
+  try {
+    const kept = JSON.parse(sessionStorage.getItem(PENDING_KEY) || "null");
+    if (kept && kept.user === me.userId && kept.agent === agent && Date.now() - kept.at < 60_000) return Promise.resolve(kept.count);
+  } catch { /* no storage: ask Studio */ }
+  pending ??= countPending(agent).then((count) => {
+    try { sessionStorage.setItem(PENDING_KEY, JSON.stringify({ user: me.userId, agent, at: Date.now(), count })); } catch { /* no storage */ }
+    return count;
+  }, () => null);
+  return pending;
+}
+
+function forgetPendingCount() {
+  pending = null;
+  try { sessionStorage.removeItem(PENDING_KEY); } catch { /* no storage */ }
+}
+
+async function countPending(agent) {
+  const projects = await apiNativeRequest("/api/v1/a4/projects").catch(() => null);
+  const rows = Array.isArray(projects?.projects) ? projects.projects : Array.isArray(projects) ? projects : [];
+  // ponytail: one read per project agent, kept a minute; batch them in one route if workspaces grow to many projects.
+  const others = [...new Set(rows.map((row) => row?.agentId).filter((id) => typeof id === "string" && id && id !== agent))];
+  const open = (found) => (found?.requests || []).filter((row) => row?.status === "PENDING").length;
+  const query = (id) => apiGet(`/approvals/requests?agentId=${encodeURIComponent(id)}&status=PENDING&limit=${OPEN_LIMIT}`);
+  const own = await query(agent);
+  if (own?.integrity?.valid !== true) return null;
+  // As in the inbox, another agent's requests count only where its approval log verifies.
+  const theirs = await Promise.all(others.map((id) => query(id).then((found) => (found?.integrity?.valid === true ? open(found) : 0), () => 0)));
+  return theirs.reduce((sum, count) => sum + count, open(own));
 }
 
 export async function apiGet(path, options) {

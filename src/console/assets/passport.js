@@ -1,6 +1,6 @@
 import { renderPassportCard } from "./components/passportCard.js";
 import { renderBadgeChip } from "./components/badgeChip.js";
-import { askInline, codeWords, recordDetails, workspacePath } from "./pageKit.js";
+import { askInline, codeWords, moreInfo, noticeChip, recordDetails, workspacePath } from "./pageKit.js";
 
 function esc(value) {
   return String(value ?? "")
@@ -37,7 +37,7 @@ async function loadPassportData(params) {
 }
 
 export async function renderPassportPage(params) {
-  params.root.innerHTML = params.card("Agent Passport", "<p aria-busy=\"true\">Reading the passports…</p>");
+  params.root.innerHTML = params.card("Passport", "<p aria-busy=\"true\">Reading the passports…</p>");
   const data = await loadPassportData(params);
   const passport = data.cache;
   const warnings = [];
@@ -70,12 +70,11 @@ export async function renderPassportPage(params) {
   params.root.innerHTML = [
     ...warnings,
     params.card(
-      "Agent Passport",
+      "Passport",
       `
-      <p class="muted">A passport is a signed summary of an agent's latest score that you can hand to someone else. The signature shows
-      who made it and that it has not changed since; it does not make the score true.</p>
-      <p class="muted">Every passport is self-issued: this workspace signs it about its own agent, using its own clock. "Verified"
-      means this workspace's own checks passed, not that anyone outside checked it.</p>
+      <p class="muted">A signed summary of an agent's latest score that you can hand to someone else.</p>
+      ${noticeChip("Self-issued", "Every passport is self-issued: this workspace signs it about its own agent, using its own clock. \"Verified\" means this workspace's own checks passed, not that anyone outside checked it.")}
+      ${moreInfo("What the signature shows", "<p>The signature shows who made it and that it has not changed since; it does not make the score true.</p>")}
       ${passport ? `<div class="grid">
         ${tile("Status", renderBadgeChip({ status: passport.status?.label === "INFORMATIONAL" ? "INFO" : passport.status?.label ?? "UNTRUSTED", badge: passport.status?.label ?? "UNTRUSTED" }))}
         ${tile("Maturity", esc(`${maturity}/5`))}

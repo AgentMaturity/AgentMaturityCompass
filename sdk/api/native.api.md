@@ -400,6 +400,7 @@ export interface AgentSessionInit {
     readonly maxSteps?: number;
     readonly compaction?: Partial<CompactionConfig>;
     readonly validation?: NativeValidationPlan;
+    readonly verifyOnStop?: false;
     readonly resourceStatus?: () => NativeResourceStatus;
     readonly compositionSources?: readonly CompositionSource[];
     readonly bindTools?: (context: {

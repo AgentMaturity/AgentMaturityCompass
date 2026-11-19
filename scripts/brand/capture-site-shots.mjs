@@ -24,11 +24,12 @@ const { values } = parseArgs({
     user: { type: "string", default: "owner" },
     "password-file": { type: "string" },
     out: { type: "string", default: "website/img" },
-    pack: { type: "string", default: "digital-health-record" }
+    pack: { type: "string", default: "digital-health-record" },
+    station: { type: "string", default: "health" }
   }
 });
 if (!values.base || !values["password-file"]) {
-  console.error("Usage: node scripts/brand/capture-site-shots.mjs --base <studio url> --user <owner> --password-file <file> [--out website/img]");
+  console.error("Usage: node scripts/brand/capture-site-shots.mjs --base <studio url> --user <owner> --password-file <file> [--out website/img] [--pack <id> --station <station>]");
   process.exit(2);
 }
 const base = values.base.replace(/\/+$/, "");
@@ -76,6 +77,28 @@ await page.fill("#loginPass", readFileSync(values["password-file"], "utf8").trim
 await page.click("#loginBtn");
 await page.waitForURL(/\/console\/home/, { timeout: 30_000 });
 
+/**
+ * Fills the start form as a person does. The Build page asks one question at a time (studio-ui redesign: a station
+ * card, then the pack; who approves; the name) with Next between them; Home's folded form shows all three at once.
+ * `upTo: 1` stops after the industry, so that question can be photographed.
+ */
+async function fillStart(form, { practice = false, name, upTo = 3 }) {
+  const station = form.locator(`label:has(input[name="a4Station"][value="${values.station}"])`);
+  if (await station.count()) await station.click();
+  const pack = form.locator('select[name="pack"]');
+  await pack.waitFor({ state: "visible" });
+  await pack.selectOption(values.pack);
+  if (upTo === 1) return;
+  const next = form.locator("[data-a4-q-next]");
+  if (await next.isVisible()) await next.click();
+  if (practice) {
+    if (await form.locator('input[name="practice"][value="yes"]').isDisabled()) throw new Error("A practice project is not offered here: use a workspace with one person in it.");
+    await form.locator('label:has(input[name="practice"][value="yes"])').click();
+  }
+  if (await next.isVisible()) await next.click();
+  await form.locator('input[name="name"]').fill(name);
+}
+
 // Each picture is one part of the console, taken at a width where that part is about as wide as the website shows it,
 // so its words stay readable on the page.
 /** One screenshot around several elements, in page coordinates, with a small margin. */
@@ -92,31 +115,31 @@ async function around(selector) {
 // 1. Home's first card, "Build an agent for your industry": the start form with an Industry Pack chosen, a name, and
 // the "Who approves each step?" choice.
 await settle();
+// With no project yet the start form sits folded behind Home's "Build an agent" tile, which opens it in place.
+await page.click("#homeBuildTile");
 await page.waitForSelector("#a4HomeTitle");
 const homeTitle = (await page.textContent("#a4HomeTitle")).trim();
 if (homeTitle !== "Build an agent for your industry") throw new Error(`The home card says "${homeTitle}": use a workspace with no agent project yet.`);
 const form = page.locator("#a4HomeForm");
-await form.locator("select").first().selectOption(values.pack);
-await form.locator("[name=name]").fill("Patient record assistant");
-await form.locator("[name=name]").blur();
+await fillStart(form, { upTo: 1 });
+await form.locator('input[name="name"]').fill("Patient record assistant");
+await form.locator('input[name="name"]').blur();
 await page.waitForTimeout(400);
 await saveWebp(await page.locator("#a4HomeCard").screenshot(), "a4-start.webp");
 
 // 2. Start a practice project from that card, as a person would, and capture its "What to do now" panel.
-const practice = form.locator("input[name=practice][value=yes]");
-if (await practice.isDisabled()) throw new Error("A practice project is not offered here: use a workspace with one person in it.");
-await practice.check();
+await fillStart(form, { practice: true, name: "Patient record assistant" });
 await form.locator("button[type=submit]").click();
 await page.waitForURL(/a4Project/, { timeout: 30_000 });
 await settle();
 await page.waitForSelector(".a4-start");
 await saveWebp(await around(".a4-practice, .a4-start"), "a4-project.webp");
 
-// 3. Home once a project exists: carry on with it, or watch an agent, run a task and score the record.
+// 3. Home once a project exists: the three ways in, and the project's route with Continue.
 await page.goto(`${base}/console/home`);
 await settle();
-await page.waitForSelector("#firstUse");
-await saveWebp(await around("#a4HomeCard, #firstUse"), "console-home.webp");
+await page.waitForSelector("#a4HomeCard .route");
+await saveWebp(await around("#homeStart, #a4HomeCard"), "console-home.webp");
 
 // 4. A project that needs a second person, waiting for its first approval (a4-approval.webp, on website/a4.html). The
 // owner starts a project from the same pack and follows the "What to do now" button, filling each stage's questions with
@@ -126,8 +149,7 @@ await saveWebp(await around("#a4HomeCard, #firstUse"), "console-home.webp");
 await page.goto(`${base}/console/a4?new=1`);
 await settle();
 const create = page.locator("#a4CreateForm");
-await create.locator("select").first().selectOption(values.pack);
-await create.locator("[name=name]").fill("Claims letter assistant");
+await fillStart(create, { name: "Claims letter assistant" });
 await create.locator("button[type=submit]").click();
 await page.waitForURL(/a4Project/, { timeout: 30_000 });
 const projectUrl = page.url();

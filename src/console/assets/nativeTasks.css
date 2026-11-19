@@ -1,54 +1,91 @@
-.native-tasks { max-width: 1400px; margin: 0 auto; min-width: 0; }
+/* Run a task as a conversation (studio-ui lane, slice "run"): greeting, the task's route, the transcript as tiles, one
+   composer, and everything else folded under "more info". Ids and behaviour live in nativeTasks.js / nativeTasksView.js. */
+.native-tasks { max-width: 880px; margin: 0 auto; min-width: 0; }
 .native-tasks-heading, .native-task-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; }
-.native-tasks-heading h2 { margin:6px 0; font-size:clamp(1.6rem,3vw,2.3rem); }
-.native-task-notice { min-height:1.5em; }
-.native-task-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(240px,300px); gap:18px; align-items:start; }
-.native-task-layout > *, .native-task-fields > * { min-width:0; }
-.native-task-fields { display:flex; flex-wrap:wrap; align-items:end; gap:12px; }
-.native-task-fields label { display:flex; flex:1 1 165px; flex-direction:column; gap:6px; }
-.native-task-fields label:has(select) { flex-basis:250px; }
-.native-task-check { display:flex; align-items:center; gap:8px; }
-.native-task-check input { flex:none; width:auto; margin:0; }
-.native-task-fields input, .native-task-fields select, #nativeTaskPrompt { width:100%; min-width:0; }
-.native-task-fields button { margin-bottom:0; }
-.native-task-conversation h3 { margin:0; }
-.native-task-transcript { margin:18px 0; }
-.native-task-event { border:1px solid var(--border); border-radius:8px; margin:12px 0; padding:14px; overflow-wrap:anywhere; }
-.native-task-event-user { background:rgba(74,239,121,.035); }
-.native-task-event-tool, .native-task-event-tool-update { border-left:3px solid var(--border-strong); }
-.native-task-event-heading { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; }
-.native-task-event pre { margin:10px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; max-height:420px; overflow:auto; }
+.run-head { display:block; text-align:center; margin:24px 0 8px; }
+.run-head h2 { margin:0; font-size:34px; line-height:1.15; font-weight:700; letter-spacing:-.01em; }
+.run-head .picture { display:block; margin:0 auto 8px; color:var(--ink); }
+.native-tasks:not([data-run="empty"]) .run-head .picture { display:none; }
+.run-lead { margin:8px 0 0; color:var(--muted); font-size:15px; }
+.native-tasks:not([data-run="empty"]) .run-head { text-align:left; margin-top:8px; }
+.native-tasks:not([data-run="empty"]) .run-head h2 { font-size:24px; }
+.native-tasks:not([data-run="empty"]) .run-lead { display:none; }
+.native-tasks[data-run="empty"] :is(.native-task-conversation, .native-task-record, .run-route-wrap) { display:none; }
+.native-tasks:not([data-run="empty"]) :is(.run-chips, .composer-pickers) { display:none; }
+/* A closed task takes no follow-up (New task is the next step), nor does one waiting for Resume: the box goes. */
+.native-tasks:is([data-run="closed"], [data-run="resume"]) .composer { display:none; }
+.run-route-wrap .route { margin:8px 0 16px; }
+.native-task-notice { min-height:1.5em; margin:8px 0; color:var(--muted); font-size:13px; text-align:center; }
+.native-tasks:not([data-run="empty"]) .native-task-notice { text-align:left; }
+.native-task-fields > * { min-width:0; }
+/* The composer: model pickers on top, the box, then Run task. One card, rounded like a chat box. */
+.composer { border-radius:22px; padding:16px 18px 12px; }
+.composer-pickers { display:flex; flex-wrap:wrap; gap:8px 12px; align-items:end; }
+.composer-pickers label { display:flex; flex-direction:column; gap:4px; flex:0 1 220px; min-width:0; font-size:13px; color:var(--muted); }
+.composer-pickers :is(select, input) { width:100%; min-width:0; min-height:36px; }
+.composer-note { margin:6px 0 0; font-size:13px; }
+#nativeTaskPromptForm { margin-top:10px; }
+#nativeTaskPrompt { width:100%; min-width:0; min-height:84px; resize:vertical; border:0; background:transparent; padding:6px 2px; font-size:16px; box-shadow:none; }
+.composer-actions { justify-content:flex-end; margin:4px 0 0; }
+.composer .native-task-disclosure { display:inline-block; margin:4px 16px 0 0; font-size:13px; color:var(--muted); vertical-align:top; }
+.composer .native-task-disclosure[open] { display:block; color:var(--ink); }
+.native-task-retry:has(button[hidden]) { display:none; }
+.run-chips { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin:14px 0 4px; }
+.chip-button { min-height:36px; padding:0 16px; border:1px solid var(--line-strong); border-radius:999px; background:var(--surface); color:var(--ink); font-weight:500; }
+.chip-button:hover { border-color:var(--accent); filter:none; }
+.composer > .more-info { margin:10px 0 0; }
+/* The conversation: what you asked on the right, what came back as tiles on a thin line. */
+.native-task-conversation { padding:16px 18px; }
+.native-task-conversation h3 { margin:0; font-size:15px; }
+.native-task-transcript { margin:12px 0; }
+.native-task-event { position:relative; border:1px solid var(--line); border-radius:var(--radius-card); margin:10px 0; padding:12px 14px; overflow-wrap:anywhere; background:var(--surface); }
+.native-task-event-user { margin-left:auto; max-width:85%; background:var(--surface-2); border-color:transparent; }
+.native-task-event-tool, .native-task-event-tool-update, .native-task-event-plan { margin-left:14px; border-style:dashed; font-size:14px; }
+.native-task-event-heading { display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; font-size:13px; }
+.native-task-event pre { margin:6px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; font-size:15px; max-height:420px; overflow:auto; }
 .native-task-event small, .native-task-identity code, .native-task-approval code, .native-task-scope-item code { overflow-wrap:anywhere; word-break:break-word; }
+.native-task-result { margin:12px 0 4px; }
+.native-task-chips { margin-top:6px; }
+.native-task-next { margin:10px 0 0; }
+.native-task-recovery p { margin:10px 0 0; }
+.native-task-approvals { border:1px solid var(--wait); border-radius:var(--radius-card); padding:12px 14px; margin:12px 0; background:var(--wait-soft); }
+.native-task-approvals h4 { display:flex; align-items:center; gap:8px; margin:0 0 4px; }
+.native-task-record { padding:16px 18px; }
+.native-task-record h3 { margin:0; font-size:15px; }
+.native-task-more { display:flex; flex-wrap:wrap; gap:0 18px; }
+.native-task-more > .more-info { margin:6px 0 0; }
+.native-task-more > .more-info[open] { flex-basis:100%; }
+.native-task-history { margin:8px 0 24px; }
 .native-task-identity { margin:0; }
 #nativeTaskIdentity { overflow-wrap:anywhere; }
 .native-task-identity dt { color:var(--muted); font-size:.8rem; margin-top:12px; }
 .native-task-identity dd { margin:3px 0 0; overflow-wrap:anywhere; }
-.native-task-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
-.native-task-sidebar .card { margin-bottom:18px; }
-.native-task-approval { border-top:1px solid var(--border-strong); padding-top:12px; margin:12px 0; }
+.native-task-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.native-task-approval { border-top:1px solid var(--line); padding-top:12px; margin:12px 0; }
 .native-task-approval p, .native-task-scope-item p { font-size:.85rem; }
 .native-task-scope-item { padding:10px 0; border-bottom:1px solid var(--border); }
 .native-task-list-item { display:flex; flex-direction:column; text-align:left; gap:6px; width:100%; margin-bottom:8px; overflow-wrap:anywhere; }
 .native-task-list-item span { font-size:.75rem; }
 .native-task-list-item[aria-current] { border-color:var(--accent); }
+.native-task-check { display:flex; align-items:center; gap:8px; }
+.native-task-check input { flex:none; width:auto; margin:0; }
+.native-task-fields button { margin-bottom:0; }
 .native-task-validation-selection { border:1px solid var(--border); border-radius:8px; margin:16px 0; padding:12px; min-width:0; }
 .native-task-validation-selection label { display:flex; align-items:start; gap:10px; margin:10px 0; }
 .native-task-validation-selection input { flex:none; width:auto; margin-top:4px; }
 .native-task-validation-selection code, .native-task-validation-result code { overflow-wrap:anywhere; word-break:break-word; }
 .native-task-validation-result { border-top:1px solid var(--border); padding-top:10px; margin-top:12px; }
 .native-task-validation-result pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:280px; overflow:auto; font:inherit; }
-#nativeTaskPromptForm label { display:block; margin:16px 0 8px; }
-#nativeTaskPrompt { resize:vertical; min-height:110px; }
 .native-tasks [hidden] { display:none !important; }
-.native-tasks :is(button,input,select,textarea,a,summary):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.native-tasks :is(button,input,select,textarea,a,summary):focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .native-task-sr { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
-.native-task-observation { border:1px solid var(--border); border-radius:8px; padding:12px; margin:12px 0; overflow-wrap:anywhere; }
+.native-task-observation { margin:4px 0 0; overflow-wrap:anywhere; }
 .native-task-observation p { margin:4px 0 8px; }
 #nativeTaskConnection { font-weight:600; }
 #nativeTaskObservedAt, #nativeTaskDraftBytes { font-size:.8rem; }
-.native-task-approval-banner { border:1px solid var(--accent); border-left-width:4px; border-radius:8px; padding:12px; margin:14px 0; overflow-wrap:anywhere; }
+.native-task-approval-banner { border:1px solid var(--wait); border-left-width:4px; border-radius:var(--radius); padding:12px; margin:14px 0; overflow-wrap:anywhere; }
 .native-task-tool-panel { border-bottom:1px solid var(--border); padding-bottom:12px; }
-.native-task-tool-panel h4 { margin:16px 0 8px; }
+.native-task-tool-panel h4 { margin:4px 0 8px; }
 #nativeTaskToolStatus { max-height:300px; overflow:auto; }
 .native-task-tool-status { border-top:1px solid var(--border); padding:10px 0; overflow-wrap:anywhere; }
 .native-task-tool-status small { display:block; margin-top:6px; color:var(--muted); }
@@ -65,10 +102,9 @@
 #nativeTaskApprovals, #nativeTaskRecord { scroll-margin-top:24px; }
 .native-tasks [aria-busy="true"] { cursor:progress; }
 .native-tasks button:disabled { cursor:not-allowed; }
-@media (max-width:1050px) { .native-task-layout { grid-template-columns:minmax(0,1fr); } .native-task-sidebar { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } }
-@media (max-width:560px) { .native-task-sidebar { display:block; } .native-task-fields { display:block; } .native-task-fields label { margin:12px 0; } .native-task-actions > button { width:100%; } .native-task-event { padding:10px; } }
-.native-task-run-row { justify-content:flex-start; margin:4px 0 8px; }
-.native-task-outcome { border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; padding:10px 12px; margin:8px 0 12px; overflow-wrap:anywhere; }
+@media (max-width:560px) { .native-task-fields { display:block; } .native-task-fields label { margin:12px 0; } .native-task-event { padding:10px; } .native-task-event-user { max-width:92%; } .run-head { margin-top:8px; } .run-head h2 { font-size:26px; } .composer { padding:14px; border-radius:18px; } .composer-pickers label { flex:1 1 100%; } .composer-actions > button { min-height:44px; } }
+.native-task-outcome { border:1px solid var(--line); border-left:4px solid var(--ink); border-radius:var(--radius); padding:10px 12px; margin:0; overflow-wrap:anywhere; }
+.native-task-fields input, .native-task-fields select { width:100%; min-width:0; }
 .native-task-outcome.status-bad { border-left-color:currentColor; }
 .native-task-disclosure { margin:10px 0; }
 .native-task-disclosure > summary { cursor:pointer; padding:4px 0; }

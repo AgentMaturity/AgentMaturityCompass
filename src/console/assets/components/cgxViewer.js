@@ -41,18 +41,18 @@ export function renderCgxViewer(container, graph) {
       if (!from || !to) {
         return "";
       }
-      return `<line x1="${from.x.toFixed(1)}" y1="${from.y.toFixed(1)}" x2="${to.x.toFixed(1)}" y2="${to.y.toFixed(1)}" stroke="#6b7280" stroke-opacity="0.45" />`;
+      return `<line x1="${from.x.toFixed(1)}" y1="${from.y.toFixed(1)}" x2="${to.x.toFixed(1)}" y2="${to.y.toFixed(1)}" style="stroke:var(--muted)" stroke-opacity="0.6" />`;
     })
     .join("");
   const nodeSvg = nodes
     .map((node) => {
       const short = node.id.length > 22 ? `${node.id.slice(0, 22)}…` : node.id;
       return `<g>
-        <circle cx="${node.x.toFixed(1)}" cy="${node.y.toFixed(1)}" r="14" fill="#0f172a" stroke="#38bdf8" />
-        <text x="${node.x.toFixed(1)}" y="${(node.y + 4).toFixed(1)}" text-anchor="middle" font-size="8" fill="#e2e8f0">${esc(node.type[0] ?? "?")}</text>
+        <circle cx="${node.x.toFixed(1)}" cy="${node.y.toFixed(1)}" r="14" style="fill:var(--surface);stroke:var(--accent)" />
+        <text x="${node.x.toFixed(1)}" y="${(node.y + 4).toFixed(1)}" text-anchor="middle" font-size="8" style="fill:var(--ink)">${esc(node.type[0] ?? "?")}</text>
         <title>${esc(node.type)} ${esc(node.id)}</title>
       </g>
-      <text x="${(node.x + 18).toFixed(1)}" y="${(node.y + 4).toFixed(1)}" font-size="9" fill="#111827">${esc(short)}</text>`;
+      <text x="${(node.x + 18).toFixed(1)}" y="${(node.y + 4).toFixed(1)}" font-size="9" style="fill:var(--ink)">${esc(short)}</text>`;
     })
     .join("");
   container.innerHTML = `
@@ -60,7 +60,7 @@ export function renderCgxViewer(container, graph) {
       <h3>Context Graph</h3>
       <p class="muted">Nodes: ${graph.nodes.length} | Edges: ${graph.edges.length}</p>
       <svg viewBox="0 0 ${width} ${height}" width="100%" height="440" aria-label="Context graph">
-        <rect x="0" y="0" width="${width}" height="${height}" fill="#f8fafc"></rect>
+        <rect x="0" y="0" width="${width}" height="${height}" style="fill:var(--surface-2)"></rect>
         ${edgeSvg}
         ${nodeSvg}
       </svg>

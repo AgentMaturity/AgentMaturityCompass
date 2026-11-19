@@ -38,16 +38,16 @@ export function renderScoreGauge(params) {
   }
   const value = Number(score);
   const pct = clampPercent(value);
-  const cssClass = value >= 85 ? "status-ok" : value >= 60 ? "status-warn" : "status-bad";
+  // A score is drawn in ink: green or red beside a self-reported number would read as "safe" or "unsafe".
   return `
-    <div class="card ${cssClass}">
+    <div class="card">
       <div class="row wrap">
         <strong>${escapeHtml(label)}</strong>
         <span>${escapeHtml(status)}</span>
       </div>
       <div class="row wrap">
-        <div style="flex:1;min-width:180px;border:1px solid #ddd;border-radius:6px;overflow:hidden;height:16px;background:#f4f4f4;">
-          <div style="height:100%;width:${pct}%;background:${value >= 85 ? "#0a7f2e" : value >= 60 ? "#ad7d00" : "#9b1c1c"};"></div>
+        <div style="flex:1;min-width:180px;border:1px solid var(--line);border-radius:6px;overflow:hidden;height:16px;background:var(--surface-2);">
+          <div style="height:100%;width:${pct}%;background:var(--ink);"></div>
         </div>
         <strong>${value.toFixed(1)}/100</strong>
       </div>

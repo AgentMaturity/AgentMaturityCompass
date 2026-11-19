@@ -22,7 +22,7 @@ export async function renderAssuranceCertPage(params) {
 
   if (!cert) {
     params.root.innerHTML = params.card(
-      "Assurance Certificate",
+      "Assurance certificate",
       "<p class='muted'>No certificate issued yet.</p>"
     );
     return;
