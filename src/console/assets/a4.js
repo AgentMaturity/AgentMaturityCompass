@@ -16,6 +16,23 @@ import { register as registerActivate } from "./a4Activate.js";
 import { API, claimSink, errorText, guarded, listOf, me, notice, one, params, previewOptions, root, send, setClaimSink, setMe, setShowClaims,
   showClaims, showError, storePack, storedPack, tell, uuid } from "./a4Send.js";
 import { bindCreateForm, renderListPage } from "./a4ListPage.js";
+import { syncWaiting } from "./homeView.js";
+import { approvalPeopleHtml } from "./dailyView.js";
+
+// A second request's people, read with the route that writes nothing; the last answer is drawn at once on each render.
+const secondPeople = new Map();
+function showSecondPeople() {
+  const holder = root?.querySelector("[data-a4-second]"), id = holder?.getAttribute("data-a4-second");
+  if (!id) return;
+  if (secondPeople.has(id)) holder.innerHTML = secondPeople.get(id);
+  apiGet(`/approvals/requests/${encodeURIComponent(id)}/view`).then((detail) => {
+    const status = typeof detail?.status === "string" ? detail.status : detail?.status?.status;
+    const html = approvalPeopleHtml({ status, quorum: detail?.quorum }, detail);
+    secondPeople.set(id, html);
+    const now = root?.querySelector(`[data-a4-second="${CSS.escape(id)}"]`);
+    if (now) now.innerHTML = html;
+  }).catch(() => root?.querySelector(`[data-a4-second="${CSS.escape(id)}"] [data-a4-second-fallback]`)?.removeAttribute("hidden"));
+}
 
 const page = document.body.dataset.page;
 const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
@@ -48,21 +65,49 @@ async function showHomeEntry() {
     if (!card || (projects.length === 0 && !canCreate(who, options))) return;
     const catalog = projects.length === 0 ? listOf(await apiGet("/industry-packs/list").catch(() => null), "packs") : [];
     const waiting = await approvalWaiting(projects, who, apiNativeRequest, API);
-    // Activate's Next line reads who acts on the release request from that project's readiness.
+    // The route and the Next line read the project's state from its head-stage readiness (a4Journey projectState): a hold,
+    // the release this Studio cannot make, who acts on a release request, and whether one person approves alone.
     const latest = waiting ? null : start.latestProject(projects);
-    const latestReadiness = latest?.stage === "activate"
+    const latestReadiness = latest
       ? await apiNativeRequest(`${API}/projects/${encodeURIComponent(latest.projectId)}/readiness`).then((reply) => reply?.readiness ?? reply, () => null) : null;
-    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null), start: options.workspace?.start ?? null, latestReadiness });
-    card.hidden = false;
+    card.innerHTML = start.homeCardHtml({ projects, waiting, industryHtml: packs.packSelectHtml(catalog, null, { fold: true }), start: options.workspace?.start ?? null, latestReadiness });
     bindCreateForm(card.querySelector("#a4HomeForm"));
+    placeHomeCard(card, { waiting: Boolean(waiting), empty: projects.length === 0 });
   } catch {
     // Signed out, unreachable or refused: the card stays absent, which is the preview gate's closed state.
   }
 }
 
+/**
+ * Where Home's A4 card goes: an approval that waits joins "Waiting for you"; with no project yet the start form stays
+ * folded behind the "Build an agent" tile, which opens it in place; otherwise it shows the project's route.
+ */
+function placeHomeCard(card, { waiting, empty }) {
+  const list = document.getElementById("homeWaitingList");
+  if (waiting && list) {
+    card.classList.remove("card");
+    list.insertBefore(card, list.firstChild);
+    card.hidden = false;
+    syncWaiting(document);
+    return;
+  }
+  card.hidden = empty;
+  if (!empty || document.body.dataset.buildTileBound === "1") return;
+  document.body.dataset.buildTileBound = "1";
+  // app.js redraws the tiles, so the click is caught on the document rather than on the tile itself.
+  document.addEventListener("click", (event) => {
+    const tile = event.target?.closest?.("#homeBuildTile");
+    if (!tile || !card.isConnected || !card.querySelector("#a4HomeForm")) return;
+    event.preventDefault();
+    card.hidden = false;
+    card.scrollIntoView({ block: "start", behavior: "smooth" });
+    card.querySelector("#a4HomeForm select, #a4HomeForm input")?.focus({ preventScroll: true });
+  });
+}
+
 function mountProject(projectId, options) {
   const projectPath = (sub) => `${API}/projects/${encodeURIComponent(projectId)}${sub}`;
-  const state = { project: null, readiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
+  const state = { project: null, readiness: null, headReadiness: null, gates: [], revision: null, stageRevision: null, comments: [], members: null, diff: null, refs: [], options };
   let stage = null, activeCard = params.get("card") || "specification", cursor = 0, timer = null;
   const invited = []; // what each Add a person answered on this page (first passwords included), never stored
   let loading = null, loadAgain = false;
@@ -187,7 +232,7 @@ function mountProject(projectId, options) {
     // under the next one. The header says when the project is at another stage (movedNote).
     const viewStage = stage ?? (view.STAGES.includes(params.get("stage")) ? params.get("stage")
       : view.STAGES.includes(project.stage) ? project.stage : "activate");
-    const [readiness, gates, revision, comments, members, diff, revisions, refs] = await Promise.all([
+    const [readiness, gates, revision, comments, members, diff, revisions, refs, headReadiness] = await Promise.all([
       apiNativeRequest(projectPath(`/readiness?stage=${viewStage}`)).then((data) => one(data, "readiness")),
       apiNativeRequest(projectPath("/gates")).then((data) => listOf(data, "gates")),
       // The resolved view (P2-42): Adapt's derived parts put back and checked by Studio; the stored form binds them by sha256.
@@ -198,7 +243,10 @@ function mountProject(projectId, options) {
         ? apiNativeRequest(projectPath(`/revisions/diff?from=${project.revisionNo - 1}&to=${project.revisionNo}`)).catch((error) => ({ error: errorText(error) }))
         : null,
       apiNativeRequest(projectPath("/revisions")).then((data) => listOf(data, "revisions")),
-      apiNativeRequest(projectPath(`/evidence?revision=${project.revisionNo}`)).then((data) => listOf(data, "refs"))
+      apiNativeRequest(projectPath(`/evidence?revision=${project.revisionNo}`)).then((data) => listOf(data, "refs")),
+      // Viewing another stage, the route draws the project's own stage from that stage's readiness (a hold, a release
+      // this Studio cannot make), as Home and the Build page do; a failed read only leaves that waypoint less precise.
+      viewStage === project.stage ? null : apiNativeRequest(projectPath("/readiness")).then((data) => one(data, "readiness"), () => null)
     ]);
     // A revision past the head read above landed between the reads; the next load shows it.
     const atStage = revisions.filter((row) => row.stage === viewStage && Number.isSafeInteger(row.revisionNo) && row.revisionNo <= project.revisionNo)
@@ -208,7 +256,7 @@ function mountProject(projectId, options) {
       : one(await apiNativeRequest(projectPath(`/revisions/${stageNo}/resolved`)), "revision");
     // Whether Studio's recorded understanding was made for the answers shown: after a reload Confirm binds the head shown then.
     const understandingCurrent = await start.understandingIsCurrent(stageRevision?.spec).catch(() => false);
-    return { project, readiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage, understandingCurrent };
+    return { project, readiness, headReadiness, gates, revision, stageRevision, comments, members, diff, refs, stage: viewStage, understandingCurrent };
   }
 
   function render() {
@@ -226,11 +274,12 @@ function mountProject(projectId, options) {
       questions: listOf(state.options?.questions?.[stage], "questions").map((question) => ({ ...question, example: start.placeholderOf(stage, question.id),
         ...(stage === "adapt" && Array.isArray(state.options?.catalogTerms?.[question.id]) ? { terms: state.options.catalogTerms[question.id] } : {}) })),
       answers: shownAnswers(), understandingCurrent: state.understandingCurrent, exampleOffered: start.FILLABLE.has(stage) && stage === state.project.stage };
-    root.innerHTML = `${view.holdBanner(project)}${view.practiceBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${view.stageBanner(stage)}${conflict ? view.renderConflict(conflict) : ""}
-      <section class="card"><h3 class="a4-project-name">${view.esc(project.name)}</h3><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
+    // The panel carries the project's name, notices and route; who the project is, its version and its stage links
+    // sit one click away under "About this project", with the eight steps in a list.
+    root.innerHTML = `${view.holdBanner(project)}${start.renderStartHere(ctx)}${startPack && stage === "aspire" ? packs.packPanelHtml(startPack, state.project.revisionNo === packFilledAt ? packFilled ?? 0 : 0) : ""}${conflict ? view.renderConflict(conflict) : ""}
+      <details class="card more-info a4-about" data-a4-open="about"><summary>About this project</summary><div class="more-info-body"><p class="muted">Agent <code>${view.esc(project.agentId)}</code> ·
         <span title="revision ${view.esc(project.revisionNo)}, head ${view.esc(project.headSeq)}">version ${view.esc(project.revisionNo)}</span></p>${view.stageLinks(project, stage)}${view.movedNote(project, stage)}
-        <p class="muted">${view.esc(readiness.claimBoundary)}</p></section>
-      <details class="card" data-a4-open="steps"><summary>The eight steps of a stage</summary><div id="a4Steps"></div></details>
+        <p class="muted">${view.esc(readiness.claimBoundary)}</p><h4>The eight steps of a stage</h4><div id="a4Steps"></div></div></details>
       <div class="a4-cards">${stageCards(stage).map((card) => view.renderCard(card, ctx, state.comments)).join("")}</div>
       <section class="card"><h4>What changed since the last version</h4>${state.diff?.error ? `<p class="status-bad">${view.esc(state.diff.error)}</p>`
         : view.renderDifferences(state.diff, project)}</section>
@@ -238,6 +287,7 @@ function mountProject(projectId, options) {
       ${view.renderLanes(readiness, state.refs, project.revisionNo)}${view.renderApprovalsBar(ctx)}${view.renderMembers(ctx)}
       <section class="card"><h4>Here now</h4><div id="a4Presence"></div></section>`;
     renderHandholdingSteps(root.querySelector("#a4Steps"), view.stepRows(project, stage));
+    showSecondPeople();
     renderPresenceChips();
     foldAway();
     for (const details of root.querySelectorAll("details[data-a4-open]")) {
@@ -260,19 +310,21 @@ function mountProject(projectId, options) {
     const sections = [...root.querySelectorAll(":scope > .a4-cards > .a4-card, :scope > .a4-cards ~ :is(section, details, .a4-lanes)")];
     // A step that needs a second section too (acknowledging an item listed under Missing requirements) names it in data-a4-also.
     const also = go?.dataset.a4Also ?? null;
-    // Never folded (A4-08): the members, the answers while the step asks for them, the specification while it is under
-    // review, and the build card (its Native Tasks link) from Build to Review.
-    const step = state.project.stage === stage ? state.project.step : null;
-    const keep = [".a4-members", ...(step === "asked" ? ['[data-card="conversation"]'] : []),
-      ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]'] : []),
+    // Kept in sight (A4-08): the answers while the step asks for them, the specification and the Approvals card while an
+    // approval is under way, and the build card (its Run a task link) from Build to Review. The panel's own target is
+    // kept wherever it is; Members and the rest fold, and the panel's go-to opens a fold when it points into one.
+    // A stopped step (the release this Studio cannot make, a hold) has nothing to fill in: every section folds.
+    const step = state.project.stage === stage && !root.querySelector('.a4-step-panel[data-state="stop"]') ? state.project.step : null;
+    // A move that sends a person to a card without a button there (the Members card) names it in data-a4-keep.
+    const keep = [...(root.querySelector(".a4-start .a4-now")?.dataset.a4Keep ? [root.querySelector(".a4-start .a4-now").dataset.a4Keep] : []), ...(step === "asked" ? ['[data-card="conversation"]'] : []),
+      ...(["proposed", "reviewed"].includes(step) ? ['[data-card="specification"]', ".a4-approvals"] : []),
       ...(["direction_approved", "built"].includes(step) ? ['[data-card="build"]'] : [])].join(", ");
-    const rest = sections.filter((section) => !section.contains(target) && !section.matches(".a4-approvals") && !section.matches(keep)
-      && !(also && section.matches(also)));
+    const rest = sections.filter((section) => !section.contains(target) && !(keep && section.matches(keep)) && !(also && section.matches(also)));
     if (rest.length === 0) return;
     const more = document.createElement("details");
-    more.className = "card a4-more";
     more.dataset.a4Open = "more";
-    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections: later steps, records and requirements)</summary>
+    more.className = "card more-info a4-more";
+    more.innerHTML = `<summary>Everything else in this stage (${rest.length} sections)</summary>
       <p class="muted">Nothing here is needed for the step above. It is all still recorded and readable.</p>`;
     root.append(more);
     more.append(...rest);
@@ -575,6 +627,8 @@ function mountProject(projectId, options) {
     for (const field of root.querySelectorAll("form[data-a4-answers] textarea[name]")) {
       if (field.value.trim() || typeof values[field.name] !== "string" || !values[field.name]) continue;
       field.value = values[field.name];
+      // A filled field is never left inside a closed fold (optional questions): the person sees every sample before saving.
+      for (let fold = field.closest("details"); fold; fold = fold.parentElement?.closest("details")) fold.open = true;
       field.dispatchEvent(new Event("input", { bubbles: true }));
       filled += 1;
     }
@@ -718,6 +772,8 @@ async function main() {
   // stays off the strip rather than being shown with a result word the page would have to supply.
   let deliver = null;
   const strip = installClaimStrip(page, (listener) => { deliver = listener; });
+  // On a project page the route and the step come first; the claims strip follows the page (the panel carries its chip).
+  if (page === "a4Project") root.after(document.getElementById("claimStrip") ?? document.createComment(""));
   onClaims((claims) => claimSink?.push(...claims.filter((claim) => typeof claim?.claimLabel === "string")));
   setShowClaims((claims) => {
     strip?.reset();

@@ -211,6 +211,7 @@ The inbox refreshes on privacy-safe approval SSE events. It starts in pending mo
 
 - `GET /approvals/requests?agentId=<id>&query=<requestId-fragment>&status=<status>&actionClass=<class>&riskTier=<tier>&effectiveMode=<mode>&createdAfter=<timestamp>&createdBefore=<timestamp>&order=<newest|oldest>&limit=<1-200>`
 - `GET /approvals/requests/:id`
+- `GET /approvals/requests/:id/view` (the same read without observing the expiry, so it writes nothing; the console's list uses it)
 - `POST /approvals/requests/:id/decide`
 - `POST /approvals/requests/:id/cancel`
 - `GET /agent/approvals/:id/status` for lease-scoped agent polling

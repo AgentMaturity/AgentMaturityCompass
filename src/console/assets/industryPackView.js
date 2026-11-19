@@ -1,6 +1,7 @@
 // An Industry Pack as the console shows it: what `amc domain pack describe` prints, every question with its full text
 // and level descriptions, the command that runs the pack, and a questionnaire Studio scores with the CLI's function.
 // Pack answers are self-reported.
+import { moreInfo, noticeChip } from "./pageKit.js";
 
 // Mirrors QUESTIONNAIRE_NOTICE in src/domains/questionnaireLabel.ts; tests/industryPackView.test.ts keeps them equal.
 export const QUESTIONNAIRE_NOTICE = "AI-drafted; not reviewed by a qualified expert; not legal advice.";
@@ -17,8 +18,9 @@ function levelText(q, level) {
 
 function questionDetailHtml(pack, q) {
   const risk = Number.isInteger(q.keyRisk) ? (pack.keyRisks ?? [])[q.keyRisk] : undefined;
-  return (q.failureMode ? `<br /><span class="muted">Prevents: ${esc(q.failureMode)}</span>` : "")
-    + (risk ? `<br /><span class="muted">Key risk ${q.keyRisk + 1}: ${esc(risk)}</span>` : "");
+  const words = (q.failureMode ? `<p class="muted">Prevents: ${esc(q.failureMode)}</p>` : "")
+    + (risk ? `<p class="muted">Key risk ${q.keyRisk + 1}: ${esc(risk)}</p>` : "");
+  return words ? `<details class="more-info q-why"><summary>Why it matters</summary><div class="more-info-body">${words}</div></details>` : "";
 }
 
 /**
@@ -35,23 +37,22 @@ export function industryPackDetailHtml(pack, saved = null) {
       <h3 id="industryPackHeading" tabindex="-1">${esc(pack.name)}</h3>
       <button type="button" class="secondary" id="industryPackClose">Close</button>
     </div>
-    <p class="muted">${esc(pack.id)} · station ${esc(pack.stationId)} · risk ${esc(pack.riskTier)} · ${questions.length} questions</p>
-    <p><strong>Content:</strong> ${esc(pack.contentStatus ?? "experimental")}, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}</p>
-    ${pack.description ? `<p>${esc(pack.description)}</p>` : ""}
-    <p><a class="button secondary" href="./a4?new=1&amp;pack=${encodeURIComponent(pack.id)}">Build an agent with this pack</a>
-      <span class="muted">Starts an agent project (A4 Forge preview) with this pack's sector, risk level and rules suggested. If the preview is off, that page says how to turn it on.</span></p>
-    <h4>Regulatory basis</h4>
-    <ul>${(pack.regulatoryBasis ?? []).map((basis) => `<li>${esc(basis)}</li>`).join("")}</ul>
-    ${(pack.keyRisks ?? []).length ? `<h4>Key risks</h4><ol>${pack.keyRisks.map((risk) => `<li>${esc(risk)}</li>`).join("")}</ol>` : ""}
-    <h4>Run it</h4>
-    <p>Answer the questions below and choose Score, or run <code>amc domain pack run --pack ${esc(pack.id)}</code>.
+    <p class="muted">${esc(pack.id)}, station ${esc(pack.stationId)}, risk ${esc(pack.riskTier)}, ${questions.length} questions</p>
+    <div class="chip-row">${noticeChip("AI-drafted, not legal advice", `Content: ${pack.contentStatus ?? "experimental"}, self-reported questionnaire. ${QUESTIONNAIRE_NOTICE}`)}</div>
+    <p class="row wrap"><a class="button secondary" href="./a4?new=1&amp;pack=${encodeURIComponent(pack.id)}">Build an agent with this pack</a></p>
+    ${moreInfo("About this pack", `${pack.description ? `<p>${esc(pack.description)}</p>` : ""}
+      <p class="muted">Build an agent with this pack starts an agent project (A4 Forge preview) with this pack's sector, risk level and rules suggested. If the preview is off, that page says how to turn it on.</p>
+      <h4>Regulatory basis</h4>
+      <ul>${(pack.regulatoryBasis ?? []).map((basis) => `<li>${esc(basis)}</li>`).join("")}</ul>
+      ${(pack.keyRisks ?? []).length ? `<h4>Key risks</h4><ol>${pack.keyRisks.map((risk) => `<li>${esc(risk)}</li>`).join("")}</ol>` : ""}`)}
+    ${moreInfo("How scoring works", `<p>Answer the questions below and choose Score, or run <code>amc domain pack run --pack ${esc(pack.id)}</code>.
       Unanswered questions are not evaluated. When you are signed in, your last scored answers are kept in this workspace,
-      so they are here when you come back${saved && Object.keys(saved).length ? " (they are filled in below)" : ""}.</p>
+      so they are here when you come back${saved && Object.keys(saved).length ? " (they are filled in below)" : ""}.</p>`)}
     <form id="industryPackForm" data-pack="${esc(pack.id)}">
       <ol class="pack-questions">${questions.map((q, i) => `
-        <li><fieldset><legend><strong>${esc(q.id)}</strong> · ${esc(q.dimension)}<br />${esc(q.text)}${questionDetailHtml(pack, q)}</legend>${levels(q, i)}</fieldset></li>`).join("")}
+        <li><fieldset><legend><span class="q-meta">${esc(q.id)} ${esc(q.dimension)}</span>${esc(q.text)}</legend>${questionDetailHtml(pack, q)}${levels(q, i)}</fieldset></li>`).join("")}
       </ol>
-      <div class="row wrap"><button type="submit">Score</button><button type="reset" class="secondary">Clear answers</button></div>
+      <div class="row wrap pack-submit"><button type="submit">Score</button><button type="reset" class="secondary">Clear answers</button></div>
     </form>
     <div id="industryPackResult" role="status" aria-live="polite"></div>`;
 }

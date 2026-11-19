@@ -27,6 +27,8 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
       await ui.open(f.identities.owner);
       await page.locator("#nativeTaskProvider").selectOption("stub");
       await page.locator("#nativeTaskTools").selectOption("workspace");
+      await page.locator("#nativeTaskSettingsMore > summary").click();
+      await page.locator("#nativeTaskValidationMore > summary").click();
       await page.locator('[data-native-validation-id="public"]').check();
       await page.locator("#nativeTaskPrompt").fill(`Automated public ${mode} validation task.`);
       const response = page.waitForResponse(r => r.request().method() === "POST" && new URL(r.url()).pathname === "/api/v1/native-tasks");
@@ -42,6 +44,8 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
       assert.equal(f.operator.effect(), mode === "success" || mode === "nonzero" ? "validation-outcome" : null);
       await expect(page.locator("#nativeTaskRefresh")).toBeEnabled(); await page.locator("#nativeTaskRefresh").click();
       await expect(page.locator("#nativeTaskValidation")).toContainText(mode === "success" ? "Selected checks passed" : mode === "nonzero" ? "Selected checks failed" : "Validation unavailable");
+      // Checks sit under a closed "Checks" section since the studio-ui redesign.
+      await page.evaluate(() => { document.getElementById("nativeTaskChecksMore").open = true; });
       await page.locator("#nativeTaskValidation summary").first().click();
       await expect(page.locator("#nativeTaskValidation")).toContainText(mode === "budget" ? "daily tool budget exhausted" : mode === "denied" ? "not approved" : "validation-outcome");
       const history = f.history(task.sessionId);
@@ -121,6 +125,7 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
     await ui.control("release"); await f.restart(); await page.reload();
     await expect(page.locator("#nativeTaskIdentity")).toContainText("jsonl");
     await expect(page.locator("#nativeTaskResume")).toBeEnabled();
+    await page.evaluate(() => { document.getElementById("nativeTaskDetailsMore").open = true; });
     await expect(page.locator('[data-native-recovery-state="ready"]')).toBeVisible();
     const before = f.jsonlBytes();
     const resumed = await ui.control("resume");

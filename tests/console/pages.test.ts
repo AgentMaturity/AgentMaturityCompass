@@ -66,6 +66,6 @@ describe("service worker precache", () => {
   });
 
   test("the cache name moved past v12, so upgraded consoles drop the old entries", () => {
-    expect(worker).toMatch(/const CACHE_NAME = "amc-console-v1[3-9]";/);
+    expect(worker).toMatch(/const CACHE_NAME = "amc-console-v(?:1[3-9]|[2-9]\d)";/);
   });
 });

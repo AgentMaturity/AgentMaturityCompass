@@ -1148,6 +1148,15 @@ describe("AMC-1471 privacy-safe approval delivery", () => {
       const studio = await startStudioApiServer({ workspace, host: "127.0.0.1", port, token });
       try {
         const url = `${studio.url}/approvals/requests/${encodeURIComponent(created.approvalRequestId)}`;
+        // The console's list reads `/view`: the same detail, and it writes nothing (no EXPIRED, no delivery).
+        const storedBefore = readFileSync(requestPath, "utf8");
+        const viewed = await getJson(`${url}/view`, token);
+        expect(viewed.status).toBe(200);
+        expect(JSON.parse(viewed.body)).not.toHaveProperty("approvalDelivery");
+        expect(JSON.parse(viewed.body)).not.toHaveProperty("call"); // a list never receives what to approve
+        expect(JSON.parse(viewed.body).request.approvalRequestId).toBe(created.approvalRequestId);
+        expect(readFileSync(requestPath, "utf8")).toBe(storedBefore);
+        expect(events).toEqual([]);
         const first = await getJson(url, token);
         expect(first.status).toBe(200);
         expect(JSON.parse(first.body)).toEqual(expect.objectContaining({

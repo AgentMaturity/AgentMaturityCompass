@@ -46,7 +46,8 @@ describe("welcome guide steps", () => {
   test("no certification wording, no hard-coded counts, no inline handlers", () => {
     const copy = allCopy();
     expect(copy).not.toMatch(/certified|compliant|guarantee|proves your agent is safe/i);
-    expect(copy.replaceAll("&#39;", "\'")).not.toMatch(/\b\d{2,}\b/);
+    // Counts are words a person reads; a drawing's coordinates (the guide's spot picture) are not copy.
+    expect(copy.replace(/<svg[\s\S]*?<\/svg>/g, "").replaceAll("&#39;", "\'")).not.toMatch(/\b\d{2,}\b/);
     expect(copy).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
   });
 });
@@ -97,9 +98,9 @@ describe("Home wiring", () => {
   const app = readFileSync("src/console/assets/app.js", "utf8");
   const home = app.slice(app.indexOf("async function renderHome()"), app.indexOf("\n}\n", app.indexOf("async function renderHome()")));
 
-  test("hero card first, progress next, developer material collapsed at the end", () => {
-    expect(home.indexOf("${firstUseCard(agentId, demoMode)}")).toBeGreaterThan(-1);
-    expect(home.indexOf("${firstUseCard(agentId, demoMode)}")).toBeLessThan(home.indexOf('card("Activation path"'));
+  // studio-ui redesign: the first steps' route comes first, the old hero card waits under "Other ways in".
+  test("first steps first, the other ways in next, developer material collapsed at the end", () => {
+    expect(home.indexOf('moreInfo("Other ways in", firstUseCard(agentId, demoMode))')).toBeGreaterThan(home.indexOf('card("Activation path"'));
     for (const block of ["studio-hero", "studio-desktop-note", "renderApiQuickstart("]) {
       const at = home.indexOf(block);
       expect(home.lastIndexOf('<details class="advanced-section">', at), block).toBeGreaterThan(home.indexOf('card("Activation path"'));
@@ -108,7 +109,7 @@ describe("Home wiring", () => {
   });
 
   test("the top bar opens the guide and the service worker precaches it", () => {
-    expect(readFileSync("src/console/assets/shell.js", "utf8")).toContain('id="guideOpenLink" href="./home?guide=1">How AMC works</a>');
+    expect(readFileSync("src/console/assets/shell.js", "utf8")).toContain('id="guideOpenLink" href="./home?guide=1" title="How AMC works">${icon("help")}<span class="visually-hidden">How AMC works</span></a>');
     expect(readFileSync("src/console/assets/sw.js", "utf8")).toContain('assetPath("assets/welcomeGuide.js")');
   });
 

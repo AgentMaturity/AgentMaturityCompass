@@ -122,6 +122,8 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       await page.locator("#nativeTaskProvider").focus(); await page.keyboard.press("Tab");
       assert.equal(await page.locator("#nativeTaskModel").evaluate(node => node === document.activeElement), true);
       await page.goto(ui.url("home"));
+      // Home keeps these ways in folded under "Other ways in" (studio-ui redesign).
+      await page.locator("summary", { hasText: "Other ways in" }).click();
       await page.locator("#firstUseConnectButton").click();
       await expect(page.locator("#nativeGuideCommand")).toContainText(`--agent='${fixture.agentId}'`);
       await page.locator("#copyNativeGuide").click();
@@ -285,9 +287,11 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       const popupPromise=page.waitForEvent("popup"); await link.click(); const popup=await popupPromise;
       try {
         await expect(popup.locator("#apprRows")).toContainText(approval.approvalRequestId);
-        popup.once("dialog", dialog=>dialog.accept("Browser acceptance denies the actual synthetic tool request."));
+        // Deny asks for its reason inline (no browser dialog); the decided card says "Turned down" and its fold "Denied".
         await popup.locator(`[data-deny="${approval.approvalRequestId}"]`).click();
-        await expect(popup.locator("#apprRows")).toContainText("DENIED");
+        await popup.locator("#apprRows .ask-inline input").fill("Browser acceptance denies the actual synthetic tool request.");
+        await popup.locator("#apprRows .ask-inline button[type=submit]").click();
+        await expect(popup.locator("#apprRows")).toContainText("Turned down");
       } finally { await popup.close(); }
       const after=await ui.ready(); await expect(page.locator("#nativeTaskTranscript")).toContainText(/denied|failed/i);
       await ui.control("release"); await ui.newTask();
@@ -329,6 +333,8 @@ export async function runNativeStudioScenarios({ browser, expect, fixture, crede
       await expect(page.locator("#nativeTaskSubmit")).toBeDisabled();
       const item = page.locator(`[data-native-task-id="${ready.taskId}"]`);
       await expect(item).toHaveCount(0);
+      // The task list sits under "Your tasks" (closed by default since the studio-ui redesign).
+      await page.locator("#nativeTaskHistory > summary").click();
       await page.locator("#nativeTaskIncludeArchived").check();
       await expect(item).toHaveCount(1); await expect(item).toContainText("Archived");
       await ui.newTask(); await item.click();

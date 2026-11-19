@@ -80,6 +80,7 @@
     "gen-website-packs": "tsx scripts/gen-website-packs.mts",
     "check:website-packs": "tsx scripts/gen-website-packs.mts --check",
     "capture:site-shots": "node scripts/brand/capture-site-shots.mjs",
+    "console:sweep": "node scripts/console-visual-sweep.mjs",
     "gen:judge-calibration": "tsx scripts/gen-judge-calibration.mts",
     "check:judge-calibration": "tsx scripts/gen-judge-calibration.mts --check",
     "check:regulatory-calendar": "node scripts/gen-regulatory-calendar.mjs --check",

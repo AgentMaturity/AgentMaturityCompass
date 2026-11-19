@@ -130,14 +130,16 @@ describe("menu session link", () => {
     const { link, doc } = nav();
     let signedOut = false;
     renderNavSession(doc, { userId: "u1", username: "<b>ann</b>" }, () => { signedOut = true; });
-    expect(link.innerHTML).toBe('Sign out<small class="nav-desc">Signed in as &lt;b&gt;ann&lt;/b&gt;</small>');
+    // The person at the foot of the rail: an initial in a circle, Sign out, and who is signed in (studio-ui lane).
+    expect(link.innerHTML).toBe('<span class="nav-avatar" aria-hidden="true">&lt;</span><span class="nav-label">Sign out</span><small class="nav-desc">Signed in as &lt;b&gt;ann&lt;/b&gt;</small>');
     (link.onclick as (event: { preventDefault(): void }) => void)({ preventDefault() {} });
     expect(signedOut).toBe(true);
     renderNavSession(doc, null);
-    expect(link.innerHTML).toBe("Sign in");
+    expect(link.innerHTML).toMatch(/^<svg [^>]*aria-hidden="true"[^>]*>.*<\/svg><span class="nav-label">Sign in<\/span>$/);
     expect(link.onclick).toBeNull();
     renderNavSession(doc, { userId: "local-demo", username: "demo" });
-    expect(link.innerHTML).toBe("Sign in");
+    expect(link.innerHTML).toContain('<span class="nav-label">Sign in</span>');
+    expect(link.innerHTML).not.toContain("Sign out");
   });
 });
 

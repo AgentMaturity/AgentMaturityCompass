@@ -61,7 +61,7 @@ export async function renderCompassPage(params) {
     .join("");
 
   params.root.innerHTML = `
-    ${params.card("Compass Summary", `
+    ${params.card("Compass", `
       <div class="grid">
         ${cardRow("Agent", agentId)}
         ${cardRow("Maturity", typeof maturityShort === "number" ? maturityShort.toFixed(2) : "n/a")}

@@ -71,7 +71,7 @@ export async function renderNorthstarPage(params) {
   params.root.innerHTML = [
     ...warningLines,
     params.card(
-      "Northstar Prompt Status",
+      "Northstar prompts",
       `
       <div class="row wrap">
         ${renderPromptStatusChip("Policy Signature", sigValid ? "PASS" : "FAIL")}

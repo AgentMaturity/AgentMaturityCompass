@@ -66,8 +66,7 @@ export async function renderForecastScopePage(params) {
   );
   renderChartMini(
     document.getElementById("forecastIntegrityMini"),
-    latest?.series?.integrityIndex?.points?.map((p) => p.value) || [],
-    "#2563eb"
+    latest?.series?.integrityIndex?.points?.map((p) => p.value) || []
   );
   renderIndicatorList(document.getElementById("forecastIndicators"), latest.leadingIndicators || []);
   renderEtaCard(document.getElementById("forecastEta"), latest.etaToTarget);

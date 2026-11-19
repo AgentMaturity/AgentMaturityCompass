@@ -17,7 +17,7 @@ Activation (`POST /api/v1/operator/plans/activate`, OWNER, vault unlocked) takes
 
 A plan an A4 project signed is normally activated from that project's effect gate (`a4.adapt.activate_plan`), which journals the effect. Activating it here consumes the same review, so the A4 effect then reports `GRANT_ALREADY_USED`.
 
-## Blocker inbox
+## Operator inbox
 
 `operator-inbox` (`GET /api/v1/operator/inbox`) lists what blocks a regulated claim, in A4's `BlockerKind` vocabulary:
 
