@@ -1,3 +1,4 @@
+import { plainCodeHtml } from "../../src/console/assets/plainError.js";
 /**
  * The console's first screen. A first-time user met a modal guide that opened by itself, a nine-field jargon strip,
  * three identical primary buttons and static "Authentication required." text. Home is now: one plain status line, one
@@ -120,14 +121,14 @@ describe("status strip and session line", () => {
 
   test("a run whose seal fails never shows the file's own trust label, integrity or claim state", () => {
     const context = vm.createContext({ htmlEscape: (text: string) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;"),
-      formatTime: String, shortId: String });
+      formatTime: String, shortId: String, plainCodeHtml });
     const src = app.slice(app.indexOf("const UNTRUSTED_SEAL_LABEL"), app.indexOf("// Studio has no work-order read route"));
     vm.runInContext(src.replace("const UNTRUSTED_SEAL_LABEL", "var UNTRUSTED_SEAL_LABEL"), context);
     const tampered = { runId: "r1", status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
     const summary = (context.runStateSummary as (a: string, r: unknown) => string)("a", tampered);
     expect(summary).toContain("UNTRUSTED (seal check fails)");
     expect(summary).not.toContain("HIGH TRUST");
-    expect(summary).toContain("status <strong>INVALID</strong>");
+    expect(summary).toContain('status <strong><span class="code-word" title="Code: INVALID">Does not check out</span></strong>');
     expect(summary).not.toContain("ELIGIBLE");
     expect((context.runStateWarning as (r: unknown) => string)(tampered)).toContain("does not pass its seal check");
     expect((context.runStateWarning as (r: unknown) => string)({ ...tampered, sealVerified: true })).toBe("");

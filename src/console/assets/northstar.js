@@ -48,7 +48,7 @@ export async function renderNorthstarPage(params) {
     warningLines.push("<div class='card status-bad'><strong>PROMPT LINT FAILED</strong></div>");
   }
   if (String(enforcement).toUpperCase() === "OFF") {
-    warningLines.push("<div class='card status-bad'><strong>ENFORCEMENT DISABLED</strong></div>");
+    warningLines.push("<div class='card status-bad'><strong>Enforcement is off</strong></div>");
   }
 
   const tableRows = agents
@@ -80,7 +80,7 @@ export async function renderNorthstarPage(params) {
       </div>
       <p class="muted">A prompt pack is the signed set of instructions AMC adds to your agent's model calls, built from what AMC knows about the agent.</p>
       <div class="row">
-        <button id="promptBuildNow">Build Pack For ${escapeHtml(agentId)}</button>
+        <button id="promptBuildNow">Build pack for ${escapeHtml(agentId)}</button>
       </div>
       <div class="scroll"><table>
         <thead>

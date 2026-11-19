@@ -98,9 +98,9 @@ export async function renderAssurancePage(params) {
         <div><div class="muted">Cert status</div><div class="tile-value">${escapeHtml(certSummary?.status || "MISSING")}</div></div>
       </div>
       <div class="row wrap">
-        <button id="assuranceRunNow" data-roles="OWNER,OPERATOR">Run Assurance Now</button>
-        <button id="assuranceIssueCert" class="secondary" data-roles="OWNER,OPERATOR">Issue Certificate</button>
-        <button id="assuranceRequestWaiver" class="secondary" data-roles="OWNER">Request Waiver</button>
+        <button id="assuranceRunNow" data-roles="OWNER,OPERATOR">Run assurance now</button>
+        <button id="assuranceIssueCert" class="secondary" data-roles="OWNER,OPERATOR">Issue certificate</button>
+        <button id="assuranceRequestWaiver" class="secondary" data-roles="OWNER">Request waiver</button>
       </div>
       <div class="row wrap">
         <a href="./assuranceRun${latestRun ? `?runId=${encodeURIComponent(latestRun.runId)}` : ""}">Open Run Detail</a>
