@@ -299,6 +299,8 @@ test("a page read of a released task whose evidence does not authenticate return
     const refused = service.poll(actor, taskId, { limit: 64 });
     expect(refused).toMatchObject({ events: [], truncated: true, task: { state: "released", history: { status: "unavailable" } } });
     expect(refused.task.history.message).toContain("could not be authenticated");
+    // Review 2026-11-19: only a first read (no cursor) takes that answer; a malformed cursor is still refused as one.
+    expect(() => service.poll(actor, taskId, { cursor: "not-a-cursor", limit: 64 })).toThrow(expect.objectContaining({ code: "NATIVE_CURSOR_INVALID", statusCode: 400 }));
     spy.mockRestore();
     await new Promise(done => setTimeout(done, 300)); // the service re-reads evidence at most every 250 ms
     const restored = service.poll(actor, taskId, { limit: 64 });

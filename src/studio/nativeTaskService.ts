@@ -190,7 +190,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     descriptors.lock(() => {
       const current = descriptors.read(entry.descriptor.taskId);
       if (!current || current.revision !== entry.descriptor.revision || current.sessionId !== entry.descriptor.sessionId) throw new NativeTaskServiceError("TASK_CHANGED", 409, "Native task descriptor changed during execution.");
-      entry.descriptor = { ...current, ...patch, updatedAt: Date.now() }; descriptors.write(entry.descriptor);
+      const { lastFailure, ...next } = { ...current, ...patch, updatedAt: Date.now() }; // `lastFailure: undefined` drops it
+      entry.descriptor = lastFailure === undefined ? next : { ...next, lastFailure }; descriptors.write(entry.descriptor);
     });
   }
   /** P1-67: revoke a lease once. Throws when the signed revocation store cannot be verified or written, or no key signs it. */
@@ -498,8 +499,9 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         entry.state = "failed";
         const failure = nativeTurnFailure(error, revision);
         entry.error = failure ? turnFailureWords(failure) : error instanceof NativeTaskServiceError ? error.message : nativeTurnFailureWords(error);
-        // Kept on the descriptor so a restarted Studio says the same; if the task changed meanwhile, the words stay in memory only.
-        if (failure) try { persist(entry, { lastFailure: failure }); } catch { /* TASK_CHANGED: a newer revision owns the descriptor */ }
+        // Kept on the descriptor so a restarted Studio says the same; if the task changed meanwhile (TASK_CHANGED), in memory only.
+        if (failure) try { persist(entry, { lastFailure: failure }); } catch (kept) {
+          if (!(kept instanceof NativeTaskServiceError && kept.code === "NATIVE_TASK_CHANGED")) entry.error += " These words could not be kept for after a Studio restart."; }
       }
       finally { entry.turn = undefined; entry.touchedAt = Date.now(); entry.work = undefined; entry.projectionAt = 0; }
     })();
@@ -573,7 +575,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         if (!sessionId) return { task, events: [], truncated: false };
         // Evidence that did not authenticate while nothing was writing stays so until it is restored: say that with the task
         // (history "unavailable", no events), as a cursor read does, instead of a 409 the page reads as a passing race.
-        if (task.history.status === "unavailable" && entry.changedSince === undefined && !entry.client) return { task, events: [], truncated: true };
+        if (task.history.status === "unavailable" && entry.changedSince === undefined && !entry.client && cursor.cursor === undefined) return { task, events: [], truncated: true };
         try {
           // CHANGED means a writer (this task's own turn, a heartbeat) appended while the page was read; nothing failed to
           // authenticate. Read again a bounded number of times, and name that cause when the store never holds still.
@@ -668,7 +670,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       }
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
       try { entry.preparation = prepare(actor, entry, "resume"); await entry.preparation;
-        if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
+        if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false, lastFailure: undefined }); }
       catch (error) {
         // A named refusal keeps its reason; stop() then appends any lease it could not revoke.
         entry.error = error instanceof NativeTaskServiceError ? `Native resume was refused: ${error.message}`
