@@ -16,8 +16,11 @@
  * plan mode they are still the model causing an effect through another seam.
  *
  * LEAVING THE MODE IS AN OPERATOR ACT. There is no tool that exits plan mode.
- * The model records its plan with the signed `plan` tool and the operator runs
- * the next turn without `--plan` (`--session <id>` continues the same session).
+ * The model records its plan with the signed `plan` tool, or hands it over with
+ * `plan_exit` (HP-08, defined only in plan mode): its NATIVE_PLAN_READY row makes
+ * the next step boundary of that turn a `plan-exit` veto, so the turn ends there.
+ * The operator runs the next turn without `--plan` (`--session <id>` continues the
+ * same session; in chat, `/plan` turns the mode off).
  * Plan mode is therefore a PER-TURN fact: it is not in the composition or policy
  * digest, so a planning turn and the executing turn that follows it share a
  * session. Every turn a plan-mode run opens (a queued follow-up included)
@@ -35,6 +38,7 @@ import type { ToolRegistry } from "../tools/toolRegistry.js";
 import type { ContextPlugin } from "../prompt/context/contextTypes.js";
 import type { SessionService } from "../session/sessionService.js";
 import { deniedToolNamesForScope } from "./delegationScope.js";
+import { PLAN_EXIT_VETO, planReadyInTurn } from "../tools/builtin/planExitTool.js";
 import type { LoopHooks } from "./loopTypes.js";
 
 const PLAN_MODE_CONTEXT = "context:plan-mode";
@@ -77,8 +81,8 @@ export function createPlanModeContextPlugin(enabled: boolean): ContextPlugin {
     // A tool mounted after composition (an MCP server) can still be offered; the guard denies it unless it is READ_ONLY.
     collect: () => Promise.resolve(enabled
       ? "This turn runs in plan mode. Only read-only tools run: any other tool call is denied, so this turn's tools do not change "
-        + "the workspace. Investigate, then record the plan with the plan tool. There is no tool that leaves plan mode: the operator "
-        + "executes the plan in a later turn started without plan mode."
+        + "the workspace. Investigate, then record the plan with the plan tool, or hand it to the person with plan_exit when it is offered "
+        + "(that ends this turn). There is no tool that leaves plan mode: the operator executes the plan in a later turn started without plan mode."
       : "")
   };
 }
@@ -94,11 +98,13 @@ function recordPlanMode(session: Pick<SessionService, "recordProjectedEvidence">
 /**
  * The root driver's pre-step in plan mode: at the first step boundary of every turn, the NATIVE_PLAN_MODE row is
  * recorded inside that turn before the step's request. A row that cannot be written stops the step (fail closed).
+ * After a plan_exit in this turn, every later step boundary is vetoed (`plan-exit`), so the turn ends.
  */
-export function planModePreStep(session: Pick<SessionService, "recordProjectedEvidence">, options: { readonly withheldTools: readonly string[] },
+export function planModePreStep(session: Pick<SessionService, "recordProjectedEvidence" | "readEvents">, options: { readonly withheldTools: readonly string[] },
   inner: LoopHooks["preStep"]): LoopHooks["preStep"] {
   return (input, next) => {
     if (input.step === 1) recordPlanMode(session, { withheldTools: options.withheldTools, turn: input.turn });
+    else if (planReadyInTurn(session.readEvents(), input.turn)) return Promise.resolve({ kind: "reject", by: PLAN_EXIT_VETO });
     return inner(input, next);
   };
 }

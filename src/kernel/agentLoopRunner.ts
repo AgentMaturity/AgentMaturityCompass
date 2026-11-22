@@ -167,6 +167,8 @@ export interface ComposedToolSession {
   readonly sessionId: string;
   readonly recordProjectedEvidence: SessionService["recordProjectedEvidence"];
   readonly assertWritable: SessionService["assertWritable"];
+  readonly retainFileCheckpoint: SessionService["retainFileCheckpoint"];
+  readonly readEvents: SessionService["readEvents"];
 }
 
 export interface ComposedTurnOptions {
@@ -479,7 +481,8 @@ export async function runComposedTurn(options: ComposedTurnOptions): Promise<Com
     options.bindToolSession?.({
       sessionId,
       recordProjectedEvidence: (row) => session.recordProjectedEvidence(row),
-      assertWritable: () => session.assertWritable()
+      assertWritable: () => session.assertWritable(),
+      retainFileCheckpoint: (bytes, callId, cap) => session.retainFileCheckpoint(bytes, callId, cap), readEvents: () => session.readEvents()
     });
     // Smoke L-3: a keyless composition (no route names a credential) never reads, or permission-checks, the store.
     const credentialsFiber = ctx.plugin(credentialsServices, { ...options.credentials,

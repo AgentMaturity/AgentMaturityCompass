@@ -75,6 +75,13 @@ Keys are stable; lanes cite them.
   approved its own command). Needs a lane: a parent-process or OS-level presence check, or an
   approval factor a same-user process cannot hold (hardware key, second device, second person).
 
+- HP-50 A process started by an approved, sandboxed shell call can outlive its turn and the chat and
+  keep changing the workspace (seen in the rewind review, 2026-11-20). AMC neither reaps nor records
+  it. Needs: reap at turn or session end by process group, or record what is left running.
+- HP-51 From the console session, 2026-11-20, in the lane 0b code: the sessions list fails for the whole
+  workspace when one session's lifecycle record is missing; Records for one agent can list another
+  agent's sessions; the Governor outcomes read is slow under load. Repair lane `repair3`.
+
 ### Orchestration and protocols (D6, R12, R13)
 - HP-25 Sub-agent definitions lack model, permission-mode and skills fields, scopes and fork modes.
 - HP-26 No ACP client/host role; only `claude-cli` as a foreign delegate; no cross-vendor review rule.
@@ -135,6 +142,12 @@ first, then either keeps the decision or writes here why it changes.
   exist: a checkpoint store that works without vault blob keys, a conflict check against the last
   recorded `afterSha256`, a live-writer fence on fork, and a truthful child identity. HP-06 builds
   those four, in that order, or stops.
+  Lane rewind (2026-11-19) changed the first condition and met the other three. The checkpoint store uses
+  the vault-backed blob key, because the only store without it is plaintext, which would repeat the
+  ADR-0010 defect (plaintext, invisible to retention and erasure); the copies are spill objects, so the
+  existing spill lifecycle covers them, and without the key a file is recorded as not kept. The conflict
+  check uses the last `afterSha256`; the live-writer fence is a check of the signed writer meta of every
+  session (not a lock); the child is opened only by the composed `--fork-from` path, which cites the rewind.
 - The LLM judge in suites is deferred (D-12). HP-36 turns it on only with a calibration record and
   never as the only grader of a criterion.
 - Sub-agent `model` must be `inherit`; "auto" and "on-failure" approval modes are refused; OpenAI

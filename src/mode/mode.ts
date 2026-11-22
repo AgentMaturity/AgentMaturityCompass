@@ -101,6 +101,8 @@ export const OWNER_ONLY_COMMAND_PATHS: readonly string[] = [
     "residency profile",
     // P1-23: clearing the hook audit latch (src/bridge/hookAuditLatch.ts).
     "connect hooks health --recover-latch",
+    // HP-06: restoring files from a session's checkpoints is the person's act, never an agent's.
+    "session rewind",
     "target set",
     "vault init",
     "vault unlock",
