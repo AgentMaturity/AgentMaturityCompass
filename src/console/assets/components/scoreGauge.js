@@ -1,3 +1,5 @@
+import { plainCodeHtml } from "../plainError.js";
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -23,7 +25,7 @@ export function renderScoreGauge(params) {
     return `
       <div class="card status-warn">
         <div><strong>${escapeHtml(label)}</strong></div>
-        <div class="muted">${escapeHtml(status)} (numeric score unavailable)</div>
+        <div class="muted">${plainCodeHtml(status)} (numeric score unavailable)</div>
       </div>
     `;
   }

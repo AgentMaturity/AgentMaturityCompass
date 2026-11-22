@@ -275,6 +275,43 @@ describe("Studio claims over actual authenticated loopback HTTP (P0-23)", () => 
     }
   });
 
+  // 2026-11-19: the report read looked only in the workspace's current agent's records, so My agent could not show
+  // another agent's run. ?agentId= now names the agent; only an id in its normal form is used, and scope still applies.
+  test("reads another agent's stored run when the request names that agent, within the same scope", async () => {
+    const fixture = await studioFixture();
+    const report = { ...storeRun(fixture.workspace, { runId: "studio-helper-run", version: "1.2.0", seal: false, storedReadiness: true }), agentId: "helper-1" };
+    rmSync(join(getAgentPaths(fixture.workspace, "default").runsDir, `${report.runId}.json`));
+    mkdirSync(getAgentPaths(fixture.workspace, "helper-1").runsDir, { recursive: true });
+    writeFileSync(join(getAgentPaths(fixture.workspace, "helper-1").runsDir, `${report.runId}.json`), JSON.stringify(report));
+    expect((await get(fixture, `/runs/${report.runId}/report`, "studio-helper-default")).status).toBe(404);
+    const named = await get(fixture, `/runs/${report.runId}/report?agentId=helper-1`, "studio-helper-named");
+    expect(named.status, named.body).toBe(200);
+    expect(named.json.agentId).toBe("helper-1");
+    for (const bad of ["../default", "Helper-1", "helper 1", ""]) {
+      const refused = await get(fixture, `/runs/${report.runId}/report?agentId=${encodeURIComponent(bad)}`, "studio-helper-bad");
+      expect(refused.status, bad).toBe(400);
+      expect(refused.json).toEqual({ error: "invalid agent id" });
+    }
+    const other = await get(fixture, `/runs/${report.runId}/report?agentId=helper-1`, "studio-helper-scope", null, ensureAgentToken(fixture.workspace, "default").token);
+    expect(other.status).toBe(403);
+  });
+
+  // Review 2026-11-19: the read fell back to the shared legacy folder, and trusted the agent written in the file, so the
+  // page for one agent could show another agent's run. A run whose agent differs from the one named answers 404.
+  test("answers 404 when the stored run belongs to an agent other than the one named", async () => {
+    const fixture = await studioFixture();
+    const report = storeRun(fixture.workspace, { runId: "studio-mismatch-run", version: "1.2.0", seal: false, storedReadiness: true });
+    rmSync(join(getAgentPaths(fixture.workspace, "default").runsDir, `${report.runId}.json`));
+    mkdirSync(join(fixture.workspace, ".amc", "runs"), { recursive: true });
+    writeFileSync(join(fixture.workspace, ".amc", "runs", `${report.runId}.json`), JSON.stringify(report));
+    mkdirSync(getAgentPaths(fixture.workspace, "helper-2").runsDir, { recursive: true });
+    writeFileSync(join(getAgentPaths(fixture.workspace, "helper-2").runsDir, `${report.runId}.json`), JSON.stringify(report));
+    const scoped = ensureAgentToken(fixture.workspace, "default").token;
+    expect((await get(fixture, `/runs/${report.runId}/report?agentId=helper-2`, "studio-mismatch-folder", null, scoped)).status).toBe(404);
+    expect((await get(fixture, `/runs/${report.runId}/report?agentId=helper-1`, "studio-mismatch-legacy")).status).toBe(404);
+    expect((await get(fixture, `/runs/${report.runId}/report?agentId=default`, "studio-mismatch-own")).status).toBe(200);
+  });
+
   test.each(["../studio-private-run", "..\\studio-private-run", "\u0000studio-private-run"])(
     "refuses a decoded run ID outside the exact file-name contract: %j", async runId => {
       const fixture = await studioFixture();

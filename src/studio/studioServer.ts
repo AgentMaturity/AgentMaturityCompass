@@ -6853,7 +6853,7 @@ export async function startStudioApiServer(options: StudioApiOptions): Promise<{
       const reportJsonMatch = pathname.match(/^\/runs\/([^/]+)\/report$/);
       if (reportJsonMatch && req.method === "GET") {
         const runId = decodeURIComponent(reportJsonMatch[1] ?? "");
-        const report = studioStoredRunReport(res, options.workspace, runId, auth);
+        const report = studioStoredRunReport(res, options.workspace, runId, auth, url.searchParams.get("agentId"));
         json(res, report.status, report.body);
         return;
       }

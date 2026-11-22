@@ -1222,8 +1222,8 @@ async function refreshUnifiedBanner() {
         <span title="${htmlEscape(BANNER_TIPS.agent)}"><strong>Agent:</strong> ${htmlEscape(agentId)}</span>
         <span title="${htmlEscape(BANNER_TIPS.trust)}"><strong>Trust:</strong> ${htmlEscape(trustLabel)}</span>
         <span title="${htmlEscape(BANNER_TIPS.integrity)}"><strong>Integrity:</strong> ${integrity === null ? "N/A" : integrity.toFixed(3)}</span>
-        <span title="${htmlEscape(BANNER_TIPS.evidence)}"><strong>Evidence:</strong> ${htmlEscape(evidenceStatus)}</span>
-        <span title="${htmlEscape(BANNER_TIPS.claims)}"><strong>Claims:</strong> ${claimEligible ? "ELIGIBLE" : "BLOCKED"}</span>
+        <span title="${htmlEscape(BANNER_TIPS.evidence)}"><strong>Evidence:</strong> ${plainCodeHtml(evidenceStatus)}</span>
+        <span title="${htmlEscape(BANNER_TIPS.claims)}"><strong>Claims:</strong> ${plainCodeHtml(claimEligible ? "ELIGIBLE" : "BLOCKED")}</span>
         <span title="${htmlEscape(BANNER_TIPS.freezes)}"><strong>Active freezes:</strong> ${freezes}</span>
         <span title="${htmlEscape(BANNER_TIPS.config)}"><strong>Config:</strong> ${status.readOnlyMode ? "UNTRUSTED CONFIG (READ-ONLY)" : "SIGNED"}</span>
         <span title="${htmlEscape(BANNER_TIPS.trustMode)}"><strong>Trust mode:</strong> ${htmlEscape(`${trustMode}${trustMode === "NOTARY" ? trustOk ? " (OK)" : " (BROKEN)" : ""}`)}</span>
@@ -1565,7 +1565,7 @@ async function renderAgent() {
   const row = await apiGet(`/agents/${encodeURIComponent(agentId)}/status`);
   let report = null;
   if (row.latestRun?.runId) {
-    report = await apiGet(`/runs/${encodeURIComponent(row.latestRun.runId)}/report`);
+    report = await apiGet(`/runs/${encodeURIComponent(row.latestRun.runId)}/report?agentId=${encodeURIComponent(agentId)}`);
   }
   // A run whose seal fails shows nothing taken from its file: no score, coverage, readiness, chart or pass state.
   const sealFails = runSealFails(row.latestRun);
@@ -1582,17 +1582,16 @@ async function renderAgent() {
       <p>Overall: <strong>${sealFails ? "N/A" : overall.toFixed(3)}</strong></p>
       <p>IntegrityIndex: <strong>${sealFails ? "N/A" : Number(report.integrityIndex || 0).toFixed(3)}</strong> (${htmlEscape(trust)})</p>
       <p>Evidence Coverage: ${sealFails ? "N/A" : `${(Number(report.evidenceCoverage || 0) * 100).toFixed(1)}%`}</p>
-      <p>Artifact Status: <strong>${htmlEscape(sealFails ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
+      <p>Artifact status: <strong>${plainCodeHtml(sealFails ? "INVALID" : String(report.status || "UNKNOWN"))}</strong></p>
       <p>Evidence Readiness: <strong>${plainCodeHtml(sealFails ? "UNVERIFIED" : String(report.evidenceReadiness?.status || "UNVERIFIED"))}</strong></p>
-      <p>Claims: <strong>${report.evidenceReadiness?.claimEligible === true && !sealFails ? "ELIGIBLE" : "BLOCKED"}</strong></p>
+      <p>Claims: <strong>${plainCodeHtml(report.evidenceReadiness?.claimEligible === true && !sealFails ? "ELIGIBLE" : "BLOCKED")}</strong></p>
       <p class="muted">${htmlEscape(sealFails ? "This run's record does not pass its seal check, so none of these numbers can back a claim."
         : String(report.evidenceReadiness?.claimBoundary || "Verify evidence readiness before relying on this score."))}</p>` : "");
   root.innerHTML = `${pageIntroHtml("How your agent is doing", `Agent ${agentId}: its latest score, and what to improve next.`, { id: "agentIntro" })}
     <section class="card agent-card">
       ${report ? "" : emptyState({ pictureName: "check", line: "No score yet.",
-        // The button sends --agent, so it scores this agent; it is offered on "default" only because this page reads a
-        // run through /runs/:id/report, which looks in the workspace's current agent's records, not this agent's.
-        action: agentId === "default" ? '<button id="agentRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>' : "" })}
+        // The button sends --agent, so it scores this agent, and the page reads the run from this agent's records.
+        action: '<button id="agentRunScore" data-roles="OWNER,OPERATOR">Run the full score</button>' })}
       ${runStateWarning(row.latestRun)}
       ${score}
       ${report ? moreInfo("About this score", details) : details}
@@ -1610,8 +1609,8 @@ async function renderEqualizer() {
       <p class="muted">Tune 67 sliders and preview policy impact before signing target.</p>
       <div id="sliderList" class="scroll" style="max-height:420px;"></div>
       <div class="row">
-        <button id="whatifBtn">Preview What-If</button>
-        <button id="applyBtn" data-roles="OWNER">Apply & Sign</button>
+        <button id="whatifBtn">Preview what-if</button>
+        <button id="applyBtn" data-roles="OWNER">Apply and sign</button>
       </div>
       <pre id="whatifOut" class="card muted"></pre>
     `)}
@@ -1947,7 +1946,7 @@ async function renderUsers() {
       <td>
         <div class="row wrap">
           ${userRolesSelect(`roles-${row.username}`, row.roles, `Roles for ${row.username}`)}
-          <button class="secondary" data-role="${htmlEscape(row.username)}" data-roles="OWNER">Set Roles</button>
+          <button class="secondary" data-role="${htmlEscape(row.username)}" data-roles="OWNER">Set roles</button>
           <button class="danger" data-revoke="${htmlEscape(row.username)}" data-roles="OWNER">Revoke</button>
         </div>
       </td>
@@ -2605,7 +2604,7 @@ async function renderIntegrations() {
     : "Run amc integrations init in this workspace before dispatching a test event.";
   root.innerHTML = `
     ${card("Connections", `
-      <p>Signature: <strong>${integrationReady ? "VALID" : "NOT CONFIGURED"}</strong></p>
+      <p>Signature: <strong>${plainCodeHtml(integrationReady ? "VALID" : "NOT_CONFIGURED")}</strong></p>
       <div class="row wrap">
         <span class="pill">${integrationChannels.length} channels</span>
         <span class="pill">${Number(queueStats.pending || 0)} pending</span>
@@ -2613,7 +2612,7 @@ async function renderIntegrations() {
       </div>
       <p class="muted">${htmlEscape(integrationGuidance)}</p>
       <div class="row wrap">
-        <button id="integrationTestBtn" data-roles="OWNER,OPERATOR"${integrationReady ? "" : ' disabled aria-disabled="true"'}>Dispatch Test Event</button>
+        <button id="integrationTestBtn" data-roles="OWNER,OPERATOR"${integrationReady ? "" : ' disabled aria-disabled="true"'}>Send a test event</button>
       </div>
       <pre id="integrationOut" class="scroll">No test event dispatched.</pre>
     `)}
@@ -2650,7 +2649,7 @@ async function renderOutcomes() {
   root.innerHTML = `
     ${card("Outcome Contract + Value Summary", `
       <p class="muted">An outcome contract lists the results the agent is meant to deliver; this page shows how far the recorded evidence shows them.</p>
-      <p>Contract signature: <strong>${verify.valid ? "VALID" : "INVALID"}</strong>${verify.reason ? ` (${verify.reason})` : ""}</p>
+      <p>Contract signature: <strong>${plainCodeHtml(verify.valid ? "VALID" : "INVALID")}</strong>${verify.reason ? ` (${verify.reason})` : ""}</p>
       <div class="grid">
         <div><div class="muted">ValueScore</div><div class="tile-value">${Number(report.valueScore || 0).toFixed(2)}</div></div>
         <div><div class="muted">EconomicSignificanceIndex</div><div class="tile-value">${Number(report.economicSignificanceIndex || 0).toFixed(2)}</div></div>
@@ -2670,7 +2669,7 @@ async function renderOutcomes() {
           (row) => `<tr>
             <td>${htmlEscape(row.metricId || "-")}</td>
             <td>${htmlEscape(row.category || "-")}</td>
-            <td>${htmlEscape(row.status || "UNKNOWN")}</td>
+            <td>${plainCodeHtml(row.status || "UNKNOWN")}</td>
             <td>${htmlEscape(String(row.measuredValue ?? "-"))}</td>
             <td>${Number(row.sampleSize || 0)}</td>
             <td>obs=${Number(row.trustCoverage?.observed || 0).toFixed(2)} att=${Number(row.trustCoverage?.attested || 0).toFixed(2)} self=${Number(row.trustCoverage?.selfReported || 0).toFixed(2)}</td>
@@ -2707,7 +2706,7 @@ async function renderExperiments() {
     ${card("Experiments", `
       <p class="muted">Deterministic baseline vs candidate comparisons for release readiness.</p>
       <div class="row wrap">
-        <button id="expCreateBtn" data-roles="OWNER,OPERATOR">Create Experiment</button>
+        <button id="expCreateBtn" data-roles="OWNER,OPERATOR">Create experiment</button>
         <button id="expRefreshBtn" class="secondary">Refresh</button>
       </div>
       <div class="scroll"><table><thead><tr><th>ID</th><th>Name</th><th>Casebook</th><th>Uplift Success</th><th>Uplift Value</th><th>Cost Ratio</th><th>Verdict</th><th>Actions</th></tr></thead><tbody id="expRows"></tbody></table></div>
@@ -2715,7 +2714,7 @@ async function renderExperiments() {
     `)}
     ${card("Governed Optimizer", `
       <div class="row wrap">
-        <button id="optimizerRunBtn" data-roles="OWNER,OPERATOR">Generate Optimizer</button>
+        <button id="optimizerRunBtn" data-roles="OWNER,OPERATOR">Generate optimizer</button>
         <button id="optimizerRefreshBtn" class="secondary">Refresh</button>
       </div>
       <div class="scroll"><table><thead><tr><th>Run</th><th>Selected for probing (estimated metrics, not executed)</th><th>Structural status</th><th>Candidates</th><th>Top Reason</th><th>Actions</th></tr></thead><tbody id="optimizerRows"></tbody></table></div>
@@ -2986,7 +2985,7 @@ async function renderRuntimeRuns() {
           <button id="runtimeCreateBtn" data-roles="OWNER,OPERATOR" class="secondary">Create</button>
         </div>
         <div class="row wrap">
-          <button id="runtimeTraceBtn" data-roles="OWNER,OPERATOR" class="secondary">Append Trace</button>
+          <button id="runtimeTraceBtn" data-roles="OWNER,OPERATOR" class="secondary">Append trace</button>
           <button id="runtimeDegradeBtn" data-roles="OWNER,OPERATOR" class="secondary">Degrade</button>
           <button id="runtimeCompleteBtn" data-roles="OWNER,OPERATOR" class="secondary">Complete</button>
         </div>
@@ -3656,7 +3655,7 @@ async function renderPlugins() {
       </div>
       <div class="row wrap">
         <input id="pluginApprovalExecute" placeholder="approvalRequestId" />
-        <button id="pluginExecuteBtn" data-roles="OWNER">Execute Approved Action</button>
+        <button id="pluginExecuteBtn" data-roles="OWNER">Run approved action</button>
       </div>
       <pre id="pluginActionOut" class="scroll muted"></pre>
     `)}
@@ -3666,7 +3665,7 @@ async function renderPlugins() {
         <input id="pluginDiffCurrent" placeholder="current version (e.g. 1.0.0)" />
         <input id="pluginDiffCandidate" placeholder="candidate version (e.g. 1.1.0)" />
         <input id="pluginDiffId" placeholder="plugin id" />
-        <button id="pluginDiffBtn">Render Local Diff Hint</button>
+        <button id="pluginDiffBtn">Show local diff hint</button>
       </div>
       <div id="pluginDiffOut"></div>
     `)}
@@ -3788,9 +3787,9 @@ function runStateSummary(agentId, latestRun) {
   }
   const when = latestRun.ts ? ` (${htmlEscape(formatTime(latestRun.ts))})` : "";
   return `Latest run for agent <strong>${htmlEscape(agentId)}</strong>: <code>${htmlEscape(shortId(latestRun.runId))}</code>${when}, `
-    + `status <strong>${htmlEscape(runSealFails(latestRun) ? "INVALID" : String(latestRun.status || "UNKNOWN"))}</strong>, `
+    + `status <strong>${plainCodeHtml(runSealFails(latestRun) ? "INVALID" : String(latestRun.status || "UNKNOWN"))}</strong>, `
     + `trust label <strong>${htmlEscape(runSealFails(latestRun) ? UNTRUSTED_SEAL_LABEL : String(latestRun.trustLabel || "UNKNOWN"))}</strong>, `
-    + `claims <strong>${latestRun.claimEligible === true && !runSealFails(latestRun) ? "ELIGIBLE" : "BLOCKED"}</strong>.`;
+    + `claims <strong>${plainCodeHtml(latestRun.claimEligible === true && !runSealFails(latestRun) ? "ELIGIBLE" : "BLOCKED")}</strong>.`;
 }
 
 /** The plain warning for a run that cannot back a claim (status not VALID, or a trust label that says so); "" otherwise. */
@@ -3895,7 +3894,7 @@ async function renderPage() {
       root.innerHTML = card("Leases", `
         ${jsonDetails(`Revocation list signature: ${leaseState.revocationSignatureValid ? "valid" : `INVALID${leaseState.revocationSignatureReason ? ` (${htmlEscape(leaseState.revocationSignatureReason)})` : ""}`} · ${Number(leaseState.revokedLeaseCount || 0)} revoked lease(s).`, leaseState)}
         <div class="row">
-          <button id="issueLeaseBtn" data-roles="OWNER">Issue Lease For ${htmlEscape(currentAgent())}</button>
+          <button id="issueLeaseBtn" data-roles="OWNER">Issue lease for ${htmlEscape(currentAgent())}</button>
         </div>
         <div id="leaseOut" aria-live="polite"></div>
       `);
@@ -3934,7 +3933,7 @@ async function renderPage() {
         <p class="muted">Budgets cap what an agent may spend and how much it may do. Edit the draft below (JSON) and apply it as a signed update.</p>
         <label for="budgetsDraft">Budgets config (JSON)</label>
         <textarea id="budgetsDraft" rows="18">${htmlEscape(JSON.stringify(data.config, null, 2))}</textarea>
-        <div class="row"><button id="applyBudgets" data-roles="OWNER">Apply Budgets</button></div>
+        <div class="row"><button id="applyBudgets" data-roles="OWNER">Apply budgets</button></div>
         <div id="budgetOut" aria-live="polite"></div>
       `);
       onAction(document.getElementById("applyBudgets"), "click", async () => {

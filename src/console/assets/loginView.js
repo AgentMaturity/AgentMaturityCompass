@@ -54,14 +54,14 @@ export function loginCardHtml({ demoMode = false, hostMode = false } = {}) {
         <p class="muted">For emergencies only: the admin token lets someone with terminal access in when username and password sign-in is not possible.</p>
         <div class="row wrap">
           <input id="adminTokenInput" type="password" placeholder="x-amc-admin-token" aria-label="Admin token" />
-          <button id="adminTokenBtn" type="button" class="secondary">Use Admin Token</button>
+          <button id="adminTokenBtn" type="button" class="secondary">Use admin token</button>
         </div>
       </details>
       <details>
         <summary>Pair another device (LAN mode)</summary>
         <p class="muted">The QR code is this console's login address for a phone on the same network; pairing needs LAN mode (<code>amc studio lan enable</code>) and an OWNER account.</p>
         <div class="row wrap">
-          <button id="pairCodeCreateBtn" type="button" class="secondary">Create Pairing Code</button>
+          <button id="pairCodeCreateBtn" type="button" class="secondary">Create pairing code</button>
           <span class="muted">OWNER role required</span>
         </div>
         <pre id="authOut" class="muted" aria-live="polite"></pre>

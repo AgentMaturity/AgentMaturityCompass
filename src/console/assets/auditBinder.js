@@ -60,7 +60,7 @@ export async function renderAuditBinderPage(params) {
       <div class="muted">controls map: <code>${esc(binder?.sections?.controls?.mapId || "-")}</code></div>
       <div class="row wrap">
         <button id="auditBinderRefresh">Refresh</button>
-        <button id="auditBinderExport" class="secondary">Export New Binder</button>
+        <button id="auditBinderExport" class="secondary">Export new binder</button>
         <a href="./audit">Back to Dashboard</a>
       </div>
       `

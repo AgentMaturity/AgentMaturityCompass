@@ -8,6 +8,7 @@ import { writeFileAtomic } from "../utils/fs.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
 import { nativeTaskValidationSelectionSchema } from "./nativeTaskValidation.js";
 import { NativeTaskServiceError } from "./nativeTaskTypes.js";
+import { turnFailureSchema } from "./nativeResidency.js";
 
 const id = z.string().uuid();
 export const taskDescriptorSchema = z.object({
@@ -27,6 +28,8 @@ export const taskDescriptorSchema = z.object({
   leaseId: z.string().regex(/^lease_[a-f0-9]{32}$/).optional(),
   // P2-13: the parent task and session a forked task's lineage names; omitted likewise.
   forkedFrom: z.object({ taskId: z.string().regex(/^[a-f0-9]{64}$/), sessionId: z.string().min(1).max(200) }).strict().optional(),
+  // Why the turn of a revision was refused (fixed codes, so its words survive a Studio restart); omitted likewise.
+  lastFailure: turnFailureSchema.optional(),
   submissions: z.array(z.object({ clientRequestId: id, bodyHash: z.string().regex(/^[a-f0-9]{64}$/), revision: z.number().int().min(1).max(32) }).strict()).min(1).max(32)
 }).strict().superRefine((value, ctx) => {
   if (value.submissions.length !== value.revision || value.submissions.some((s, i) => s.revision !== i + 1)

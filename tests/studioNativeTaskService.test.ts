@@ -213,6 +213,14 @@ test("a turn AMC's own budget refused says so instead of a generic failure, and 
   expect(current.error).toContain("AMC's signed budget for this agent refused the model request before sending it.");
   expect(current.error).not.toMatch(/provider reported|quota/i);
   expect(rows(task.sessionId).filter(row => row.event_type === "request/header")).toHaveLength(2);
+  // 2026-11-19: the words were kept in memory only, so a Studio restart lost them. A fresh service over the same store reads them again.
+  await s.close();
+  const restarted = service();
+  expect(restarted.poll(actor, task.taskId).task.error).toBe(current.error);
+  // Review 2026-11-19: an explicit resume clears the kept refusal, as it clears the words in memory, so a later restart does not bring it back.
+  expect((await restarted.resume(actor, task.taskId, 2)).error).toBeNull();
+  await restarted.close();
+  expect(service().poll(actor, task.taskId).task.error).toBeNull();
 });
 
 // P0-62: a writer still appending while Studio reads. Every append moves the ledger file's identity, and the history

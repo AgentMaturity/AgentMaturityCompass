@@ -51,6 +51,35 @@ describe("reference deployment matrix", () => {
     expect(targetProblems({ ...AGREED, rtoSeconds: 0 })).toContain("rtoSeconds must be a positive integer");
     expect(targetProblems({ ...AGREED, status: "assumed" })).toHaveLength(1);
   });
+
+  // 2026-11-18: the nightly workflow failed (exit 2) only because no target is configured yet. It now ends as a visible
+  // "not run" skip in that case; a malformed or half-filled file still fails.
+  it("--check-targets says not-configured for the shipped file, configured for agreed targets, and refuses anything else", async () => {
+    const dir = mkdtempSync(join(tmpdir(), "amc-rd-targets-"));
+    const run = async (argv: string[]) => {
+      const { log, error } = console; let out = "";
+      console.log = (line: string) => { out += line; }; console.error = () => {};
+      try { return { code: await main(argv), out }; } finally { console.log = log; console.error = error; }
+    };
+    let n = 0;
+    const check = (targets: unknown) => {
+      const file = join(dir, `t${n += 1}.json`);
+      writeFileSync(file, typeof targets === "string" ? targets : JSON.stringify(targets));
+      return run(["--check-targets", "--targets", file]);
+    };
+    try {
+      expect(await run(["--check-targets"])).toEqual({ code: 0, out: "not-configured" });
+      expect(await check(AGREED)).toEqual({ code: 0, out: "configured" });
+      expect((await check({ ...AGREED, status: "unagreed", rpoSeconds: null })).code).toBe(2);
+      expect((await check({ ...JSON.parse(readFileSync(join(MATRIX_DIR, "targets.json"), "utf8")), rpoSeconds: 900 })).code).toBe(2);
+      expect((await check("{ not json")).code).toBe(2);
+      expect((await check({ schema: "something-else" })).code).toBe(2);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+    const workflow = readFileSync(".github/workflows/reference-deployment.yml", "utf8");
+    expect(workflow).toContain("--check-targets");
+    expect(workflow).toContain("if: needs.targets.outputs.state == 'configured'");
+    expect(workflow).toContain("Reference deployment not run");
+  });
 });
 
 describe("receipt verdict", () => {

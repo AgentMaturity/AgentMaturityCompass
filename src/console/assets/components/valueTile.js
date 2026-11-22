@@ -1,3 +1,5 @@
+import { plainCodeHtml } from "../plainError.js";
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -16,7 +18,7 @@ function formatScore(value) {
 
 export function renderValueTile(params) {
   const label = escapeHtml(params.label ?? "Value");
-  const status = escapeHtml(params.status ?? "OK");
+  const status = plainCodeHtml(params.status ?? "OK");
   const score = formatScore(params.value);
   const tone = score === "UNKNOWN" ? "status-warn" : "status-ok";
   return `<div class="card">

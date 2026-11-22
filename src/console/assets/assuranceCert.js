@@ -1,4 +1,5 @@
 import { recordRows } from "./pageKit.js";
+import { plainCodeHtml } from "./plainError.js";
 import { renderWaiverBanner } from "./components/waiverBanner.js";
 
 function escapeHtml(value) {
@@ -36,11 +37,11 @@ export async function renderAssuranceCertPage(params) {
       <div class="grid">
         <div><div class="muted">Cert ID</div><div class="tile-value"><code>${escapeHtml(cert.certId)}</code></div></div>
         <div><div class="muted">Run ID</div><div class="tile-value"><code>${escapeHtml(cert.runId)}</code></div></div>
-        <div><div class="muted">Status</div><div class="tile-value">${escapeHtml(cert.status)}</div></div>
+        <div><div class="muted">Status</div><div class="tile-value">${plainCodeHtml(cert.status)}</div></div>
         <div><div class="muted">Issued</div><div class="tile-value">${escapeHtml(iso(cert.issuedTs))}</div></div>
       </div>
       <div class="muted">file: <code>${escapeHtml(file || "-")}</code></div>
-      <div class="muted">verify: ${verify?.ok ? "PASS" : "FAIL"}</div>
+      <div class="muted">Record check: ${plainCodeHtml(verify?.ok ? "PASS" : "FAIL")}</div>
       ${recordRows({
         riskAssuranceScore: cert.riskAssuranceScore,
         findingCounts: cert.findingCounts,

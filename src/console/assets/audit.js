@@ -75,8 +75,8 @@ export async function renderAuditPage(params) {
         ${tiles.map((tile) => `<div><div class="muted">${esc(tile.label)}</div><div class="tile-value">${tile.value}</div></div>`).join("")}
       </div>
       <div class="row wrap">
-        <button id="auditRefreshCache">Refresh Binder Cache</button>
-        <button id="auditExportNow" class="secondary">Export Binder</button>
+        <button id="auditRefreshCache">Refresh binder cache</button>
+        <button id="auditExportNow" class="secondary">Export binder</button>
         <a href="./auditBinder">Open Binder Detail</a>
         <a href="./auditRequests">Open Evidence Requests</a>
       </div>
