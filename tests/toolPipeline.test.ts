@@ -98,6 +98,26 @@ describe("a call traverses the full pipeline", () => {
     expect(recorded).toEqual([{ name: "nope", actionClass: null, callId: "call-1", stage: "visibility" }]);
   });
 
+  it("names a recorder failure that is not an Error in the refusal of every later call", async () => {
+    const registry = new ToolRegistry();
+    registry.define(echoTool());
+    let failing = true;
+    const pipeline = new ToolPipeline({ registry, workspace: WORKSPACE, record: () => { if (failing) throw "disk full"; } });
+    await pipeline.execute({ name: "echo", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    failing = false;
+    const later = await pipeline.execute({ name: "echo", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(later.denied?.reason).toBe("EVIDENCE_RECORDER_FAILED: a tool-evidence record failed (disk full); this pipeline refuses every later call");
+  });
+
+  it("under code mode, a direct call to a name nobody registered is refused with the route to take, and recorded", async () => {
+    const recorded: Array<{ name: string; actionClass: string | null }> = [];
+    const pipeline = new ToolPipeline({ registry: new ToolRegistry(), workspace: WORKSPACE, mode: "code",
+      record: (execution) => { recorded.push({ name: execution.name, actionClass: execution.actionClass }); } });
+    const outcome = await pipeline.execute({ name: "nope", agentId: "a", arguments: {}, requestedMode: "EXECUTE" });
+    expect(outcome.denied?.reason).toContain('"nope" cannot be called directly under code mode');
+    expect(recorded).toEqual([{ name: "nope", actionClass: null }]);
+  });
+
   it("refuses every later call, before its body, once a recorder write failed (P1-78)", async () => {
     let bodies = 0;
     let failing = true;
