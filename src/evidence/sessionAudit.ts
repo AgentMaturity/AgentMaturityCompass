@@ -14,7 +14,7 @@ import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { buildSessionExport } from "../observability/sessionExport.js";
 import { renderSessionExportHtml } from "../observability/sessionExportHtml.js";
 import { readEventPayload } from "../session/eventPayload.js";
-import { loadSessionEventHistory } from "../session/sessionEventHistory.js";
+import { loadListableSessionHistory, loadSessionEventHistory, SessionHistoryRefused, type SessionHistoryRefusal } from "../session/sessionEventHistory.js";
 import { summarizeNativeSessions } from "../session/latestSession.js";
 import { callMatchesRequest, describeReportedCall } from "../setup/nativeApprovalPreview.js";
 import { secretRegions } from "../shield/redaction/redactSecrets.js";
@@ -42,6 +42,11 @@ export interface AuditSession {
   readonly turns: number;
   readonly actions: readonly AuditAction[];
   readonly moreActions: number;
+  /**
+   * Present when this session's own record cannot be read (its lifecycle record is missing or does not match its
+   * rows): the row is listed under every agent, never sealed, with no actions, so an auditor sees it is broken.
+   */
+  readonly unreadable?: { readonly code: SessionHistoryRefusal; readonly reason: string };
 }
 
 function meta(row: EvidenceEvent): Record<string, unknown> {
@@ -94,42 +99,53 @@ function storeKey(workspace: string): string {
     try { const stat = statSync(join(workspace, ".amc", file)); return `${stat.size}:${stat.mtimeMs}`; } catch { return "-"; }
   }).join("|");
 }
+/** Every agent's sessions per workspace, keyed on the store's files; each request filters by agent (one build serves all). */
 const built = new Map<string, { readonly key: string; readonly sessions: readonly AuditSession[] }>();
 
-/** Every native session, newest first, from one verified read of the history; each session's rows grouped in one pass. */
-function buildAuditSessions(workspace: string, agentId: string): readonly AuditSession[] {
-  const history = loadSessionEventHistory({ workspace });
+/**
+ * Every native session of every agent, newest first, from one verified read of the history; each session's rows grouped
+ * in one pass. A session whose own record cannot be read is a row of its own (`unreadable`), never dropped.
+ */
+function buildAuditSessions(workspace: string): readonly AuditSession[] {
+  const { history, unreadable } = loadListableSessionHistory(workspace);
   const rowsBy = new Map<string, EvidenceEvent[]>();
   for (const row of history.events) {
     const rows = rowsBy.get(row.session_id);
     if (rows === undefined) rowsBy.set(row.session_id, [row]);
     else rows.push(row);
   }
-  return summarizeNativeSessions(workspace, agentId, history).filter((summary) => summary.source === "native").map((summary) => {
+  // The agent argument only decides `canResume`, which this list does not show; agents are filtered per request.
+  const readable: AuditSession[] = summarizeNativeSessions(workspace, "", history).filter((summary) => summary.source === "native").map((summary) => {
     const rows = rowsBy.get(summary.sessionId) ?? [];
     const actions = actionsOf(workspace, summary.agentId, rows);
     return { sessionId: summary.sessionId, agentId: summary.agentId, sealed: summary.state === "sealed", startedAt: rows[0]?.ts ?? summary.updatedAt,
       updatedAt: summary.updatedAt, turns: summary.turns, actions: actions.slice(-MAX_ACTIONS), moreActions: Math.max(0, actions.length - MAX_ACTIONS) };
   });
+  // Broken sessions first: they are what an auditor must see, and their own times cannot be trusted for ordering.
+  const broken: AuditSession[] = unreadable.map((entry) => ({ sessionId: entry.sessionId, agentId: null, sealed: false, startedAt: 0, updatedAt: 0, turns: 0,
+    actions: [], moreActions: 0, unreadable: { code: entry.code, reason: entry.reason } }));
+  return [...broken, ...readable];
 }
 
 /**
- * One page of the workspace's native sessions, newest first (M7): at most `limit` (1-50) sessions and 20 actions each,
- * continued with `cursor`. The history has no per-session index, so the list is built from one verified read and reused
- * until the store's files change; a GET that finds them unchanged reads nothing.
+ * One page of the workspace's native sessions for one agent, newest first (M7): at most `limit` (1-50) sessions and 20
+ * actions each, continued with `cursor`. Unreadable sessions have no knowable agent and are listed for every agent. The
+ * history has no per-session index, so the list is built from one verified read and reused until the store's files
+ * change; a GET that finds them unchanged reads nothing.
  */
 export function listAuditSessions(workspace: string, agentId = "default", page: { readonly limit?: number; readonly cursor?: string | null } = {}):
   { readonly sessions: readonly AuditSession[]; readonly total: number; readonly nextCursor: string | null } {
-  const key = `${agentId}|${storeKey(workspace)}`;
+  const key = storeKey(workspace);
   let cached = built.get(workspace);
   if (cached === undefined || cached.key !== key) {
-    cached = { key, sessions: buildAuditSessions(workspace, agentId) };
+    cached = { key, sessions: buildAuditSessions(workspace) };
     built.set(workspace, cached);
   }
+  const mine = cached.sessions.filter((session) => session.unreadable !== undefined || session.agentId === agentId);
   const limit = Math.min(MAX_SESSIONS, Math.max(1, Math.trunc(page.limit ?? 20) || 20));
   const start = page.cursor !== undefined && page.cursor !== null && /^[0-9]{1,6}$/.test(page.cursor) ? Number(page.cursor) : 0;
-  const sessions = cached.sessions.slice(start, start + limit);
-  return { sessions, total: cached.sessions.length, nextCursor: start + limit < cached.sessions.length ? String(start + limit) : null };
+  const sessions = mine.slice(start, start + limit);
+  return { sessions, total: mine.length, nextCursor: start + limit < mine.length ? String(start + limit) : null };
 }
 
 /**
@@ -139,10 +155,21 @@ export function listAuditSessions(workspace: string, agentId = "default", page: 
  * route is for AUDITOR and OWNER only (src/api/accessPolicy.ts), as a review packet is.
  */
 export function sessionAuditExport(workspace: string, sessionId: string, format: "json" | "html"):
-  { readonly status: 200; readonly fileName: string; readonly contentType: string; readonly body: string } | { readonly status: 400 | 404; readonly error: string } {
+  { readonly status: 200; readonly fileName: string; readonly contentType: string; readonly body: string } | { readonly status: 400 | 404 | 409; readonly error: string } {
   if (!SESSION_ID.test(sessionId)) return { status: 400, error: "not a session id" };
-  if (!loadSessionEventHistory({ workspace }).sessions.some((record) => record.session_id === sessionId)) return { status: 404, error: "no such session in this workspace" };
-  const doc = buildSessionExport({ workspace, sessionId, includeContent: false });
+  const { history, unreadable } = loadListableSessionHistory(workspace);
+  const broken = unreadable.find((entry) => entry.sessionId === sessionId);
+  if (broken !== undefined) return { status: 409, error: broken.reason };
+  if (!history.sessions.some((record) => record.session_id === sessionId)) return { status: 404, error: "no such session in this workspace" };
+  let doc: ReturnType<typeof buildSessionExport>;
+  try { doc = buildSessionExport({ workspace, sessionId, includeContent: false }); }
+  catch (error) {
+    // The export reads the whole history strictly: another session's broken record refuses it (amc verify names which).
+    if (error instanceof SessionHistoryRefused && unreadable.length > 0) {
+      return { status: 409, error: `This session cannot be exported while ${unreadable.length} other session(s) in this workspace have an incomplete record that cannot be read. Run amc verify in this workspace for the detail.` };
+    }
+    throw error;
+  }
   const fileName = `amc-session-${sessionId.slice(0, 8)}.${format}`;
   return format === "json"
     ? { status: 200, fileName, contentType: "application/json; charset=utf-8", body: JSON.stringify(doc, null, 2) }

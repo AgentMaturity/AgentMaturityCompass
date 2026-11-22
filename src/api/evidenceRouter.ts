@@ -380,7 +380,10 @@ export async function handleEvidenceRoute(
       res.setHeader('Cache-Control', 'no-store');
       apiSuccess(res, listAuditSessions(workspace, queryParam(url, 'agentId') ?? 'default', { limit: Number(queryParam(url, 'limit') ?? 20), cursor: queryParam(url, 'cursor') }));
     } catch (err) {
-      apiError(res, 500, err instanceof Error ? err.message : 'Sessions could not be read');
+      // One session's broken record is a row of the list; this is the whole store failing its checks.
+      const { SessionHistoryRefused } = await import('../session/sessionEventHistory.js');
+      if (err instanceof SessionHistoryRefused) apiError(res, 409, `No session is listed: this workspace's evidence did not pass its checks (${err.code}). Run amc verify in this workspace for the detail.`);
+      else apiError(res, 500, err instanceof Error ? err.message : 'Sessions could not be read');
     }
     return true;
   }

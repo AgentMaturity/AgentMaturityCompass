@@ -143,9 +143,9 @@ describe("desktop app packaging and visual identity", () => {
     const app = read("src/console/assets/app.js");
 
     expect(dashboard).toContain('<link rel="manifest" href="./assets/manifest.json" />');
-    expect(dashboard).toContain('<link rel="stylesheet" href="./assets/styles.css?v=20261119c" />');
+    expect(dashboard).toContain('<link rel="stylesheet" href="./assets/styles.css?v=20261122a" />');
     expect(dashboard).toContain('data-page="home"');
-    expect(dashboard).toContain('<script type="module" src="./assets/app.js?v=20261119c"></script>');
+    expect(dashboard).toContain('<script type="module" src="./assets/app.js?v=20261122a"></script>');
     expect(dashboard).not.toContain("<style>body{font-family:system-ui");
     expect(home).toContain("<title>Home · Compass Console</title>");
     // studio-ui redesign: two themes; the dark theme keeps the brand green, the older names are aliases of the new tokens.

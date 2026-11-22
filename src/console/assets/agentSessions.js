@@ -19,7 +19,18 @@ function actionLine(action) {
   return `<li><strong>${esc(action.tool)}</strong> ${esc(outcome)}${approved} <span class="muted">${esc(when(action.at))}</span></li>`;
 }
 
+/** A session whose own record cannot be read: its id and the server's words, a stop dot, no actions, no export. */
+function unreadableHtml(session) {
+  const id = esc(session.sessionId);
+  return `<li class="run-card agent-session is-stop" data-session="${id}">
+    <div class="run-card-head"><span class="state-dot" aria-hidden="true"></span><strong>Session ${id}</strong>
+      <span class="run-card-state">Cannot be read</span></div>
+    <p class="status-bad">${esc(session.unreadable.reason)}</p>
+  </li>`;
+}
+
 function sessionHtml(session) {
+  if (session.unreadable) return unreadableHtml(session);
   const id = esc(session.sessionId);
   const state = session.sealed ? "Sealed: closed and signed at its end." : "Not sealed: left open so it can be continued. An export says so.";
   const count = session.actions.length;
