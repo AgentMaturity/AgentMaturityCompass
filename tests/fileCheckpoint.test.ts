@@ -79,7 +79,7 @@ test("fs.write over a read file keeps its prior bytes encrypted behind a signed 
   expect(JSON.parse(committed.meta_json)).toMatchObject({ subject: "file/checkpoint", callId: "ckpt-2" });
   // The commitment is durable before the checkpoint row and before the file changed.
   const ids = f.session.readEvents().map((event) => event.id);
-  expect(ids.indexOf(committed.id)).toBeGreaterThanOrEqual(0);
+  expect(ids).toContain(committed.id);
   expect(ids.indexOf(committed.id)).toBeLessThan(ids.indexOf(row!.id));
   expect(retrieveSpilledContent(f.workspace, committed).subarray(CHECKPOINT_SALT_BYTES).toString("utf8")).toBe("before\n");
   expect(readFileSync(join(f.workspace, "workspace", "note.txt"), "utf8")).toBe("after\n");
