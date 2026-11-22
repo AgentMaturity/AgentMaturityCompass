@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { ToolPipeline } from "../../src/tools/toolPipeline.js";
 import type { ToolDenial } from "../../src/tools/toolTypes.js";
-import { FAULT_ARGUMENTS, PAYMENT_TOOL } from "../helpers/actionFaults.js";
+import { DELETION_TOOL, FAULT_ARGUMENTS, PAYMENT_TOOL, failingJournal } from "../helpers/actionFaults.js";
 import { checkedChain, createP104Fixture, oracleCounts, type P104Fixture } from "../helpers/p104Qualification.js";
 
 /**
@@ -69,6 +69,30 @@ describe("early refusals on a journaled call", () => {
     const outcome = await pipeline.execute({ name: PAYMENT_TOOL, agentId: "default", arguments: { currency: "USD" }, requestedMode: "EXECUTE", parentToken: "program" });
     expect(ask).not.toHaveBeenCalled();
     expect(outcome.denied?.stage).toBe("authorization");
+    expect(oracleCounts(f).effects).toHaveLength(0);
+  });
+
+  test("a journaled sub-call cancelled before it was admitted is a cancelled receipt, and nobody is asked", async () => {
+    f = createP104Fixture();
+    const pipeline = over(f, {});
+    const ask = vi.fn(async () => ({ approvalRequestIds: ["apr"] }));
+    pipeline.bindApprovalGate({ gates: () => true, ask });
+    const cancelled = new AbortController(); cancelled.abort();
+    const outcome = await pipeline.execute({ name: DELETION_TOOL, agentId: "default", arguments: { ...FAULT_ARGUMENTS[DELETION_TOOL] }, requestedMode: "EXECUTE",
+      parentToken: "program", signal: cancelled.signal });
+    expect(ask).not.toHaveBeenCalled();
+    expect(outcome.action?.state).toBe("cancelled");
+    expect(checkedChain(f, outcome.action!.executionId).at(-1)).toMatchObject({ state: "cancelled", reasonCode: "aborted_before_dispatch" });
+    expect(oracleCounts(f).effects).toHaveLength(0);
+  });
+
+  test("a journal that cannot say what blocks the call denies it as unavailable", async () => {
+    f = createP104Fixture();
+    const real = f.journal;
+    const outcome = await pay(over(f, { journal: () => failingJournal(real, new Set(["blockingExecutions"])) }));
+    expect(outcome.denied?.stage).toBe("authorization");
+    expect(outcome.denied?.reason).toMatch(/^journal_unavailable/);
+    expect(checkedChain(f, outcome.action!.executionId).at(-1)).toMatchObject({ state: "denied", reasonCode: "journal_unavailable" });
     expect(oracleCounts(f).effects).toHaveLength(0);
   });
 });
