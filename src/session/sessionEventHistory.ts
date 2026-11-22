@@ -110,7 +110,7 @@ const UNREADABLE_WHY: Partial<Record<SessionHistoryRefusal, string>> = {
 };
 
 /** Plain words for an unreadable session; `amc verify` on the workspace shows the full detail. */
-export function unreadableSessionReason(code: SessionHistoryRefusal): string {
+function unreadableSessionReason(code: SessionHistoryRefusal): string {
   const why = UNREADABLE_WHY[code] ?? "its start record or closing seal is malformed or does not match its events";
   return `This session's record is incomplete and cannot be read: ${why}. It is not verified. Run amc verify in this workspace for the detail.`;
 }
