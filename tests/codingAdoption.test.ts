@@ -30,7 +30,7 @@ import { verifyLedgerIntegrity } from "../src/ledger/ledgerVerification.js";
 import { appendOpsAuditEvent } from "../src/ops/audit.js";
 import { loadRuntimeFirewallPolicy, writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { readEventPayload } from "../src/session/eventPayload.js";
-import { assertPersonAdopts, codingAdoptionBlockers, CODING_MOVE_PHRASE, readTypedLine, type CodingAdoptionIo } from "../src/setup/codingAdoption.js";
+import { assertPersonAdopts, codingAdoptionBlockers, CODING_MOVE_PHRASE, prepareCodingAdoption, readTypedLine, type CodingAdoptionIo } from "../src/setup/codingAdoption.js";
 import { codingMoveInterrupted } from "../src/setup/codingMove.js";
 import { refuseForceOverCommittedKeys, runStarterInit } from "../src/setup/starterProfiles.js";
 import { toolsConfigPath } from "../src/toolhub/toolhubValidators.js";
@@ -217,6 +217,83 @@ describe("moving a menu workspace to the coding setup (UX-01)", () => {
     const dir = menuWorkspace();
     vi.stubEnv("AMC_HOME", temp("amc-adopt-other-machine-"));
     expect(codingAdoptionBlockers(dir)).toEqual(["this computer did not create its keys (a copy or a clone)"]);
+  });
+});
+
+describe("the questions before a move (prepareCodingAdoption)", () => {
+  /** A person whose new secrets go through the prompt's own check, as inquirer's validate does; a refused entry is typed again as `retry`. */
+  function checked(answers: { vault?: [string, string]; studio?: [string, string]; refused?: string[] } = {}): CodingAdoptionIo {
+    const refused = answers.refused ?? [];
+    return { ...typed(), newSecret: async (message, problem) => {
+      const [first, second] = message.startsWith("Studio password") ? answers.studio ?? [OWNER.password, OWNER.password] : answers.vault ?? [NEW_PASSPHRASE, NEW_PASSPHRASE];
+      for (const attempt of ["short", first]) { const why = problem(attempt); if (why !== null) refused.push(`${message}: ${why}`); }
+      return first === second ? first : null;
+    } };
+  }
+
+  it("asks for a new vault passphrase of at least 8 characters and an owner password the password policy accepts", async () => {
+    const dir = menuWorkspace();
+    const refused: string[] = [];
+    const adoption = await prepareCodingAdoption(dir, ["example.org"], checked({ refused }));
+    expect(adoption).toMatchObject({ passphrase: { next: NEW_PASSPHRASE }, owner: OWNER });
+    expect(refused[0]).toBe("New vault passphrase: At least 8 characters");
+    expect(refused[1]).toMatch(/^Studio password for folder-owner: /);
+    expect(refused).toHaveLength(2);
+  });
+
+  it("stops, writing nothing, when two entries differ or the owner password is refused", async () => {
+    const dir = menuWorkspace();
+    const tools = readFileSync(toolsConfigPath(dir), "utf8");
+    await expect(prepareCodingAdoption(dir, [], checked({ vault: [NEW_PASSPHRASE, "something else"] }))).rejects.toThrow("New vault passphrase: the two entries differ. Nothing was changed.");
+    await expect(prepareCodingAdoption(dir, [], checked({ studio: [OWNER.password, "other"] }))).rejects.toThrow("Studio password: the two entries differ. Nothing was changed.");
+    await expect(prepareCodingAdoption(dir, [], checked({ studio: ["folder-owner", "folder-owner"] }))).rejects.toThrow(/^The owner's Studio password is refused: .+\. Nothing was changed\.$/);
+    expect(readFileSync(toolsConfigPath(dir), "utf8")).toBe(tools);
+  });
+
+  it("says the person stopped at the prompt when a prompt is closed", async () => {
+    const dir = menuWorkspace();
+    const closed = Object.assign(new Error("User force closed the prompt"), { name: "ExitPromptError" });
+    await expect(prepareCodingAdoption(dir, [], { ...typed(), newSecret: async () => { throw closed; } })).rejects.toThrow("Stopped at the prompt. Nothing was changed.");
+  });
+
+  it("names every file in the way and refuses before asking anything", async () => {
+    const dir = menuWorkspace();
+    writeFileSync(usersConfigPath(dir), "users: []\n");
+    const io = typed();
+    await expect(prepareCodingAdoption(dir, [], io)).rejects.toThrow("This folder cannot move to the coding setup in place: it already has accounts (.amc/users.yaml). Nothing was changed. "
+      + "Use a new folder for the coding setup, or keep this one as it is.");
+    expect(io.lines).toEqual([]);
+    expect(codingAdoptionBlockers(temp("amc-adopt-empty-"))).toEqual(["its .amc folder is not a complete AMC workspace"]);
+  });
+
+  it("refuses a workspace whose settings use another profile, or cannot be read", () => {
+    const dir = menuWorkspace();
+    const config = join(dir, ".amc", "amc.config.yaml");
+    const original = readFileSync(config, "utf8");
+    writeFileSync(config, original.replace(/^(\s*profile:\s*).*$/m, "$1prod"));
+    expect(codingAdoptionBlockers(dir)).toEqual(["its settings use another profile (.amc/amc.config.yaml)"]);
+    writeFileSync(config, "{ not yaml: [\n");
+    expect(codingAdoptionBlockers(dir)).toEqual(["its settings cannot be read (.amc/amc.config.yaml)"]);
+  });
+
+  it("at a terminal, each secret is a masked prompt checked as typed, and a new one is asked twice", async () => {
+    const asked: Array<{ message: string; mask: string; validate?: (value: string) => string | true }> = [];
+    const answers = ["first", "first", "one", "two", "plain"];
+    vi.resetModules();
+    vi.doMock("inquirer", () => ({ default: { prompt: async ([question]: Array<(typeof asked)[number]>) => { asked.push(question!); return { value: answers.shift() }; } } }));
+    try {
+      const { terminalAdoptionIo } = await import("../src/setup/codingAdoption.js");
+      expect(await terminalAdoptionIo.newSecret("New vault passphrase", (v) => v.length >= 8 ? null : "At least 8 characters")).toBe("first");
+      expect(await terminalAdoptionIo.newSecret("New vault passphrase", () => null)).toBeNull();
+      expect(await terminalAdoptionIo.secret("This folder's vault passphrase")).toBe("plain");
+      expect(asked.map((question) => question.message)).toEqual(["New vault passphrase", "New vault passphrase (again)", "New vault passphrase", "New vault passphrase (again)", "This folder's vault passphrase"]);
+      expect(asked.every((question) => question.mask === "*")).toBe(true);
+      expect(asked[0]!.validate!("short")).toBe("At least 8 characters");
+      expect(asked[0]!.validate!("long enough")).toBe(true);
+      expect(asked[1]!.validate).toBeUndefined();
+      terminalAdoptionIo.log("a line for the person");
+      expect(console.log).toHaveBeenCalledWith("a line for the person");
+    } finally { vi.doUnmock("inquirer"); vi.resetModules(); }
   });
 });
 
