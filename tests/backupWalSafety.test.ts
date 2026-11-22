@@ -34,9 +34,10 @@ const APPENDER = `
   while (Date.now() < end) {
     ledger.appendEvidence({ sessionId: "concurrent", runtime: "unknown", eventType: "stdout", payload: "row " + n + " " + "x".repeat(3000), inline: true });
     if (++n === 40) console.log("ready");
-    // Leave the write lock free for a moment every ten appends, as real writers do, so the backup's own
-    // audit row is not starved past SQLite's 5 s busy timeout on a loaded runner.
-    if (n % 10 === 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+    // Leave the write lock free every ten appends, as real writers do, for longer than SQLite's longest busy-retry
+    // sleep (100 ms): a shorter gap falls between retries on a loaded runner and the backup's own audit row is
+    // starved past the 5 s busy timeout ("database is locked").
+    if (n % 10 === 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 120);
   }
   ledger.close();
   console.log("done " + n);
