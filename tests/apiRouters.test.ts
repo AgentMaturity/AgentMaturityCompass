@@ -1855,7 +1855,7 @@ describe("AMC API routers", () => {
     const cases = [
       ["/api/v1/watch/status", "GET", undefined, undefined],
       ["/api/v1/watch/guard", "POST", { agentId: "agent-1", proposedOutput: "hello", riskTier: "low", actionType: "respond" }, undefined],
-      ["/api/v1/watch/attest", "POST", { agentId: "agent-1", output: "response", sessionId: "sess-1" }, undefined],
+      ["/api/v1/watch/attest", "POST", { agentId: "agent-1", output: "response" }, undefined],
       ["/api/v1/watch/safety-test", "POST", { agentId: "agent-1", packId: "all", window: "30d" }, undefined],
       ["/api/v1/watch/explain", "POST", { agentId: "agent-1", runId: "run-1" }, undefined],
       ["/api/v1/watch/replay-corpus", "POST", { agentId: "agent-1", corpusId: "corpus-1", corpusVersion: "v1", baselineRunId: "base", candidateRunId: "candidate", rows: [] }, undefined],
@@ -1872,7 +1872,9 @@ describe("AMC API routers", () => {
       await assertJsonRoute(handleWatchRoute, { pathname, method, body, url, workspace: ws });
     }
     // attest and oversight start the session they write to (HP-51); the real-store check is in tests/p055/noSignWriters.test.ts.
-    expect(m.startSession.mock.calls.map(([params]: [{ sessionId: string }]) => params.sessionId)).toEqual(["sess-1", expect.stringMatching(/^oversight_/)]);
+    expect(m.startSession.mock.calls.map(([params]: [{ sessionId: string }]) => params.sessionId)).toEqual([expect.stringMatching(/^attest_/), expect.stringMatching(/^oversight_/)]);
+    const refused = await callRoute(handleWatchRoute, { pathname: "/api/v1/watch/attest", method: "POST", body: { output: "response", sessionId: "sess-1" }, workspace: ws });
+    expect([refused.status, m.startSession.mock.calls.length]).toEqual([400, 2]);
     const eddRagWatch = await assertJsonRoute(handleWatchRoute, { pathname: "/api/v1/watch/live-drift", method: "POST", body: eddRagLiveDriftRequestBody(), workspace: ws });
     expect(eddRagWatch.receipt.failClosed).toBe(true);
     expect(eddRagWatch.watchAlerts.map((alert: { metricId: string }) => alert.metricId)).toEqual(expect.arrayContaining([

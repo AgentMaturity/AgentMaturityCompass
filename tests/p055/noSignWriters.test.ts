@@ -438,7 +438,21 @@ test("watch attest and oversight write unsigned rows to the unsigned store", asy
     const unsealed = db.prepare("SELECT s.session_id FROM sessions s JOIN evidence_events e ON e.session_id = s.session_id WHERE e.id IN (?, ?) AND s.ended_ts IS NULL")
       .all(String(attest.data.eventId), String(oversight.data.eventId));
     expect([orphans, unsealed]).toEqual([[], []]);
+    expect(String(attest.data.sessionId)).toMatch(/^attest_[0-9a-f-]{36}$/);
   } finally { db.close(); }
+});
+
+test("watch attest refuses a caller-named session and writes nothing (an unknown id, another agent's, a native one)", async () => {
+  const native = "nosign-native-owned", ledger = openLedger(workspace, { store: "unsigned" });
+  try { ledger.startSession({ sessionId: native, runtime: "amc", binaryPath: "agent-2", binarySha256: "test" }); } finally { ledger.close(); }
+  const rows = () => { const db = new Database(join(workspace, UNSIGNED_EVIDENCE_STORE), { readonly: true }); try { return db.prepare("SELECT (SELECT count(*) FROM evidence_events) AS e, (SELECT count(*) FROM sessions) AS s").get(); } finally { db.close(); } };
+  const before = rows();
+  for (const sessionId of ["never-opened-id", native]) {
+    const refused = await postWatch("/api/v1/watch/attest", { agentId: "default", output: "agent output", sessionId });
+    expect(refused.status).toBe(400);
+    expect(String(refused.data.error)).toContain("sessionId is not accepted");
+  }
+  expect(rows()).toEqual(before);
 });
 
 test("the change envelope session-open audit writes an unsigned row to the unsigned store", () => {

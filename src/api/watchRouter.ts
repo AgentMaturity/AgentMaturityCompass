@@ -18,13 +18,19 @@ import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProvider
 import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
 import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
 import type { Ledger } from '../ledger/ledger.js';
+import { randomUUID } from 'node:crypto';
 import { sha256Hex } from '../utils/hash.js';
 
-/** Starts the session's lifecycle record when it has none; true when this call started it. */
-function startWatchSession(ledger: Ledger, sessionId: string): boolean {
-  if (ledger.getSessionById(sessionId) !== null) return false;
+/**
+ * One audit row in a session this server opens for it and seals at once (HP-51: a row without its session's lifecycle
+ * record fails `amc verify` and the session list). The id is the server's own, random: a caller never names it.
+ */
+function appendWatchRow(ledger: Ledger, kind: 'attest' | 'oversight', row: { payload: string; payloadExt: 'txt' | 'json' }): { sessionId: string; eventId: string } {
+  const sessionId = `${kind}_${randomUUID()}`;
   ledger.startSession({ sessionId, runtime: 'unknown', binaryPath: 'amc-watch', binarySha256: sha256Hex('amc-watch') });
-  return true;
+  try {
+    return { sessionId, eventId: ledger.appendEvidence({ sessionId, runtime: 'unknown', eventType: 'audit', ...row }) };
+  } finally { ledger.sealSession(sessionId); }
 }
 
 export async function handleWatchRoute(
@@ -127,22 +133,15 @@ export async function handleWatchRoute(
     try {
       const body = await bodyJson<{ agentId?: string; output: string; sessionId?: string }>(req);
       if (!body.output) { apiError(res, 400, 'output required'); return true; }
+      // A caller-named session would let a client write into, or open, a session that is not its own (another agent's,
+      // a native or A4 session). AMC opens a session for each attestation and returns its id.
+      if (body.sessionId !== undefined) { apiError(res, 400, 'sessionId is not accepted: AMC opens a new session for each attestation and returns its id. Send the request again without sessionId.'); return true; }
       const agentId = body.agentId ?? 'default';
       const { openLedger } = await import('../ledger/ledger.js');
       const { writerStore } = await import('../ledger/ledgerConnection.js');
       const ledger = openLedger(workspace, writerStore());
       try {
-        const sessionId = body.sessionId ?? `attest_${Date.now()}`;
-        // A row needs its session's lifecycle record, or `amc verify` and the session list refuse the workspace (HP-51).
-        const started = startWatchSession(ledger, sessionId);
-        const eventId = ledger.appendEvidence({
-          sessionId,
-          runtime: 'unknown',
-          eventType: 'audit',
-          payload: body.output,
-          payloadExt: 'txt',
-        });
-        if (started && body.sessionId === undefined) ledger.sealSession(sessionId);
+        const { sessionId, eventId } = appendWatchRow(ledger, 'attest', { payload: body.output, payloadExt: 'txt' });
         apiSuccess(res, { attested: true, agentId, eventId, sessionId });
       } finally {
         ledger.close();
@@ -450,16 +449,7 @@ export async function handleWatchRoute(
       const { writerStore } = await import('../ledger/ledgerConnection.js');
       const ledger = openLedger(workspace, writerStore());
       try {
-        const sessionId = `oversight_${Date.now()}`;
-        startWatchSession(ledger, sessionId);
-        const eventId = ledger.appendEvidence({
-          sessionId,
-          runtime: 'unknown',
-          eventType: 'audit',
-          payload: JSON.stringify({ event: body.event, metadata: body.metadata }),
-          payloadExt: 'json',
-        });
-        ledger.sealSession(sessionId);
+        const { eventId } = appendWatchRow(ledger, 'oversight', { payload: JSON.stringify({ event: body.event, metadata: body.metadata }), payloadExt: 'json' });
         apiSuccess(res, { logged: true, eventId });
       } finally {
         ledger.close();

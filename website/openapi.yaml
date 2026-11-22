@@ -10069,11 +10069,11 @@ paths:
                   type: string
                 output:
                   type: string
-                sessionId:
-                  type: string
       responses:
         '200':
-          description: Attestation result
+          description: Attestation result, with the id of the session AMC opened and sealed for it
+        '400':
+          description: output missing, or a sessionId was sent (AMC chooses the session)
 
   /v1/watch/safety-test:
     post:
