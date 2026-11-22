@@ -17,6 +17,15 @@ import type { RunPatronusProviderDriftInput } from '../benchmarks/patronusProvid
 import type { RunInspectProviderDriftInput } from '../benchmarks/inspectProviderDrift.js';
 import type { RunTensorZeroProviderDriftInput } from '../benchmarks/tensorZeroProviderDrift.js';
 import type { RunHelmProviderDriftInput } from '../benchmarks/helmProviderDrift.js';
+import type { Ledger } from '../ledger/ledger.js';
+import { sha256Hex } from '../utils/hash.js';
+
+/** Starts the session's lifecycle record when it has none; true when this call started it. */
+function startWatchSession(ledger: Ledger, sessionId: string): boolean {
+  if (ledger.getSessionById(sessionId) !== null) return false;
+  ledger.startSession({ sessionId, runtime: 'unknown', binaryPath: 'amc-watch', binarySha256: sha256Hex('amc-watch') });
+  return true;
+}
 
 export async function handleWatchRoute(
   pathname: string,
@@ -124,6 +133,8 @@ export async function handleWatchRoute(
       const ledger = openLedger(workspace, writerStore());
       try {
         const sessionId = body.sessionId ?? `attest_${Date.now()}`;
+        // A row needs its session's lifecycle record, or `amc verify` and the session list refuse the workspace (HP-51).
+        const started = startWatchSession(ledger, sessionId);
         const eventId = ledger.appendEvidence({
           sessionId,
           runtime: 'unknown',
@@ -131,6 +142,7 @@ export async function handleWatchRoute(
           payload: body.output,
           payloadExt: 'txt',
         });
+        if (started && body.sessionId === undefined) ledger.sealSession(sessionId);
         apiSuccess(res, { attested: true, agentId, eventId, sessionId });
       } finally {
         ledger.close();
@@ -438,13 +450,16 @@ export async function handleWatchRoute(
       const { writerStore } = await import('../ledger/ledgerConnection.js');
       const ledger = openLedger(workspace, writerStore());
       try {
+        const sessionId = `oversight_${Date.now()}`;
+        startWatchSession(ledger, sessionId);
         const eventId = ledger.appendEvidence({
-          sessionId: `oversight_${Date.now()}`,
+          sessionId,
           runtime: 'unknown',
           eventType: 'audit',
           payload: JSON.stringify({ event: body.event, metadata: body.metadata }),
           payloadExt: 'json',
         });
+        ledger.sealSession(sessionId);
         apiSuccess(res, { logged: true, eventId });
       } finally {
         ledger.close();

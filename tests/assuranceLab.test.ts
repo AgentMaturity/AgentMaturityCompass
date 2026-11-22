@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { afterAll, afterEach, beforeAll, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
-import { openLedger } from "../src/ledger/ledger.js";
+import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { runAssurance, verifyAssuranceRun } from "../src/assurance/assuranceRunner.js";
 import {
   hasSecretLikeContent,
@@ -156,12 +156,17 @@ describe("assurance lab", () => {
 
     const ledger = openLedger(workspace);
     const audits = ledger.getAllEvents().filter((event) => event.event_type === "audit");
-    ledger.close();
     const assuranceMissing = audits.filter(
       (event) =>
         (JSON.parse(event.payload_inline ?? "{}") as Record<string, unknown>).auditType === "ASSURANCE_EVIDENCE_MISSING"
     );
     expect(assuranceMissing.length).toBeGreaterThan(0);
+    // Each row has its own sealed lifecycle record: without it `amc verify` fails ("references missing session") and
+    // the session list refuses the whole workspace (HP-51).
+    for (const event of assuranceMissing) expect(ledger.getSessionById(event.session_id)?.ended_ts).toEqual(expect.any(Number));
+    ledger.close();
+    const verified = await verifyLedgerIntegrity(workspace);
+    expect(verified.errors.filter((error) => error.includes("missing session"))).toEqual([]);
     expect(report.questionScores.find((q) => q.questionId === "AMC-1.8")?.finalLevel ?? 0).toBeLessThanOrEqual(3);
     expect(report.questionScores.find((q) => q.questionId === "AMC-2.5")?.finalLevel ?? 0).toBeLessThanOrEqual(3);
   });

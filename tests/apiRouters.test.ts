@@ -66,8 +66,12 @@ const m = vi.hoisted(() => ({
     db: {},
     close: m.ledgerClose,
     listRuns: m.listRuns,
-    appendEvidence: m.appendEvidence
+    appendEvidence: m.appendEvidence,
+    getSessionById: vi.fn(() => null),
+    startSession: m.startSession,
+    sealSession: vi.fn()
   })),
+  startSession: vi.fn(),
   ledgerClose: vi.fn(),
   listRuns: vi.fn(() => [{ run_id: "run-b" }, { run_id: "run-a" }]),
   appendEvidence: vi.fn(() => "event-1"),
@@ -1867,6 +1871,8 @@ describe("AMC API routers", () => {
     for (const [pathname, method, body, url] of cases) {
       await assertJsonRoute(handleWatchRoute, { pathname, method, body, url, workspace: ws });
     }
+    // attest and oversight start the session they write to (HP-51); the real-store check is in tests/p055/noSignWriters.test.ts.
+    expect(m.startSession.mock.calls.map(([params]: [{ sessionId: string }]) => params.sessionId)).toEqual(["sess-1", expect.stringMatching(/^oversight_/)]);
     const eddRagWatch = await assertJsonRoute(handleWatchRoute, { pathname: "/api/v1/watch/live-drift", method: "POST", body: eddRagLiveDriftRequestBody(), workspace: ws });
     expect(eddRagWatch.receipt.failClosed).toBe(true);
     expect(eddRagWatch.watchAlerts.map((alert: { metricId: string }) => alert.metricId)).toEqual(expect.arrayContaining([

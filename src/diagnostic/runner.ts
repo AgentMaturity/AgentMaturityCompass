@@ -1046,6 +1046,10 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       );
     }
     if (assuranceMissingQuestions.size > 0) {
+      // These rows get their own lifecycle record, as persistAuditFindings' do: events under a session id that was never
+      // started fail `amc verify` ("references missing session") and the session list for the whole workspace.
+      ledger.startSession({ sessionId: runId, runtime: "unknown", binaryPath: "amc-diagnostic-audits", binarySha256: sha256Hex("amc-diagnostic-audits") });
+      try {
       for (const questionId of assuranceMissingQuestions) {
         instant?.assertCurrent();
         ledger.appendEvidence({
@@ -1068,6 +1072,9 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
             runId
           }
         });
+      }
+      } finally {
+        ledger.sealSession(runId);
       }
       _cachedAllEvents = null;
       events = filterEventsForAgent(

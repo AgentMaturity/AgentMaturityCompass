@@ -431,6 +431,14 @@ test("watch attest and oversight write unsigned rows to the unsigned store", asy
   const unsigned = unsignedStore();
   expect([unsigned.get(String(attest.data.eventId)), unsigned.get(String(oversight.data.eventId))]).toEqual(["unsigned", "unsigned"]);
   expect(signedStore().size).toBe(signedBefore);
+  // Each row's session has a sealed lifecycle record (HP-51): an orphan row fails verify and the session list.
+  const db = new Database(join(workspace, UNSIGNED_EVIDENCE_STORE), { readonly: true });
+  try {
+    const orphans = db.prepare("SELECT e.id FROM evidence_events e LEFT JOIN sessions s ON s.session_id = e.session_id WHERE s.session_id IS NULL").all();
+    const unsealed = db.prepare("SELECT s.session_id FROM sessions s JOIN evidence_events e ON e.session_id = s.session_id WHERE e.id IN (?, ?) AND s.ended_ts IS NULL")
+      .all(String(attest.data.eventId), String(oversight.data.eventId));
+    expect([orphans, unsealed]).toEqual([[], []]);
+  } finally { db.close(); }
 });
 
 test("the change envelope session-open audit writes an unsigned row to the unsigned store", () => {
