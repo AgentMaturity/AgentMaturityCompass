@@ -70,6 +70,8 @@ export function studioStoredRunReport(res: ServerResponse, workspace: string, ru
     }
     throw error;
   }
+  // The shared legacy folder, or a file in the wrong folder, can hold another agent's run: answer only for the agent named.
+  if (agentId !== undefined && report.agentId !== agentId) return { status: 404, body: { error: "run report not found" } };
   if (!auth.isAdmin && auth.agentId && report.agentId !== auth.agentId) {
     return { status: 403, body: { error: "scope does not include this agent" } };
   }
