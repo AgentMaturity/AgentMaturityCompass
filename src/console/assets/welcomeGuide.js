@@ -79,10 +79,10 @@ export const BANNER_TIPS = {
   trust: "How much the latest score can be relied on, based on the strength of its evidence. N/A means no scored run yet.",
   integrity: "A number from 0 to 1 for how complete and consistent the evidence behind the score is. N/A means no scored run yet.",
   evidence: "Whether the latest run has enough trustworthy evidence. NO RUN means nothing has been scored yet.",
-  claims: "ELIGIBLE means the evidence is strong enough to make a claim about this agent. BLOCKED means it is not yet.",
+  claims: "Can be claimed means the evidence is strong enough to make a claim about this agent. Blocked means it is not yet.",
   freezes: "How many pauses are stopping actions right now. 0 means none.",
   config: "SIGNED means AMC's settings carry a valid signature. Otherwise AMC switches to read-only to stay safe.",
-  trustMode: "Where AMC's signing keys live: LOCAL_VAULT is a locked store on this computer; NOTARY is a separate signing service.",
+  trustMode: "Where AMC's signing keys live: Local vault is a locked store on this computer; NOTARY is a separate signing service.",
   transparency: "Whether AMC's public log of signed records checks out. OK means no changes were found."
 };
 

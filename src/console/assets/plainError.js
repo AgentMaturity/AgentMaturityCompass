@@ -46,7 +46,7 @@ const CODE_WORDS = {
   EXPIRED: "Expired", CANCELLED: "Cancelled", CONSUMED: "Approved and used", APPROVED: "Approved", OWNER: "Owner", AUDITOR: "Auditor", APPROVER: "Approver",
   OPERATOR: "Operator", VIEWER: "Viewer", ACTIVE: "Active", REVOKED: "Revoked", LOCAL_VAULT: "Local vault",
   VALID: "Checks out", INVALID: "Does not check out", PASS: "Passed", FAIL: "Failed", WARN: "Needs a look", ENFORCE: "Enforced",
-  UNKNOWN: "Not known", MISSING: "Missing", UNVERIFIED: "Not verified", ELIGIBLE: "Allowed", BLOCKED: "Blocked", NOT_CONFIGURED: "Not set up",
+  UNKNOWN: "Not known", MISSING: "Missing", UNVERIFIED: "Not verified", ELIGIBLE: "Can be claimed", BLOCKED: "Blocked", NOT_CONFIGURED: "Not set up",
   SOC2: "SOC 2", NIST_AI_RMF: "NIST AI RMF", ISO_27001: "ISO 27001", ISO_42001: "ISO 42001", EU_AI_ACT: "EU AI Act"
 };
 // Words joined by underscores are codes; a single word only when the table names it (so "AMC" stays "AMC").

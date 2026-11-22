@@ -76,7 +76,7 @@ describe("code words shown as values read as words, with the code kept on the ti
   // 2026-11-19: console code wrote VALID, PASS, ENFORCE and the like as bare codes on inherited pages.
   test("status codes the console writes itself read as words, the code on the title", async () => {
     expect(["VALID", "INVALID", "PASS", "FAIL", "ENFORCE", "ELIGIBLE", "BLOCKED", "UNKNOWN", "NOT_CONFIGURED"].map(plainCode))
-      .toEqual(["Checks out", "Does not check out", "Passed", "Failed", "Enforced", "Allowed", "Blocked", "Not known", "Not set up"]);
+      .toEqual(["Checks out", "Does not check out", "Passed", "Failed", "Enforced", "Can be claimed", "Blocked", "Not known", "Not set up"]);
     const { renderPromptStatusChip } = await import("../../src/console/assets/components/promptStatusChip.js");
     expect(renderPromptStatusChip("Enforcement", "enforce")).toContain('Enforcement: <span class="code-word" title="Code: ENFORCE">Enforced</span>');
     const app = readFileSync("src/console/assets/app.js", "utf8");

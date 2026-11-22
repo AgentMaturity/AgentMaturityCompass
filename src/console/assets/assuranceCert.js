@@ -41,7 +41,7 @@ export async function renderAssuranceCertPage(params) {
         <div><div class="muted">Issued</div><div class="tile-value">${escapeHtml(iso(cert.issuedTs))}</div></div>
       </div>
       <div class="muted">file: <code>${escapeHtml(file || "-")}</code></div>
-      <div class="muted">Signature check: ${plainCodeHtml(verify?.ok ? "PASS" : "FAIL")}</div>
+      <div class="muted">Record check: ${plainCodeHtml(verify?.ok ? "PASS" : "FAIL")}</div>
       ${recordRows({
         riskAssuranceScore: cert.riskAssuranceScore,
         findingCounts: cert.findingCounts,
