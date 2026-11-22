@@ -55,6 +55,11 @@ export function registerSessionCommands(program: Command): void {
         return;
       }
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
+      // Say why, as amc verify does: a bare FAILED left the cause untraced (HP-51).
+      if (!result.ok) {
+        for (const error of result.errors.slice(0, 10)) console.log(`- ${error}`);
+        if (result.errors.length > 10) console.log(chalk.gray(`  ... and ${result.errors.length - 10} more`));
+      }
       printClaimResult(claim, {});
       const { open, released, interrupted, closed } = result.sessions;
       console.log("");
