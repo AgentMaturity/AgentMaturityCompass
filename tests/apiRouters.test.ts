@@ -1872,7 +1872,7 @@ describe("AMC API routers", () => {
       await assertJsonRoute(handleWatchRoute, { pathname, method, body, url, workspace: ws });
     }
     // attest and oversight start the session they write to (HP-51); the real-store check is in tests/p055/noSignWriters.test.ts.
-    expect(m.startSession.mock.calls.map(([params]: [{ sessionId: string }]) => params.sessionId)).toEqual([expect.stringMatching(/^attest_/), expect.stringMatching(/^oversight_/)]);
+    expect(m.startSession.mock.calls.map((call: any[]) => (call[0] as { sessionId: string }).sessionId)).toEqual([expect.stringMatching(/^attest_/), expect.stringMatching(/^oversight_/)]);
     const refused = await callRoute(handleWatchRoute, { pathname: "/api/v1/watch/attest", method: "POST", body: { output: "response", sessionId: "sess-1" }, workspace: ws });
     expect([refused.status, m.startSession.mock.calls.length]).toEqual([400, 2]);
     const eddRagWatch = await assertJsonRoute(handleWatchRoute, { pathname: "/api/v1/watch/live-drift", method: "POST", body: eddRagLiveDriftRequestBody(), workspace: ws });

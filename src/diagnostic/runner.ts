@@ -1046,36 +1046,16 @@ async function runDiagnosticCore(input: RunDiagnosticInput, outputMarkdownPath?:
       );
     }
     if (assuranceMissingQuestions.size > 0) {
-      // These rows get their own lifecycle record, as persistAuditFindings' do: events under a session id that was never
-      // started fail `amc verify` ("references missing session") and the session list for the whole workspace.
+      // Their own lifecycle record, as persistAuditFindings': rows of a never-started session fail `amc verify` (HP-51).
       ledger.startSession({ sessionId: runId, runtime: "unknown", binaryPath: "amc-diagnostic-audits", binarySha256: sha256Hex("amc-diagnostic-audits") });
       try {
-      for (const questionId of assuranceMissingQuestions) {
-        instant?.assertCurrent();
-        ledger.appendEvidence({
-          sessionId: runId,
-          runtime: "unknown",
-          eventType: "audit",
-          payload: JSON.stringify({
-            auditType: "ASSURANCE_EVIDENCE_MISSING",
-            severity: "HIGH",
-            questionId,
-            runId,
-            message: "Assurance evidence missing in selected window for high/critical risk scoring."
-          }),
-          payloadExt: "json",
-          inline: true,
-          meta: {
-            auditType: "ASSURANCE_EVIDENCE_MISSING",
-            severity: "HIGH",
-            questionId,
-            runId
-          }
-        });
-      }
-      } finally {
-        ledger.sealSession(runId);
-      }
+        for (const questionId of assuranceMissingQuestions) {
+          instant?.assertCurrent();
+          const meta = { auditType: "ASSURANCE_EVIDENCE_MISSING", severity: "HIGH", questionId, runId };
+          ledger.appendEvidence({ sessionId: runId, runtime: "unknown", eventType: "audit", payloadExt: "json", inline: true, meta,
+            payload: JSON.stringify({ ...meta, message: "Assurance evidence missing in selected window for high/critical risk scoring." }) });
+        }
+      } finally { ledger.sealSession(runId); }
       _cachedAllEvents = null;
       events = filterEventsForAgent(
         getCachedEvents(),

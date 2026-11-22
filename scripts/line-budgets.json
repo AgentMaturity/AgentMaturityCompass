@@ -20,7 +20,7 @@
     "src/studio/openapi.ts": 2208,
     "src/enforce/resourceManifest.ts": 2032,
     "src/eval/evalImporters.ts": 1968,
-    "src/diagnostic/runner.ts": 1896,
+    "src/diagnostic/runner.ts": 1883,
     "src/diagnostic/evidenceDrilldown.ts": 1714,
     "src/workspaces/workspaceRouter.ts": 1701,
     "src/runtime/firewall.ts": 1636,
