@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { binaryAllowedForTool, hostAllowedForTool, pathAllowedByPatterns, validateToolRequest } from "../src/toolhub/toolhubValidators.js";
+import { hostAllowedForTool, pathAllowedByPatterns, validateToolRequest } from "../src/toolhub/toolhubValidators.js";
 import type { ToolDefinition } from "../src/toolhub/toolsSchema.js";
 
 /**
@@ -291,10 +291,9 @@ describe("declared binary and argv policies need the call to name what they chec
     expect(validateToolRequest({ workspace: workspace(), tool: tool({ name: "runner.go", deny } as never), args: { command: "ls" } }).ok).toBe(true);
   });
 
-  it("a tool with no host or binary list and no deny-by-default allows any host and any binary when asked directly", () => {
+  it("a tool with no host list and no deny-by-default allows any host when asked directly; deny-by-default allows none", () => {
     expect(hostAllowedForTool(tool({ name: "open.web" }), "example.org")).toBe(true);
     expect(hostAllowedForTool(tool({ name: "open.web", denyByDefault: true } as never), "example.org")).toBe(false);
-    expect(binaryAllowedForTool(tool({ name: "runner.go" }), "anything")).toBe(true);
   });
 
   it("refuses a path whose workspace has no real location, naming the path", () => {

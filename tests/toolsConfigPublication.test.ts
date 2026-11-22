@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import YAML from "yaml";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { initToolsConfigAsync, listAllowedTools, loadToolsConfig, prepareToolsConfigPair, toolsConfigPath, ToolsConfigPublicationError,
+import { initToolsConfigAsync, loadToolsConfig, prepareToolsConfigPair, toolsConfigPath, ToolsConfigPublicationError,
   verifyToolsConfigSignature } from "../src/toolhub/toolhubValidators.js";
 import { defaultToolsConfig } from "../src/toolhub/toolsSchema.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -31,7 +31,7 @@ const changedConfig = (): Buffer => {
 
 describe("the tools config pair", () => {
   it("reads the allowed tools of the signed config, and names a missing file", () => {
-    expect(listAllowedTools(workspace).map((tool) => tool.name)).toEqual(defaultToolsConfig().tools.allowedTools.map((tool) => tool.name));
+    expect(loadToolsConfig(workspace).tools.allowedTools.map((tool) => tool.name)).toEqual(defaultToolsConfig().tools.allowedTools.map((tool) => tool.name));
     expect(() => loadToolsConfig(workspace, "missing-tools.yaml")).toThrow(`Tools config not found: ${join(workspace, "missing-tools.yaml")}`);
   });
 
@@ -47,7 +47,7 @@ describe("the tools config pair", () => {
     const paths = prepared.publish((path) => recorded.push(path));
     expect(paths).toEqual({ configPath: toolsConfigPath(workspace), sigPath: `${toolsConfigPath(workspace)}.sig` });
     expect(recorded).toEqual([paths.configPath, paths.sigPath]);
-    expect(listAllowedTools(workspace)).toHaveLength(1);
+    expect(loadToolsConfig(workspace).tools.allowedTools).toHaveLength(1);
     expect(verifyToolsConfigSignature(workspace).valid).toBe(true);
   });
 
