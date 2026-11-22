@@ -40,6 +40,28 @@ describe("nativeToolSchemas", () => {
   });
 });
 
+describe("nativeToolSchemas refuses an incomplete or invalid listing", () => {
+  afterEach(() => { vi.doUnmock("../src/autonomy/goalTool.js"); vi.doUnmock("../src/agent/nativeToolCapabilities.js"); vi.resetModules(); });
+
+  it("names the tool whose published schema is not a valid JSON Schema", async () => {
+    vi.resetModules();
+    vi.doMock("../src/autonomy/goalTool.js", () => ({ goalTool: () => ({ name: "get_goal", actionClass: "READ_ONLY", description: "broken fixture",
+      parameters: { type: "object", properties: { round: { type: "not-a-type" } } }, body: () => ({ ok: true, output: "" }) }) }));
+    const { nativeToolSchemas: listing } = await import("../src/tools/builtin/nativeToolSchemas.js");
+    expect(() => listing(scratch())).toThrow(/^tool "get_goal" publishes an invalid JSON Schema: /);
+  });
+
+  it("names every native capability that has neither a listed schema nor an unavailable entry", async () => {
+    vi.resetModules();
+    vi.doMock("../src/agent/nativeToolCapabilities.js", async (importOriginal) => {
+      const real = await importOriginal<typeof import("../src/agent/nativeToolCapabilities.js")>();
+      return { ...real, NATIVE_BUILTIN_CAPABILITIES: [...real.NATIVE_BUILTIN_CAPABILITIES, { name: "teleport", actionClass: "WRITE_HIGH" }, { name: "time_travel", actionClass: "WRITE_HIGH" }] };
+    });
+    const { nativeToolSchemas: listing } = await import("../src/tools/builtin/nativeToolSchemas.js");
+    expect(() => listing(scratch())).toThrow("native capabilities without a listed schema: teleport, time_travel");
+  });
+});
+
 describe("amc tools list --schemas", () => {
   it("reports the grants of an unsigned workspace as none, filters by tool and refuses an unknown name", () => {
     const report = toolSchemasReport(scratch());
