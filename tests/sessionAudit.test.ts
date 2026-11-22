@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -20,6 +20,7 @@ import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { renderNativeSessionList } from "../src/setup/nativeInteractiveNavigation.js";
+import { callRoute } from "./helpers/routeCall.js";
 
 /** UX-04/UX-05: a CLI session's actions are listed for the console, exported for an auditor, and shown to an approver. */
 describe("session audit for the console", () => {
@@ -297,6 +298,32 @@ describe("session audit for the console", () => {
     expect(sessionAuditExport(workspace, orphan, "json")).toEqual({ status: 409, error: reason });
     expect(sessionAuditExport(workspace, id, "json")).toMatchObject({ status: 409, error: expect.stringContaining("1 other session(s)") });
     expect(renderNativeSessionList(workspace, "default", 20)).toEqual([expect.stringContaining(`${orphan} · cannot be read (MISSING)`), expect.stringContaining(id)]);
+  });
+
+  it("the export route: a readable page as an attachment, and refusals in words for a bad format, a bad id and an unknown session", async () => {
+    const id = chat();
+    const exportUrl = (sessionId: string, format: string) => `/api/v1/evidence/sessions/${sessionId}/export?format=${format}`;
+    const html = await callRoute(handleEvidenceRoute, workspace, "GET", exportUrl(id, "html"));
+    expect(html.status).toBe(200);
+    expect(html.headers).toMatchObject({ "Content-Type": "text/html; charset=utf-8", "Content-Disposition": 'attachment; filename="amc-session-cli-chat.html"',
+      "X-Content-Type-Options": "nosniff", "Cache-Control": "no-store" });
+    expect(html.body).toContain("<html");
+    expect(html.body).not.toContain("wrote hello.txt");
+    expect((await callRoute(handleEvidenceRoute, workspace, "GET", exportUrl(id, "pdf"))).json).toMatchObject({ ok: false, error: "format must be json or html" });
+    const unknown = await callRoute(handleEvidenceRoute, workspace, "GET", exportUrl("cli-chat-9999", "json"));
+    expect([unknown.status, unknown.json?.error]).toEqual([404, "no such session in this workspace"]);
+    const badId = await callRoute(handleEvidenceRoute, workspace, "GET", exportUrl("not%20an%20id", "json"));
+    expect([badId.status, badId.json?.error]).toEqual([400, "not a session id"]);
+  });
+
+  it("a store that fails its checks as a whole lists no session, and says so in words (409)", async () => {
+    chat();
+    const marker = join(workspace, ".amc", "session-store.json");
+    expect(existsSync(marker)).toBe(true);
+    writeFileSync(marker, "{ not json");
+    const listed = await callRoute(handleEvidenceRoute, workspace, "GET", "/api/v1/evidence/sessions");
+    expect(listed.status).toBe(409);
+    expect(listed.json?.error).toBe("No session is listed: this workspace's evidence did not pass its checks (UNSUPPORTED_FORMAT). Run amc verify in this workspace for the detail.");
   });
 
   it("HP-51: Records for one agent list only that agent's sessions", () => {
