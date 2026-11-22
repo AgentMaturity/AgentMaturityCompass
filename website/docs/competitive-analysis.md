@@ -524,7 +524,7 @@ The AI evaluation, security, and governance landscape has exploded into a fragme
 | **Multi-Regulation Packs** | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅✅ | ❌ | ❌ |
 | **Open Source Core** | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ⚠️ |
 | **Docker/Self-Host** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| **CLI (1,306 command paths)** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| **CLI (1,307 command paths)** | ✅ | ✅ | ✅ | ⚠️ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
 Legend: ✅ = Has feature | ✅✅ = Industry-leading | ⚠️ = Partial/basic | ❌ = Missing
 
@@ -580,7 +580,7 @@ What AMC has (comparisons with other tools are not verified):
 | **Deep diagnostic coverage + broad assurance library** | A large question bank and assurance pack library. | Other tools' coverage: not verified. |
 | **16 framework adapters** | Direct integration with actual agent frameworks (LangChain, CrewAI, AutoGen, etc.) for behavior capture. | Other tools' framework integration: not verified. |
 | **Gateway behavioral capture** | Sits between agent and LLM, captures real behavior without agent cooperation. | Other tools' capture method: not verified. |
-| **Developer-first + governance depth** | CLI (1,306 command paths) + REST API + Docker + Browser playground. Both developer and governance buyer. | Other tools' audience: not verified. |
+| **Developer-first + governance depth** | CLI (1,307 command paths) + REST API + Docker + Browser playground. Both developer and governance buyer. | Other tools' audience: not verified. |
 
 ### Strategic Positioning Summary
 

@@ -3,7 +3,7 @@ import { assertStorageAdmission } from "../residency/checkEgress.js";
 import type { EvidenceEvent } from "../types.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
-import { sha256Hex } from "../utils/hash.js";
+import { normalizeSha256, sha256Hex } from "../utils/hash.js";
 import type { ConversationHistory } from "./surfaceProjection.js";
 import { describeLiveEntries, prepareSurfaceCompaction, type AutomaticCompaction, type LiveSurfaceEntry } from "./surfaceCompaction.js";
 import { workspaceSelfTrust } from "../trust/trustContext.js";
@@ -46,12 +46,6 @@ import type {
   TurnRef,
   TurnStartParams
 } from "./sessionApiTypes.js";
-// A monitor digest is a 64-char lowercase hex sha256. compositionDigest is
-// already one in normal use; anything else is hashed so the sessions row's
-// binary_sha256 column is always well-formed.
-function normalizeSha256(value: string): string {
-  return /^[0-9a-f]{64}$/i.test(value) ? value.toLowerCase() : sha256Hex(value);
-}
 
 // SessionService is the SINGLE WRITER for one session's spine. It owns the
 // per-session head (seq + prevSessionEventHash) in memory and the current
@@ -535,6 +529,10 @@ export class SessionService extends SessionEventWriter {
   retainOversizeInput(what: string, bytes: Buffer, cap: number, subject: SpillCommitmentSubject): { readonly ref: SpillRef; readonly descriptor: Buffer } { // Commitment row durable BEFORE the object (./spill/spillInput.ts).
     return this.requireSpill().retainInput({ nameSeed: spillCommitmentNameSeed(subject), content: bytes }, { what, cap }, (ref) => void this.appendSessionEvent({ eventType: SPILL_COMMITMENT_EVENT_TYPE,
       surface: { op: "none" }, turn: this.currentTurn, step: this.currentStep, typeMeta: { turn: this.currentTurn, step: this.currentStep, ...spillCommitmentMeta(subject), [SPILL_META_KEY]: ref } }));
+  }
+  /** HP-06: a file's earlier bytes as an encrypted spill object behind a signed commitment (src/tools/builtin/fileCheckpoint.ts). */
+  retainFileCheckpoint(bytes: Buffer, callId: string, cap: number): SpillRef {
+    return this.retainOversizeInput("A file checkpoint", bytes, cap, { subject: "file/checkpoint", callId }).ref;
   }
 
   recordToolCall(call: ToolCallInput): SessionEventRef {

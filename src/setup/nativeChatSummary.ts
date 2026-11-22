@@ -59,7 +59,7 @@ function renderContext(reading: ChatContextReading | null): string | null {
 export function renderTurnFooter(input: { readonly recorded: boolean; readonly turn: number | undefined; readonly ending: string | undefined;
   readonly usage: unknown; readonly context: ChatContextReading | null }): string {
   const parts = [input.recorded ? "reply recorded" : "no reply recorded",
-    `turn ${input.turn ?? "?"} ${input.ending ?? "has no recorded ending"}`, renderChatUsage(chatUsageTotals(input.usage)), renderContext(input.context)];
+    `turn ${input.turn ?? "?"} ${input.ending === "blocked" ? "ended by AMC before its next step (blocked)" : input.ending ?? "has no recorded ending"}`, renderChatUsage(chatUsageTotals(input.usage)), renderContext(input.context)];
   return chalk.dim(`── ${parts.filter(part => part !== null).join(" · ")}`);
 }
 

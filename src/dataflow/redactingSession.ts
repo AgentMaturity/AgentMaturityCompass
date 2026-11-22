@@ -302,6 +302,11 @@ export function createRedactingSession(session: SessionService, redactor: Redact
       return session.recordLoopEvent({ ...record, text, ...(record.clientRequestId === undefined || record.origin === null ? {} : {
         clientRequestSha256: requestFingerprint(record.target, record.origin, record.wake, record.demotedFrom, undefined, spilled ?? Buffer.from(text, "utf8")) }) });
     },
+    // HP-06: under protected-data mode no earlier file content is kept: the edit goes ahead and its checkpoint row says why.
+    retainFileCheckpoint(...[bytes, callId, cap]: Parameters<SessionService["retainFileCheckpoint"]>): ReturnType<SessionService["retainFileCheckpoint"]> {
+      if (active()) throw Object.assign(new Error("protected-data mode keeps no earlier file content"), { stage: "protected-data" });
+      return session.retainFileCheckpoint(bytes, callId, cap);
+    },
     retainOversizeInput(...[what, bytes, cap, subject]: Parameters<SessionService["retainOversizeInput"]>): ReturnType<SessionService["retainOversizeInput"]> {
       if (!active() || subject.subject !== "loop/inbox") return session.retainOversizeInput(what, bytes, cap, subject);
       // Media is refused before its spill commitment or object is written, not after.

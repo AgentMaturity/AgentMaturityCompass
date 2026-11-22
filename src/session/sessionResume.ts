@@ -31,6 +31,7 @@
  * untouched. Byte-consistent history is a property of the ledger, not of this
  * module: B reads the rows A wrote.
  */
+import { recordForkAfterRewind, rewindForFork } from "./sessionRewindEvidence.js";
 import { openSessionEventStore } from "../persistence/openSessionEventStore.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
 import { verifyLedgerIntegrity, verifyNativeSessionContinuation } from "../ledger/ledgerVerification.js";
@@ -348,14 +349,16 @@ export function forkSession(params: ForkSessionParams): { service: SessionServic
           try { assertSessionContinuationControls(loadSessionEventHistory({ workspace: params.workspace }), params.parentSessionId); }
           catch (error) { throw error instanceof SessionContinuationControlRefused ? new SessionResumeRefused(error.code, error.message) : error; }
         }
-        const selected = params.inheritConversation === false ? { rows: all, forkTurn: undefined } : selectForkPrefix(all, params.forkTurn);
+        // HP-06: a fork of a rewound parent continues from the rewind's turn and cites it (./sessionRewindEvidence.ts).
+        const rewind = params.inheritConversation === false || params.forkTurn !== undefined ? null : rewindForFork(params.workspace, params.parentSessionId, all);
+        const selected = params.inheritConversation === false ? { rows: all, forkTurn: undefined } : selectForkPrefix(all, rewind?.toTurn ?? params.forkTurn);
         const parts = params.inheritConversation === false ? [] : prepareForkConversation(params.workspace, selected.rows);
         const last = selected.rows.at(-1)!;
         const parent: SessionLineage = { sessionId: params.parentSessionId, finalEventHash: last.event_hash,
           seq: extractEnvelope(last.meta_json)!.seq, ...(selected.forkTurn === undefined ? {} : { forkTurn: selected.forkTurn }) };
         // PXA-12: the parent's measured counts at the fork point travel with the inherited conversation.
         const tokenCounts = params.inheritConversation === false ? null : sessionTokenCounts(selected.rows);
-        return { parent, parts, tokenCounts };
+        return { parent, parts, tokenCounts, rewind };
       });
     } catch (error) {
       if (error instanceof SessionHistoryRefused) throw new SessionResumeRefused(
@@ -368,6 +371,7 @@ export function forkSession(params: ForkSessionParams): { service: SessionServic
   try {
     service.open({ runtime: params.runtime, agentId: params.agentId, harnessVersion: params.harnessVersion,
       compositionDigest: params.compositionDigest, policyDigest: params.policyDigest, parent: prepared.parent });
+    if (prepared.rewind !== null) recordForkAfterRewind(service, prepared.rewind);
     copyForkConversation(redactingSessionFor(service), prepared.parts);
     if (prepared.tokenCounts !== null) {
       const inherited = { auditType: FORK_TOKEN_COUNTS_AUDIT, version: 1, parentSessionId: prepared.parent.sessionId, counts: prepared.tokenCounts };

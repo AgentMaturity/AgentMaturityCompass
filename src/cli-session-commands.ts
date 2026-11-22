@@ -17,6 +17,7 @@ import { registerSessionCompactionCommands } from "./cli-session-compaction-comm
 import { registerSessionContinuityCommands } from "./cli-session-continuity-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
 import { registerSessionExportCommands } from "./cli-session-export-commands.js";
+import { registerSessionRewindCommand } from "./cli-session-rewind-command.js";
 import { finishVerify, ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
@@ -30,6 +31,7 @@ export function registerSessionCommands(program: Command): void {
   registerSessionContinuityCommands(session);
   registerSessionSpillReadCommand(session);
   registerSessionExportCommands(session);
+  registerSessionRewindCommand(session);
 
   withTrustFlags(session
     .command("verify")
@@ -144,6 +146,8 @@ export function registerSessionCommands(program: Command): void {
         for (const stop of turnStops) console.log(chalk.yellow(`Turn ${stop.turn} stopped at a limit: ${escapeTerminalControls(stop.text)}`));
         for (const line of describeCompactionFollowUps(process.cwd(), events)) console.log(escapeTerminalControls(line));
         for (const row of turnChecks) console.log(describeTurnCheck(row)); // HP-04: every turn's recorded check status
+        const { describeSessionRewinds } = await import("./session/sessionRewindEvidence.js");
+        for (const line of describeSessionRewinds(process.cwd(), id, events)) console.log(line); // HP-06
         console.log("");
         if (!opts.spine) { console.log(chalk.gray(`Event spine: ${spine.length} recorded events; add --spine to list them.`)); return; }
         console.log(chalk.bold("Event spine"));

@@ -31,6 +31,8 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "ask_user", actionClass: "READ_ONLY" },
   { name: "todo", actionClass: "READ_ONLY" },
   { name: "plan", actionClass: "READ_ONLY" },
+  // HP-08: defined only in a plan-mode turn (src/tools/builtin/planExitTool.ts).
+  { name: "plan_exit", actionClass: "READ_ONLY" },
   // DXC-29: loads an attributed skill body; denied until the signed tools policy lists it.
   { name: "skill.load", actionClass: "READ_ONLY" },
   { name: "get_goal", actionClass: "READ_ONLY" },

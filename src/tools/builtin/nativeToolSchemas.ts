@@ -14,6 +14,7 @@ import { bashTool } from "./bashTool.js";
 import { fsTools } from "./fsTools.js";
 import { lsTool } from "./lsTool.js";
 import type { NativeReceiptRecorder } from "./nativeToolBreadth/nativeReceipt.js";
+import { planExitTool } from "./planExitTool.js";
 import { planTool } from "./planTool.js";
 import { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { searchTools } from "./searchTools.js";
@@ -59,7 +60,7 @@ function inertDefinitions(workspace: string): ToolDefinition[] {
     ...fsTools({ ledger }), applyPatchTool({ ledger }), lsTool(), ...searchTools(), bashTool(),
     toolSearchTool({ catalog: () => [] }), sessionSpillReadTool({ workspace, agentId: "schema-listing", sessionId }),
     webFetchTool({ record: never }), webSearchTool({ record: never }), askUserTool({ sessionId, record: never }),
-    todoTool({ sessionId, record: never }), planTool({ sessionId, record: never }), skillLoadTool({ roots: [], record: never }), goalTool(),
+    todoTool({ sessionId, record: never }), planTool({ sessionId, record: never }), planExitTool(() => { throw new Error("schema listing never runs a tool body"); }), skillLoadTool({ roots: [], record: never }), goalTool(),
     ...jobTools({ registry: new JobRegistry(), sessionId, ownerStep: () => undefined, run: () => { throw new Error("never runs"); } }),
     ...new NativeTerminalTools({ workspace, sessionId }).tools()
   ];

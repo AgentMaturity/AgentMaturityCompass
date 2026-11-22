@@ -36,7 +36,9 @@ export function withContinuityRunOptions(command: Command): Command {
 }
 
 export function withContinuityChatOptions(command: Command): Command {
-  return command.option("--continue", CONTINUE_HELP);
+  return command.option("--continue", CONTINUE_HELP)
+    .option("--plan", "start in plan mode (HP-08): each task runs with --plan, so the agent can only read; /plan turns it off or on")
+    .option("--no-plan", "start in write mode even when the resumed session's last turn ran in plan mode");
 }
 
 export interface ContinuityRun {

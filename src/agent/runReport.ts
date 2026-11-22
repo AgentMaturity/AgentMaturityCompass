@@ -38,6 +38,7 @@ import type { AgentStatus } from "./loopTypes.js";
 import type { NativeValidationResult } from "./nativeValidation.js";
 import { projectNativeValidation } from "./nativeValidationProjection.js";
 import { describeTurnCheck, projectTurnChecks, turnVerificationErrors, type TurnCheckRow } from "./turnVerification.js";
+import { rewindVerificationErrors } from "../session/sessionRewindEvidence.js";
 import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
 import { projectNativeRunUsage, renderNativeRunUsage, type NativeRunUsage } from "./nativeRunUsage.js";
 import { projectNativeRunDiagnostics, renderNativeRunDiagnostics, type NativeRunDiagnostic } from "./nativeFailureGuidance.js";
@@ -308,6 +309,7 @@ export async function verifyAgentRun(workspace: string, sessionId: string, trust
   }
   // HP-04: each recorded turn check status must match the turn's own rows.
   sessionChainErrors.push(...turnVerificationErrors(sessionRows));
+  sessionChainErrors.push(...rewindVerificationErrors(workspace, sessionId, sessionRows)); // HP-06: rewinds and the forks that continue them
   // P1-38: a pi-ai request re-derives only through the pinned library, loaded only when this session used it.
   const piEncoders = await (await import("../llm/providers/piAi/piAiAdapter.js")).piAiDerivationEncoders(workspace, sessionId);
   const requests = deriveSessionRequests({ workspace, sessionId, ...(piEncoders === null ? {} : { encoders: piEncoders }) }).map((derivation) => ({

@@ -142,6 +142,12 @@ first, then either keeps the decision or writes here why it changes.
   exist: a checkpoint store that works without vault blob keys, a conflict check against the last
   recorded `afterSha256`, a live-writer fence on fork, and a truthful child identity. HP-06 builds
   those four, in that order, or stops.
+  Lane rewind (2026-11-19) changed the first condition and met the other three. The checkpoint store uses
+  the vault-backed blob key, because the only store without it is plaintext, which would repeat the
+  ADR-0010 defect (plaintext, invisible to retention and erasure); the copies are spill objects, so the
+  existing spill lifecycle covers them, and without the key a file is recorded as not kept. The conflict
+  check uses the last `afterSha256`; the live-writer fence is a check of the signed writer meta of every
+  session (not a lock); the child is opened only by the composed `--fork-from` path, which cites the rewind.
 - The LLM judge in suites is deferred (D-12). HP-36 turns it on only with a calibration record and
   never as the only grader of a criterion.
 - Sub-agent `model` must be `inherit`; "auto" and "on-failure" approval modes are refused; OpenAI
