@@ -75,6 +75,13 @@ Keys are stable; lanes cite them.
   approved its own command). Needs a lane: a parent-process or OS-level presence check, or an
   approval factor a same-user process cannot hold (hardware key, second device, second person).
 
+- HP-50 A process started by an approved, sandboxed shell call can outlive its turn and the chat and
+  keep changing the workspace (seen in the rewind review, 2026-11-20). AMC neither reaps nor records
+  it. Needs: reap at turn or session end by process group, or record what is left running.
+- HP-51 From the console session, 2026-11-20, in the lane 0b code: the sessions list fails for the whole
+  workspace when one session's lifecycle record is missing; Records for one agent can list another
+  agent's sessions; the Governor outcomes read is slow under load. Repair lane `repair3`.
+
 ### Orchestration and protocols (D6, R12, R13)
 - HP-25 Sub-agent definitions lack model, permission-mode and skills fields, scopes and fork modes.
 - HP-26 No ACP client/host role; only `claude-cli` as a foreign delegate; no cross-vendor review rule.
