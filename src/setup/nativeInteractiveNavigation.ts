@@ -1,4 +1,5 @@
 import { summarizeNativeSessions, type NativeSessionSummary } from "../session/latestSession.js";
+import { loadListableSessionHistory } from "../session/sessionEventHistory.js";
 import { escapeTerminalControls } from "../tools/builtin/askUserTool.js";
 
 /** Derived navigation only: selection never claims a writer or grants execution. */
@@ -17,13 +18,16 @@ export function renderNativeInteractiveSession(row: NativeInteractiveSessionSumm
 
 /**
  * `amc sessions list` (smoke M-6): this agent's native agent-loop sessions, newest first, each with how to resume or
- * inspect it. Read-only derived navigation, like the chat picker.
+ * inspect it. Read-only derived navigation, like the chat picker. A session whose own record cannot be read is listed
+ * first, for every agent, in words (HP-51): it is never dropped and never shown as a usable session.
  */
 export function renderNativeSessionList(workspace: string, agentId: string, limit: number): string[] {
-  return summarizeNativeSessions(workspace, agentId).filter(row => row.source === "native" && row.agentId === agentId).slice(0, limit)
+  const { history, unreadable } = loadListableSessionHistory(workspace);
+  const broken = unreadable.map(entry => escapeTerminalControls(`${entry.sessionId} · cannot be read (${entry.code}) · ${entry.reason}`));
+  return [...broken, ...summarizeNativeSessions(workspace, agentId, history).filter(row => row.source === "native" && row.agentId === agentId).slice(0, limit)
     .map(row => escapeTerminalControls(`${row.sessionId} · updated ${new Date(row.updatedAt).toISOString()} · ${row.state} · ${row.turns} turns · `
       + (row.canResume ? `resume: amc agent-loop chat --session ${row.sessionId} (with the original --provider/--model)`
-        : `inspect: amc session show ${row.sessionId} · continue in a fork: amc agent-loop chat --fork-from ${row.sessionId}`)));
+        : `inspect: amc session show ${row.sessionId} · continue in a fork: amc agent-loop chat --fork-from ${row.sessionId}`)))];
 }
 
 /** Re-read authenticated metadata after inspection/confirmation and again before dispatch. */

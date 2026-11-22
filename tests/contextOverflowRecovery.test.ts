@@ -187,6 +187,20 @@ describe("reactive compaction after a context-window overflow (HP-05 item 1)", (
     ]);
   });
 
+  it("HP-51: a session written before this rule (an overflow ends the turn, no decision row, the next turn asks again) still passes it", async () => {
+    const { h } = run([textStep("never"), textStep("next turn")], [1]);
+    await turn(h, "Hello.");
+    await turn(h, "Try again.");
+    const rows = h.events();
+    expect(rowsOf(rows, "request/header")).toHaveLength(2);
+    expect(overflowRetryProblems(rows)).toEqual([]);
+    // Builds before HP-05 wrote no CONTEXT_OVERFLOW_RECOVERY row: the same rows without it are what they recorded.
+    const older = rows.filter(row => meta(row).auditType !== OVERFLOW_DECISION_AUDIT);
+    expect(older.length).toBe(rows.length - 1);
+    expect(overflowRetryProblems(older)).toEqual([]);
+    await verified(h);
+  });
+
   it("MUTATION: when pruning removes nothing the turn ends with the overflow; no summary request is sent", async () => {
     // Turn 1 completes with a large answer a summary could cover (one recent step kept, so turn 1 is eligible); in turn 2
     // nothing can be pruned.

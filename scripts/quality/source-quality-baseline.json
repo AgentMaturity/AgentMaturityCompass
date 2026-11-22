@@ -932,7 +932,6 @@
     {"id":"f683a4297bbb17664acf8a764a06d2350eca7e4f8663726d6622ea1b57079922","paths":["watch/garageLiveDrift.ts","watch/llmFighterLiveDrift.ts"],"format":"typescript"},
     {"id":"f69200b1684256ffc587bf6f608ea9dc6190acb3e4074820e0d7a1db37e97438","paths":["assurance/packs/advancedThreatsPack.ts","assurance/packs/globalAIRegulatoryPack.ts"],"format":"typescript"},
     {"id":"f6bc70845a09189df5837bcf5e6ae9301d9a83f225fe628915fe2515eab4a622","paths":["diagnostic/questionScoreExplainability.ts","diagnostic/questionScoreExplainability.ts"],"format":"typescript"},
-    {"id":"f6cd89121ad8a4197ed09a92bab024a4f582c88f302b82e94cac98e723b77369","paths":["governor/governorCli.ts","governor/governorCli.ts"],"format":"typescript"},
     {"id":"f6fd57988098abf9a9e1739ce7fbc5f4a636c5fb8f892c0c9ab82309b0f9c341","paths":["assurance/packs/advancedThreatsPack.ts","assurance/packs/honeytokenDetectionPack.ts"],"format":"typescript"},
     {"id":"f72396fb8953c33d9f0bee858d752485be0e1c194e8311dbe072cf0d00993c3f","paths":["gateway/server.ts","toolhub/toolhubClient.ts"],"format":"typescript"},
     {"id":"f738249e81ab75781fc47afbf0919b2e36b736cc005c2759c643de0844c42787","paths":["redteam/jailbreak/runner.ts","redteam/mcpAgentProvider.ts"],"format":"typescript"},

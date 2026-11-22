@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { actionPolicyPath, actionPolicySigPath, loadActionPolicy, verifyActionPolicySignature } from "../../governor/actionPolicyEngine.js";
 import { actionPolicyDeclaredAbsent } from "../../governor/actionPolicyStore.js";
-import { runGovernorCheck } from "../../governor/governorCli.js";
+import { readGovernorInputs, runGovernorCheck, type GovernorInputs } from "../../governor/governorCli.js";
 import type { ActionClass } from "../../types.js";
 import { RUN_CODE_TOOL } from "../toolPipeline.js";
 import type { ToolExecution, ToolGuard, ToolMode } from "../toolTypes.js";
@@ -56,11 +56,11 @@ export function executeOnApprovalClasses(workspace: string): ReadonlySet<ActionC
 }
 
 /** The Action Policy's verdict for one call, or null when it does not apply (not configured, or the Code Mode transport). */
-function actionPolicyVerdict(workspace: string, call: ActionPolicyCall):
+function actionPolicyVerdict(workspace: string, call: ActionPolicyCall, read?: { readonly state: ActionPolicyState; readonly inputs: () => GovernorInputs }):
   { readonly denial: string | null; readonly mode: ToolMode; readonly reasons?: readonly string[] } | null {
   // The transport is not a capability; each call it dispatches meets this verdict on its own name and class.
   if (call.name === RUN_CODE_TOOL) return null;
-  const state = actionPolicyState(workspace);
+  const state = read?.state ?? actionPolicyState(workspace);
   if (state === "not configured") return null;
   if (state === "untrusted") {
     return { denial: existsSync(actionPolicyPath(workspace))
@@ -69,7 +69,7 @@ function actionPolicyVerdict(workspace: string, call: ActionPolicyCall):
   }
   try {
     const decision = runGovernorCheck({ workspace, agentId: call.agentId, actionClass: call.actionClass, riskTier: "med", mode: call.requestedMode,
-      approvedByPerson: call.approved === true });
+      approvedByPerson: call.approved === true, ...(read === undefined ? {} : { inputs: read.inputs() }) });
     if (!decision.allowed) return { denial: `Action Policy denied ${call.actionClass}: ${decision.reasons.join(" ") || decision.matchedRuleId}`, mode: "SIMULATE" };
     // A freeze or an exhausted budget does not run an EXECUTE simulated: ToolHub refuses it at execution, and so does
     // this guard. The mode is left as requested so the budgets guard, composed before this one, names it first.
@@ -133,14 +133,18 @@ export type ActionOutcome = "runs" | "asks a person" | "dry run" | "blocked" | "
  */
 export function actionPolicyOutcomes(workspace: string, agentId: string, classes: readonly ActionClass[]):
   Array<{ readonly actionClass: ActionClass; readonly outcome: ActionOutcome; readonly reasons: readonly string[] }> {
+  // One read of the policy state and the governor's inputs serves every class of this request (each read alone scans
+  // the ledger for budget usage); the guard and the mode still read them fresh for every call.
+  let inputs: GovernorInputs | undefined;
+  const read = { state: actionPolicyState(workspace), inputs: () => (inputs ??= readGovernorInputs(workspace, agentId)) };
   return classes.map((actionClass) => {
     const call = { name: "governor-outcome", agentId, actionClass, requestedMode: "EXECUTE" as const };
-    const alone = actionPolicyVerdict(workspace, call);
+    const alone = actionPolicyVerdict(workspace, call, read);
     if (alone === null) return { actionClass, outcome: "no signed policy", reasons: ["No signed Action Policy applies in this workspace."] };
     if (alone.denial !== null) return { actionClass, outcome: "blocked", reasons: [alone.denial] };
     const reasons = alone.reasons ?? [];
     if (alone.mode === "EXECUTE" || actionClass === "READ_ONLY") return { actionClass, outcome: "runs", reasons };
-    const approved = actionPolicyVerdict(workspace, { ...call, approved: true });
+    const approved = actionPolicyVerdict(workspace, { ...call, approved: true }, read);
     return { actionClass, outcome: approved?.denial === null && approved.mode === "EXECUTE" ? "asks a person" : "dry run", reasons };
   });
 }

@@ -35,6 +35,15 @@ describe("Governor outcomes", () => {
     expect(["dry run", "blocked"]).toContain(outcomes.SECURITY);
   });
 
+  it("HP-51: one read serves every class of a request and gives each class the verdict it gets alone; nothing carries to the next request", () => {
+    const dir = workspace();
+    const classes = ["READ_ONLY", "WRITE_LOW", "WRITE_HIGH", "DEPLOY", "SECURITY"] as const;
+    const together = actionPolicyOutcomes(dir, "default", [...classes]);
+    expect(together).toEqual(classes.flatMap((actionClass) => actionPolicyOutcomes(dir, "default", [actionClass])));
+    appendFileSync(actionPolicyPath(dir), "# edited after signing\n");
+    expect(new Set(actionPolicyOutcomes(dir, "default", [...classes]).map((row) => row.outcome))).toEqual(new Set(["blocked"]));
+  });
+
   it("a policy edited after signing blocks every kind", () => {
     const dir = workspace();
     appendFileSync(actionPolicyPath(dir), "# edited after signing\n");

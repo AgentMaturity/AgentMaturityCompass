@@ -18,6 +18,8 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
+import { renderNativeSessionList } from "../src/setup/nativeInteractiveNavigation.js";
 
 /** UX-04/UX-05: a CLI session's actions are listed for the console, exported for an auditor, and shown to an approver. */
 describe("session audit for the console", () => {
@@ -32,9 +34,9 @@ describe("session audit for the console", () => {
   });
   afterEach(() => { lockVault(workspace); vi.unstubAllEnvs(); rmSync(workspace, { recursive: true, force: true }); });
 
-  function chat(args: string = defaultArgs, toolName = "fs.write", result = "wrote hello.txt"): string {
+  function chat(args: string = defaultArgs, toolName = "fs.write", result = "wrote hello.txt", sessionId = "cli-chat-0001", agentId = "default"): string {
     const s = new SessionService(workspace, openSessionEventStore(workspace, "sqlite"));
-    s.open({ sessionId: "cli-chat-0001", agentId: "default", harnessVersion: "audit-test", compositionDigest: sha256Hex("c"), policyDigest: sha256Hex("p") });
+    s.open({ sessionId, agentId, harnessVersion: "audit-test", compositionDigest: sha256Hex("c"), policyDigest: sha256Hex("p") });
     s.startTurn({ trigger: "user" }); s.startStep();
     s.recordToolCall({ toolCallId: "call-1", toolName, args, dispatch: "native", parentToken: null });
     s.recordApproval({ phase: "request", approvalId: "appr-1", toolCallId: "call-1", toolName: "fs.write", actionClass: "WRITE_LOW", question: "write hello.txt?" });
@@ -42,7 +44,7 @@ describe("session audit for the console", () => {
     s.recordToolResult({ toolCallId: "call-1", outcome: "OK", exitCode: 0, timedOut: false, denied: false, content: result });
     s.endStep({ stopReason: "end_turn", usage: null }); s.endTurn({ reason: "complete" }); s.sealTurn();
     s.disposeWithoutClosing(); // a chat closed with /exit: not sealed
-    return "cli-chat-0001";
+    return sessionId;
   }
 
   it("lists a CLI chat's action with who approved it, and says it is not sealed", () => {
@@ -265,5 +267,43 @@ describe("session audit for the console", () => {
       await handleEvidenceRoute("/api/v1/evidence/sessions/cli-chat-0001/export", method, req, res, workspace);
     }
     expect((res.end as ReturnType<typeof vi.fn>).mock.calls.join("")).not.toContain("amc.session-export");
+  });
+
+  /** Rows under a session id that was never started, as the diagnostic run's assurance audits were written before HP-51. */
+  function orphanRows(sessionId = "orphan-run-0001"): string {
+    const ledger = openLedger(workspace);
+    try {
+      ledger.appendEvidence({ sessionId, runtime: "unknown", eventType: "audit", payload: "{}", payloadExt: "json", inline: true, meta: { auditType: "ASSURANCE_EVIDENCE_MISSING" } });
+    } finally { ledger.close(); }
+    return sessionId;
+  }
+
+  it("HP-51: a session whose lifecycle record is missing is a row that says so, for every agent; the rest still list", async () => {
+    const id = chat();
+    const orphan = orphanRows();
+    for (const agent of ["default", "agent-b"]) {
+      const { sessions } = listAuditSessions(workspace, agent);
+      const broken = sessions.find((session) => session.sessionId === orphan);
+      expect(broken, `listed for ${agent}`).toMatchObject({ sealed: false, actions: [], unreadable: { code: "MISSING", reason: expect.stringContaining("record is incomplete and cannot be read") } });
+      expect(broken?.unreadable?.reason).toContain("not verified");
+    }
+    expect(listAuditSessions(workspace, "default").sessions.find((session) => session.sessionId === id)).toMatchObject({ actions: [{ tool: "fs.write" }] });
+    expect(listAuditSessions(workspace, "default").sessions.find((session) => session.sessionId === id)?.unreadable).toBeUndefined();
+    // The route answers (no 500), the export of the broken session refuses with the same words, and the CLI list names it.
+    const res = { setHeader: vi.fn(), writeHead: vi.fn(), end: vi.fn(), statusCode: 200 } as unknown as ServerResponse;
+    await handleEvidenceRoute("/api/v1/evidence/sessions", "GET", { url: "/api/v1/evidence/sessions", method: "GET" } as IncomingMessage, res, workspace);
+    expect((res.writeHead as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]).toBe(200);
+    const reason = listAuditSessions(workspace).sessions[0]!.unreadable!.reason;
+    expect(sessionAuditExport(workspace, orphan, "json")).toEqual({ status: 409, error: reason });
+    expect(sessionAuditExport(workspace, id, "json")).toMatchObject({ status: 409, error: expect.stringContaining("1 other session(s)") });
+    expect(renderNativeSessionList(workspace, "default", 20)).toEqual([expect.stringContaining(`${orphan} · cannot be read (MISSING)`), expect.stringContaining(id)]);
+  });
+
+  it("HP-51: Records for one agent list only that agent's sessions", () => {
+    chat();
+    chat(defaultArgs, "fs.write", "wrote hello.txt", "cli-chat-0002", "agent-b");
+    expect(listAuditSessions(workspace, "default").sessions.map((session) => session.sessionId)).toEqual(["cli-chat-0001"]);
+    expect(listAuditSessions(workspace, "agent-b").sessions.map((session) => session.sessionId)).toEqual(["cli-chat-0002"]);
+    expect(listAuditSessions(workspace, "agent-c")).toMatchObject({ sessions: [], total: 0 });
   });
 });
