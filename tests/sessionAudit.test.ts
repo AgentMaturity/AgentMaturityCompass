@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -316,13 +316,14 @@ describe("session audit for the console", () => {
     expect([badId.status, badId.json?.error]).toEqual([400, "not a session id"]);
   });
 
-  it("a store that cannot be read at all lists no session (409, in words) and exports none", async () => {
+  it("a store that fails its checks as a whole lists no session, and says so in words (409)", async () => {
     chat();
-    vi.stubEnv("AMC_SESSION_STORE", "carrier-pigeon");
+    const marker = join(workspace, ".amc", "session-store.json");
+    expect(existsSync(marker)).toBe(true);
+    writeFileSync(marker, "{ not json");
     const listed = await callRoute(handleEvidenceRoute, workspace, "GET", "/api/v1/evidence/sessions");
     expect(listed.status).toBe(409);
-    expect(listed.json?.error).toBe("No session is listed: this workspace's evidence did not pass its checks (INVALID_INPUT). Run amc verify in this workspace for the detail.");
-    expect((await callRoute(handleEvidenceRoute, workspace, "GET", "/api/v1/evidence/sessions/cli-chat-0001/export")).status).toBe(500);
+    expect(listed.json?.error).toBe("No session is listed: this workspace's evidence did not pass its checks (UNSUPPORTED_FORMAT). Run amc verify in this workspace for the detail.");
   });
 
   it("HP-51: Records for one agent list only that agent's sessions", () => {

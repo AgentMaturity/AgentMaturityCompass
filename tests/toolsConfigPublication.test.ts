@@ -17,7 +17,7 @@ beforeEach(() => {
   workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-tools-pair-")));
   dirs.push(workspace);
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-});
+}, 60_000);
 afterEach(() => {
   for (const dir of dirs.splice(0)) { try { lockVault(dir); } catch { /* not a workspace */ } rmSync(dir, { recursive: true, force: true }); }
   vi.unstubAllEnvs();

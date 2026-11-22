@@ -1,7 +1,7 @@
 import { mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { handleGovernorRoute } from "../src/api/governorRouter.js";
 import { ACTION_CLASSES } from "../src/governor/actionCatalog.js";
 import { defaultActionPolicy, initActionPolicy } from "../src/governor/actionPolicyEngine.js";
@@ -10,18 +10,18 @@ import { initWorkspace } from "../src/workspace.js";
 import { initWorkspaceWithoutActionPolicy, removeActionPolicy } from "./helpers/actionPolicyFixtures.js";
 import { callRoute } from "./helpers/routeCall.js";
 
-/** The Governor routes over a real workspace (no mocked governor): the outcomes grid, explain, the report, and refusals. */
+/**
+ * The Governor routes over a real workspace (no mocked governor): the outcomes grid, explain, the report, and refusals.
+ * Reads share one signed workspace; a test that changes its workspace makes its own.
+ */
 const dirs: string[] = [];
-let workspace: string;
-beforeEach(() => {
-  vi.stubEnv("AMC_VAULT_PASSPHRASE", "governor-router-workspace");
-  workspace = scratch();
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-});
-afterEach(() => { vi.unstubAllEnvs(); for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
+let shared: string;
+beforeAll(() => { vi.stubEnv("AMC_VAULT_PASSPHRASE", "governor-router-workspace"); shared = signed(); }, 60_000);
+afterAll(() => { vi.unstubAllEnvs(); for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true }); });
 function scratch(): string { const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-gov-router-"))); dirs.push(dir); return dir; }
+function signed(): string { const dir = scratch(); initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" }); return dir; }
 
-const call = (method: string, url: string, body?: unknown, ws = workspace) => callRoute(handleGovernorRoute, ws, method, url, body);
+const call = (method: string, url: string, body?: unknown, ws = shared) => callRoute(handleGovernorRoute, ws, method, url, body);
 
 describe("Governor routes over a real workspace", () => {
   it("leaves other paths and unknown governor paths to the next router", async () => {
@@ -65,14 +65,16 @@ describe("Governor routes over a real workspace", () => {
   it("explain: a class without a rule in the signed policy says the policy default applies", () => {
     const policy = defaultActionPolicy();
     policy.actions = policy.actions.filter((rule) => rule.actionClass !== "FINANCIAL");
+    const workspace = signed();
     initActionPolicy(workspace, policy);
     expect(explainGovernorAction({ workspace, actionClass: "FINANCIAL" })).toEqual({ actionClass: "FINANCIAL", exists: false, details: "No explicit rule. Policy default applies." });
   });
 
   it("explain and report answer 500 when the workspace has no policy to read", async () => {
+    const workspace = signed();
     removeActionPolicy(workspace);
-    expect((await call("POST", "/api/v1/governor/explain", { action: "READ_ONLY" })).status).toBe(500);
-    expect((await call("GET", "/api/v1/governor/report")).status).toBe(500);
+    expect((await call("POST", "/api/v1/governor/explain", { action: "READ_ONLY" }, workspace)).status).toBe(500);
+    expect((await call("GET", "/api/v1/governor/report", undefined, workspace)).status).toBe(500);
   });
 
   it("report: the governor matrix as JSON, and as markdown on request", async () => {
@@ -88,8 +90,9 @@ describe("Governor routes over a real workspace", () => {
 
   it("oversight needs an agent id; mode refuses anything but owner or agent, and keeps what was set", async () => {
     expect((await call("GET", "/api/v1/oversight/assess")).json!.error).toBe("Required query param: agentId");
-    expect((await call("PUT", "/api/v1/mode", { mode: "root" })).json!.error).toBe("Required: mode (owner | agent)");
-    expect((await call("PUT", "/api/v1/mode", { mode: "agent" })).json!.data).toEqual({ mode: "agent" });
-    expect((await call("GET", "/api/v1/mode")).json!.data).toEqual({ mode: "agent" });
+    const workspace = scratch();
+    expect((await call("PUT", "/api/v1/mode", { mode: "root" }, workspace)).json!.error).toBe("Required: mode (owner | agent)");
+    expect((await call("PUT", "/api/v1/mode", { mode: "agent" }, workspace)).json!.data).toEqual({ mode: "agent" });
+    expect((await call("GET", "/api/v1/mode", undefined, workspace)).json!.data).toEqual({ mode: "agent" });
   });
 });

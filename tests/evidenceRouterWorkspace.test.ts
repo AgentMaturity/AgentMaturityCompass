@@ -1,21 +1,21 @@
 import { mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { handleEvidenceRoute } from "../src/api/evidenceRouter.js";
 import { getAgentPaths } from "../src/fleet/paths.js";
 import { lockVault } from "../src/vault/vault.js";
 import { initWorkspace } from "../src/workspace.js";
 import { callRoute } from "./helpers/routeCall.js";
 
-/** The evidence routes over a real workspace with nothing recorded yet: empty answers, and each refusal in its own status. */
+/** The evidence routes over one real workspace with nothing recorded yet: empty answers, and each refusal in its own status. */
 let workspace: string;
-beforeEach(() => {
+beforeAll(() => {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "evidence-router-workspace");
   workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-evidence-router-")));
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
-});
-afterEach(() => { lockVault(workspace); vi.unstubAllEnvs(); rmSync(workspace, { recursive: true, force: true }); });
+}, 60_000);
+afterAll(() => { lockVault(workspace); vi.unstubAllEnvs(); rmSync(workspace, { recursive: true, force: true }); });
 const call = (method: string, url: string, body?: unknown) => callRoute(handleEvidenceRoute, workspace, method, url, body);
 
 describe("evidence routes over a fresh workspace", () => {

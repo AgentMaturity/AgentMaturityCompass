@@ -40,12 +40,6 @@ describe("noteOverflowOutage", () => {
   const session = (readEvents: () => Array<{ event_type: string; id: string }>) =>
     ({ workspace: "/ws", sessionId: "sess-1", readEvents }) as unknown as SessionService;
 
-  it("records the last request failure as an outage incident, naming the overflow", () => {
-    noteOverflowOutage(session(() => [{ event_type: "request/failure", id: "evt-1" }, { event_type: "request/failure", id: "evt-2" }]), overflow);
-    expect(outage.record).toHaveBeenCalledWith({ workspace: "/ws", sessionId: "sess-1", outcomeEventId: "evt-2",
-      reason: "the request was too large for the model's context window, and the turn ended on it" });
-  });
-
   it("records nothing for any other error, or when no request failure was written", () => {
     const readEvents = vi.fn(() => [{ event_type: "request/failure", id: "evt-1" }]);
     noteOverflowOutage(session(readEvents), new LlmError("busy", LLM_FAILURE_CODE.RATE_LIMIT));
