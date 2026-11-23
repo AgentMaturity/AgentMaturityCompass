@@ -34,7 +34,17 @@ export const CANONICAL_NAV = [
     ["./leases", "Leases", "Short-lived permission slips for tools."],
     ["./budgets", "Budgets", "Limits on spend and activity."],
     ["./equalizer", "Target levels", "Set the target level you want, per area."],
-    ["./policypacks", "Policy packs", "Ready-made rule sets for guardrails."]]],
+    ["./policypacks", "Policy packs", "Ready-made rule sets for guardrails."],
+    ["./northstar", "Northstar prompts", "The signed instructions AMC adds to your agent's model calls."]]],
+  ["Scores and reports", "score", [["./score", "Maturity score", "The commands that score your agent."],
+    ["./compass", "Compass", "Your agent's levels by area, with its gaps."],
+    ["./assurance", "Assurance", "Attack-style tests and how well your agent holds up."],
+    ["./audit", "Audit", "Binders and evidence requests for an auditor."],
+    ["./trust", "Trust", "How this workspace signs and checks its settings."],
+    ["./passport", "Passport", "A signed summary of your agent to hand to someone."],
+    ["./standard", "Open Standard", "The record formats AMC publishes, and a format check."],
+    ["./forecast", "Forecast", "Where the score is heading, and early warnings."],
+    ["./value", "Value", "Value your agent delivers, tracked over time (self-reported)."]]],
   ["Watch and review", "live", [["./operator-inbox", "Operator inbox", "Things blocking your agents, in one inbox."],
     ["./drift", "Drift", "Alerts when behaviour changes over time."],
     ["./outcomes", "Outcomes", "Whether the agent delivers the value it should."],
@@ -50,6 +60,7 @@ export const CANONICAL_NAV = [
     ["./fleet", "Fleet", "Many agents and how they work together."]]],
   ["Workspace", "person", [["./users", "Users", "Who can sign in, and their roles."],
     ["./integrations", "Connections", "Connect AMC to the tools you already use."],
+    ["./plugins", "Plugins", "Add-ons installed into this workspace."],
     ["./ops", "Maintenance", "Readiness, how long records are kept, clean-up and backups."]]]]
     .flatMap(([section, iconName, links]) => links.map(([href, label, desc]) => ({ href, label, desc, section, icon: iconName, group: "features" })))
 ];
@@ -62,32 +73,22 @@ const pathOf = (href) => normalizeHref(String(href || "").split(/[?#]/)[0]);
  */
 export const PAGE_NAMES = {
   advisories: "Advisories",
-  assurance: "Assurance",
   assuranceCert: "Assurance certificate",
   assuranceRun: "Assurance run",
-  audit: "Audit",
   auditBinder: "Audit binder",
   auditRequests: "Evidence requests",
   benchCompare: "Compare benchmarks",
   benchPortfolio: "Benchmark portfolio",
   benchRegistry: "Benchmark registries",
-  compass: "Compass",
   contextGraph: "Context graph",
   diagnosticView: "Diagnostic",
   evidenceDrilldown: "Evidence drilldown",
-  forecast: "Forecast",
   forecastAgent: "Agent forecast",
   forecastNode: "Team forecast",
   mechanic: "Mechanic",
-  northstar: "Northstar prompts",
-  passport: "Passport",
-  plugins: "Plugins",
   portfolioForecast: "Portfolio forecast",
   simulator: "Simulator",
-  standard: "Open Standard",
-  trust: "Trust",
   upgradeWizard: "Upgrade plan",
-  value: "Value",
   valueAgent: "Agent value",
   valueKpis: "Value KPIs"
 };
@@ -111,7 +112,7 @@ const railFootHtml = () => `<div class="rail-foot"><div class="theme-switch" rol
 /** In the folded rail a page's own links show their initials ("Context graph": CG), as each file icon looks the same. */
 const initialsOf = (label) => String(label).split(/\s+/).filter((word) => /^[A-Za-z]/.test(word)).slice(0, 2).map((word) => word[0].toUpperCase()).join("") || "?";
 
-/** The canonical menu, "More" with every other page, the page's own links it lacks under "More pages", and the rail's foot. */
+/** The canonical menu, the page's own links it lacks under "More pages", "More" with every other page, and the rail's foot. */
 export function canonicalNavHtml(extra = []) {
   const seen = new Set(CANONICAL_NAV.map((link) => pathOf(link.href)));
   const own = extra.filter((link) => !seen.has(pathOf(link.href)) && seen.add(pathOf(link.href)))
@@ -124,8 +125,9 @@ export function canonicalNavHtml(extra = []) {
   const pages = own.length ? `<details class="nav-features nav-pages" open><summary>${icon("file")}<span class="nav-label">More pages</span></summary>`
     + `${own.map((link) => navLink({ ...link, icon: "file" }).replace("<span class=\"nav-label\">", `<span class="nav-initials" aria-hidden="true">${esc(initialsOf(link.label))}</span><span class="nav-label">`)).join("")}</details>` : "";
   // The person comes last in the document too, so the keyboard reaches it where it is drawn: at the foot of the rail.
+  // The page's own links come before "More", so on a phone they are near the top of the sheet, not under every page.
   const top = CANONICAL_NAV.filter((link) => !link.group && !link.person).map(navLink).join("");
-  return top + more + pages + railFootHtml() + CANONICAL_NAV.filter((link) => link.person).map(navLink).join("");
+  return top + pages + more + railFootHtml() + CANONICAL_NAV.filter((link) => link.person).map(navLink).join("");
 }
 
 /** Replaces the static menu (every child but the <h1> and the phone toggle) with the canonical one, once per page. */

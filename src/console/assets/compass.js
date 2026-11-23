@@ -19,7 +19,7 @@ export async function renderCompassPage(params) {
     params.apiGet(`/diagnostic/render?agentId=${encodeURIComponent(agentId)}`)
   ]);
   const measured = auto.measuredScores ?? {};
-  const byDimension = new Map((render.dimensions ?? []).map((row) => [row.dimensionId, row.name]));
+  const byDimension = new Map((render.dimensions ?? []).map((row) => [row.dimensionId ?? row.id, row.name]));
   const dimensionScores = new Map();
   for (const question of render.questions ?? []) {
     const dimension = byDimension.get(question.dimensionId) ?? `Dimension ${question.dimensionId}`;

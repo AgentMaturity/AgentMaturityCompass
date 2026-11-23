@@ -1,3 +1,5 @@
+import { plainCodeHtml } from "../plainError.js";
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -12,7 +14,7 @@ export function renderActionCard(action) {
   return `
     <article class="card">
       <div class="row spaced">
-        <strong>${esc(action?.kind || "ACTION")}</strong>
+        <strong>${plainCodeHtml(action?.kind || "ACTION", { small: true })}</strong>
         <span class="pill">${action?.requiresApproval ? "Approval Required" : "Direct"}</span>
       </div>
       <p>${esc(action?.effect || "")}</p>

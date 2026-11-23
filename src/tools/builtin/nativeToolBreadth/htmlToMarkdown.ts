@@ -32,7 +32,11 @@ const NAMED_ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quo
 const MAX_TAG_CHARS = 65_536;
 /** Lists nested deeper than this are indented as this deep: indentation per item would otherwise grow with nesting. */
 const MAX_LIST_INDENT = 8;
-/** The wall-clock backstop for one rendering. Linear rendering of the 5 MB hard cap takes a fraction of it. */
+/**
+ * The wall-clock backstop for one rendering. Rendering is linear, but its speed depends on the machine: on a slow CI
+ * runner a 200,000-row table (about 3.8 MB) reached this deadline and was cut, so a page near the 5 MB cap can come back
+ * cut short (with a note saying where) rather than whole.
+ */
 export const RENDER_DEADLINE_MS = 2_000;
 /** Tokens between clock reads. */
 const CLOCK_EVERY = 1_024;

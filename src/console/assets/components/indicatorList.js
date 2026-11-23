@@ -1,3 +1,5 @@
+import { plainCodeHtml } from "../plainError.js";
+
 function htmlEscape(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -17,8 +19,8 @@ export function renderIndicatorList(container, indicators) {
         .map(
           (row) => `<li>
         <strong>${htmlEscape(row.label || row.id)}</strong>:
-        ${htmlEscape(row.direction)} (z=${Number(row.robustZ || 0).toFixed(2)}, mag=${Number(row.magnitude || 0).toFixed(3)})
-        <div class="muted">${htmlEscape(row.explanationTemplateId || "-")}</div>
+        ${plainCodeHtml(row.direction, { small: true })} (z=${Number(row.robustZ || 0).toFixed(2)}, mag=${Number(row.magnitude || 0).toFixed(3)})
+        ${row.explanationTemplateId ? `<small class="code-note">${htmlEscape(row.explanationTemplateId)}</small>` : ""}
       </li>`
         )
         .join("")}</ul>`

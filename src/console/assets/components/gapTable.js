@@ -1,3 +1,5 @@
+import { plainCodeHtml } from "../plainError.js";
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -34,7 +36,7 @@ export function renderGapTable(container, gap) {
               <td>${Number(row.measured || 0).toFixed(2)}</td>
               <td>${Number(row.desired || 0).toFixed(2)}</td>
               <td>${Number(row.gap || 0).toFixed(2)}</td>
-              <td>${esc(row.status || "OK")}</td>
+              <td>${plainCodeHtml(row.status || "OK", { small: true })}</td>
               <td>${(Number(row.evidenceCoverage || 0) * 100).toFixed(1)}%</td>
             </tr>`
             )

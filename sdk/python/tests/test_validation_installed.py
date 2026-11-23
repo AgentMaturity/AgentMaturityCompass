@@ -5,6 +5,9 @@ ran without an installed wheel, so its consumer cases failed at import by design
 and the native lane skipped (receipt:
 qualification/2026-10-06-P0-13/README.md, S7 section).
 A passing run requires a wheel built and installed from the candidate source.
+Since 2026-11-23 the consumer cases skip, saying why, when the running interpreter has no
+installed amc_sdk wheel and AMC_PYTHON_INSTALLED is unset (a source-tree or editable run);
+an installed wheel that does not match this source still fails.
 The isolated consumer must import an actual installed wheel, never the checkout
 or an editable install. Scripted ACP peers test wire behavior, not native trust.
 An optional pre-provisioned native lane uses the real explicit installed CLI;
@@ -123,11 +126,26 @@ def wire(status):
     return value
 
 
+def wheel_installed(interpreter):
+    """True when `interpreter -I` imports amc_sdk from its own site-packages (an installed wheel).
+
+    Only presence is decided here; whether the installed files match this source is still checked, and fails, in CONSUMER.
+    """
+    probe = ("import pathlib, sysconfig, amc_sdk; "
+             "print(pathlib.Path(amc_sdk.__file__).resolve().is_relative_to(pathlib.Path(sysconfig.get_path('purelib')).resolve()))")
+    found = subprocess.run([interpreter, "-I", "-c", probe], cwd=Path(interpreter).parent, capture_output=True, text=True, timeout=30)
+    return found.returncode == 0 and found.stdout.strip() == "True"
+
+
 def run_consumer(tmp_path, case):
     if os.name != "posix":
         pytest.skip("installed fixture supervision requires POSIX process groups; other platform qualification is separate")
     interpreter = os.environ.get("AMC_PYTHON_INSTALLED", sys.executable)
     assert Path(interpreter).is_absolute(), "select the installed wheel's absolute Python interpreter"
+    if "AMC_PYTHON_INSTALLED" not in os.environ and not wheel_installed(interpreter):
+        pytest.skip("amc_sdk is not installed as a wheel in this interpreter (missing, or imported from the source tree or an "
+                    "editable install); build and install the wheel from sdk/python as ci.yml's python-sdk job does, or set "
+                    "AMC_PYTHON_INSTALLED to an interpreter that has it")
     source = Path(__file__).resolve().parents[1] / "amc_sdk"
     expected = {name: hashlib.sha256((source / name).read_bytes()).hexdigest()
                 for name in ["__init__.py", "client.py"]}

@@ -29,6 +29,8 @@ export const CLAIM_PAGES = new Set(["home", "transparency", "compliance", "assur
   "forecast", "forecastAgent", "forecastNode", "portfolioForecast", "org", "outcomes", "value", "valueAgent", "valueKpis",
   "audit", "auditBinder", "fleet", "systemic"]);
 
+import { plainCode } from "../plainError.js";
+
 function esc(value) {
   return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
@@ -43,7 +45,7 @@ export function claimBadge(claim) {
   if (!claim || typeof claim.claimKind !== "string") return "";
   const result = claim.statusDimensions?.result;
   const tone = result === "pass" ? "pill ok" : result === "fail" ? "pill bad" : "pill";
-  const kind = segment(claim.claimLabel, "Claim") ?? claim.claimKind;
+  const kind = segment(claim.claimLabel, "Claim") ?? plainCode(claim.claimKind);
   const outcome = segment(claim.claimLabel, "Result") ?? "not evaluated";
   return `<span class="claim-badge ${tone}" data-claim-kind="${esc(claim.claimKind)}" title="${esc(claim.claimLabel)}">`
     + `${esc(kind)} · ${esc(outcome)}</span>`;

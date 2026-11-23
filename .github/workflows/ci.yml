@@ -512,6 +512,8 @@ jobs:
         working-directory: ${{ runner.temp }}
         env:
           AMC_BIN: ${{ github.workspace }}/dist/cli.js
+          # Set, so the installed-wheel cases never skip here: without the wheel they fail.
+          AMC_PYTHON_INSTALLED: ${{ runner.temp }}/venv/bin/python
           PYTHONDONTWRITEBYTECODE: "1"
         run: |
           "$RUNNER_TEMP/venv/bin/python" -I -c "import amc_sdk, sys; assert amc_sdk.__file__.startswith(sys.prefix), amc_sdk.__file__"
