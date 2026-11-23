@@ -351,7 +351,7 @@ describe("A working folder that cannot be restored, and Windows", () => {
     try { executeSessionRewind(plan, { onlyClean: false }); } catch (error) { caught = error; }
     spy.mockRestore();
     process.chdir(workspace);
-    const zeroed = fills.mock.contexts.filter((buffer) => buffer.length === 3 && buffer.every((byte) => byte === 0));
+    const zeroed = (fills.mock.contexts as Buffer[]).filter((buffer) => buffer.length === 3 && buffer.every((byte: number) => byte === 0));
     fills.mockRestore();
     expect((caught as { code?: string }).code).toBe("INTERRUPTED");
     expect((caught as Error).message).toContain("Some files may already have been changed");
