@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { renderCompassPage } from "../../src/console/assets/compass.js";
 import { renderDiagnosticViewPage } from "../../src/console/assets/diagnosticView.js";
-import { FakeDocument } from "./fakeDom.js";
+import { FakeDocument, type FakeElement } from "./fakeDom.js";
 
 // The diagnostic page in the route style: a short picture summary on top, every area folded, the same cards and filters.
 
@@ -67,7 +67,7 @@ test("a filter shows only matching questions and opens just the areas holding on
   const doc = new FakeDocument();
   const root = doc.createElement("div");
   await render(root as never);
-  const buttons = Object.fromEntries(root.querySelectorAll("button[data-confidence-filter]").map((button) => [button.getAttribute("data-confidence-filter"), button]));
+  const buttons: Record<string, FakeElement> = Object.fromEntries(root.querySelectorAll("button[data-confidence-filter]").map((button) => [button.getAttribute("data-confidence-filter") ?? "", button]));
   const areas = root.querySelectorAll(".records-folds > details.more-info");
   const cards = root.querySelectorAll(".question-card");
   expect(areas.map((area) => area.textContent.split(" (")[0])).toEqual(["<b>Strategy</b>", "Skills"]);
