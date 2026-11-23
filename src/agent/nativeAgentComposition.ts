@@ -109,7 +109,7 @@ export interface NativeAgentInit {
   readonly hasOwnedWork?: () => boolean;
   /** Runs after the prompt row and before the driver: admission checks and control rows. A throw fails composition. */
   readonly admit?: (composed: { readonly systemPrompt: string; readonly tools: AgentToolSeam }) => void;
-  readonly driver?: Pick<AgentDriverInit, "validation" | "config">;
+  readonly driver?: Pick<AgentDriverInit, "validation" | "verifyOnStop" | "config">;
   readonly resourceStatus?: () => NativeResourceStatus;
   readonly compositionSources?: readonly CompositionSource[];
 }
@@ -173,6 +173,7 @@ export function composeNativeAgent(init: NativeAgentInit): NativeAgent {
     recordNativeComposition(session, promptAssembly, tools, init.route, init.compositionSources);
     const driver = new AgentDriver({ session, llm, route, systemPromptEventId, tools, hooks,
       ...(init.driver?.validation === undefined ? {} : { validation: init.driver.validation }),
+      ...(init.driver?.verifyOnStop === undefined ? {} : { verifyOnStop: init.driver.verifyOnStop }),
       ...(init.driver?.config === undefined ? {} : { config: init.driver.config }) });
     const composedPrompt = prompt;
     let shutdown: Promise<boolean> | undefined;

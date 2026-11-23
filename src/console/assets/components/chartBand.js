@@ -1,9 +1,11 @@
+import { themed } from "../charts.js";
+
 function clamp(n) {
   if (!Number.isFinite(n)) return 0;
   return Number(n);
 }
 
-export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
+export function renderChartBand(canvas, points, forecast, color) {
   if (!canvas || typeof canvas.getContext !== "function") {
     return;
   }
@@ -11,6 +13,7 @@ export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
   if (!ctx) {
     return;
   }
+  const theme = themed(canvas);
   const width = canvas.width;
   const height = canvas.height;
   ctx.clearRect(0, 0, width, height);
@@ -23,7 +26,7 @@ export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
         .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y))
     : [];
   if (series.length === 0) {
-    ctx.fillStyle = "#9ca3af";
+    ctx.fillStyle = theme.words;
     ctx.font = "14px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText("No data yet", width / 2, height / 2);
@@ -58,7 +61,7 @@ export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
   const px = (x) => ((x - minX) / dx) * (width - 20) + 10;
   const py = (y) => height - (((y - minY) / dy) * (height - 20) + 10);
 
-  ctx.strokeStyle = color;
+  ctx.strokeStyle = color || theme.ink;
   ctx.lineWidth = 2;
   ctx.beginPath();
   series.forEach((p, idx) => {
@@ -70,7 +73,7 @@ export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
   ctx.stroke();
 
   if (extras.length > 0) {
-    ctx.fillStyle = "rgba(15,118,110,0.15)";
+    ctx.fillStyle = theme.grid;
     ctx.beginPath();
     extras.forEach((p, idx) => {
       const x = px(p.x);
@@ -85,7 +88,7 @@ export function renderChartBand(canvas, points, forecast, color = "#4AEF79") {
     ctx.closePath();
     ctx.fill();
 
-    ctx.strokeStyle = "#0ea5e9";
+    ctx.strokeStyle = theme.words;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     extras.forEach((p, idx) => {

@@ -71,11 +71,15 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
    and AI-drafted until a named expert signs it, and starting from a pack does not show the agent meets any rule. The
    `amc` menu's "Build an agent for my industry (A4 Forge preview)" line starts AMC with the flag set and opens this form.
 
-   **One section at a time.** The project page keeps open only the section the next step needs, plus the Approvals card.
-   Every other section of the stage is under "Everything else in this stage", unchanged.
+   **One section at a time.** The project page keeps open only the section the next step needs, and the Approvals card
+   while an approval is under way. Every other section of the stage, Members included, is under "Everything else in this
+   stage", unchanged; who the project is and its version are under "About this project".
 
-   Each project page opens with a **What to do now** panel: what a project is, the four stages as a stepper (done,
-   current, later), the current step ("step 1 of 8"), one sentence that says what is needed now, and one primary button.
+   Each project page opens with the project's name, its notices as small chips (practice, preview, self-reported), the
+   four stages drawn as a route (done, current, waiting for a person, later), and a **What to do now** panel: the stage's
+   eight steps as a smaller route, one sentence that says what is needed now, the people an open approval waits for
+   (initials, and whether each has decided), and one primary button. What a project is and "part 1 of 8" sit under a
+   small "What is a project?" fold.
    The button only moves to, or presses, the page's own control for that step; Studio checks every action again. When a
    step is not yours to take (an approver at Build, say), the panel says so instead. Errors are shown as sentences with
    the next step, and the code in small print.
@@ -119,9 +123,9 @@ completes Aspire, Assemble and Adapt and stops at Activate's release approval (s
 
 5. **Assemble and Adapt.** Assemble asks for capabilities, autonomy, the build provider (`stub` runs offline) and the
    path (`native`). Its Build starts one native build session; Review is refused (`409 A4_NOT_READY`,
-   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on Studio's Native Tasks page. Studio's
+   `BUILD_SESSION_OPEN`) until the session's owner presses Close and verify on the Run a task page. Studio's
    readiness says so before you press Review (`allowed.review` carries `BUILD_SESSION_OPEN`), so the panel's step is
-   **Close the build session**: its button opens that session on Native Tasks, and **Back to the agent project** returns. Its
+   **Close the build session**: its button opens that session on Run a task, and **Back to the agent project** returns. Its
    completion needs two approvals and then an effect gate, `a4.assemble.apply`: the owner opens it on the stage's
    effect card (`POST …/stages/assemble/effects/a4.assemble.apply/open` with the completion `gateId`), two project
    approvers approve its request on that card (`POST …/approvals/<approvalRequestId>/approve`), and `amc a4 complete`
@@ -425,7 +429,7 @@ framework through a scaffold, connect instructions and a trace import.
   (`POLICY_UNVERIFIED`), still surface as the session's start error after the step is recorded. A build session that
   failed before its runtime opened a session, or never started, has nothing to resume: its owner presses Build again at
   Build (`allowed.review` carries `BUILD_RETRYABLE`), which runs every check a first Build runs and journals a new
-  session in a new revision. A session that opened and then failed is resumed on Native Tasks instead (Release for
+  session in a new revision. A session that opened and then failed is resumed on Run a task instead (Release for
   later, then Resume session), never replaced. Propose already leaves such checks out of the plan and lists them as
   unsupported (`NOT_IN_VALIDATION_CONFIG`, `VALIDATION_SCOPE_REQUIRED`), and builds the prompt from the capabilities with
   control characters removed, cut by code point.

@@ -244,8 +244,9 @@ describe("MCP resource subscriptions with a bounded ttlMs", () => {
     await vi.waitFor(() => expect(subscription.active).toBe(false), { timeout: 3_000, interval: 20 });
     // The lifetime bound itself ends it, not the SDK request timeout behind it.
     expect(Date.now() - opened).toBeLessThan(1_700);
-    const cancels = f.log().filter(row => row.method === "notifications/cancelled");
-    expect(cancels.map(row => row.params!.requestId)).toEqual([listen.id]);
+    // The cancel reaches the server process and its log after `active` turns false; wait for the row.
+    await vi.waitFor(() => expect(f.log().filter(row => row.method === "notifications/cancelled")
+      .map(row => row.params!.requestId)).toEqual([listen.id]), { timeout: 3_000, interval: 20 });
     const delivered = updates.length;
     await new Promise(resolve => setTimeout(resolve, 200));
     expect(updates).toHaveLength(delivered);

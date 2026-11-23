@@ -12,6 +12,7 @@ import type { AgentLoopCliIo } from "../cli-agent-options.js";
 import type { ComposedTurnHandle } from "../kernel/agentLoopRunner.js";
 import { readNativeSessionEvents } from "../session/readNativeSessionEvents.js";
 import type { EvidenceEvent } from "../types.js";
+import { workspaceCheckFailed } from "../agent/turnVerification.js";
 
 /**
  * Headless `agent-loop run` (SH-UI-01): the prompt from stdin, `--output-format text|json|stream-json`, and the exit
@@ -116,6 +117,8 @@ export interface RunReport {
   /** The workflow pass's outcome when the run ran one (SH-ORCH-03); a pass that is not ok fails the run. */
   readonly workflow?: { readonly ok: boolean };
   readonly runLimit?: import("../agent/runLimits.js").RunLimitBreach;
+  /** A turn guard ended the turn (src/agent/turnGuards.ts): bounded, like the step cap. */
+  readonly guardStop?: import("../agent/runLimits.js").RunLimitBreach;
 }
 
 /**
@@ -147,8 +150,10 @@ export function runExitCode(report: RunReport): number {
   const { summary, execution, ending, goalStop } = report;
   if (summary.driverStatus === "failed" || ending?.reason === "error"
     || (report.validationRequested && summary.validation.status !== "passed") || execution.receiptStates.includes(INTEGRITY_FAILED)
+    // HP-04: a failed workspace check (or one that could not run) fails the run exactly as a --validate check does.
+    || workspaceCheckFailed(summary.turnChecks?.filter(row => row.turn === ending?.turn).at(-1))
     || (report.workflow !== undefined && !report.workflow.ok)) return RUN_EXIT_CODES.failed;
-  if (report.runLimit !== undefined) return RUN_EXIT_CODES.bounded;
+  if (report.runLimit !== undefined || report.guardStop !== undefined) return RUN_EXIT_CODES.bounded;
   if (report.workflow !== undefined) return RUN_EXIT_CODES.ok;
   const settled = execution.phases["side-effect-completion"] === "succeeded";
   if (goalStop !== undefined) {
@@ -307,8 +312,8 @@ export function createRunEventSink(io: AgentLoopCliIo, workspace: string): RunEv
       stopPolling(); settled = true;
       if (handle !== null) flush(() => readNativeSessionEvents(workspace, handle!.sessionId));
       if (failed) return;
-      const { summary, execution, exitCode, goalRounds, runLimit } = report;
-      emit({ type: "result", ...summary, ...(goalRounds === undefined ? {} : { goalRounds }), ...(runLimit === undefined ? {} : { runLimit }), execution, exitCode });
+      const { summary, execution, exitCode, goalRounds, runLimit, guardStop } = report;
+      emit({ type: "result", ...summary, ...(goalRounds === undefined ? {} : { goalRounds }), ...(runLimit === undefined ? {} : { runLimit }), ...(guardStop === undefined ? {} : { guardStop }), execution, exitCode });
       terminal = true;
     },
     error(message, exitCode) {

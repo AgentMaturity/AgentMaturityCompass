@@ -49,11 +49,11 @@ function render(root, data) {
       </div>
       <div class="row wrap">
         <label><input id="benchPubAck" type="checkbox" /> irreversible sharing acknowledged</label>
-        <button id="benchPubReqBtn">Request Publish</button>
+        <button id="benchPubReqBtn">Request publish</button>
       </div>
       <div class="row wrap">
         <input id="benchPubApproval" placeholder="approvalRequestId" />
-        <button id="benchPubExecBtn">Execute Publish</button>
+        <button id="benchPubExecBtn">Publish</button>
       </div>
       <pre id="benchPubOut" class="scroll muted"></pre>
     `

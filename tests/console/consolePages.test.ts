@@ -73,6 +73,17 @@ describe("code words shown as values read as words, with the code kept on the ti
     expect(plainCodeHtml("<b>x</b>")).toBe("&lt;b&gt;x&lt;/b&gt;");
   });
 
+  // 2026-11-19: console code wrote VALID, PASS, ENFORCE and the like as bare codes on inherited pages.
+  test("status codes the console writes itself read as words, the code on the title", async () => {
+    expect(["VALID", "INVALID", "PASS", "FAIL", "ENFORCE", "ELIGIBLE", "BLOCKED", "UNKNOWN", "NOT_CONFIGURED"].map(plainCode))
+      .toEqual(["Checks out", "Does not check out", "Passed", "Failed", "Enforced", "Can be claimed", "Blocked", "Not known", "Not set up"]);
+    const { renderPromptStatusChip } = await import("../../src/console/assets/components/promptStatusChip.js");
+    expect(renderPromptStatusChip("Enforcement", "enforce")).toContain('Enforcement: <span class="code-word" title="Code: ENFORCE">Enforced</span>');
+    const app = readFileSync("src/console/assets/app.js", "utf8");
+    expect(app).not.toMatch(/\? "ELIGIBLE" : "BLOCKED"}/);
+    expect(app).not.toContain('integrationReady ? "VALID" : "NOT CONFIGURED"}');
+  });
+
   test("role pickers are checkboxes in words, not a multi-select of codes (C-27)", () => {
     const app = readFileSync("src/console/assets/app.js", "utf8");
     const picker = app.slice(app.indexOf("function userRolesSelect("), app.indexOf("async function renderUsers()"));
@@ -130,14 +141,16 @@ describe("menu session link", () => {
     const { link, doc } = nav();
     let signedOut = false;
     renderNavSession(doc, { userId: "u1", username: "<b>ann</b>" }, () => { signedOut = true; });
-    expect(link.innerHTML).toBe('Sign out<small class="nav-desc">Signed in as &lt;b&gt;ann&lt;/b&gt;</small>');
+    // The person at the foot of the rail: an initial in a circle, Sign out, and who is signed in (studio-ui lane).
+    expect(link.innerHTML).toBe('<span class="nav-avatar" aria-hidden="true">&lt;</span><span class="nav-label">Sign out</span><small class="nav-desc">Signed in as &lt;b&gt;ann&lt;/b&gt;</small>');
     (link.onclick as (event: { preventDefault(): void }) => void)({ preventDefault() {} });
     expect(signedOut).toBe(true);
     renderNavSession(doc, null);
-    expect(link.innerHTML).toBe("Sign in");
+    expect(link.innerHTML).toMatch(/^<svg [^>]*aria-hidden="true"[^>]*>.*<\/svg><span class="nav-label">Sign in<\/span>$/);
     expect(link.onclick).toBeNull();
     renderNavSession(doc, { userId: "local-demo", username: "demo" });
-    expect(link.innerHTML).toBe("Sign in");
+    expect(link.innerHTML).toContain('<span class="nav-label">Sign in</span>');
+    expect(link.innerHTML).not.toContain("Sign out");
   });
 });
 
@@ -242,7 +255,7 @@ describe("Open Standard before any schema exists", () => {
     } finally {
       [g.document, g.window] = saved;
     }
-    expect(root.innerHTML).toContain("No schemas yet: press Generate Schemas to write them.");
+    expect(root.innerHTML).toContain("No schemas yet: press Generate schemas to write them.");
     expect(root.innerHTML).not.toMatch(/NOT VERIFIED|ok=|meta\.json/);
   });
 });

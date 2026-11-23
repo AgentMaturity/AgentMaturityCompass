@@ -46,10 +46,10 @@ export async function renderStandardPage(params) {
       "Open Compass Standard",
       `
       <div class="row wrap">
-        <button id="standardGenerateBtn" data-roles="OWNER">Generate Schemas</button>
-        <button id="standardVerifyBtn" class="secondary">Verify Bundle</button>
+        <button id="standardGenerateBtn" data-roles="OWNER">Generate schemas</button>
+        <button id="standardVerifyBtn" class="secondary">Verify bundle</button>
       </div>
-      <div class="muted">${noBundle ? "No schemas yet: press Generate Schemas to write them."
+      <div class="muted">${noBundle ? "No schemas yet: press Generate schemas to write them."
         : `${esc(String(rows.length))} schemas; the bundle ${schemas?.verify?.ok ? "checks out" : "does not check out"}.`}</div>
       <pre id="standardOut" class="scroll muted"></pre>
       `

@@ -37,9 +37,10 @@ import type { Skill } from "./skillCatalog.js";
  */
 export const SKILL_CONTEXT_ORDER = 150;
 
-/** The context name a loaded skill registers under. */
+/** The context name a loaded skill registers under: this prefix and the skill's name. */
+export const SKILL_CONTEXT_PREFIX = "skill:";
 function skillContextName(skill: Skill): string {
-  return `skill:${skill.name}`;
+  return `${SKILL_CONTEXT_PREFIX}${skill.name}`;
 }
 
 /** What `$ARGUMENTS` substitution produced, when the operator supplied arguments (SH-EXT-05). */

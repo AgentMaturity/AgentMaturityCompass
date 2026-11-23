@@ -143,13 +143,14 @@ describe("desktop app packaging and visual identity", () => {
     const app = read("src/console/assets/app.js");
 
     expect(dashboard).toContain('<link rel="manifest" href="./assets/manifest.json" />');
-    expect(dashboard).toContain('<link rel="stylesheet" href="./assets/styles.css?v=20260711a" />');
+    expect(dashboard).toContain('<link rel="stylesheet" href="./assets/styles.css?v=20261122a" />');
     expect(dashboard).toContain('data-page="home"');
-    expect(dashboard).toContain('<script type="module" src="./assets/app.js?v=20260711a"></script>');
+    expect(dashboard).toContain('<script type="module" src="./assets/app.js?v=20261122a"></script>');
     expect(dashboard).not.toContain("<style>body{font-family:system-ui");
     expect(home).toContain("<title>Home · Compass Console</title>");
+    // studio-ui redesign: two themes; the dark theme keeps the brand green, the older names are aliases of the new tokens.
     expect(styles).toContain("--accent: #4AEF79");
-    expect(styles).toContain("--bg-terminal: #2a2a2a");
+    expect(styles).toContain("--bg-terminal: var(--surface-2)");
     expect(styles).toContain(".studio-desktop-note");
     expect(styles).toContain(".topbar");
     expect(styles).toContain(".quick-action-grid");
@@ -168,7 +169,8 @@ describe("desktop app packaging and visual identity", () => {
     expect(app).toContain("const launchCommand = demoMode");
     // LIVE-UX-02: the phone menu toggle lives in the shared shell, which reaches pages that do not load app.js.
     const shell = read("src/console/assets/shell.js");
-    expect(shell).toContain('setAttribute("aria-label", "Toggle navigation")');
+    // studio-ui redesign: on a phone the toggle is the tab bar's "More" (it reads "Close" while the sheet is open).
+    expect(shell).toContain('<span class="nav-label">${open ? "Close" : "More"}</span>');
     expect(shell).toContain('nav.classList.toggle("mobile-nav-open"');
     const worker = read("src/console/assets/sw.js");
     expect(worker).toMatch(/const CACHE_NAME = "amc-console-v[1-9]\d*";/);

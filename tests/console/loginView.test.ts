@@ -80,7 +80,8 @@ describe("loginCardHtml", () => {
 
   // Onboarding: a first-time visitor reads what AMC is and sees a plain form; the account steps and LAN-only fields fold away.
   test("leads with what AMC is, then the form; account steps and the pairing code sit in collapsed details", () => {
-    const lead = local.indexOf("AMC checks how far you can trust an AI agent");
+    // The card carries the decided one-line description (studio-ui "run" slice), within the 16-word budget.
+    const lead = local.indexOf("Build, run and check AI agents for regulated work.");
     expect(lead).toBeGreaterThan(-1);
     expect(lead).toBeLessThan(local.indexOf("<form"));
     const help = local.indexOf("<summary>No account yet? How to get one</summary>");

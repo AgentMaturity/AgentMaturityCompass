@@ -7,7 +7,8 @@ import { defineTool } from "../toolRegistry.js";
 import type { FileChange, ToolBodyResult, ToolDefinition, ToolExecution } from "../toolTypes.js";
 import { MAX_PATCH_BYTES, parsePatch, type PatchSection } from "./applyPatchParse.js";
 import { applyHunks, locateBudget, type LocateBudget } from "./applyPatchPlan.js";
-import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
+import { deleteIfUnchanged, readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, strictJsonNote, utf8, writeIfUnchanged } from "./fsWritePrimitives.js";
+import type { FileCheckpoint } from "./fileCheckpoint.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { insideWorkspaceNoLinks } from "./workspacePath.js";
 
@@ -154,7 +155,17 @@ const targetsOf = (op: Operation): Target[] => [op.target, ...(op.kind === "upda
 /** One key per real file on a case-insensitive volume: NFC and case only, never compatibility forms. */
 const fileKey = (full: string): string => full.normalize("NFC").toLowerCase();
 
-export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger }): ToolDefinition {
+/** HP-06: each file's prior bytes, kept for every section before the first one lands. */
+function checkpointAll(checkpoint: FileCheckpoint | undefined, execution: ToolExecution, operations: readonly Operation[]): void {
+  for (const op of operations) {
+    if (op.kind === "add") checkpoint?.(execution, op.target.rel, null, op.after);
+    else if (op.kind === "delete") checkpoint?.(execution, op.target.rel, op.before, null);
+    else if (op.moveTo === null) checkpoint?.(execution, op.target.rel, op.before, op.after);
+    else { checkpoint?.(execution, op.moveTo.rel, null, op.after); checkpoint?.(execution, op.target.rel, op.before, null); }
+  }
+}
+
+export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger; readonly checkpoint?: FileCheckpoint }): ToolDefinition {
   const { ledger } = deps;
   return defineTool({
     name: "apply_patch",
@@ -213,6 +224,7 @@ export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger }):
       if (execution.effectiveMode === "SIMULATE") {
         return { ok: true, output: render(`SIMULATE apply_patch: ${operations.length} file(s), nothing written`, operations), bytes: 0 };
       }
+      checkpointAll(deps.checkpoint, execution, operations);
       const landed: FileChange[] = [];
       for (let index = 0; index < operations.length; index++) {
         try {
@@ -232,7 +244,8 @@ export function applyPatchTool(deps: { readonly ledger: ReadBeforeEditLedger }):
         }
       }
       const bytes = landed.reduce((sum, entry) => sum + entry.bytesAfter, 0);
-      return { ok: true, output: render(`applied patch: ${operations.length} file(s)`, operations), bytes, effect: "applied", fileChanges: landed };
+      const jsonNotes = operations.map(op => op.kind === "delete" ? "" : strictJsonNote((op.kind === "update" && op.moveTo !== null ? op.moveTo : op.target).path, op.after)).join("");
+      return { ok: true, output: render(`applied patch: ${operations.length} file(s)`, operations) + jsonNotes, bytes, effect: "applied", fileChanges: landed };
     }
   });
 }

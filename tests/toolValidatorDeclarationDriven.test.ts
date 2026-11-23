@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { validateToolRequest } from "../src/toolhub/toolhubValidators.js";
+import { hostAllowedForTool, pathAllowedByPatterns, validateToolRequest } from "../src/toolhub/toolhubValidators.js";
 import type { ToolDefinition } from "../src/toolhub/toolsSchema.js";
 
 /**
@@ -270,5 +270,35 @@ describe("the working-directory invariant applies to every tool", () => {
       args: { cwd: "src" }
     });
     expect(verdict.ok, `denied: ${verdict.reason ?? ""}`).toBe(true);
+  });
+});
+
+describe("declared binary and argv policies need the call to name what they check", () => {
+  it("refuses a call that names no binary when the tool declares a binaries allowlist", () => {
+    const verdict = validateToolRequest({ workspace: workspace(), tool: tool({ name: "runner.go", allow: { binariesAllowlist: ["node"] } } as never), args: {} });
+    expect(verdict).toEqual({ ok: false, reason: "binary is required" });
+  });
+
+  it("refuses a call that names no command when the tool declares argv deny patterns", () => {
+    const verdict = validateToolRequest({ workspace: workspace(), tool: tool({ name: "runner.go", deny: { argvRegexDenylist: ["sudo"] } } as never), args: {} });
+    expect(verdict).toEqual({ ok: false, reason: "a command is required" });
+  });
+
+  it("skips a deny pattern that is not a valid regular expression and still applies the others", () => {
+    const deny = { argvRegexDenylist: ["(unclosed", "(^|\\s)sudo(\\s|$)"] };
+    expect(validateToolRequest({ workspace: workspace(), tool: tool({ name: "runner.go", deny } as never), args: { command: "sudo reboot" } }))
+      .toEqual({ ok: false, reason: "argv blocked by deny pattern: (^|\\s)sudo(\\s|$)" });
+    expect(validateToolRequest({ workspace: workspace(), tool: tool({ name: "runner.go", deny } as never), args: { command: "ls" } }).ok).toBe(true);
+  });
+
+  it("a tool with no host list and no deny-by-default allows any host when asked directly; deny-by-default allows none", () => {
+    expect(hostAllowedForTool(tool({ name: "open.web" }), "example.org")).toBe(true);
+    expect(hostAllowedForTool(tool({ name: "open.web", denyByDefault: true } as never), "example.org")).toBe(false);
+  });
+
+  it("refuses a path whose workspace has no real location, naming the path", () => {
+    const gone = join(workspace(), "removed-workspace");
+    expect(pathAllowedByPatterns(gone, join(gone, "notes.txt"), ["**"])).toEqual({ ok: false, resolvedPath: join(gone, "notes.txt"),
+      reason: "path 'notes.txt' could not be resolved to a real location" });
   });
 });

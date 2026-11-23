@@ -1,8 +1,8 @@
 # Run native AMC tasks in Studio
 
-Open **Native Tasks** from Studio Home. Select an agent, check setup, choose a provider and enter a task. AMC runs the task through its own native model loop and records the conversation in its evidence ledger. No DSH or Pi installation is required.
+Open **Run a task** from the Compass Console menu or Home. Select an agent, check setup, choose a provider and enter a task. AMC runs the task through its own native model loop and records the conversation in its evidence ledger. No DSH or Pi installation is required.
 
-Choose **Local recording demonstration** to try the workflow without credentials or a provider charge. This exercises recording and task controls; it does not produce a real model answer. Demo sessions can use this mode with no tools. Sign in as an authorized operator to use a real provider or workspace tools.
+Choose **Stand-in model (canned replies)** to try the workflow without credentials or a provider charge. This exercises recording and task controls; it does not produce a real model answer. Demo sessions can use this mode with no tools. Sign in as an authorized operator to use a real provider or workspace tools.
 
 ## Connect a model
 

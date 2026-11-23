@@ -6,6 +6,8 @@ export interface NativeToolCapability {
   readonly name: string;
   readonly actionClass: ToolDefinition["actionClass"];
   readonly context?: ToolDefinition["context"];
+  /** Its result may change with no call in between (a job's output, a terminal's screen): repeating it is polling, not a loop. */
+  readonly polls?: true;
 }
 
 export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Object.freeze([
@@ -29,21 +31,28 @@ export const NATIVE_BUILTIN_CAPABILITIES: readonly NativeToolCapability[] = Obje
   { name: "ask_user", actionClass: "READ_ONLY" },
   { name: "todo", actionClass: "READ_ONLY" },
   { name: "plan", actionClass: "READ_ONLY" },
+  // HP-08: defined only in a plan-mode turn (src/tools/builtin/planExitTool.ts).
+  { name: "plan_exit", actionClass: "READ_ONLY" },
   // DXC-29: loads an attributed skill body; denied until the signed tools policy lists it.
   { name: "skill.load", actionClass: "READ_ONLY" },
   { name: "get_goal", actionClass: "READ_ONLY" },
   { name: "job_start", actionClass: "WRITE_HIGH" },
-  { name: "job_list", actionClass: "READ_ONLY" },
-  { name: "job_output", actionClass: "READ_ONLY" },
+  { name: "job_list", actionClass: "READ_ONLY", polls: true },
+  { name: "job_output", actionClass: "READ_ONLY", polls: true },
   { name: "job_kill", actionClass: "READ_ONLY" },
   { name: "terminal_open", actionClass: "WRITE_HIGH" },
-  { name: "terminal_list", actionClass: "READ_ONLY" },
-  { name: "terminal_read", actionClass: "READ_ONLY" },
+  { name: "terminal_list", actionClass: "READ_ONLY", polls: true },
+  { name: "terminal_read", actionClass: "READ_ONLY", polls: true },
   { name: "terminal_send", actionClass: "WRITE_HIGH" },
   { name: "terminal_signal", actionClass: "WRITE_HIGH" },
   { name: "terminal_resize", actionClass: "WRITE_HIGH" },
   { name: "terminal_close", actionClass: "WRITE_HIGH" }
 ].map(capability => Object.freeze(capability as NativeToolCapability)));
+
+/** Whether a built-in tool is polling-shaped (the turn guards do not count its repeats). */
+export function isPollingNativeTool(name: string): boolean {
+  return NATIVE_BUILTIN_CAPABILITIES.some(capability => capability.name === name && capability.polls === true);
+}
 
 /** These become executable only when a caller also supplies the delegation capability. */
 export const NATIVE_DELEGATION_CAPABILITIES: readonly NativeToolCapability[] = Object.freeze([

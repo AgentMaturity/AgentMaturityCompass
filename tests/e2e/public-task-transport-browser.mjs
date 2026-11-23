@@ -27,6 +27,8 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
       await ui.open(f.identities.owner);
       await page.locator("#nativeTaskProvider").selectOption("stub");
       await page.locator("#nativeTaskTools").selectOption("workspace");
+      await page.locator("#nativeTaskSettingsMore > summary").click();
+      await page.locator("#nativeTaskValidationMore > summary").click();
       await page.locator('[data-native-validation-id="public"]').check();
       await page.locator("#nativeTaskPrompt").fill(`Automated public ${mode} validation task.`);
       const response = page.waitForResponse(r => r.request().method() === "POST" && new URL(r.url()).pathname === "/api/v1/native-tasks");
@@ -42,11 +44,16 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
       assert.equal(f.operator.effect(), mode === "success" || mode === "nonzero" ? "validation-outcome" : null);
       await expect(page.locator("#nativeTaskRefresh")).toBeEnabled(); await page.locator("#nativeTaskRefresh").click();
       await expect(page.locator("#nativeTaskValidation")).toContainText(mode === "success" ? "Selected checks passed" : mode === "nonzero" ? "Selected checks failed" : "Validation unavailable");
+      // Checks sit under a closed "Checks" section since the studio-ui redesign.
+      await page.evaluate(() => { document.getElementById("nativeTaskChecksMore").open = true; });
       await page.locator("#nativeTaskValidation summary").first().click();
       await expect(page.locator("#nativeTaskValidation")).toContainText(mode === "budget" ? "daily tool budget exhausted" : mode === "denied" ? "not approved" : "validation-outcome");
       const history = f.history(task.sessionId);
       assert.ok(history.events.some(row => row.id === task.validation.checks[0].outputEventId));
-      assert.equal(history.events.filter(row => row.event_type === "tool/call").length, 1, "Do not hide the stub's separate model-tool request");
+      // Since UX-28 (2026-11-18) the stand-in answers a plain sentence in text when no offered tool takes it, so the
+      // model makes no tool call here; the operator check is AMC's own call, never a model tool call.
+      assert.equal(history.events.filter(row => row.event_type === "tool/call").length, 0, "The operator check must not appear as a model tool call");
+      assert.equal(history.events.filter(row => row.event_type === "request/header").length, 1, "One stand-in request for one sentence");
       receipt.checks.push({ name: "actual-http-browser-validation-outcome", status, taskId: task.taskId,
         sessionId: task.sessionId, outputEventId: task.validation.checks[0].outputEventId, historyHead: history.headEventHash });
       if (mode === "success") {
@@ -70,9 +77,9 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
         await expect(page.locator("#nativeTaskRetry")).toBeHidden();
         await expect(page.locator("#nativeTaskPrompt")).toHaveValue("Edited draft must remain unsent.");
         const beforeReplay = f.history(task.sessionId).events;
-        // Candidate-01 recorded three actual request headers across these two
-        // stub turns; operator validation is not an additional model request.
-        assert.equal(beforeReplay.filter(row => row.event_type === "request/header").length, 3);
+        // One stand-in request per turn since UX-28 (it answers in text, no tool round); operator validation is not an
+        // additional model request.
+        assert.equal(beforeReplay.filter(row => row.event_type === "request/header").length, 2);
         const replay = await f.request(f.taskPath(task.taskId, "turn"), { body: originalBody });
         assert.equal(replay.status, 202); assert.equal(replay.body.data.revision, task.revision);
         assert.deepEqual(f.history(task.sessionId).events, beforeReplay);
@@ -121,6 +128,7 @@ export async function runPublicTaskBrowser({ browser, expect, createFixture }) {
     await ui.control("release"); await f.restart(); await page.reload();
     await expect(page.locator("#nativeTaskIdentity")).toContainText("jsonl");
     await expect(page.locator("#nativeTaskResume")).toBeEnabled();
+    await page.evaluate(() => { document.getElementById("nativeTaskDetailsMore").open = true; });
     await expect(page.locator('[data-native-recovery-state="ready"]')).toBeVisible();
     const before = f.jsonlBytes();
     const resumed = await ui.control("resume");

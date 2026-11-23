@@ -24,6 +24,8 @@ import { askUserTool, type AskUserAnswerer } from "../tools/builtin/askUserTool.
 import { todoTool } from "../tools/builtin/todoTool.js";
 import { goalTool } from "../autonomy/goalTool.js";
 import { planTool } from "../tools/builtin/planTool.js";
+import { fileCheckpoints, type FileCheckpointWriter } from "../tools/builtin/fileCheckpoint.js";
+import { planExitTool } from "../tools/builtin/planExitTool.js";
 import { skillLoadTool } from "../skills/skillLoadTool.js";
 import { workspaceSkillRoots } from "../skills/skillTurn.js";
 import type { NativeReceiptRecorder } from "../tools/builtin/nativeToolBreadth/nativeReceipt.js";
@@ -173,6 +175,9 @@ export interface AgentToolsetOptions {
     }): unknown;
     /** Throws when the writer can no longer append (e.g. closed); checked before every tool body (P1-78). */
     assertWritable?(): void;
+    /** HP-06: keeps a file's prior bytes as an encrypted spill object; absent, the file tools keep none. */
+    retainFileCheckpoint?: FileCheckpointWriter["retainFileCheckpoint"];
+    readEvents?: FileCheckpointWriter["readEvents"];
   };
 }
 
@@ -399,8 +404,10 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     .map(capability => [capability.name, capability]));
 
   const ledger = new ReadBeforeEditLedger();
-  for (const tool of fsTools({ ledger })) registry.define(tool);
-  registry.define(applyPatchTool({ ledger }));
+  const recorder = options.recorder;
+  const checkpoint = fileCheckpoints(() => recorder?.retainFileCheckpoint === undefined ? null : recorder as FileCheckpointWriter);
+  for (const tool of fsTools({ ledger, checkpoint })) registry.define(tool);
+  registry.define(applyPatchTool({ ledger, checkpoint }));
   registry.define(lsTool());
   for (const tool of searchTools()) registry.define(tool);
   const admittedCatalog = (scope: string, snapshot = loadVerifiedToolsConfigSnapshot(workspace), strict = true) => {
@@ -709,13 +716,15 @@ export function agentToolset(options: AgentToolsetOptions): AgentToolset {
     }));
   }
 
+  // HP-08: plan_exit exists only in a plan-mode turn; it records the plan and ends the turn, and changes no mode.
+  if (options.planMode === true && recorder !== undefined) registry.define(planExitTool((row) => recorder.recordProjectedEvidence(row)));
   const planModeWithheld = options.planMode === true ? applyPlanMode(registry) : null;
   const seam = pipelineToolSeam({ registry, pipeline, agentId });
   const closeHandles = (): void => { ledgerHandle?.close(); ledgerHandle = null; journal?.close(); journal = null; };
   const hasOwnedWork = (): boolean => background.hasOwnedWork() || delegates.hasOwnedWork();
   const shutdown = (): Promise<boolean> => Promise.all([delegates.closeAll(), background.shutdown()]).then(done => done.every(Boolean));
   return {
-    seam: { ...seam, extensionHooks, shutdown, hasOwnedWork,
+    seam: { ...seam, extensionHooks, shutdown, hasOwnedWork, hasBackgroundWork: () => background.hasOwnedWork(),
       ...(options.expectedToolsDigest === undefined ? {} : { expectedToolsDigest: options.expectedToolsDigest }), schemas: () => {
       recordUnconfinedEnabled();
       const snapshot = loadVerifiedToolsConfigSnapshot(workspace);

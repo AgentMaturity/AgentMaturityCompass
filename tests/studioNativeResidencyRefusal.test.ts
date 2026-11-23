@@ -9,7 +9,8 @@ import { afterEach, beforeAll, beforeEach, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { lockVault } from "../src/vault/vault.js";
 import { NativeTaskDescriptors } from "../src/studio/nativeTaskDescriptors.js";
-import { registryStatus } from "../src/residency/admissionWords.js";
+import { registryStatus, residencyRouteWords } from "../src/residency/admissionWords.js";
+import { initDestinationRegistry } from "../src/residency/destinationRegistry.js";
 import type { NativeTaskActor, NativeTaskService } from "../src/studio/nativeTaskTypes.js";
 
 let createService: typeof import("../src/studio/nativeTaskService.js").createNativeTaskService;
@@ -54,4 +55,22 @@ test("a held workspace refuses the start in words, with its codes, and writes no
   expect(refused!.message).not.toContain(root);
   const directory = new NativeTaskDescriptors(root).directory;
   expect((existsSync(directory) ? readdirSync(directory) : []).filter(name => name.endsWith(".json"))).toEqual([]);
+}, 60_000);
+
+test("a model request a residency check refused gives the task Studio's words, and a restarted Studio says the same", async () => {
+  // Storage is declared; the model provider is not, so the session opens and its first model request is refused before it is sent.
+  initDestinationRegistry(root, { schemaVersion: "amc.residency-destinations/v1", profile: { path: ".amc/residency/profile.yaml", storageUrl: "http://localhost/amc" },
+    destinations: [{ destinationId: "this-laptop", match: { hosts: ["localhost"] }, channels: ["storage"], region: { jurisdiction: "US", code: "us-laptop" }, transferBasis: null }],
+    rules: [{ ruleId: "us-only", controlId: "fixture-01", appliesTo: { dataClasses: ["health"], jurisdictions: ["US"] }, allowedJurisdictions: ["US"], acceptsTransferBasis: false }] });
+  const open = () => { const service = createService({ workspace: root, credentialsHome: home, credentialsFile: join(home, ".credentials.yaml"),
+    environment: { HOME: home, PATH: process.env.PATH, AMC_VAULT_PASSPHRASE: pass, AMC_TRUST_WORKSPACE: "1" } }); services.push(service); return service; };
+  const service = open();
+  const started = await service.start(actor, { agentId: "default", clientRequestId: randomUUID(), provider: "stub", tools: "none", prompt: "Say hello.", maxSteps: 2, maxTokens: 64 });
+  const deadline = Date.now() + 25_000;
+  let task = service.poll(actor, started.taskId).task;
+  while ((task.state === "running" || task.state === "starting") && Date.now() < deadline) { await new Promise(done => setTimeout(done, 50)); task = service.poll(actor, started.taskId).task; }
+  const words = `${residencyRouteWords("provider", "destination_unregistered", "destination_unregistered")} No automatic retry was sent.`;
+  expect(task).toMatchObject({ state: "failed", error: words });
+  await service.close();
+  expect(open().poll(actor, started.taskId).task.error).toBe(words);
 }, 60_000);

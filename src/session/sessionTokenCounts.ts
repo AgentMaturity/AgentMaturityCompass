@@ -51,7 +51,7 @@ export function sessionTokenCounts(rows: readonly EvidenceEvent[]): SessionToken
       turns.set(turn, total);
     } else if (row.event_type === "loop/compact" && raw.compaction !== undefined) {
       const receipt = compactionReceipt(row);
-      compactions.push({ eventId: row.id, turn, promptTokensBefore: receipt.v === 2 ? receipt.trigger.promptTokens : null, promptTokensAfter: null });
+      compactions.push({ eventId: row.id, turn, promptTokensBefore: receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.promptTokens : null, promptTokensAfter: null });
     } else if (row.event_type === "audit" && raw.auditType === "COMPACTION_EFFECT_OBSERVED" && Array.isArray(raw.compactionEventIds)) {
       for (const id of raw.compactionEventIds) after.set(String(id), count(raw.promptTokensAfter));
     } else if (row.event_type === "audit" && raw.auditType === FORK_TOKEN_COUNTS_AUDIT && typeof raw.parentSessionId === "string") {

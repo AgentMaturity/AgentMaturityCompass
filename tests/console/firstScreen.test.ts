@@ -1,3 +1,4 @@
+import { plainCodeHtml } from "../../src/console/assets/plainError.js";
 /**
  * The console's first screen. A first-time user met a modal guide that opened by itself, a nine-field jargon strip,
  * three identical primary buttons and static "Authentication required." text. Home is now: one plain status line, one
@@ -39,21 +40,26 @@ describe("hero card", () => {
     expect(hero).toContain("Available in your own workspace: in the app choose Studio &gt; Open My Workspace, or run <code>amc up</code> in a terminal.");
   });
 
-  test("the primary label and link follow the workspace", () => {
+  // studio-ui redesign: Home's "Run a task" tile carries the first action (the top bar keeps it only in the demo).
+  test("the primary label and link follow the workspace", async () => {
     const demo = topbarHtml({ demoMode: true, agent: "a b" } as never);
     expect(demo).toContain('href="./native-tasks?agent=a%20b&amp;sample=1">Try a demo task</a>');
-    expect(topbarHtml({ demoMode: false } as never)).toContain(">Run a task</a>");
+    const { homeStartHtml } = await import("../../src/console/assets/homeView.js");
+    expect(homeStartHtml({ agentId: "a b", demoMode: false })).toMatch(/id="homeRunTile" href="\.\/native-tasks\?agent=a%20b&amp;sample=1">[\s\S]*Run a task/);
+    expect(homeStartHtml({ agentId: "a", demoMode: true })).toContain("Try a demo task");
   });
 
-  test("Home's order: hero, progress line with its steps folded, then everything else under More", () => {
+  test("Home's order: the first steps as a route, its steps and the progress line folded, the other ways in, then More", () => {
     const home = fnBody("async function renderHome()");
     const at = (text: string) => home.indexOf(text);
-    expect(at("${firstUseCard(agentId, demoMode)}")).toBeGreaterThan(-1);
-    expect(at("${firstUseCard(agentId, demoMode)}")).toBeLessThan(at("progressLineText("));
-    expect(at("progressLineText(")).toBeLessThan(at("<summary>Show all steps</summary>"));
-    expect(at("<summary>Show all steps</summary>")).toBeLessThan(at('card("Activation path"'));
+    expect(at("homeStartHtml(")).toBeGreaterThan(-1);
+    expect(at("homeStartHtml(")).toBeLessThan(at("activationRouteHtml("));
+    expect(at("activationRouteHtml(")).toBeLessThan(at("<summary>Show all steps</summary>"));
+    expect(at("<summary>Show all steps</summary>")).toBeLessThan(at("progressLineText("));
+    expect(at("progressLineText(")).toBeLessThan(at('card("Activation path"'));
+    expect(at('moreInfo("Other ways in", firstUseCard(agentId, demoMode))')).toBeGreaterThan(at('card("Activation path"'));
     const more = at('<details id="homeMore" class="home-more">');
-    expect(more).toBeGreaterThan(at('card("Activation path"'));
+    expect(more).toBeGreaterThan(at('moreInfo("Other ways in"'));
     for (const block of ["quick-action-grid", "studio-kpi-grid", "Overall Trend", "renderApiQuickstart("]) expect(at(block), block).toBeGreaterThan(more);
     expect(home).toContain("${latestRun ? `");
     expect(home).toContain('getElementById("homeMore")?.querySelector("summary")?.after(claimStrip)');
@@ -115,14 +121,14 @@ describe("status strip and session line", () => {
 
   test("a run whose seal fails never shows the file's own trust label, integrity or claim state", () => {
     const context = vm.createContext({ htmlEscape: (text: string) => String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;"),
-      formatTime: String, shortId: String });
+      formatTime: String, shortId: String, plainCodeHtml });
     const src = app.slice(app.indexOf("const UNTRUSTED_SEAL_LABEL"), app.indexOf("// Studio has no work-order read route"));
     vm.runInContext(src.replace("const UNTRUSTED_SEAL_LABEL", "var UNTRUSTED_SEAL_LABEL"), context);
     const tampered = { runId: "r1", status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
     const summary = (context.runStateSummary as (a: string, r: unknown) => string)("a", tampered);
     expect(summary).toContain("UNTRUSTED (seal check fails)");
     expect(summary).not.toContain("HIGH TRUST");
-    expect(summary).toContain("status <strong>INVALID</strong>");
+    expect(summary).toContain('status <strong><span class="code-word" title="Code: INVALID">Does not check out</span></strong>');
     expect(summary).not.toContain("ELIGIBLE");
     expect((context.runStateWarning as (r: unknown) => string)(tampered)).toContain("does not pass its seal check");
     expect((context.runStateWarning as (r: unknown) => string)({ ...tampered, sealVerified: true })).toBe("");
@@ -140,12 +146,14 @@ describe("status strip and session line", () => {
 });
 
 describe("top bar", () => {
-  test("has no Open Standard shortcut, and no Sign out in the demo workspace", () => {
+  // studio-ui redesign: Sign out is the person at the foot of the rail, so the top bar never carries it.
+  test("has no Open Standard shortcut and no Sign out; it opens the guide", () => {
     const me = { username: "demo" };
     expect(topbarHtml({ me } as never)).not.toContain("Open Standard");
     expect(topbarHtml({ me, demoMode: true } as never)).not.toContain("Sign out");
-    expect(topbarHtml({ me, demoMode: false } as never)).toContain("Sign out");
-    expect(topbarHtml({} as never)).toContain('id="guideOpenLink" href="./home?guide=1">How AMC works</a>');
+    expect(topbarHtml({ me, demoMode: false } as never)).not.toContain("Sign out");
+    expect(topbarHtml({} as never)).toContain('id="guideOpenLink" href="./home?guide=1" title="How AMC works">');
+    expect(topbarHtml({} as never)).toContain('<span class="visually-hidden">How AMC works</span></a>');
   });
 });
 

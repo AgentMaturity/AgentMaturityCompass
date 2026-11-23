@@ -50,7 +50,7 @@ export async function renderDiagnosticViewPage(params) {
     .join("");
 
   params.root.innerHTML = `
-    ${params.card("Diagnostic Overview", `
+    ${params.card("Diagnostic", `
       <div class="grid">
         <div><div class="muted">Agent</div><div class="tile-value">${esc(agentId)}</div></div>
         <div><div class="muted">Score used</div><div class="tile-value" title="${esc(auto.runId ?? "")}">${auto.runId ? `latest (${esc(String(auto.runId).slice(0, 8))})` : "none"}</div></div>

@@ -6,6 +6,7 @@
  */
 import { createHash } from "node:crypto";
 import { agentPromptProfile, type AgentPromptProfile } from "../prompt/agentPromptProfile.js";
+import { SKILL_CONTEXT_PREFIX } from "../skills/skillPrompt.js";
 import { amcVersion } from "../version.js";
 import { credentialsServices } from "./services/credentialsServices.js";
 import { llmServices } from "./services/llmServices.js";
@@ -57,7 +58,12 @@ export function promptProfileFor(options: ComposedTurnOptions): AgentPromptProfi
  * prompt was built out of, and whether a human stood in front of the tools —
  * the facts that decide what the agent could do and what it was told it could do.
  */
-export function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptProfile): string {
+export function compositionDigestOf(options: ComposedTurnOptions, profile: AgentPromptProfile, legacySkills?: readonly string[]): string {
+  const names = profile.contextPlugins.map((plugin) => plugin.name).filter((name) => !name.startsWith(SKILL_CONTEXT_PREFIX));
+  // The form before UX-02, for resuming a session a skill turn opened then: skills sat after the defaults and mission
+  // context and before the extensions' contexts (agentPromptProfile's extraContextPlugins, skills first).
+  const extension = (name: string): boolean => name.startsWith("native-extension:");
+  const contexts = legacySkills === undefined ? names : [...names.filter((name) => !extension(name)), ...legacySkills, ...names.filter(extension)];
   const gate = options.approvalGate;
   const shape = JSON.stringify({
     plugins: [
@@ -78,7 +84,9 @@ export function compositionDigestOf(options: ComposedTurnOptions, profile: Agent
     sources: options.compositionSources ?? [],
     prompt: {
       sections: profile.sections.map((section) => section.name),
-      contexts: profile.contextPlugins.map((plugin) => plugin.name),
+      // A `/skill` loads for one turn and that turn's signed composition record names it. Counting it here would make
+      // a skill turn and a plain turn different compositions, so chat (one resumed run per turn) could never hold both (UX-02).
+      contexts,
       variables: Object.keys(profile.variables).sort(),
       pinned: options.systemPrompt !== undefined
     },

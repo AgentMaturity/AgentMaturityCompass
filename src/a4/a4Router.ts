@@ -548,10 +548,11 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   const now = Date.now();
   const state = loadA4State(store, projectId, now);
   assertVisible(route, state.members);
-  const readinessAt = (stage: A4Stage) => viewerReadiness(evaluateFor(store, state, route.principal, route.principal ? callOf(route, undefined, true) : { fullIntegrity: true }, stage, now), state, route.native, route.workspace);
+  const evaluatedAt = (stage: A4Stage) => evaluateFor(store, state, route.principal, route.principal ? callOf(route, undefined, true) : { fullIntegrity: true }, stage, now);
+  const readinessAt = (stage: A4Stage) => viewerReadiness(evaluatedAt(stage), state, route.native, route.workspace);
   if (rest === "") {
     assertQuery(params, []);
-    const readiness = readinessAt(headStage(state.project));
+    const readiness = evaluatedAt(headStage(state.project)).readiness; // returns no allowed/nextGate: one build-session read (buildRefusal)
     const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no) ?? null;
     apiSuccess(route.res, { ...projectView(state.project, state.members, { status: readiness.status, bindingDigest: readiness.bindingDigest }),
       practice: openedAsPractice(state.chain), practiceActive: state.practice === true, regulated: regulatedOrClosed(route.workspace, state),

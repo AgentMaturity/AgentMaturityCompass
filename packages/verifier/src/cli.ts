@@ -154,8 +154,20 @@ function options(args: string[]) {
   };
 }
 
+/** One plain line on what was checked and what was not (UX-05): never a pass word beside an unchecked result. */
+export function plainSummary(report: VerifierReport): string {
+  const integrity = { pass: "unchanged, and every signature checks out", fail: "changed, or a signature does not check out",
+    "not-evaluated": "not checked: no supplied trust list holds the key that signed it" }[report.integrity.status];
+  const signer = { pass: "a key your trust list names", fail: "not a key your trust list names for this", "not-evaluated": "not checked" }[report.issuerAdmission.status];
+  const anchoring = report.anchoring.status === "anchored" ? "recorded in a public log" : "not checked against a public log";
+  const content = report.satisfaction.status === "pass" ? "its stated result follows from its evidence" : "whether what it says is true was not checked";
+  const complete = report.completeness.status === "not-evaluated" && report.integrity.status === "pass"
+    ? ` Not a pass: ${report.completeness.reasons.join("; ") || "completeness was not established"}.` : "";
+  return `Result: the record is ${integrity}; signer: ${signer}; ${anchoring}; ${content}.${complete}`;
+}
+
 function human(report: VerifierReport): string {
-  const lines = [`amc-verify: ${report.artifact.kind} ${report.artifact.path} (as of ${report.asOf})`];
+  const lines = [`amc-verify: ${report.artifact.kind} ${report.artifact.path} (as of ${report.asOf})`, `  ${plainSummary(report)}`];
   for (const dimension of DIMENSIONS) {
     const codes = report.reasonCodes[dimension];
     lines.push(`  ${dimension.padEnd(16)} ${report[dimension].status.padEnd(14)} ${codes.join(", ")}`.trimEnd());

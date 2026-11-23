@@ -32,7 +32,7 @@ async function main() {
 
   const planId = await resolvePlanId();
   if (!planId) {
-    root.innerHTML = card("Simulator", "<p>No upgrade plan yet. Make one on the <a href='./upgradeWizard'>Upgrade Wizard</a> page first; the simulator shows what it could change.</p>");
+    root.innerHTML = card("Simulator", "<p>No upgrade plan yet. Make one on the <a href='./upgradeWizard'>Upgrade plan</a> page first; the simulator shows what it could change.</p>");
     return;
   }
 

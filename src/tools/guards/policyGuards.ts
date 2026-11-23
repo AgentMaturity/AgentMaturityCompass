@@ -80,7 +80,9 @@ export function runtimeFirewallGuard(workspace: string): ToolGuard {
  *
  * - A SIMULATE call is never denied for budget. Simulation does not spend, and
  *   `budgetUsageSnapshot` only counts EXECUTE — denying it would make the
- *   guard disagree with the meter it reads.
+ *   guard disagree with the meter it reads. The one exception is the early look
+ *   before a person is asked (UX-03): it runs as SIMULATE, and a call that will
+ *   run as EXECUTE is refused there when its budget is spent, reserving nothing.
  * - An unverifiable budgets config denies EVERY action class, not the three
  *   the engine names. The engine lists DEPLOY/WRITE_HIGH/SECURITY because
  *   those are what its consequence model freezes; but a config whose signature

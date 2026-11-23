@@ -35,7 +35,7 @@ async function main() {
   // Opening the page only reads the latest plan (C-01); making one writes a signed record, so it is a button.
   const plan = await latestPlan();
   if (!plan) {
-    root.innerHTML = card("Upgrade Wizard", `<p>No upgrade plan yet. A plan compares your latest score with your target levels and lists the steps between them.</p>
+    root.innerHTML = card("Upgrade plan", `<p>No upgrade plan yet. A plan compares your latest score with your target levels and lists the steps between them.</p>
       <div class="row wrap"><button id="makePlanBtn" data-roles="OWNER,OPERATOR">Make an upgrade plan</button></div>`);
     applyRoleGates(root);
     document.getElementById("makePlanBtn")?.addEventListener("click", async () => {
@@ -46,7 +46,7 @@ async function main() {
   }
   root.innerHTML = `
     ${card(
-      "Upgrade Wizard",
+      "Upgrade plan",
       `
       <p class="muted">
         The plan lists the steps from your latest score to your target levels. Its steps change signed settings only after

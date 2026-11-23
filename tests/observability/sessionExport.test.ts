@@ -223,9 +223,11 @@ describe("session export", () => {
     const fp = logs.join("\n").match(/^\s+([0-9a-f]{64})$/m)![1]!;
     logs.length = 0;
     await program.parseAsync(["session", "verify-export", out, "--expect-monitor", fp], { from: "user" });
-    expect(logs.join("\n")).toContain("verification PASSED");
+    // UX-05: one plain line says what was checked and what was not; no bare PASSED beside an unevaluated claim.
+    expect(logs.join("\n")).toContain("Session export checked:");
+    expect(logs.join("\n")).not.toContain("verification PASSED");
     await program.parseAsync(["session", "verify-export", jsonOut, "--expect-monitor", fp], { from: "user" });
-    expect(logs.join("\n")).toContain("verification PASSED");
+    expect(logs.join("\n")).toContain("Not checked: a public log anchor");
     await expect(program.parseAsync(["session", "verify-export", out, "--expect-monitor", "0".repeat(64)], { from: "user" })).rejects.toThrow("exit 1");
     writeFileSync(out, readFileSync(out, "utf8").replace('"event_type":"turn/end"', '"event_type":"turn/ended"'));
     await expect(program.parseAsync(["session", "verify-export", out, "--expect-monitor", fp], { from: "user" })).rejects.toThrow("exit 1");
@@ -258,7 +260,7 @@ describe("session export", () => {
     expect(logs.join("\n")).toContain("--accept-unverifiable-content");
     logs.length = 0;
     await program.parseAsync(["session", "verify-export", withContent, "--expect-monitor", fp2, "--accept-unverifiable-content"], { from: "user" });
-    expect(logs.join("\n")).toContain("verification PASSED");
+    expect(logs.join("\n")).toContain("Session export checked:");
     expect(logs.join("\n")).toContain("accepted as display-only");
   });
 });

@@ -4,10 +4,11 @@ import { z } from "zod";
 import { sha256Hex } from "../../utils/hash.js";
 import { defineTool } from "../toolRegistry.js";
 import type { ToolDefinition, ToolExecution } from "../toolTypes.js";
+import type { FileCheckpoint } from "./fileCheckpoint.js";
 import type { ReadBeforeEditLedger } from "./readBeforeEdit.js";
 import { planLiteralEdits, type LiteralEdit } from "./fsEditPlan.js";
 import { scanRegularFile } from "./fsRegularFile.js";
-import { readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
+import { readBeforeWrite, refuseBeforeWrite, refuseRedactionPlaceholder, shownDiff, strictJsonNote, utf8, writeIfUnchanged, writeTarget } from "./fsWritePrimitives.js";
 import { insideWorkspace } from "./workspacePath.js";
 
 export { insideWorkspace } from "./workspacePath.js";
@@ -134,6 +135,8 @@ const withDiff = (head: string, diff: string): string => (diff === "" ? head : `
 
 export interface FsToolDeps {
   readonly ledger: ReadBeforeEditLedger;
+  /** HP-06: keeps a file's prior bytes before a write lands (./fileCheckpoint.ts). */
+  readonly checkpoint?: FileCheckpoint;
 }
 
 export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
@@ -199,6 +202,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (simulated(execution)) {
           return { ok: true, output: withDiff(`SIMULATE fs.write ${args.path} (${after.length} bytes)`, diff?.text ?? ""), bytes: 0 };
         }
+        deps.checkpoint?.(execution, rel, before, after);
         mkdirSync(dirname(full), { recursive: true });
         writeIfUnchanged(execution, ledger, full, args.path, before, after);
         // Refresh: the agent now knows this file's contents, because it just
@@ -209,7 +213,7 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
           bytesBefore: before?.length ?? 0, bytesAfter: after.length, replacements: null,
           diffSha256: diff === null ? null : sha256Hex(diff.text), diffTruncated: diff?.truncated ?? false
         };
-        return { ok: true, output: diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text), bytes: after.length, fileChanges: [change] };
+        return { ok: true, output: (diff === null ? `created ${args.path}` : withDiff(`wrote ${args.path}`, diff.text)) + strictJsonNote(args.path, after), bytes: after.length, fileChanges: [change] };
       }
     }),
 
@@ -274,13 +278,14 @@ export function fsTools(deps: FsToolDeps): readonly ToolDefinition[] {
         if (simulated(execution)) {
           return { ok: true, output: withDiff(`SIMULATE fs.edit ${args.path} (${summary})`, diff.text), bytes: 0 };
         }
+        deps.checkpoint?.(execution, rel, raw, after);
         writeIfUnchanged(execution, ledger, full, args.path, raw, after);
         ledger.recordRead(execution.agentId, full, after);
         const change = {
           path: rel, beforeSha256: sha256Hex(raw), afterSha256: sha256Hex(after), bytesBefore: raw.length,
           bytesAfter: after.length, replacements: plan.replacements, diffSha256: sha256Hex(diff.text), diffTruncated: diff.truncated
         };
-        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text), bytes: after.length, fileChanges: [change] };
+        return { ok: true, output: withDiff(`edited ${args.path} (${summary})`, diff.text) + strictJsonNote(args.path, after), bytes: after.length, fileChanges: [change] };
       }
     })
   ];

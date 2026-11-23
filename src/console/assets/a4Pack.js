@@ -2,6 +2,8 @@
 // /industry-packs/:id), HTML or plain values out; every pack string goes through esc(). Nothing here is recorded: the
 // suggestions fill empty Aspire answers on the page, and the member checks them and presses Save answers.
 import { esc } from "./a4View.js";
+import { icon } from "./iconSet.js";
+import { noticeChip, pictureCard } from "./pageKit.js";
 import { QUESTIONNAIRE_NOTICE } from "./industryPackView.js";
 
 const list = (value) => (Array.isArray(value) ? value : []);
@@ -30,27 +32,37 @@ export function packAnswers(pack) {
 }
 
 /** The create form's industry choice: every pack, grouped by station; empty when the catalog could not be read. */
-export function packSelectHtml(packs, selected) {
+export function packSelectHtml(packs, selected, { fold = false, cards = false } = {}) {
   const rows = list(packs).filter((pack) => packIdOf(pack?.packId));
   if (rows.length === 0) return "";
   const stations = [...new Set(rows.map((pack) => String(pack.domain ?? "")))].sort();
-  return `<label>Your industry (optional) <select name="pack" aria-describedby="a4PackHint"><option value="">No industry pack</option>${stations.map((station) =>
+  // The Build page asks the field first as picture cards (an unnamed choice: the start request never reads it); the
+  // pack list below then shows that field's packs. The select is the same either way.
+  const card = (value, words, line, iconName) => pictureCard({ title: words, line, iconName, className: "a4-station-card",
+    input: `<input type="radio" name="a4Station" value="${esc(value)}"${value ? "" : " checked"} />` });
+  const field = cards ? `<div class="picture-grid a4-station-grid" role="radiogroup" aria-label="Which field is it for?">${card("", "No industry", "A general agent", "agent")}${
+    stations.map((station) => card(station, title(station), `${rows.filter((pack) => String(pack.domain ?? "") === station).length} packs`, station)).join("")}</div>` : "";
+  return `${field}<label>Your industry (optional) <select name="pack" aria-describedby="a4PackHint"><option value="">No industry pack</option>${stations.map((station) =>
     `<optgroup label="${esc(title(station))}">${rows.filter((pack) => String(pack.domain ?? "") === station).map((pack) =>
       `<option value="${esc(pack.packId)}"${pack.packId === selected ? " selected" : ""}>${esc(pack.name || pack.packId)}</option>`).join("")}</optgroup>`).join("")}</select></label>
-    <p class="muted" id="a4PackHint">Pick the Industry Pack closest to what the agent will do. AMC then suggests the sector, a risk level and the rules to check, and shows
-      the risks the pack names. You can change every suggestion. ${esc(QUESTIONNAIRE_NOTICE)}</p>`;
+    ${fold ? `<details class="notice-chip"><summary>${icon("info", { size: 16 })}<span>AI-drafted, not legal advice</span></summary>` : ""}<p class="muted" id="a4PackHint">Pick the Industry Pack closest to what the agent will do. AMC then suggests the sector, a risk level and the rules to check, and shows
+      the risks the pack names. You can change every suggestion. ${esc(QUESTIONNAIRE_NOTICE)}</p>${fold ? "</details>" : ""}`;
 }
 
 /** The project page's panel while it starts from a pack: what was suggested, the pack's risks, and its questionnaire. */
 export function packPanelHtml(pack, filled) {
   const risks = list(pack?.keyRisks);
+  // One line in sight; the pack's risks, its questionnaire and its notice one click away (the notice also as a chip).
   return `<section class="card a4-pack" aria-labelledby="a4PackTitle"><h3 id="a4PackTitle">Starting from the Industry Pack: ${esc(pack.name)}</h3>
     <p>${filled > 0 ? `AMC filled ${filled} empty answer(s) under Ask from this pack: the sector (stations), the risk appetite, the governance and the constraints.
       They are suggestions and nothing is saved yet. Check each one, change what is wrong, then press Save answers.`
     : "The answers this pack suggests are already filled or saved. Check them under Ask."}</p>
+    ${noticeChip("AI-drafted, not legal advice", `The pack is a self-reported questionnaire with experimental content. ${QUESTIONNAIRE_NOTICE} Starting from it does not show the agent meets any rule.`)
+      .replace('<details class="notice-chip"', '<details class="notice-chip" data-a4-open="pack:notice"')}
+    <details class="more-info" data-a4-open="pack:more"><summary>What the pack says</summary><div class="more-info-body">
     ${risks.length ? `<h4>Risks this pack names</h4><p class="muted">Use them to write what the agent must never do. AMC does not turn them into rules for you.</p>
       <ol>${risks.map((risk) => `<li>${esc(risk)}</li>`).join("")}</ol>` : ""}
     <p><a class="button secondary" href="./industrypacks?pack=${encodeURIComponent(pack.id)}">Answer this pack's ${list(pack.questions).length} questions</a></p>
     <p class="muted">The pack is a self-reported questionnaire with experimental content. ${esc(QUESTIONNAIRE_NOTICE)}
-      Starting from it does not show the agent meets any rule.</p></section>`;
+      Starting from it does not show the agent meets any rule.</p></div></details></section>`;
 }

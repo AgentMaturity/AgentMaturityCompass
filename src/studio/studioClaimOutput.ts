@@ -11,7 +11,7 @@ import { claimFields, type ClaimFields } from "../claims/eligibility/index.js";
 import { evaluateDiagnosticEvidenceReadiness } from "../diagnostic/evidenceReadiness.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
 import { loadRunReport } from "../diagnostic/runReportResolution.js";
-import { getAgentPaths } from "../fleet/paths.js";
+import { getAgentPaths, normalizeAgentId } from "../fleet/paths.js";
 import type { DiagnosticReport } from "../types.js";
 
 const DIAGNOSTIC = { source: "diagnostic_report" } as const;
@@ -49,14 +49,20 @@ export function bindStudioResultRoute(res: ServerResponse, method: string, pathn
 
 /** Verify the original stored report after authorization, before adding display-only readiness. */
 export function studioStoredRunReport(res: ServerResponse, workspace: string, runId: string,
-  auth: { isAdmin: boolean; agentId: string | null }): { status: number; body: unknown } {
+  auth: { isAdmin: boolean; agentId: string | null }, requestedAgent: string | null = null): { status: number; body: unknown } {
   if (runId.includes("/") || runId.includes("\\") || runId.includes(String.fromCharCode(0))) {
     return { status: 400, body: { error: "invalid run id" } };
   }
-  const reportFiles = [join(getAgentPaths(workspace).runsDir, runId + ".json"), join(workspace, ".amc", "runs", runId + ".json")];
+  // ?agentId= reads that agent's records; only an id already in its normal form is used to build a path.
+  let agentId: string | undefined;
+  if (requestedAgent !== null) {
+    try { agentId = normalizeAgentId(requestedAgent); } catch { agentId = undefined; }
+    if (agentId === undefined || agentId !== requestedAgent || agentId.length > 128) return { status: 400, body: { error: "invalid agent id" } };
+  }
+  const reportFiles = [join(getAgentPaths(workspace, agentId).runsDir, runId + ".json"), join(workspace, ".amc", "runs", runId + ".json")];
   let report: DiagnosticReport;
   try {
-    report = loadRunReport(workspace, runId);
+    report = loadRunReport(workspace, runId, agentId);
   } catch (error) {
     const missing = error as NodeJS.ErrnoException | null;
     if (missing?.code === "ENOENT" && typeof missing.path === "string" && reportFiles.includes(missing.path)) {
@@ -64,6 +70,8 @@ export function studioStoredRunReport(res: ServerResponse, workspace: string, ru
     }
     throw error;
   }
+  // The shared legacy folder, or a file in the wrong folder, can hold another agent's run: answer only for the agent named.
+  if (agentId !== undefined && report.agentId !== agentId) return { status: 404, body: { error: "run report not found" } };
   if (!auth.isAdmin && auth.agentId && report.agentId !== auth.agentId) {
     return { status: 403, body: { error: "scope does not include this agent" } };
   }

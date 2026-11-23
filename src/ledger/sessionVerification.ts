@@ -10,6 +10,7 @@
 import { admitSessionEnvelope, SESSION_GENESIS } from "../session/sessionTypes.js";
 import type { Ledger } from "./ledger.js";
 import { validateSurfaceCompactions } from "../session/surfaceCompaction.js";
+import { overflowRetryProblems } from "../session/overflowRetryRule.js";
 import type { OperationalEvidenceOptions } from "../keys/operationalLedgerReader.js";
 
 /**
@@ -31,6 +32,7 @@ export function verifySessionChains(ledger: Ledger, errors: string[], options: O
   const events = ledger.getAllEvents();
   try { validateSurfaceCompactions(ledger.workspace, events, { ...options, ledger }); }
   catch (error) { errors.push(`Session compaction invalid: ${error instanceof Error ? error.message : "unsupported history"}`); }
+  for (const problem of overflowRetryProblems(events)) errors.push(`Session overflow retry invalid: ${problem}`);
   const expectedSeqBySession = new Map<string, number>();
   const expectedPrevHashBySession = new Map<string, string>();
   for (const event of events) {

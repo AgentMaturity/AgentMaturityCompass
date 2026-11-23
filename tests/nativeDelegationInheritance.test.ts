@@ -168,10 +168,13 @@ describe("native child cancellation and inherited governance", () => {
     }));
     const result = await runner({ ...context(), delegationScope: ["READ_ONLY"] });
     expect(result.ok).toBe(true); expect(factories).toBe(2);
-    expect(asked).toEqual(["delegate", "fs.read", "delegate"]);
+    // UX-03: the signed allowlist refuses ./package.json before anyone is asked, so only the two delegate calls are put to a person.
+    expect(asked).toEqual(["delegate", "delegate"]);
     const childRows = rows(workspace, "native-child"), grandRows = rows(workspace, "native-grandchild");
     expect(childRows.filter(row => row.event_type === "approval/request")).toHaveLength(1);
-    expect(grandRows.filter(row => row.event_type === "approval/request")).toHaveLength(2);
+    expect(grandRows.filter(row => row.event_type === "approval/request")).toHaveLength(1);
+    const readResult = grandRows.find(row => row.event_type === "tool/result" && JSON.parse(row.meta_json).toolCallId === "read_b");
+    expect(JSON.parse(readResult!.meta_json).denied).toBe(true);
     expect(JSON.parse(childRows.find(row => row.event_type === "agent_delegation_started")!.meta_json)).toMatchObject({ depth: 2 });
     expect(grandRows.some(row => row.event_type === "agent_delegation_started")).toBe(false);
     const writeResult = grandRows.find(row => row.event_type === "tool/result" && JSON.parse(row.meta_json).toolCallId === "write_b");

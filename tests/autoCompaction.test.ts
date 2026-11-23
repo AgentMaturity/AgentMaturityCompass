@@ -240,13 +240,15 @@ function assertMeasured(f: Fixture, rows: readonly EvidenceEvent[]): void {
     expect(receipt.v).toBe(2);
     if (receipt.v !== 2) throw new Error("automatic fixture produced a v1 receipt");
     expect(receipt.trigger.kind).toBe("automatic");
-    expect(receipt.trigger.formula).toBe("inputTokens+cacheRead+cacheWrite");
+    const trigger = receipt.trigger;
+    if (trigger.kind !== "automatic") throw new Error("threshold fixture produced an overflow receipt");
+    expect(trigger.formula).toBe("inputTokens+cacheRead+cacheWrite");
     expect(receipt.measurement).toBe("payload-bytes-not-tokens");
-    const measured = rows.find(candidate => candidate.id === receipt.trigger.measuredAtEventId)!;
+    const measured = rows.find(candidate => candidate.id === trigger.measuredAtEventId)!;
     expect(measured.event_type).toBe("step/end");
     const usage = meta(measured).usage as TokenUsage;
-    expect(receipt.trigger.promptTokens).toBe(usage.inputTokens + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0));
-    expect(receipt.trigger.ratio).toBe(receipt.trigger.promptTokens / WINDOW);
+    expect(trigger.promptTokens).toBe(usage.inputTokens + (usage.cacheRead ?? 0) + (usage.cacheWrite ?? 0));
+    expect(trigger.ratio).toBe(trigger.promptTokens / WINDOW);
     const bytes = receipt.sources.map(source => {
       const original = rows.find(candidate => candidate.id === source.sourceEventId)!;
       expect(original.event_hash).toBe(source.sourceEventHash);
@@ -261,9 +263,9 @@ function assertMeasured(f: Fixture, rows: readonly EvidenceEvent[]): void {
   }
 }
 function scriptsForThreeTools(prompt: number, missingUsage = false): readonly ScriptedStream[] {
-  const scripts = [toolStep("old", "fixture", "{}", { inputTokens: 7000 }),
-    toolStep("recent-1", "fixture", "{}", { inputTokens: 7000 }),
-    toolStep("recent-2", "fixture", "{}", { inputTokens: prompt }), textStep("finished", { inputTokens: 7000 })];
+  const scripts = [toolStep("old", "fixture", '{"id":"old"}', { inputTokens: 7000 }),
+    toolStep("recent-1", "fixture", '{"id":"recent-1"}', { inputTokens: 7000 }),
+    toolStep("recent-2", "fixture", '{"id":"recent-2"}', { inputTokens: prompt }), textStep("finished", { inputTokens: 7000 })];
   return missingUsage ? scripts.map(script => script.filter(chunk => chunk.type !== "usage")) : scripts;
 }
 const threeOutputs = { old: "O".repeat(8192), "recent-1": "R".repeat(8192), "recent-2": "S".repeat(8192) };
@@ -310,7 +312,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       const rows = f.h.events();
       expect(compactRows(rows)).toHaveLength(1);
       const receipt = compactionReceipt(compactRows(rows)[0]!);
-      expect(receipt.v === 2 ? receipt.trigger.reserveTokens : null).toBe(16384);
+      expect(receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.reserveTokens : null).toBe(16384);
       await verifyRecorded(f, 4);
     });
   });
@@ -323,7 +325,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(compactRows(rows)).toHaveLength(prompt < 8500 ? 0 : 1);
       if (prompt === 8500) {
         const receipt = compactionReceipt(compactRows(rows)[0]!);
-        expect(receipt.v === 2 ? receipt.trigger.reserveTokens : null).toBe(1500);
+        expect(receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.reserveTokens : null).toBe(1500);
       }
       await verifyRecorded(f, 4);
     });
@@ -337,7 +339,7 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       if (prompt >= 8000) {
         const receipt = compactionReceipt(compactRows(rows)[0]!);
         expect(receipt.v).toBe(2);
-        if (receipt.v === 2) expect(receipt.trigger.ratio).toBe(0.8);
+        if (receipt.v === 2 && receipt.trigger.kind === "automatic") expect(receipt.trigger.ratio).toBe(0.8);
         expect(receipt.sources.map(source => source.originEventId)).toEqual([old.id]);
       }
       assertMeasured(f, rows);
@@ -386,8 +388,8 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
   it("orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact", async () => {
     const outputs = { a: "a".repeat(5000), b: "b".repeat(7000), c: "c".repeat(7000), small: "x".repeat(4095),
       "recent-1": "r".repeat(8000), "recent-2": "s".repeat(8000) };
-    await withFixture({ scripts: [toolStepMulti(["a", "b", "c", "small"].map(id => ({ id, name: "fixture", args: "{}" })), { inputTokens: 7000 }),
-      toolStep("recent-1", "fixture", "{}", { inputTokens: 7000 }), toolStep("recent-2", "fixture", "{}", { inputTokens: 8500 }),
+    await withFixture({ scripts: [toolStepMulti(["a", "b", "c", "small"].map(id => ({ id, name: "fixture", args: JSON.stringify({ id }) })), { inputTokens: 7000 }),
+      toolStep("recent-1", "fixture", '{"id":"recent-1"}', { inputTokens: 7000 }), toolStep("recent-2", "fixture", '{"id":"recent-2"}', { inputTokens: 8500 }),
       textStep("finished", { inputTokens: 6000 })], tools: syntheticTools(outputs), config: { compaction: compaction() } }, async f => {
       await turn(f, "Order is part of the context contract.");
       const rows = f.h.events(), originalOrder = ["a", "b", "c", "small", "recent-1", "recent-2"].map(id => toolResult(rows, id));
@@ -503,14 +505,14 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
 
   it("caps successful compaction boundaries at three in one turn and resets the count on the next turn", async () => {
     const ids = Array.from({ length: 7 }, (_, index) => `turn1-${index + 1}`), outputs = Object.fromEntries([...ids, "turn2-1"].map(id => [id, id.repeat(1500)]));
-    await withFixture({ scripts: [...ids.map(id => toolStep(id, "fixture", "{}", { inputTokens: 8500 })), textStep("first turn done", { inputTokens: 7000 }),
-      toolStep("turn2-1", "fixture", "{}", { inputTokens: 8500 }), textStep("second turn done", { inputTokens: 7000 })],
+    await withFixture({ scripts: [...ids.map(id => toolStep(id, "fixture", JSON.stringify({ id }), { inputTokens: 8500 })), textStep("first turn done", { inputTokens: 7000 }),
+      toolStep("turn2-1", "fixture", '{"id":"turn2-1"}', { inputTokens: 8500 }), textStep("second turn done", { inputTokens: 7000 })],
       tools: syntheticTools(outputs), config: { compaction: compaction() } }, async f => {
       await turn(f, "First high-pressure turn.");
       const first = f.h.events(), firstReceipts = compactRows(first);
       expect(firstReceipts.map(row => compactionReceipt(row).sources[0]!.originEventId)).toEqual(ids.slice(0, 3).map(id => toolResult(first, id).id));
       expect(new Set(firstReceipts.map(row => {
-        const receipt = compactionReceipt(row); return receipt.v === 2 ? receipt.trigger.measuredAtEventId : "unexpected-v1";
+        const receipt = compactionReceipt(row); return receipt.v === 2 && receipt.trigger.kind === "automatic" ? receipt.trigger.measuredAtEventId : "unexpected";
       })).size).toBe(3);
       expect(toolSource(first, "turn1-4").sourceEventId).toBe(toolResult(first, "turn1-4").id);
       expect(f.notifications.some(item => item.kind === "compaction" && /already compacted 3 time/.test(item.message))).toBe(true);
@@ -529,9 +531,9 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
     const longAnswer = "Synthetic prior work: inspected /owned/fixture.txt; open task remains. ".repeat(150);
     const summary = "Synthetic work summary: inspected /owned/fixture.txt; the open task remains; repetitive detail omitted.";
     const outputs = { old: "a".repeat(5000), middle: "b".repeat(6000), "new-1": "c".repeat(8000), "new-2": "d".repeat(8000) };
-    await withFixture({ scripts: [toolStep("old", "fixture", "{}", { inputTokens: 7000 }), toolStep("middle", "fixture", "{}", { inputTokens: 7000 }),
-      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", "{}", { inputTokens: 8500 }),
-      toolStep("new-2", "fixture", "{}", { inputTokens: 8500 }), textStep(summary, { inputTokens: 2000 }), textStep("Final answer, distinct from summary.", { inputTokens: 3000 })],
+    await withFixture({ scripts: [toolStep("old", "fixture", '{"id":"old"}', { inputTokens: 7000 }), toolStep("middle", "fixture", '{"id":"middle"}', { inputTokens: 7000 }),
+      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", '{"id":"new-1"}', { inputTokens: 8500 }),
+      toolStep("new-2", "fixture", '{"id":"new-2"}', { inputTokens: 8500 }), textStep(summary, { inputTokens: 2000 }), textStep("Final answer, distinct from summary.", { inputTokens: 3000 })],
       tools: syntheticTools(outputs), config: { compaction: compaction({ summarize: true }) } }, async f => {
       await turn(f, oldUser);
       const first = f.h.events(); expect(compactRows(first)).toEqual([]);
@@ -548,8 +550,8 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
       expect(extractEnvelope(header.meta_json)?.turn).toBe(2);
       const headerMeta = parseRequestHeaderMeta(header.meta_json)!;
       expect(headerMeta.toolSchemaEventId).toBeNull(); expect(headerMeta.toolSchemaSha256).toBeNull();
-      expect(receipt.summarizer).toEqual({ requestHeaderEventId: header.id, promptVersion: 1, model: "claude-loop-test", claimKind: "self_reported", role: "assistant" });
-      const boundary = rows.find(item => item.id === receipt.trigger.measuredAtEventId)!;
+      expect(receipt.summarizer).toEqual({ requestHeaderEventId: header.id, promptVersion: 2, model: "claude-loop-test", claimKind: "self_reported", role: "assistant" });
+      const boundary = rows.find(item => item.id === (receipt.trigger.kind === "automatic" ? receipt.trigger.measuredAtEventId : ""))!;
       expect(meta(boundary).usage).toMatchObject({ inputTokens: 8500 });
       expect(extractEnvelope(boundary.meta_json)?.step).toBe(2);
       const before = foldSurfaceEntries(rows.slice(0, rows.findIndex(item => item.id === row.id)));
@@ -622,9 +624,9 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
   it("P2-02: a protected-data refusal of the summary request skips the summary, is recorded, and the turn continues", async () => {
     const longAnswer = "Synthetic prior work, long enough to be worth summarizing. ".repeat(150);
     const outputs = { old: "a".repeat(5000), middle: "b".repeat(6000), "new-1": "c".repeat(8000), "new-2": "d".repeat(8000) };
-    await withFixture({ scripts: [toolStep("old", "fixture", "{}", { inputTokens: 7000 }), toolStep("middle", "fixture", "{}", { inputTokens: 7000 }),
-      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", "{}", { inputTokens: 8500 }),
-      toolStep("new-2", "fixture", "{}", { inputTokens: 8500 }), textStep("Final answer after the refused summary.", { inputTokens: 3000 })],
+    await withFixture({ scripts: [toolStep("old", "fixture", '{"id":"old"}', { inputTokens: 7000 }), toolStep("middle", "fixture", '{"id":"middle"}', { inputTokens: 7000 }),
+      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", '{"id":"new-1"}', { inputTokens: 8500 }),
+      toolStep("new-2", "fixture", '{"id":"new-2"}', { inputTokens: 8500 }), textStep("Final answer after the refused summary.", { inputTokens: 3000 })],
       tools: syntheticTools(outputs), config: { compaction: compaction({ summarize: true }) } }, async f => {
       await turn(f, "First turn.");
       // This turn's third prepare is the summary request: admission refuses it as llmRuntime would, before any header.
@@ -652,9 +654,9 @@ describe("automatic compaction: synthetic provider usage, real signed loop evide
     const longAnswer = "Synthetic prior work, long enough to be worth summarizing. ".repeat(150);
     const outputs = { old: "a".repeat(5000), middle: "b".repeat(6000), "new-1": "c".repeat(8000), "new-2": "d".repeat(8000) };
     const body = '{"error":"invalid x-api-key sk-ant-FAKE-SECRET-123"}';
-    await withFixture({ scripts: [toolStep("old", "fixture", "{}", { inputTokens: 7000 }), toolStep("middle", "fixture", "{}", { inputTokens: 7000 }),
-      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", "{}", { inputTokens: 8500 }),
-      toolStep("new-2", "fixture", "{}", { inputTokens: 8500 }), textStep("Final answer after the failed summary.", { inputTokens: 3000 })],
+    await withFixture({ scripts: [toolStep("old", "fixture", '{"id":"old"}', { inputTokens: 7000 }), toolStep("middle", "fixture", '{"id":"middle"}', { inputTokens: 7000 }),
+      textStep(longAnswer, { inputTokens: 7000 }), toolStep("new-1", "fixture", '{"id":"new-1"}', { inputTokens: 8500 }),
+      toolStep("new-2", "fixture", '{"id":"new-2"}', { inputTokens: 8500 }), textStep("Final answer after the failed summary.", { inputTokens: 3000 })],
       tools: syntheticTools(outputs), config: { compaction: compaction({ summarize: true }) } }, async f => {
       await turn(f, "First turn.");
       const prepare = f.h.llm.prepare.bind(f.h.llm);

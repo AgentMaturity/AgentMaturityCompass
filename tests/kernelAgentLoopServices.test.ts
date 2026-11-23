@@ -24,6 +24,7 @@ import {
   stubProviderTransport
 } from "../src/agent/stubProvider.js";
 import { echoToolSeam } from "../src/agent/echoTool.js";
+import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
 import type { EvidenceEvent } from "../src/types.js";
 
 /**
@@ -287,6 +288,55 @@ describe("the agent loop on the composed tree", () => {
     // Cordis records effect-disposal errors in its public logger rather than rejecting fiber.dispose().
     const errors = ctx.logger.buffer.filter(message => message.type === "error").flatMap(message => message.args).map(String).join("\n");
     expect(errors).toContain("Native driver shutdown incomplete: owned work is still running");
+  });
+
+  it("passes the loop config to the driver: a one-step cap ends a tool-calling turn at max_steps", async () => {
+    const ctx = new Context();
+    const fiber = ctx.plugin(agentLoopServices, { session, llm: runtimeOver(stubProviderTransport()), route, systemPromptEventId,
+      tools: echoToolSeam(), config: { ...DEFAULT_AGENT_LOOP_CONFIG, maxStepsPerTurn: 1 } });
+    await fiber.await();
+    const loop = serviceOn(ctx);
+    loop.followup("hello");
+    await loop.whenIdle();
+    await fiber.dispose();
+    const rows = events();
+    expect(rows.filter((row) => row.event_type === "step/start")).toHaveLength(1);
+    expect(readTurnEndMeta(rows.find((row) => row.event_type === "turn/end")!.meta_json)?.reason).toBe("max_steps");
+  });
+
+  it("steer wakes an idle driver for a turn; send without wakeup only queues", async () => {
+    const ctx = new Context();
+    const fiber = ctx.plugin(agentLoopServices, { session, llm: runtimeOver(stubProviderTransport()), route, systemPromptEventId });
+    await fiber.await();
+    const loop = serviceOn(ctx);
+    const steered = loop.steer("look at the README first");
+    await loop.whenIdle();
+    expect(events().filter((row) => row.event_type === "turn/end")).toHaveLength(1);
+    const queued = loop.send("background context", "next-turn", false);
+    expect(loop.status).toBe("idle");
+    expect(queued.messageId).not.toBe(steered.messageId);
+    const result = await loop.shutdown();
+    expect(result.cancelledMessageIds).toEqual([queued.messageId]);
+    await fiber.dispose();
+  });
+
+  it("reports a disposal that timed out, and an incomplete shutdown with no named error, through the disposal error channel", async () => {
+    const errorsOf = (ctx: Context) => ctx.logger.buffer.filter(message => message.type === "error").flatMap(message => message.args).map(String).join("\n");
+    const timedOut = new Context();
+    const first = timedOut.plugin(agentLoopServices, { session, llm: runtimeOver(stubProviderTransport()), route, systemPromptEventId });
+    await first.await();
+    vi.spyOn(serviceOn(timedOut).agent, "dispose").mockResolvedValue(false);
+    await first.dispose();
+    expect(errorsOf(timedOut)).toContain("Agent loop disposal timed out; cleanup remains unknown.");
+
+    const silent = new Context();
+    const second = silent.plugin(agentLoopServices, { session, llm: runtimeOver(stubProviderTransport()), route, systemPromptEventId });
+    await second.await();
+    const loop = serviceOn(silent);
+    const result = await loop.shutdown();
+    vi.spyOn(loop, "shutdown").mockResolvedValue({ ...result, state: "incomplete", errors: [] });
+    await second.dispose();
+    expect(errorsOf(silent)).toContain("Native driver shutdown incomplete: pending work remains");
   });
 
   it("refuses a cancellation that names no cause", async () => {

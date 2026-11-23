@@ -252,6 +252,7 @@ describe("amc session verify and the ledger trust root", () => {
       const result = await sessionVerify(workspace, ["--expect-monitor", fingerprint, ...flags]);
       expect(result.exit, result.out).toBe(1);
       expect(result.out).toContain("Ledger verification FAILED");
+      expect(result.out, "FAILED says why (HP-51)").toMatch(/FAILED\n- \S/);
       expect(result.err).toEqual([]);
     }
   });

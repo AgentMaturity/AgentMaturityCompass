@@ -19,26 +19,14 @@
 /* Digests, reason codes and ids are long unbroken strings: wrap them instead of clipping them at phone width. */
 #app code { overflow-wrap: anywhere; }
 
-/* First-run guidance (a4Start.js): the "What to do now" panel, its stage stepper and its one primary action. */
-.a4-start { border-left: 4px solid var(--accent); }
-.a4-stepper { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 12px 0; list-style: none; }
-.a4-stepper li { border: 1px solid var(--border-strong); border-radius: 6px; padding: 8px; min-width: 0; overflow-wrap: anywhere; }
-.a4-stepper li a { display: block; color: inherit; text-decoration: none; }
-.a4-stepper li a span { display: block; }
-.a4-stepper .a4-stepper-done { opacity: .75; }
-.a4-stepper .a4-stepper-current { border-color: var(--accent); }
-.a4-stepper [data-viewing="true"] strong { text-decoration: underline; }
-.a4-stepper-state { font-size: .8rem; color: var(--muted); }
+/* First-run guidance (a4Start.js): the "What to do now" panel and its one primary action. */
 .a4-now { font-size: 1.05rem; }
 .a4-who { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 8px; }
 /* One primary action per screen: on a project page every other action button takes the secondary look. */
-body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { background: rgba(255,255,255,.035); border: 1px solid var(--border-strong); color: var(--ink); }
-@media (max-width: 640px) { .a4-stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { background: var(--surface); border: 1px solid var(--border-strong); color: var(--ink); }
 
 /* The start page (2026-11-14): the four steps in human words with the A4 name small; "More options" and the terminal
    commands folded; the approver notice above the form. */
-.a4-stepper-intro li { display: flex; flex-direction: column; gap: 2px; }
-.a4-stepper-intro small, .a4-stepper small { display: block; font-size: .8rem; }
 .a4-intro h2 { margin-top: 0; }
 .a4-approver-note { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px; }
 .a4-approver-note .row { margin: 8px 0; }
@@ -84,3 +72,78 @@ body[data-page="a4Project"] #app button:not(.a4-primary):not(.danger) { backgrou
 
 /* A notice can hold a long project link (Add a person): it wraps instead of pushing the page sideways at phone width. */
 #a4Notice { overflow-wrap: anywhere; }
+
+/* The project drawn as a route (a4Journey.js, studio-ui slice a4): the name and its notice chips, the four stages, then one
+   step panel with the stage's eight steps, what it needs, the people an approval waits for and one primary action. Colour
+   is process state only (accent done, wait for a person, stop refused); no card carries a coloured edge. */
+.a4-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.a4-head h2 { margin: 0; font-size: 24px; }
+.a4-chips { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 4px; }
+.a4-chips .notice-chip[open] { flex-basis: 100%; order: 9; }
+.route-link { color: inherit; text-decoration: none; }
+.route-link:hover { text-decoration: underline; }
+.route-link::after { content: ""; position: absolute; inset: 0; }
+.a4-stages { margin: 20px 0 8px; }
+.a4-step-panel { margin-top: 16px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card, 14px); background: var(--bg); }
+.a4-step-panel h3 { margin: 0; font-size: 18px; }
+.a4-step-label { display: block; margin-bottom: 2px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.a4-steps-route { margin: 12px 0 16px; }
+.a4-steps-route .route-dot { width: 20px; height: 20px; }
+.a4-steps-route .route-dot svg { width: 12px; height: 12px; }
+.a4-steps-route .is-now .route-dot { width: 26px; height: 26px; margin: -3px 0; }
+.a4-steps-route .is-now .route-dot::after { width: 8px; height: 8px; }
+.a4-steps-route .route-step + .route-step::before { top: 9px; left: calc(-50% + 14px); right: calc(50% + 14px); }
+.a4-steps-route .route-label { font-size: 12px; }
+.a4-now { font-size: 15px; max-width: 68ch; }
+.a4-now strong { font-weight: 600; }
+.a4-step-panel .row { margin: 12px 0 4px; }
+.a4-step-panel .more-info { margin: 8px 0 0; }
+.a4-about > summary, .a4-more > summary { cursor: pointer; }
+.a4-intro .route { margin: 20px 0; }
+.a4-intro-steps { padding-left: 18px; }
+
+/* The Build page's start form, one question at a time: each question a fieldset with a large legend; choices are
+   picture cards around the same radios (the radio itself is visually hidden, its focus drawn on the card). */
+.a4-q { border: 0; margin: 0 0 8px; padding: 0; min-width: 0; }
+.a4-q > legend, .a4-approvers.a4-q > legend { font-size: 18px; font-weight: 650; margin-bottom: 12px; padding: 0; }
+.a4-q[hidden], .a4-q-nav [hidden], .a4-form .row[hidden], .a4-form label[hidden] { display: none !important; }
+.a4-approvers.a4-q { border: 0; padding: 0; }
+.a4-q .picture-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.a4-q .picture-card, .a4-approvers.a4-q label.picture-card { position: relative; display: flex; flex-flow: column nowrap; align-items: flex-start; gap: 6px; margin: 0; min-height: 0; padding: 16px; }
+.a4-q .picture-card input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.a4-q .picture-card:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.a4-q .picture-card.is-disabled { cursor: not-allowed; opacity: .7; }
+.a4-q .picture-card > :not(input) { margin: 0; }
+.a4-q .picture-card-title { font-size: 16px; }
+.a4-q-nav { align-items: center; gap: 12px; margin: 16px 0 4px; }
+.a4-q-count { font-size: 13px; }
+.a4-form .a4-approvers.a4-q p { margin: 0; }
+@media (max-width: 560px) {
+  .a4-q .picture-grid, .a4-approvers.a4-q .picture-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  /* As Home's tiles on a phone: icon and title on one row, the line under the title. */
+  .a4-q .picture-card, .a4-approvers.a4-q label.picture-card { flex-flow: row wrap; align-items: center; column-gap: 14px; padding: 12px 16px; }
+  .a4-q .picture-card > .picture-card-line { flex-basis: 100%; padding-left: 62px; margin-top: -12px; }
+  .a4-step-panel { padding: 16px; }
+}
+.a4-project-list { list-style: none; margin: 0; padding: 0; }
+.a4-project-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.a4-project-row:first-child { border-top: 0; }
+.a4-project-words { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.a4-mini-route { margin: 0; }
+@media (max-width: 760px) { .a4-project-row { grid-template-columns: minmax(0, 1fr); } }
+/* On a phone the A4 routes stay across the screen (four or eight waypoints fit at 360 px); the eight steps then name only
+   the step a person is on, the others keep their names for assistive technology and in their tooltips. */
+@media (max-width: 560px) {
+  .a4-start .route, .a4-intro .route, .a4-mini-route { flex-direction: row; }
+  .a4-start .route-step, .a4-intro .route-step, .a4-mini-route .route-step { flex-direction: column; gap: 6px; padding: 0; text-align: center; }
+  .a4-start .route-step + .route-step::before, .a4-intro .route-step + .route-step::before, .a4-mini-route .route-step + .route-step::before {
+    top: 13px; left: calc(-50% + 18px); right: calc(50% + 18px); width: auto; height: 2px; }
+  .a4-start .is-now .route-dot, .a4-intro .is-now .route-dot, .a4-mini-route .is-now .route-dot { margin: -4px 0; }
+  .a4-start .route-label, .a4-intro .route-label, .a4-mini-route .route-label { font-size: 12px; }
+  .a4-steps-route .route-step + .route-step::before { top: 9px; left: calc(-50% + 13px); right: calc(50% + 13px); }
+  .a4-steps-route .is-now .route-dot { margin: -3px 0; }
+  .a4-steps-route .route-step:not([aria-current]) .route-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .a4-steps-route .route-step[aria-current] .route-label { white-space: nowrap; }
+}
+/* The stage a project page is viewing: its waypoint label underlined, as the page's own place on the route. */
+.a4-stages .route-step.is-viewed .route-label { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }

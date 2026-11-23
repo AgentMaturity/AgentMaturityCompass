@@ -54,14 +54,15 @@ export function claimLegendHtml() {
     .map(([term, text]) => `<li><strong>${esc(term)}</strong>: ${esc(text)}</li>`).join("")}</ul>`).join("\n");
 }
 
-/** Collapsed, so the strip stays a few lines above the page's own content. */
+/** Collapsed, so the strip stays a few lines long. */
 export function claimLegend() {
   return `<details id="claim-legend" class="claim-legend"><summary>How to read claim kinds</summary>${claimLegendHtml()}</details>`;
 }
 
 /**
- * Shows every claim the page's API calls returned above #app; `onClaims` is api.js's subscription. A page that reloads
- * its results calls the returned reset() first, so a claim the server has since lowered does not stay on the strip.
+ * Shows every claim the page's API calls returned above #app, so a result's label is in sight before the result (Home,
+ * the project page and the daily pages move it beside their own results); `onClaims` is api.js's subscription. A page
+ * that reloads its results calls the returned reset() first, so a claim the server has since lowered does not stay on the strip.
  */
 export function installClaimStrip(page, onClaims) {
   const app = typeof document === "undefined" ? null : document.getElementById("app");

@@ -34,7 +34,7 @@ function render(root, latest) {
         </select>
         <input id="benchScopeId" placeholder="scope id (workspace|nodeId|agentId)" />
         <input id="benchAgainst" placeholder="imported or registry:<id>" value="imported" />
-        <button id="benchCompareRun">Run Compare</button>
+        <button id="benchCompareRun">Run compare</button>
       </div>
       <pre id="benchCompareOut" class="scroll muted"></pre>
     `

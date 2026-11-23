@@ -16,7 +16,7 @@ amc status
 
 `amc up` prints Studio, gateway, proxy, and dashboard URLs. When no port was configured, Studio listens on the port this folder used last time while it is free, otherwise 3212, otherwise a free port; it prints the change, and the printed console URL uses the port it bound. In a terminal, "Open the console in my browser" in the `amc` start menu runs `amc up` when AMC is not running, then opens the console.
 
-The first screen after sign-in shows one plain status line (with Details), one card ("See what your AI agent really does.") with **Run a task** (**Try a demo task** in the demo workspace) and **Connect my agent** (it shows the `amc connect --agent=<agent>` command to run in your terminal; see [Connect](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/CONNECT.md)), a progress line, and everything else under **More**. "How AMC works" in the top bar opens a three-step guide; it does not open by itself. A signed-out page shows `Authentication required.` with a Sign in link; the first account comes from `amc user init` below.
+The menu runs down the left side (on a phone it is a tab bar at the bottom, with **More** for every other page); its foot holds the colour theme (Auto, Light, Dark) and who is signed in. The top bar names the page, shows the workspace status as a dot and two words (press it once for the full status with its details; a problem, a kill switch or a freeze stays in sight; on a page without a status it names the workspace), and a **?** button, "How AMC works", that opens a three-step guide; it does not open by itself. Home asks "What would you like to do?" with three tiles: **Build an agent**, **Run a task** (**Try a demo task** in the demo workspace; it opens Run a task with a sample prompt) and **Check my agent**. Below them: **Waiting for you** (how many approval requests are open for your agent and your agent projects' agents, not only those you may decide; 50 or more reads "50+"), your latest agent project drawn as a route with **Continue**, and your first steps as a route with one button for the next step (**Connect an agent** while that is next). **Other ways in** holds **Watch an agent I already use** (it shows the `amc connect --agent=<agent>` command to run in your terminal; see [Connect](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/CONNECT.md)); everything else is under **More**. A signed-out page shows `Authentication required.` with a Sign in link; the first account comes from `amc user init` below.
 
 ## Accounts
 
@@ -39,24 +39,34 @@ Without a terminal, pass `--password-file` (a private file holding the password)
 
 ## Main Views
 
-Every page shows the same navigation; a page's own links appear under **This section**; the A4 link shows on Home and
-the A4 pages when the preview is on. On pages that do not load the A4 script the A4 link stays hidden even when the
-preview is on; A4 is reached from Home. On a phone, the menu button at the top opens the navigation.
+Every page shows the same menu, and a page reached from another (Assurance from Compass, say) lists its neighbours under
+**More pages**; in the folded menu those show as initials ("CG" for Context graph), with the full name as a tooltip.
+The page's name in the top bar and its menu entry are the same words. Who is signed in is said once, at
+the foot of the menu (with "(view only)" for a viewer). If one request gets no answer while AMC is running, a notice
+says just that and offers to reload the page; only when AMC's health check does not answer either does it say "AMC is
+not running". On a phone the first five pages are a tab bar at the bottom and **More** opens every other page, with
+who is signed in at the top of that sheet. The "Claims on this page" box sits above the page's content, so a result's
+label is in sight before the result; Home keeps it under **More**, and My agent, Records, Approvals, Industry Packs,
+Live runs and the agent project page keep it under their own content.
 
-- `Home`: service health, fleet summary, trust/integrity tiles.
-- `Login`: credential sign-in + optional pairing workflow.
-- `Agent`: score, radar, heatmap, provider/model last-seen, evidence coverage.
-- `Equalizer`: one slider per active diagnostic question with deterministic what-if preview and signed apply.
-- `Governor`: action-class allow/deny matrix with reasons.
-- `ToolHub`: allowed tools, recent executions, denials, receipt verify actions.
-- `Approvals`: quorum progress, dual-control decisions, single-shot consumption.
+- `Home`: "What would you like to do?" with three ways in, what waits for you, your latest agent project as a route, and your first steps (see above). Once the agent has chat or run sessions, the newest three show under **Agent sessions** (see Records).
+- `Sign in`: one card with the logo, user name, password and **Sign in**; a failed sign-in says why under the card. The pairing code, "No account yet?", the emergency admin token and pairing another device sit in closed sections.
+- `Run a task`: asks "What should your agent do?" with one box, a model and tools picker, and three ideas that only fill the box. A task is drawn as a route (your task, working, answer, checked; a request waiting for approval shows as waiting, a task that did not finish as stopped), the conversation as tiles, and an answer with two chips that open their full notices ("Stand-in model", "Correctness not checked"); Answer is ticked only after a turn that completed, and Checked only after a full verification (a partial one reads "Partly checked"). The task's buttons stay in sight; task details, evidence, tool activity, the agent's plan, checks, usage, task settings and your earlier tasks are one click away.
+- `My agent`: "How your agent is doing": the overall level as a dial out of 5 drawn in ink with its trust label and evidence label beside it (never a tick or a badge), integrity, evidence coverage and whether claims are allowed, each area as an ink bar, and the first three things to improve with their levels (all suggestions one click away). A run that fails its seal shows no score. With no score yet, the default agent's page offers **Run the full score**; another agent's page cannot show its run yet (it reads runs from the workspace's current agent only), so score it in a terminal in the workspace folder with `amc --agent <id> --no-menu`. Under it the agent's state (proposed, approved, active) as a route; its transitions, reassessments and the owner's change form are one click away.
+- `Target levels`: one slider per active diagnostic question with deterministic what-if preview and signed apply; how the sliders work is one click away.
+- `Governor`: "What the agent may do here": each kind of action with what the signed Action Policy in force does to it (runs, asks a person first, dry run only, blocked), read through the same verdict the agent's tools apply; it records nothing. What the words mean and the reasons are one click away. On a phone each kind of action is one row.
+- `Tools (ToolHub)`: allowed tools, recent executions, denials, receipt verify actions. On a phone a wide table scrolls sideways inside its card.
+- `Approvals`: each request as a card: what it is, its path (asked, then its decision in words, then used), the people who decided as initials with their decision, the places still open, who may decide, and Approve, Dry run only and Deny where you may decide. Approve and Dry run only appear for a tool call only when Studio sent the whole call and found nothing secret-shaped in it; otherwise the card links to **See the call to decide**, and one request's page shows **What you are approving** (the tool, the kind of action, the working folder and the call itself) or says in words why it is decided at the terminal instead. An agent project's own requests keep their project rules. An empty inbox offers **Show decided requests**. **Waiting** and **All** switch the list; search and filters, and each request's details, are one click away.
+- `Records`: what AMC recorded about the agent: **Run the full score** (it scores the agent the page shows), counts, the eight parts as tiles with their state in words, and every kind of record (with its count) one click away. The "Signature limits" chip says what a signature shows. **Agent sessions** lists the agent's newest chats and runs (sealed or open, turns and actions; what each did is one click away) with **Export for auditor** and **Readable page** for an auditor or an owner; an auditor checks the export with `amc-verify`, without AMC.
+- `Industry Packs`: "Pick your field": the seven stations as tiles (and All); picking one shows its packs as cards with Open; the "AI-drafted, not legal advice" chip opens the full notice. An open pack asks one question at a time with **Score** always in reach; what the pack is for, its rules and how scoring works are one click away.
+- `Live runs`: runs of connected agents as cards with their state in words, then **Agent sessions** as on Records; tool-call numbers, latest events, the table and recording a run by hand are one click away.
 - `Users`: owner-managed user/role administration.
 - `Leases`: active lease metadata (no token disclosure), expiry, revoke.
 - `Budgets`: usage vs limits, consequences, signed update path.
 - `Drift`: incidents, freezes, run drift checks, freeze lift flow.
 - `Benchmarks`: imported ecosystem benchmarks, percentiles, scatter/heatmap.
 - `Transparency`: append-only issuance log + client-side seal verification.
-- `Policy Packs`: list/diff/apply signed golden configs by archetype+risk.
+- `Policy packs`: list/diff/apply signed golden configs by archetype+risk.
 
 ## Device Access
 

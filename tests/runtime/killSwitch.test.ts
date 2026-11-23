@@ -97,6 +97,23 @@ describe("the pipeline's authorization stage", () => {
     expect((await run(p, "fixture.read")).denied).toBeNull();
     expect(effects).toEqual(["fixture.write", "fixture.read"]);
   });
+
+  test("a kill switched on while a person was being asked refuses the approved call at the authorization stage", async () => {
+    const effects: string[] = [];
+    const registry = new ToolRegistry();
+    registry.define(defineTool({ name: "fixture.write", description: "fixture", actionClass: "WRITE_LOW", body: () => { effects.push("ran"); return { ok: true, output: "ran" }; } }));
+    const p = new ToolPipeline({ registry, workspace, approvalRequiredFor: new Set(["WRITE_LOW"]), approve: async () => { await kill(); return "allow"; } });
+    const write = await run(p, "fixture.write");
+    expect(write.denied).toMatchObject({ stage: "authorization", reason: expect.stringContaining("kill_switch_active") });
+    expect(effects).toEqual([]);
+  });
+
+  test("the early look before asking a person already gives the kill switch's refusal", async () => {
+    const p = pipeline([]);
+    await kill();
+    expect(await p.denialBeforeApproval({ name: "fixture.write", agentId: "default", arguments: {}, requestedMode: "EXECUTE" }))
+      .toMatchObject({ stage: "authorization", reason: expect.stringContaining("kill_switch_active") });
+  });
 });
 
 describe("fail closed", () => {

@@ -69,7 +69,8 @@ type Spend = { kind: "llm"; nativeSessionId: string; headerEventId: string } |
  * lease. A missing outcome stays pending; only matching recorded facts settle it.
  * This is admission against known usage, not a tokenizer or pricing oracle.
  */
-function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: NativeBudgetDispatch): void {
+/** `peek`: check a tool spend against the limit and write nothing (the early look before a person is asked, UX-03). */
+function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: NativeBudgetDispatch, peek = false): void {
   // An unsigned reservation would make every later signed budget read fail, so AMC_NO_SIGN=1 admits nothing.
   if (process.env.AMC_NO_SIGN === "1") throw new NativeBudgetRefusal("native budget admission records a signed reservation; AMC_NO_SIGN=1 cannot reserve, so the dispatch is refused");
   const ledger = openLedger(workspace);
@@ -95,6 +96,7 @@ function reserve(workspace: string, spend: Spend, agentId?: string, dispatch?: N
         if (limit !== undefined && usage.daily.toolExecutes[spend.actionClass] + usage.daily.toolPending[spend.actionClass] >= limit) {
           throw new NativeBudgetRefusal(`daily tool budget exhausted for ${spend.actionClass}`);
         }
+        if (peek) return;
       } else {
         const stub = localStubDispatch(header?.meta_json, dispatch);
         if (usage.daily.llmRequests >= budget.daily.maxLlmRequests) {
@@ -144,10 +146,13 @@ export function reserveNativeModelBudget(session: SessionService, headerEventId:
 }
 
 export function reserveNativeToolBudget(execution: ToolExecution, sessionId: string): string | undefined {
-  if (execution.effectiveMode !== "EXECUTE") return undefined;
+  // UX-03: on the early look (run as SIMULATE) a call that will run as EXECUTE is refused when its budget is already
+  // spent, so nobody is asked about it; nothing is reserved until the real EXECUTE after the approval.
+  const peek = execution.preApproval?.mode === "EXECUTE";
+  if (execution.effectiveMode !== "EXECUTE" && !peek) return undefined;
   if (execution.signal?.aborted) return "native tool cancelled before budget admission";
   try {
-    reserve(execution.workspace, { kind: "tool", nativeSessionId: sessionId, toolToken: execution.token, callId: execution.callId, actionClass: execution.actionClass }, execution.agentId);
+    reserve(execution.workspace, { kind: "tool", nativeSessionId: sessionId, toolToken: execution.token, callId: execution.callId, actionClass: execution.actionClass }, execution.agentId, undefined, peek);
     return undefined;
   } catch (error) { return error instanceof Error ? error.message : "native budget admission failed"; }
 }

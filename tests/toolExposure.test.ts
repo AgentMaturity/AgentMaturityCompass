@@ -122,7 +122,8 @@ describe("PI-046 tool exposure routes", () => {
       expect((await pipeline.execute(call(nested))).denied).toMatchObject({ stage: "guard", guardLabel: "ordinary-policy" });
       denied = false;
       expect((await pipeline.execute(call(nested))).ok).toBe(true);
-      expect(body).toHaveBeenCalledTimes(1); expect(approve).toHaveBeenCalledTimes(3);
+      // UX-03: the second call is refused by the guard before anyone is asked, so only two questions are put.
+      expect(body).toHaveBeenCalledTimes(1); expect(approve).toHaveBeenCalledTimes(2);
     }
   );
 

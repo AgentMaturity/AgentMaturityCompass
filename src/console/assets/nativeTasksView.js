@@ -1,49 +1,123 @@
+import { icon, picture } from "./iconSet.js";
+import { routeTrack, noticeChip } from "./pageKit.js";
+
 const esc = value => String(value ?? "unknown").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
 const labels = { starting: "Starting", idle: "Ready for another turn", running: "Running", "cancel-requested": "Stop requested", releasing: "Releasing writer…", released: "Released", failed: "Task failed", verifying: "Verifying recorded evidence…", closed: "Closed" };
-export const providerLabel = id => ({ stub: "Local recording demonstration", openai: "OpenAI · Chat", "openai-responses": "OpenAI · Responses", anthropic: "Anthropic", deepseek: "DeepSeek · Chat", gemini: "Gemini", "gemini-audio": "Gemini · Audio", ollama: "Ollama · local model server" })[id] || id;
+export const providerLabel = id => ({ stub: "Stand-in model (canned replies)", openai: "OpenAI · Chat", "openai-responses": "OpenAI · Responses", anthropic: "Anthropic", deepseek: "DeepSeek · Chat", gemini: "Gemini", "gemini-audio": "Gemini · Audio", ollama: "Ollama · local model server" })[id] || id;
 const time = value => Number.isFinite(value) ? new Date(value).toLocaleString() : "unknown";
 
+/** Words for the stand-in model chip and the "not checked for correctness" chip on a task's result. */
+export const STAND_IN_NOTICE = "This answer came from AMC's stand-in model, which gives canned replies. It is not a real AI model, so it says nothing about how a real agent would do.";
+export const CORRECTNESS_NOTICE = "AMC records what happened in this task. It does not assess whether the answer is correct.";
+
+/** Ideas a person can start from: a short label, and the text it puts in the box (never sent by itself). */
+export const RUN_SUGGESTIONS = [
+  ["Say hello", "Say hello and repeat this sentence back to me."],
+  ["What can you do?", "In a few plain sentences, say what you can and cannot do for me."],
+  ["Draft an update", "Draft a short status update for my team about this week."]
+];
+
+/** True only when the last turn ended normally ("complete"); every other or unknown ending is not an answer. */
+export const answerShown = task => task?.turnEndReason === "complete";
+/** The last turn's ending in words, after the task's state; a complete turn needs none. Unknown endings stay generic. */
+export function turnEndingWords(reason) {
+  if (reason === "complete") return "";
+  return ` ${({ cancelled: "The last turn was stopped.", blocked: "The last turn was blocked.", max_tokens: "The last turn reached its output limit.",
+    max_steps: "The last turn reached its step limit.", error: "The last turn ended in an error.", interrupted: "The last turn was interrupted." })[reason]
+    || "The last turn ended for a reason this page does not know."}`;
+}
+/** How a turn that did not complete is named on the route (at most two words); unknown endings read "No answer". */
+const ENDING_STEPS = { cancelled: "Stopped", blocked: "Blocked", max_tokens: "Cut short", max_steps: "Cut short" };
+/** Only these two verdicts check the whole record; the prefix verdict checks part of it. */
+const CHECK_STEPS = { "workspace-key-consistency": { label: "Checked", state: "done" }, "externally-anchored": { label: "Checked", state: "done" },
+  "anchored-prefix": { label: "Partly checked", state: "done", hint: "Only the first part of the record was checked" },
+  failed: { label: "Check failed", state: "stop" } };
+
+/**
+ * The task as a route of four waypoints, from the task's own fields only. A read that is not confirmed (stale, or
+ * history AMC could not authenticate) shows nothing as done; pending or unreadable approvals wait; a failed or
+ * stopping task stops; Answer is done only after a complete turn and Checked only after a full verification verdict.
+ */
+export function taskRouteSteps(task, { stale = false } = {}) {
+  const steps = [{ label: "Your task", state: "now" }, { label: "Working", state: "todo" }, { label: "Answer", state: "todo" }, { label: "Checked", state: "todo" }];
+  if (!task) return steps;
+  if (stale || task.history?.status === "unavailable") return steps.map(step => ({ ...step, state: "todo" }));
+  steps[0].state = "done";
+  const state = task.state, ending = task.turnEndReason;
+  if (task.approvals?.length) steps[1] = { label: "Needs approval", state: "wait", hint: "A person must review a request in Approvals" };
+  else if (task.approvalError) steps[1] = { label: "Check approvals", state: "wait", hint: "Pending approvals could not be read. Refresh status." };
+  else if (["starting", "running"].includes(state)) steps[1].state = "now";
+  else if (state === "cancel-requested") steps[1] = { label: "Stopping", state: "stop" };
+  else if (state === "failed") steps[1] = { label: "Did not finish", state: "stop" };
+  else if (ending) steps[1].state = "done";
+  if (steps[1].state !== "done") return steps;
+  if (!answerShown(task)) steps[2] = { label: ENDING_STEPS[ending] || "No answer", state: "stop" };
+  else steps[2] = state === "idle" ? { label: "Answer", state: "now", hint: "Read it, send a follow-up, or close and check" } : { ...steps[2], state: "done" };
+  if (state === "verifying") steps[3].state = "now";
+  else if (CHECK_STEPS[task.verification]) steps[3] = { ...CHECK_STEPS[task.verification] };
+  else if (["closed", "released"].includes(state)) steps[3].hint = "Not checked yet";
+  return steps;
+}
+
+export function renderTaskRoute(task, options) {
+  return routeTrack(taskRouteSteps(task, options), { label: "This task", className: "run-route" });
+}
+
+/** The chips under a finished answer: each opens its full sentence. */
+export function renderOutcomeChips(task) {
+  return `${task?.provider === "stub" ? noticeChip("Stand-in model", STAND_IN_NOTICE) : ""}${noticeChip("Correctness not checked", CORRECTNESS_NOTICE)}`;
+}
+
+const more = (summary, html, id = "") => `<details class="more-info"${id ? ` id="${id}"` : ""}><summary>${esc(summary)}</summary><div class="more-info-body">${html}</div></details>`;
+
 export function nativeTasksShell(agentId) {
-  return `<section class="native-tasks" aria-labelledby="nativeTasksTitle">
-    <header class="native-tasks-heading"><div><div class="studio-kicker">Native runtime</div><h2 id="nativeTasksTitle">Native Tasks</h2><p>Run a task here and follow its recorded activity.</p></div><a class="button secondary" href="./evidence?agent=${encodeURIComponent(agentId)}">Workspace evidence</a></header>
+  return `<section class="native-tasks" data-run="empty" aria-labelledby="nativeTasksTitle">
+    <header class="native-tasks-heading run-head">${picture("run") ?? ""}<h2 id="nativeTasksTitle">What should your agent do?</h2><p class="run-lead">Type a task. AMC records each step it takes.</p></header>
+    <div id="nativeTaskRoute" class="run-route-wrap"></div>
     <p id="nativeTaskNotice" class="native-task-notice" role="status" aria-live="polite">Loading task setup…</p>
     <div id="nativeTaskError" class="card status-bad" role="alert" hidden></div>
-    <section class="card native-task-setup" aria-labelledby="nativeSetupTitle"><h3 id="nativeSetupTitle">Run a task</h3>
-      <form id="nativeTaskSetup"><div class="native-task-fields"><label>Agent<input name="agent" id="nativeTaskAgent" value="${esc(agentId)}" maxlength="128" autocomplete="off" spellcheck="false" required></label><button type="submit" class="secondary">Check setup</button>
-      <label>Provider<select id="nativeTaskProvider" disabled><option value="">Choose a provider</option></select></label><label>Model<input id="nativeTaskModel" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Enter the model name" disabled></label>
-      <label>Tools<select id="nativeTaskTools" disabled><option value="none">No tools</option><option value="workspace">Signed workspace tools</option></select></label></div></form>
-      <p id="nativeTaskCredential" class="muted"></p><p id="nativeTaskShell" class="native-task-approval-banner" role="status" hidden></p>
-      <form id="nativeTaskPromptForm"><label for="nativeTaskPrompt">Task or follow-up</label><textarea id="nativeTaskPrompt" rows="4" placeholder="What would you like AMC to do?" aria-describedby="nativeTaskDraftHint nativeTaskDraftBytes" required disabled></textarea><p id="nativeTaskDraftHint" class="muted">Enter adds a new line. Ctrl/⌘ + Enter submits. Drafts and selected files stay in this page only; reloading loses them.</p>
-        <div class="native-task-row native-task-run-row"><button id="nativeTaskSubmit" type="submit" disabled>Run task</button><button id="nativeTaskCancel" type="button" class="danger" hidden>Stop task</button></div>
-        <p id="nativeTaskOutcome" class="native-task-outcome" role="status" aria-live="polite" hidden></p>
+    <section class="card native-task-conversation" aria-labelledby="nativeTranscriptTitle">
+      <div class="native-task-row"><h3 id="nativeTranscriptTitle">Conversation</h3><span id="nativeTaskState" class="pill">No task selected</span></div>
+      <div id="nativeTaskApprovalBanner" class="native-task-approval-banner" role="status" aria-live="polite" hidden></div>
+      <section id="nativeTaskApprovalsCard" class="native-task-approvals" aria-labelledby="nativeTaskApprovalsTitle" hidden><h4 id="nativeTaskApprovalsTitle">${icon("approvals", { size: 18 })}Waiting for approval</h4><div id="nativeTaskApprovals"><p class="muted">No pending requests.</p></div></section>
+      <p id="nativeTaskRetention" class="muted" hidden></p><div id="nativeTaskTranscript" class="native-task-transcript" role="log" aria-label="Recorded task conversation" aria-live="off"><p class="muted" id="nativeTaskEmpty">Your task will appear here after you choose Run task.</p></div>
+      <button id="nativeTaskNewMessages" class="secondary" hidden>Jump to new activity</button>
+      <div id="nativeTaskResult" class="native-task-result" hidden><p id="nativeTaskOutcome" class="native-task-outcome" role="status" aria-live="polite" hidden></p><div id="nativeTaskOutcomeChips" class="native-task-chips"></div></div>
+      <p id="nativeTaskActionHelp" class="native-task-next" hidden></p>
+      <div class="native-task-observation"><button id="nativeTaskReconnect" type="button" class="secondary" hidden>Reconnect and refresh status</button>
+        ${more("Live status", `<p id="nativeTaskConnection" role="status" aria-live="polite">Loading setup…</p><p id="nativeTaskObservedAt" class="muted"></p><p class="muted">Stop requests cancellation of the active turn. Release for later preserves an eligible session; Close and verify ends it.</p><p class="muted">Updates below are recorded blocks, not a token preview. Full evidence verification is separate.</p>`)}</div>
+    </section>
+    <section class="card composer" aria-label="Your task">
+      <div class="composer-pickers"><label>Model<select id="nativeTaskProvider" disabled><option value="">Choose a provider</option></select></label><label>Model name<input id="nativeTaskModel" maxlength="200" autocomplete="off" spellcheck="false" placeholder="Enter the model name" disabled></label>
+      <label>Tools<select id="nativeTaskTools" disabled><option value="none">No tools</option><option value="workspace">Signed workspace tools</option></select></label></div>
+      <p id="nativeTaskCredential" class="muted composer-note"></p><p id="nativeTaskShell" class="native-task-approval-banner" role="status" hidden></p>
+      <form id="nativeTaskPromptForm"><label for="nativeTaskPrompt" class="visually-hidden">Task or follow-up</label><textarea id="nativeTaskPrompt" rows="3" placeholder="Ask your agent to do something" aria-describedby="nativeTaskDraftHint nativeTaskDraftBytes" required disabled></textarea>
+        <div class="native-task-row native-task-run-row composer-actions"><button id="nativeTaskCancel" type="button" class="danger" hidden>Stop task</button><button id="nativeTaskSubmit" type="submit" disabled>Run task</button></div>
         <details id="nativeTaskAttachmentsDisclosure" class="native-task-disclosure"><summary>Attachments (optional)</summary><fieldset class="native-task-attachments"><legend>Attachments</legend><label for="nativeTaskAttachments">Attach UTF-8 text files</label><input id="nativeTaskAttachments" type="file" multiple accept=".txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.yaml,.yml,.log,.xml,.html,.css,.js,.mjs,.cjs,.ts,.tsx,.jsx,.py,.rs,.go,.java,.sh,.sql,.toml,.ini" aria-describedby="nativeTaskAttachmentHelp" disabled><p id="nativeTaskAttachmentHelp" class="muted">Up to four text files. Their text is included in the prompt when you submit, and may be sent to your chosen provider. Review it first; do not attach credentials or secrets. Text context is not a binary upload, filesystem grant, or authenticated attachment object. PDFs are unsupported.</p>
           <label for="nativeTaskMediaAttachments">Attach original images or WAV audio</label><input id="nativeTaskMediaAttachments" type="file" multiple aria-describedby="nativeTaskMediaHelp" disabled><p id="nativeTaskMediaHelp" class="muted">Select a provider and check setup for advertised original-media support.</p><p class="muted">Submission order: task text and text-file context first, followed by original media in the order below. Media filenames stay local; original bytes may be sent to the selected provider. Only basic headers are checked here; Studio validates original payloads and runtime negotiation. Model compatibility is not probed by setup. No conversion, OCR or transcription is used as a fallback.</p>
           <p id="nativeTaskAttachmentLoading" role="status" hidden>Reading selected files locally. Selecting files sends no request.</p><div id="nativeTaskAttachmentList"></div></fieldset>
           <details id="nativeTaskSubmissionPreview" hidden><summary>Review submitted text and media order</summary><pre id="nativeTaskSubmittedText" tabindex="0"></pre></details></details>
-        <details id="nativeTaskSizeDisclosure" class="native-task-disclosure"><summary>Prompt size</summary><p id="nativeTaskDraftBytes" class="muted"></p></details></form>
-      <details class="native-task-disclosure"><summary>Validation checks (optional)</summary><div id="nativeTaskValidationSetup"></div></details>
-      <details class="native-task-disclosure"><summary>Run limits and scope</summary><div class="native-task-fields"><label>Maximum steps<input id="nativeTaskMaxSteps" type="number" min="1" step="1" disabled></label><label>Maximum output tokens<input id="nativeTaskMaxTokens" type="number" min="1" step="1" disabled></label></div><p id="nativeTaskLimits" class="muted"></p>
-        <div id="nativeTaskScope"></div><p id="nativeTaskBoundary" class="muted"></p></details>
+        <details id="nativeTaskSizeDisclosure" class="native-task-disclosure"><summary>Prompt size</summary><p id="nativeTaskDraftHint" class="muted">Enter adds a new line. Ctrl/⌘ + Enter submits. Drafts and selected files stay in this page only; reloading loses them.</p><p id="nativeTaskDraftBytes" class="muted"></p></details></form>
+      <div class="native-task-retry"><button id="nativeTaskRetry" type="button" class="secondary" aria-describedby="nativeTaskRetryHelp" hidden disabled>Retry original submission</button><p id="nativeTaskRetryHelp" class="muted" hidden></p></div>
+      <div class="run-chips" role="group" aria-label="Ideas to start from">${RUN_SUGGESTIONS.map(([label, text]) => `<button type="button" class="chip-button" data-run-suggest="${esc(text)}">${esc(label)}</button>`).join("")}</div>
+      ${more("Task settings", `<form id="nativeTaskSetup"><div class="native-task-fields"><label>Agent<input name="agent" id="nativeTaskAgent" value="${esc(agentId)}" maxlength="128" autocomplete="off" spellcheck="false" required></label><button type="submit" class="secondary">Check setup</button></div></form>
+        <details id="nativeTaskValidationMore" class="native-task-disclosure"><summary>Validation checks (optional)</summary><div id="nativeTaskValidationSetup"></div></details>
+        <details class="native-task-disclosure"><summary>Run limits and scope</summary><div class="native-task-fields"><label>Maximum steps<input id="nativeTaskMaxSteps" type="number" min="1" step="1" disabled></label><label>Maximum output tokens<input id="nativeTaskMaxTokens" type="number" min="1" step="1" disabled></label></div><p id="nativeTaskLimits" class="muted"></p>
+        <div id="nativeTaskScope"></div><p id="nativeTaskBoundary" class="muted"></p></details>`, "nativeTaskSettingsMore")}
     </section>
-    <div class="native-task-layout"><section class="card native-task-conversation" aria-labelledby="nativeTranscriptTitle">
-      <div class="native-task-row"><h3 id="nativeTranscriptTitle">Conversation</h3><span id="nativeTaskState" class="pill">No task selected</span></div>
-      <p class="muted">Updates below are recorded blocks, not a token preview. Full evidence verification is separate.</p>
-      <div class="native-task-observation"><p id="nativeTaskConnection" role="status" aria-live="polite">Loading setup…</p><p id="nativeTaskObservedAt" class="muted"></p><button id="nativeTaskReconnect" type="button" class="secondary" hidden>Reconnect and refresh status</button></div>
-      <p id="nativeTaskActionHelp" class="muted"></p>
-      <div id="nativeTaskApprovalBanner" class="native-task-approval-banner" role="status" aria-live="polite" hidden></div>
-      <section class="native-task-tool-panel" aria-labelledby="nativeTaskToolTitle"><h4 id="nativeTaskToolTitle">Recorded tool activity</h4><div id="nativeTaskToolStatus"><p class="muted">No tool activity loaded.</p></div></section>
-      <p id="nativeTaskRetention" class="muted" hidden></p><div id="nativeTaskTranscript" class="native-task-transcript" role="log" aria-label="Recorded task conversation" aria-live="off"><p class="muted" id="nativeTaskEmpty">Your task will appear here after you choose Run task.</p></div>
-      <button id="nativeTaskNewMessages" class="secondary" hidden>Jump to new activity</button>
-      <div><button id="nativeTaskRetry" type="button" class="secondary" aria-describedby="nativeTaskRetryHelp" hidden disabled>Retry original submission</button><p id="nativeTaskRetryHelp" class="muted" hidden></p></div>
-    </section><aside class="native-task-sidebar">
-      <section id="nativeTaskRecord" class="card" tabindex="-1"><h3>Session</h3><div id="nativeTaskIdentity"><p class="muted">No task has been started.</p></div><div class="native-task-actions"><button id="nativeTaskRefresh" class="secondary" disabled>Refresh status</button><button id="nativeTaskRelease" class="secondary" hidden>Release for later</button><button id="nativeTaskResume" hidden>Resume session</button><button id="nativeTaskVerify" class="secondary" hidden>Close and verify</button><button id="nativeTaskArchive" class="secondary" aria-describedby="nativeTaskArchiveHelp" hidden>Archive closed task</button><button id="nativeTaskNew" class="secondary" disabled>New task</button></div><p id="nativeTaskArchiveHelp" class="muted" hidden>Removes this closed task from your current list. Its signed history stays available under Show archived tasks.</p></section>
-      <section class="card"><h3>Approvals</h3><div id="nativeTaskApprovals"><p class="muted">No pending requests.</p></div></section>
-      <section class="card"><h3>Agent todo and plan</h3><div id="nativeTaskPlans"><p class="muted">No standing list loaded.</p></div></section>
-      <section class="card"><h3>Public validation</h3><div id="nativeTaskValidation"><p class="muted">No checks requested.</p></div></section>
-      <section class="card"><h3>Evidence</h3><div id="nativeTaskVerification"><p class="muted">No verification has been requested.</p></div></section>
-      <section class="card"><h3>Recorded usage</h3><div id="nativeTaskUsage"><p class="muted">Usage unavailable until reported by Studio.</p></div></section>
-      <section class="card"><h3>Your tasks</h3><label class="native-task-check"><input id="nativeTaskIncludeArchived" type="checkbox">Show archived tasks</label><div id="nativeTaskList"><p class="muted">Loading…</p></div></section>
-    </aside></div></section>`;
+    <section id="nativeTaskRecord" class="card native-task-record" tabindex="-1" aria-labelledby="nativeTaskRecordTitle"><h3 id="nativeTaskRecordTitle">This task</h3>
+      <div class="native-task-actions"><button id="nativeTaskVerify" class="secondary" hidden>Close and verify</button><button id="nativeTaskResume" hidden>Resume session</button><button id="nativeTaskNew" class="secondary" disabled>New task</button><button id="nativeTaskRelease" class="secondary" hidden>Release for later</button><button id="nativeTaskArchive" class="secondary" aria-describedby="nativeTaskArchiveHelp" hidden>Archive closed task</button><button id="nativeTaskRefresh" class="secondary" disabled>Refresh status</button></div><p id="nativeTaskArchiveHelp" class="muted" hidden>Removes this closed task from your current list. Its signed history stays available under Show archived tasks.</p><div id="nativeTaskRecovery" class="native-task-recovery"></div>
+      <div class="native-task-more">
+      ${more("Task details", `<div id="nativeTaskIdentity"><p class="muted">No task has been started.</p></div><p><a href="./evidence?agent=${encodeURIComponent(agentId)}">Workspace evidence</a></p>`, "nativeTaskDetailsMore")}
+      ${more("Is it recorded?", `<div id="nativeTaskVerification"><p class="muted">No verification has been requested.</p></div>`, "nativeTaskRecordedMore")}
+      ${more("Tool activity", `<section class="native-task-tool-panel" aria-labelledby="nativeTaskToolTitle"><h4 id="nativeTaskToolTitle">Recorded tool activity</h4><div id="nativeTaskToolStatus"><p class="muted">No tool activity loaded.</p></div></section>`)}
+      ${more("Agent's plan", `<div id="nativeTaskPlans"><p class="muted">No standing list loaded.</p></div>`)}
+      ${more("Checks", `<h4>Public validation</h4><div id="nativeTaskValidation"><p class="muted">No checks requested.</p></div>`, "nativeTaskChecksMore")}
+      ${more("Usage", `<h4>Recorded usage</h4><div id="nativeTaskUsage"><p class="muted">Usage unavailable until reported by Studio.</p></div>`)}
+      </div>
+    </section>
+    <section class="native-task-history" aria-label="Your tasks">${more("Your tasks", `<label class="native-task-check"><input id="nativeTaskIncludeArchived" type="checkbox">Show archived tasks</label><div id="nativeTaskList"><p class="muted">Loading…</p></div>`, "nativeTaskHistory")}</section>
+  </section>`;
 }
 
 export function renderTaskScope(config, toolsMode, task = null) {
@@ -56,10 +130,15 @@ export function renderTaskScope(config, toolsMode, task = null) {
 
 export function renderTaskIdentity(task) {
   if (!task) return '<p class="muted">No task has been started.</p>';
-  return `<dl class="native-task-identity"><dt>Agent</dt><dd>${esc(task.agentId)}</dd><dt>Provider / model</dt><dd>${esc(providerLabel(task.provider))} / ${esc(task.model ?? "local stub")}</dd><dt>Tools</dt><dd>${task.tools === "workspace" ? "Signed workspace scope" : "None"}</dd><dt>Task ID</dt><dd><code>${esc(task.taskId)}</code></dd><dt>Session ID</dt><dd><code>${esc(task.sessionId || "not accepted yet")}</code></dd><dt>Task last changed</dt><dd>${esc(time(task.updatedAt))}</dd><dt>Last recorded turn ending</dt><dd>${esc(task.turnEndReason ?? "not yet known")}</dd></dl>
+  return `<dl class="native-task-identity"><dt>Agent</dt><dd>${esc(task.agentId)}</dd><dt>Provider / model</dt><dd>${esc(providerLabel(task.provider))} / ${esc(task.model ?? "stand-in model")}</dd><dt>Tools</dt><dd>${task.tools === "workspace" ? "Signed workspace scope" : "None"}</dd><dt>Task ID</dt><dd><code>${esc(task.taskId)}</code></dd><dt>Session ID</dt><dd><code>${esc(task.sessionId || "not accepted yet")}</code></dd><dt>Task last changed</dt><dd>${esc(time(task.updatedAt))}</dd><dt>Last recorded turn ending</dt><dd>${esc(task.turnEndReason ?? "not yet known")}</dd></dl>
     ${task.history ? `<p>Persisted history: <strong>${esc(task.history.status)}</strong>${task.history.backend ? ` · ${esc(task.history.backend)}` : ""}</p><p class="muted">${esc(task.history.message)}</p>` : ""}
-    ${task.recovery ? `<p data-native-recovery-state="${esc(task.recovery.state)}"><strong>${task.recovery.state === "interrupted" ? "Interrupted session · recovery available" : task.recovery.state === "ready" ? "Session ready to resume" : "Recovery unavailable"}</strong></p><p class="muted">${esc(task.recovery.message)}</p>` : ""}
     ${task.resumeBlockedReason ? `<p class="muted">${esc(task.resumeBlockedReason)}</p>` : ""}${task.error ? `<p class="status-bad">${esc(task.error)}</p>` : ""}${renderTaskDelegation(task.delegation)}`;
+}
+/** Whether the session can be picked up again, beside Resume (it used to sit in Task details, out of sight). */
+export function renderTaskRecovery(task) {
+  if (!task?.recovery) return "";
+  const words = { interrupted: "Interrupted session: recovery available", ready: "Session ready to resume" }[task.recovery.state] || "Recovery unavailable";
+  return `<p data-native-recovery-state="${esc(task.recovery.state)}"><strong>${words}</strong></p><p class="muted">${esc(task.recovery.message)}</p>`;
 }
 /** P2-25: the signed delegation chain the runtime's lease binds, as Studio verified it on this read. */
 export function renderTaskDelegation(delegation) {

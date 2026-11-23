@@ -1,6 +1,6 @@
 import { apiGet, apiPost, applyRoleGates, showSignIn, whoami } from "./api.js";
 import { renderEqualizerSliders, collectEqualizerTargets } from "./components/equalizerSliders.js";
-import { recordDetails } from "./pageKit.js";
+import { moreInfo, recordDetails } from "./pageKit.js";
 import { plainErrorText } from "./plainError.js";
 
 function esc(value) {
@@ -54,10 +54,9 @@ async function main() {
     ${card(
       "Target levels",
       `
-      <p class="muted">
-        Measured levels come from your agent's records. The sliders set the level you want; they change nothing about the
-        agent. A higher measured level needs new records after the work is done.
-      </p>
+      <p class="muted">Set the level you want for each question.</p>
+      ${moreInfo("What the sliders change", `<p>Measured levels come from your agent's records. The sliders set the level you want; they change nothing about the
+        agent. A higher measured level needs new records after the work is done.</p>`)}
       ${gapEnvelope?.refused ? `<p role="alert">${esc(gapEnvelope.refused)} Every measured level shows 0 until then.</p>`
         : gapEnvelope ? "" : "<p>No score yet, so every measured level shows 0. Run a score (amc run in the workspace folder) to fill them in.</p>"}
       <div class="row wrap">

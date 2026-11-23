@@ -11,11 +11,13 @@ import { hostname } from "node:os";
 import { resolve } from "node:path";
 import { randomUUID } from "node:crypto";
 import chalk from "chalk";
+import { escapeTerminalControls } from "./utils/terminalEscape.js";
 import { artifactClaim, printClaimResult, withClaimFields } from "./cli/claimOutput.js";
 import { registerSessionCompactionCommands } from "./cli-session-compaction-commands.js";
 import { registerSessionContinuityCommands } from "./cli-session-continuity-commands.js";
 import { registerSessionSpillReadCommand } from "./cli-session-spill-read-command.js";
 import { registerSessionExportCommands } from "./cli-session-export-commands.js";
+import { registerSessionRewindCommand } from "./cli-session-rewind-command.js";
 import { finishVerify, ledgerExitCode, trustFromFlags, withTrustFlags, type TrustFlags } from "./cli-trust-flags.js";
 import { admitKey, buildVerifierReport, withPins } from "./trust/index.js";
 import { fileSha256 } from "./trust/signatureCheck.js";
@@ -29,6 +31,7 @@ export function registerSessionCommands(program: Command): void {
   registerSessionContinuityCommands(session);
   registerSessionSpillReadCommand(session);
   registerSessionExportCommands(session);
+  registerSessionRewindCommand(session);
 
   withTrustFlags(session
     .command("verify")
@@ -52,6 +55,11 @@ export function registerSessionCommands(program: Command): void {
         return;
       }
       console.log(renderLedgerVerdict(result, trust.allowUnanchored));
+      // Say why, as amc verify does: a bare FAILED left the cause untraced (HP-51).
+      if (!result.ok) {
+        for (const error of result.errors.slice(0, 10)) console.log(`- ${error}`);
+        if (result.errors.length > 10) console.log(chalk.gray(`  ... and ${result.errors.length - 10} more`));
+      }
       printClaimResult(claim, {});
       const { open, released, interrupted, closed } = result.sessions;
       console.log("");
@@ -80,6 +88,9 @@ export function registerSessionCommands(program: Command): void {
       const { readNativeSessionEvents } = await import("./session/readNativeSessionEvents.js");
       const { projectNativeRunUsage, renderNativeRunUsage } = await import("./agent/nativeRunUsage.js");
       const { projectNativeRunDiagnostics, renderNativeRunDiagnostics } = await import("./agent/nativeFailureGuidance.js");
+      const { projectTurnStops } = await import("./agent/turnGuards.js");
+      const { describeCompactionFollowUps } = await import("./agent/compaction/compactionFollowUp.js");
+      const { describeTurnCheck, projectTurnChecks } = await import("./agent/turnVerification.js");
       const { projectSurface } = await import("./session/surfaceProjection.js");
       const { extractEnvelope } = await import("./session/sessionTypes.js");
       try {
@@ -104,6 +115,8 @@ export function registerSessionCommands(program: Command): void {
         const history = projectSurface(events);
         const usage = projectNativeRunUsage(events, id);
         const diagnostics = projectNativeRunDiagnostics(events, id);
+        const turnStops = projectTurnStops(events, id);
+        const turnChecks = projectTurnChecks(events);
         const spine = events.map((event) => {
           const envelope = extractEnvelope(event.meta_json);
           return {
@@ -119,7 +132,7 @@ export function registerSessionCommands(program: Command): void {
         const context = sessionContextAccounting(events);
         if (opts.json) {
           const { sessionTokenCounts } = await import("./session/sessionTokenCounts.js");
-          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), context, diagnostics }, null, 2));
+          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), context, diagnostics, turnStops, turnChecks }, null, 2));
           return;
         }
         console.log(chalk.bold(`Session ${id}`) + chalk.gray(` · ${events.length} events`));
@@ -135,6 +148,11 @@ export function registerSessionCommands(program: Command): void {
         console.log(renderNativeRunUsage(usage));
         for (const line of renderSessionContextAccounting(context)) console.log(line);
         console.log(renderNativeRunDiagnostics(diagnostics));
+        for (const stop of turnStops) console.log(chalk.yellow(`Turn ${stop.turn} stopped at a limit: ${escapeTerminalControls(stop.text)}`));
+        for (const line of describeCompactionFollowUps(process.cwd(), events)) console.log(escapeTerminalControls(line));
+        for (const row of turnChecks) console.log(describeTurnCheck(row)); // HP-04: every turn's recorded check status
+        const { describeSessionRewinds } = await import("./session/sessionRewindEvidence.js");
+        for (const line of describeSessionRewinds(process.cwd(), id, events)) console.log(line); // HP-06
         console.log("");
         if (!opts.spine) { console.log(chalk.gray(`Event spine: ${spine.length} recorded events; add --spine to list them.`)); return; }
         console.log(chalk.bold("Event spine"));

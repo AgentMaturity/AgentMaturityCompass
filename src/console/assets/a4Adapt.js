@@ -103,7 +103,9 @@ function renderActivation(ctx) {
   const [request] = coded(item, "APPROVAL_REQUEST");
   const completion = ctx.readiness?.gates?.completion;
   const openable = completion?.status === "QUORUM_MET" ? ctx.allowed.openEffect : view.held("The final approval does not have enough approvals yet");
-  return `<p class="muted">Build signs the plan (a local audit trail under this workspace's keys). Activation is a second, separately decided plan review
+  // The second request in one line; how activation and its lockout work, word for word as before, one click away.
+  return `<p>Activating the plan is a second request: an owner opens it, then the project's approvers approve it here.</p>
+    <details class="more-info" data-a4-open="activation:how"><summary>How activation works</summary><div class="more-info-body"><p class="muted">Build signs the plan (a local audit trail under this workspace's keys). Activation is a second, separately decided plan review
     that an owner opens once the completion gate has its quorum; project approvers decide it here (two distinct people when regulated), and completing
     the stage activates the plan for the whole workspace. A regulated project activates at completion; any other completes with the plan signed and
     not activated unless an owner opens it before completing (once the gate is consumed without it, it can no longer be opened there). Once a plan is
@@ -116,7 +118,7 @@ function renderActivation(ctx) {
       sessions, ACP sessions and in-process sessions with workspace tools mint their own, naming the active <code>users.yaml</code> user whose
       username is the OS account, which their delegated children inherit; a run whose OS account is not one is refused
       <code>PRINCIPAL_UNRESOLVED</code> before its session opens or a child starts. Tasks started before activation carry none and are denied.
-      A non-regulated project therefore completes with the plan signed and not activated.</p>
+      A non-regulated project therefore completes with the plan signed and not activated.</p></div></details>
     ${["plan_signed", "plan_activated", "plan_review_opened", "adapt.plan.nativeSessionsAllowed"].map((id) => status(ctx, id)).join("")}
     ${registryHoldHtml(ctx)}
     <div class="row wrap">${view.actionButton(request ? "Re-open the plan review" : "Open the plan review", "open-effect", openable,

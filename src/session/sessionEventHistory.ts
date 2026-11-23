@@ -2,10 +2,12 @@ import type { EvidenceEvent, SessionRecord } from "../types.js";
 import type { SessionStoreBackendId } from "../persistence/sessionEventStore.js";
 import { verifyStoredSessionEventMetadata, verifyStoredSessionEvents, type StoredSessionTrustRoot } from "../persistence/sessionStoreVerification.js";
 import { admitSessionEnvelope, extractEnvelope } from "./sessionTypes.js";
-import { exactHistoryId, historyRefuse, openHistoryReader, SessionHistoryRefused } from "./sessionHistoryReader.js";
+import { exactHistoryId, historyRefuse, openHistoryReader, SessionHistoryRefused, type SessionHistoryRefusal } from "./sessionHistoryReader.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { monitorPinFromEnv } from "../trust/monitorPinEnv.js";
+import { legacyLedgerRowKeys } from "../keys/operationalLedgerReader.js";
+import { verifySessionRecords } from "../persistence/sessionRecordVerification.js";
 
 export { SessionHistoryRefused, type SessionHistoryRefusal } from "./sessionHistoryReader.js";
 export interface SessionEventHistoryOptions {
@@ -90,6 +92,41 @@ function assertRecord(record: SessionRecord | null, id: string, events: readonly
  * No writers, model calls, key creation, repair or retained-output decryption.
  */
 export function loadSessionEventHistory(options: SessionEventHistoryOptions): SessionEventHistory {
+  return loadHistory(options, false).history;
+}
+
+/** A session a listing names but cannot read: its lifecycle record is missing, malformed or disagrees with its rows. */
+export interface UnreadableSession {
+  readonly sessionId: string;
+  readonly code: SessionHistoryRefusal;
+  /** The same words everywhere the session is named (list, detail, export): never "verified". */
+  readonly reason: string;
+}
+
+const UNREADABLE_WHY: Partial<Record<SessionHistoryRefusal, string>> = {
+  MISSING: "its start record is missing",
+  IDENTITY_MISMATCH: "its start record names a different agent or runtime than its signed opening",
+  UNSEALED: "it was closed, but its closing seal is missing"
+};
+
+/** Plain words for an unreadable session; `amc verify` on the workspace shows the full detail. */
+function unreadableSessionReason(code: SessionHistoryRefusal): string {
+  const why = UNREADABLE_WHY[code] ?? "its start record or closing seal is malformed or does not match its events";
+  return `This session's record is incomplete and cannot be read: ${why}. It is not verified. Run amc verify in this workspace for the detail.`;
+}
+
+/**
+ * For listings only (the auditor's session list, \`amc sessions list\`): the whole store is authenticated as
+ * loadSessionEventHistory does (chain, signatures, envelopes over every row; a failure there still refuses), but a
+ * session whose own lifecycle record is missing, malformed, disagrees with its signed opening or whose seal does not
+ * verify is returned in \`unreadable\` with its rows left out of \`history\`, instead of refusing every other session.
+ * A caller must show each unreadable session, never drop it and never present it as verified.
+ */
+export function loadListableSessionHistory(workspace: string): { readonly history: SessionEventHistory; readonly unreadable: readonly UnreadableSession[] } {
+  return loadHistory({ workspace }, true);
+}
+
+function loadHistory(options: SessionEventHistoryOptions, listing: boolean): { readonly history: SessionEventHistory; readonly unreadable: readonly UnreadableSession[] } {
   if (!options || typeof options !== "object") historyRefuse("INVALID_INPUT", "Provide workspace and an optional exact session identity.");
   if (options.sessionId !== undefined) exactHistoryId(options.sessionId, "sessionId");
   if (options.agentId !== undefined) {
@@ -112,12 +149,27 @@ export function loadSessionEventHistory(options: SessionEventHistoryOptions): Se
     assertRows(all);
     const ids = [...new Set(all.map(row => row.session_id))];
     if (options.sessionId !== undefined && !ids.includes(options.sessionId)) historyRefuse("MISSING", "Requested session has no persisted events in the selected backend.");
-    const records = ids.map(id => { const record = reader.store.readSessionRecord(id); assertRecord(record, id, all); return record; });
-    const verifyOptions = { sessionRecords: records, ...(expectedMonitorFingerprint === undefined ? {} : { expectedMonitorFingerprint }) };
+    const unreadable: UnreadableSession[] = [];
+    const records: SessionRecord[] = [];
+    for (const id of ids) {
+      const record = reader.store.readSessionRecord(id);
+      try { assertRecord(record, id, all); records.push(record); }
+      catch (error) {
+        if (!listing || !(error instanceof SessionHistoryRefused)) throw error;
+        unreadable.push({ sessionId: id, code: error.code, reason: unreadableSessionReason(error.code) });
+      }
+    }
+    const pin = expectedMonitorFingerprint === undefined ? {} : { expectedMonitorFingerprint };
+    // A listing checks each session's record against its own rows below, so one bad record names one session.
+    const verifyOptions = listing ? pin : { sessionRecords: records, ...pin };
     const result = (options.verifyPayloads ? verifyStoredSessionEvents : verifyStoredSessionEventMetadata)(reader.workspace, all, verifyOptions);
     if (!result.ok || result.trustRoot.monitorFingerprint === null) historyRefuse("TAMPERED", "Persisted evidence failed native signature, chain, seal or requested payload verification; no rows were returned.");
-    const events = options.sessionId === undefined ? all : all.filter(row => row.session_id === options.sessionId);
-    const sessions = options.sessionId === undefined ? records : records.filter(record => record.session_id === options.sessionId);
+    if (listing) unreadable.push(...unverifiedSeals(reader.workspace, all, records));
+    const hidden = new Set(unreadable.map(entry => entry.sessionId));
+    const readable = hidden.size === 0 ? all : all.filter(row => !hidden.has(row.session_id));
+    const events = options.sessionId === undefined ? readable : readable.filter(row => row.session_id === options.sessionId);
+    const kept = hidden.size === 0 ? records : records.filter(record => !hidden.has(record.session_id));
+    const sessions = options.sessionId === undefined ? kept : kept.filter(record => record.session_id === options.sessionId);
     if (options.agentId !== undefined) {
       const opened = events.find(row => row.event_type === "session/open");
       if (!opened || (JSON.parse(opened.meta_json) as Record<string, unknown>).agentId !== options.agentId) {
@@ -126,12 +178,12 @@ export function loadSessionEventHistory(options: SessionEventHistoryOptions): Se
     }
     const sealed = sessions.every(record => record.ended_ts !== null);
     if (options.requireSealed && !sealed) historyRefuse("UNSEALED", "Requested history includes an unsealed session; release and seal its writer before requiring a closed history.");
-    const headEventHash = events[events.length - 1]!.event_hash;
+    const headEventHash = (events.at(-1) ?? all.at(-1)!).event_hash;
     if (options.expectedHeadEventHash !== undefined && options.expectedHeadEventHash !== headEventHash) {
       historyRefuse("TAMPERED", "Persisted history head differs from the independently saved head; rollback or a different snapshot is possible.");
     }
     reader.assertUnchanged();
-    return Object.freeze({ format: "amc-session-event-history-v1", workspace: reader.workspace, backend: reader.backend,
+    const history: SessionEventHistory = Object.freeze({ format: "amc-session-event-history-v1", workspace: reader.workspace, backend: reader.backend,
       scope: options.sessionId === undefined ? "workspace" : "session", sessionId: options.sessionId ?? null,
       events: Object.freeze(events.map(row => Object.freeze({ ...row }))),
       sessions: Object.freeze(sessions.map(record => Object.freeze({ ...record }))), headEventHash,
@@ -139,8 +191,24 @@ export function loadSessionEventHistory(options: SessionEventHistoryOptions): Se
       verification: Object.freeze({ metadata: "hashes-signatures-global-and-session-chains", checkedStoreEventCount: all.length,
         payloads: options.verifyPayloads ? "verified" : "not-read", retainedOutput: "not-read", trustRoot: Object.freeze(result.trustRoot),
         completeness: "all-available-events-in-requested-scope", rollbackProtection: options.expectedHeadEventHash === undefined ? "no-external-head" : "expected-head-matched" }) });
+    return { history, unreadable: Object.freeze(unreadable) };
   } catch (error) {
     if (error instanceof SessionHistoryRefused) throw error;
     return historyRefuse("UNREADABLE", "Persisted history could not be decoded or verified; no partial rows or fallback history were returned.");
   } finally { reader.store.close(); }
+}
+
+/** Per session, the checks verifySessionRecords makes for the whole store: a seal must sign that session's last event. */
+function unverifiedSeals(workspace: string, all: readonly EvidenceEvent[], records: readonly SessionRecord[]): UnreadableSession[] {
+  const rowsBy = new Map<string, EvidenceEvent[]>();
+  for (const row of all) {
+    const rows = rowsBy.get(row.session_id);
+    if (rows === undefined) rowsBy.set(row.session_id, [row]); else rows.push(row);
+  }
+  const keys = legacyLedgerRowKeys(workspace);
+  return records.flatMap(record => {
+    const errors: string[] = [];
+    verifySessionRecords(rowsBy.get(record.session_id) ?? [], [record], keys, errors);
+    return errors.length === 0 ? [] : [{ sessionId: record.session_id, code: "TAMPERED" as const, reason: unreadableSessionReason("TAMPERED") }];
+  });
 }

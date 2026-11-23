@@ -535,7 +535,7 @@ describe("AMC-1474 reusable action-class scope templates", () => {
     expect(scopeUi).toContain('scopeApplyButton.disabled');
     expect(scopeUi).not.toContain('window.confirm');
     expect(readFileSync("src/console/pages/policypacks.html", "utf8"))
-      .toContain('app.js?v=20260711c');
+      .toContain('app.js?v=20261122a');
   });
 
   test("projects one scope template per action control and keeps source provenance unique", () => {

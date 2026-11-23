@@ -1,5 +1,6 @@
 import type { EffectState } from "../actions/receiptStates.js";
-import { DefiniteFailureError, type ToolBodyResult, type ToolDenial, type ToolOutcome } from "./toolTypes.js";
+import { activeFreezeStatus } from "../drift/freezeEngine.js";
+import { DefiniteFailureError, type ToolBodyResult, type ToolDenial, type ToolExecution, type ToolOutcome } from "./toolTypes.js";
 
 // Pure outcome helpers of ToolPipeline, split out to keep toolPipeline.ts under its line cap.
 
@@ -59,4 +60,15 @@ export function effectGuardDenial(beforeEffect: (() => string | null) | undefine
   catch { reason = "Trusted effect guard could not be verified."; }
   return reason === null ? null : { stage: "guard", guardLabel: "trusted-before-effect",
     reason: typeof reason === "string" ? reason : "Trusted effect guard returned no valid decision." };
+}
+
+/** A drift or integrity freeze holding this call's class, as ToolHub refuses it. A freeze that cannot be read denies. */
+export function unboundFreezeDenial(execution: Pick<ToolExecution, "workspace" | "agentId" | "actionClass">): string | null {
+  try {
+    const freeze = activeFreezeStatus(execution.workspace, execution.agentId);
+    return freeze.active && (freeze.actionClasses as readonly string[]).includes(execution.actionClass)
+      ? `action_class_frozen: incidents ${freeze.incidentIds.join(", ")}` : null;
+  } catch (error) {
+    return `action_class_frozen: the freeze state could not be read: ${String(error)}`;
+  }
 }

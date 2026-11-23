@@ -115,6 +115,8 @@ export interface AgentSessionInit {
   /** Automatic compaction defaults to reviewed route metadata; an explicit null window disables it. */
   readonly compaction?: Partial<CompactionConfig>;
   readonly validation?: NativeValidationPlan;
+  /** HP-04: false turns the workspace's checks after edits off for this session (recorded on each turn). */
+  readonly verifyOnStop?: false;
   readonly resourceStatus?: () => NativeResourceStatus;
   readonly compositionSources?: readonly CompositionSource[];
   /** Bind approvals/extensions to the real owning session and its existing pipeline. */
@@ -346,6 +348,7 @@ function composeAgentSession(init: AgentSessionInit, claimant?: RecoveryClaimant
           ...(init.additionalCapabilities === undefined ? {} : { additionalCapabilities: init.additionalCapabilities }) }) }),
         driver: {
           ...(init.validation === undefined ? {} : { validation: init.validation }),
+          ...(init.verifyOnStop === false ? { verifyOnStop: false as const } : {}),
           config: { ...(init.maxSteps === undefined ? {} : { maxStepsPerTurn: init.maxSteps }), ...(compaction === undefined ? {} : { compaction }) }
         }
       });

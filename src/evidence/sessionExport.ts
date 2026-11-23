@@ -65,7 +65,10 @@ export function exportSessionBundle(params: { workspace: string; sessionId: stri
     store.close();
   }
   if (record === null || record.ended_ts === null || record.session_final_event_hash === null || record.session_seal_sig === null) {
-    throw new SessionExportError(sessionId, ["SESSION_NOT_SEALED: only a sealed (closed) session can be exported"]);
+    // UX-05: say what to run. A chat closed with /exit is left open on purpose so it can be continued (--continue).
+    throw new SessionExportError(sessionId, [`it is not sealed, and a .json bundle needs a sealed session. A chat closed with /exit stays open so it can be `
+      + `continued. Export it as a page instead, which says it is not sealed and which amc session verify-export and amc-verify check: `
+      + `amc session export ${sessionId} --out session-${sessionId.slice(0, 8)}.html`]);
   }
   // The descriptor builder runs every per-row, envelope and seal rule against the workspace's keys and throws otherwise.
   const descriptor = buildSessionRootDescriptor({ workspace, sessionId, rows, record,

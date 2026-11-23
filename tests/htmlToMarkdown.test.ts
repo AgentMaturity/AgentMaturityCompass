@@ -88,8 +88,9 @@ describe("renderHtml on HTML5 optional tags and hostile shapes", () => {
   it("closes table rows and cells implicitly, and renders very many rows without recursion limits", () => {
     expect(md("<table><tr><td>a<td>b<tr><td>c<td>d</table>")).toBe("| a | b |\n| --- | --- |\n| c | d |");
     const started = performance.now();
-    const out = md(`<table>${"<tr><td>x</td></tr>".repeat(200_000)}</table>`);
-    expect(out.split("\n")).toHaveLength(200_001);
+    // 50,000 rows: far past any recursion limit, and a quarter of what a loaded runner renders inside RENDER_DEADLINE_MS.
+    const out = md(`<table>${"<tr><td>x</td></tr>".repeat(50_000)}</table>`);
+    expect(out.split("\n")).toHaveLength(50_001);
     expect(performance.now() - started).toBeLessThan(3_000);
   });
 

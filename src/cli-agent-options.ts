@@ -86,6 +86,8 @@ export interface RunOptions {
   validationConfigSha256?: string;
   validationRepair?: string;
   validate?: string[];
+  /** HP-04: commander's --no-verify-on-stop sets false. */
+  verifyOnStop?: boolean;
   extension?: string[];
   extensionPin?: string[];
   mcpConfig?: string[];

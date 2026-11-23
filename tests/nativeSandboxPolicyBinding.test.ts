@@ -62,6 +62,17 @@ function compose(root: string) {
 const call = (command = "printf reviewed") => ({ name: "bash", agentId: "default", arguments: { command, timeoutMs: 5000 }, requestedMode: "EXECUTE" as const });
 
 describe("signed native shell mount policy", () => {
+  it("UX-03 B1: a Code Mode sub-call to the sandboxed shell is put to the bound gate, not refused by the early guard look", async () => {
+    const root = setup(); sign(root);
+    const composed = compose(root);
+    const ask = vi.fn(async () => null);
+    composed.pipeline.bindApprovalGate({ gates: () => true, ask });
+    const outcome = await composed.pipeline.execute({ ...call(), parentToken: "trusted-program" });
+    expect(ask).toHaveBeenCalledTimes(1);
+    expect(outcome.denied).toMatchObject({ stage: "approval" });
+    expect(backend.run).not.toHaveBeenCalled();
+  });
+
   it("dispatches command-only public arguments with exactly the signed directory grant and digest", async () => {
     const root = setup(); sign(root);
     const composed = compose(root);

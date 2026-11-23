@@ -30,13 +30,13 @@ describe("native chat recorded tool results", () => {
       compositionDigest: sha256Hex("composition"), policyDigest: sha256Hex("policy") });
     return session;
   }
-  function turn(session: SessionService, content: string, outcome: "OK" | "ERROR" | "TOOL_OUTCOME_UNKNOWN" = "OK", calls = 1): void {
+  function turn(session: SessionService, content: string, outcome: "OK" | "ERROR" | "TOOL_OUTCOME_UNKNOWN" | "DENIED" = "OK", calls = 1): void {
     session.startTurn({ trigger: "user" }); session.startStep();
     for (let index = 0; index < calls; index++) {
       const toolCallId = `call-${session.sessionId}-${index}-${content.length}`;
       session.recordToolCall({ toolCallId, toolName: "fs.read", args: "{}", dispatch: "native", parentToken: null });
       session.recordToolResult({ toolCallId, outcome, exitCode: outcome === "OK" ? 0 : outcome === "ERROR" ? 42 : null,
-        timedOut: false, denied: false, content });
+        timedOut: false, denied: outcome === "DENIED", content });
     }
     session.endStep({ stopReason: "end_turn", usage: null }); session.endTurn({ reason: "complete" }); session.sealTurn();
   }
@@ -49,6 +49,14 @@ describe("native chat recorded tool results", () => {
     expect(lines.split("\n")).toHaveLength(1); expect(lines).toContain("fs.read"); expect(lines).toContain("failed");
     expect(lines).toContain("exit 42"); expect(lines).toContain("latest result"); expect(lines).not.toContain("old result");
     expect(loadSessionEventHistory({ workspace }).headEventHash).toBe(before);
+  });
+  it("shows a refusal's whole reason, so a hook's own words are not cut off (UX-03)", () => {
+    const reason = `[amc] guard denied: hooks.json sha256 ${"a".repeat(64)} PreToolUse #1: QA guard: shell is blocked in this folder`;
+    const session = start(); turn(session, `${reason}\u001b[2J`, "DENIED"); finish(session);
+    const lines = renderNativeInteractiveToolResults(workspace, "result-session").join("\n");
+    expect(lines).toContain("denied: guard denied: hooks.json");
+    expect(lines).toContain("QA guard: shell is blocked in this folder");
+    expect(lines).not.toContain("\u001b");
   });
   it("escapes terminal controls in results and never turns an unknown outcome into success", () => {
     const session = start(); turn(session, "unsafe\u001b[2J\rtext\u009b", "TOOL_OUTCOME_UNKNOWN"); finish(session);

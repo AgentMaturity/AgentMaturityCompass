@@ -6,8 +6,10 @@ import { renderPromptDiffViewer } from "./components/promptDiffViewer.js";
 import { QUESTION_LABELS, questionDisplay } from "./a4Questions.js";
 import { exclusionLine, PRACTICE_CHOICE } from "./a4Who.js";
 import { cardLabel, codes, esc, isObject, list, shown, stageTitle, time } from "./a4Html.js";
-import { STAGE_PLAIN, STEP_PLAIN, code, itemLine, itemTitle, record, say, sayCode, when } from "./a4Plain.js";
+import { STAGE_PLAIN, STAGE_SHORT, STEP_PLAIN, code, itemLine, itemTitle, record, say, sayCode, when } from "./a4Plain.js";
 import { renderOutline } from "./a4Outline.js";
+import { laterFold, projectState } from "./a4Journey.js";
+import { moreInfo, noticeChip, pictureCard, routeTrack } from "./pageKit.js";
 export { clashingChanges, jsonDiff, mergeOnTop, presenceRows, renderConflict, renderPresence, validateA4Poll } from "./a4Sync.js";
 
 export { esc, STAGE_PLAIN, STEP_PLAIN };
@@ -47,7 +49,6 @@ export const COMMENT_MAX_BYTES = 8 * 1024;
 // comment path); a proposal's spec and the answers are written as they are into the a4_revisions record.
 const RETAINED = "Pasted text is retained until the project's blob key is destroyed.";
 const IN_RECORD = "This is stored as written in the project's record, not in its encrypted blob store, so destroying the project's blob key does not erase it. Do not paste personal data or secrets here.";
-
 
 /**
  * A disabled button names Studio's reason codes; Studio re-checks every action, so this is a convenience only. `held`
@@ -116,19 +117,22 @@ export const held = (note) => ({ allowed: false, reasonCodes: [], note });
 export const GATE_CHANGED = "The gate changed while you were on this page";
 export const ACTIVATE_COMPLETE = "Activate's release and deployment approval are completed on the Release card, which shows each lease token once";
 
-
 export function holdBanner(project) {
   return project?.hold ? `<div class="card banner a4-hold">On hold${project.holdReason ? `: ${esc(project.holdReason)}` : ""}</div>` : "";
 }
+
+/** A notice as a neutral chip (pageKit.noticeChip) whose open state survives the page's re-renders under `key`. */
+const chip = (label, text, key, className = "") => noticeChip(label, text)
+  .replace('<details class="notice-chip"', `<details class="notice-chip${className ? ` ${className}` : ""}" data-a4-open="chip:${key}"`);
 
 /** A practice project says so on every page, and says when a second person ended it (Studio's `practiceActive`). */
 export function practiceBanner(project) {
   if (project?.practice !== true) return "";
   return project.practiceActive === true
-    ? `<div class="card banner a4-practice"><strong>Practice project.</strong> You may approve your own work here. Each approval you give yourself
-      is recorded and shown as self-approved. Do not use a practice project for real work.</div>`
-    : `<div class="card banner a4-practice"><strong>This was a practice project.</strong> More than one person can sign in to this workspace now,
-      so nobody approves their own work here any more, and the project follows the rules its risk level calls for.</div>`;
+    ? chip("Practice project", "Practice project. You may approve your own work here. Each approval you give yourself is recorded and shown as self-approved. "
+      + "Do not use a practice project for real work.", "practice", "a4-practice")
+    : chip("Was practice", "This was a practice project. More than one person can sign in to this workspace now, so nobody approves their own work here "
+      + "any more, and the project follows the rules its risk level calls for.", "practice", "a4-practice");
 }
 
 /**
@@ -136,21 +140,28 @@ export function practiceBanner(project) {
  * a pack is regulated: a second person approves each step. A practice project is offered when Studio says one person
  * alone may open one (`start` is GET /options' workspace.start); otherwise its reason is shown.
  */
-export function approverChoiceHtml(start) {
+export function approverChoiceHtml(start, { fold = false } = {}) {
   if (!isObject(start)) return "";
   const practice = start.practiceAvailable === true;
-  return `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>
-    <label><input type="radio" name="practice" value="" checked /> A second person (needed for real work)</label>
-    <p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
-      you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>
-    <label><input type="radio" name="practice" value="yes"${practice ? "" : " disabled"} /> Just me, as practice (for learning AMC alone)</label>
-    <p class="muted">${practice ? PRACTICE_CHOICE : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>
-    </fieldset>`;
+  const second = `<p class="muted">Every Industry Pack is high risk or above, so a project started from a pack is governed as regulated: someone other than
+      you approves each step, and nobody approves their own work. Add that person with Add a person, or on the project's Members card.</p>`;
+  const alone = `<p class="muted">${practice ? PRACTICE_CHOICE : esc(start.practiceRefusal ?? "A practice project is not offered here.")}</p>`;
+  const radio = (value, words, disabled) => `<label><input type="radio" name="practice" value="${value}"${value ? "" : " checked"}${disabled ? " disabled" : ""} /> ${words}</label>`;
+  // Home's form keeps the two explanations one click away (the console's text budget). The Build page asks it as two
+  // picture cards around the same radios, a practice card that is not offered saying why on its face.
+  if (fold) return `<fieldset class="a4-approvers"><legend>Who approves each step?</legend>${radio("", "A second person (needed for real work)")}
+    ${radio("yes", "Just me, as practice (for learning AMC alone)", !practice)}${moreInfo("Which should I pick?", second + alone)}</fieldset>`;
+  const card = (value, words, line, iconName, disabled) => pictureCard({ title: words, line, iconName, className: `a4-approver-card${disabled ? " is-disabled" : ""}`,
+    input: `<input type="radio" name="practice" value="${value}"${value ? "" : " checked"}${disabled ? " disabled" : ""} />` });
+  return `<fieldset class="a4-approvers a4-q" data-a4-q="approvers"><legend>Who approves each step?</legend>
+    <div class="picture-grid">${card("", "A second person", "Needed for real work", "people")}
+    ${card("yes", "Just me, as practice", practice ? "For learning AMC alone" : start.practiceRefusal ?? "Not offered here", "person", !practice)}</div>
+    ${moreInfo("Which should I pick?", second + alone)}</fieldset>`;
 }
 
 export function stageBanner(stage) {
-  if (stage === "adapt") return `<div class="card banner">${TRUTH.experimental}</div>`;
-  if (stage === "activate") return `<div class="card banner">${TRUTH.recorded}</div>`;
+  if (stage === "adapt") return chip("AI-drafted, not reviewed", TRUTH.experimental, "adapt");
+  if (stage === "activate") return chip("Recorded or checked", TRUTH.recorded, "activate");
   return "";
 }
 
@@ -162,10 +173,12 @@ export const CREATE_NEEDS = "Starting an agent project needs a workspace OPERATO
  * has no disclosure around it and asks for the plainest explanation level.
  */
 export function renderCreateForm(open, industryHtml = "", { home = false, start = null } = {}) {
+  // The Build page asks one question at a time (a4Journey.bindQuestions): each fieldset[data-a4-q] is one question.
+  const ask = (legend, html, key) => (home ? html : `<fieldset class="a4-q" data-a4-q="${key}"><legend>${legend}</legend>${html}</fieldset>`);
   const form = `<form id="${home ? "a4HomeForm" : "a4CreateForm"}" class="a4-form" novalidate>
-      ${industryHtml}
-      ${approverChoiceHtml(start)}
-      <label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="${home ? "a4HomeNameHint" : "a4NameHint"}" /></label>
+      ${industryHtml ? ask("Which field is it for?", industryHtml, "industry") : ""}
+      ${approverChoiceHtml(start, { fold: home })}
+      ${ask("What will you call it?", `<label>Project name <input name="name" required maxlength="200" placeholder="For example: Invoice triage helper" aria-describedby="${home ? "a4HomeNameHint" : "a4NameHint"}" /></label>
       <p class="muted" id="${home ? "a4HomeNameHint" : "a4NameHint"}">A short name your team will recognise. It is stored in the project's record.</p>
       ${home ? '<input type="hidden" name="expertise" value="novice" />' : `<details class="a4-more"><summary>More options</summary>
       <label>Existing agent id (optional) <input name="agentId" maxlength="128" pattern="[a-z0-9][a-z0-9_\\-]{0,127}" placeholder="Leave empty to create a new agent"
@@ -174,22 +187,24 @@ export function renderCreateForm(open, industryHtml = "", { home = false, start 
         Leave it empty and AMC creates a new agent for the project.</p>
       <label>How much detail do you want in explanations? <select name="expertise">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select></label>
       <p><button type="button" class="secondary" data-a4-example-project>Use an example</button></p>
-      <p class="muted">Use an example fills a sample project, marked (sample) in its name, so the records show it is sample data.</p></details>`}
+      <p class="muted">Use an example fills a sample project, marked (sample) in its name, so the records show it is sample data.</p></details>`}`, "name")}
       <p class="a4-form-error status-bad" role="alert" hidden></p>
       <div class="row wrap"><button type="submit" class="a4-primary">${home ? "Start building" : "Start an agent project"}</button></div>
     </form>`;
   return home ? form : `<section class="card" id="a4Create"${open ? "" : " hidden"}><h3>Start an agent project</h3>${form}</section>`;
 }
 
-export function renderProjectList(projects) {
+/** Each project as a row: its name, its route (projectState, from its readiness when read) and Open; codes in small print. */
+export function renderProjectList(projects, readinessOf = new Map()) {
   if (projects.length === 0) return "";
-  return `<section class="card"><h3>Your agent projects</h3>${list(projects.map((project) => `<li>
-    <a href="./a4Project?project=${encodeURIComponent(project.projectId)}"><strong>${esc(project.name)}</strong></a>
-    <span class="chip" title="${esc(stageTitle(project.stage))}">${esc(STAGE_PLAIN[project.stage] ?? stageTitle(project.stage))}</span>
-    <span class="chip" title="${esc(STEP_TITLES[project.step] ?? project.step)}">${esc(STEP_PLAIN[project.step] ?? project.step)}</span>
-    ${project.readiness ? `<span>${sayCode("readinessStatus", project.readiness.status)}</span>` : ""}
-    <span class="muted">agent <code>${esc(project.agentId)}</code> · r${esc(project.revisionNo)}</span>${holdBanner(project)}</li>`),
-  "No agent projects yet.")}</section>`;
+  const where = (project) => routeTrack(STAGES.map((name, index) => ({ label: STAGE_SHORT[name], hint: STAGE_PLAIN[name],
+    state: index < STAGES.indexOf(project.stage) ? "done" : name === project.stage ? projectState(project, readinessOf.get(project.projectId) ?? null) : "todo" })),
+  { label: `Where ${project.name} is`, className: "a4-mini-route" });
+  return `<section class="card" id="a4ProjectList"><h3>Your agent projects</h3><ul class="a4-project-list">${projects.map((project) => `<li class="a4-project-row">
+    <div class="a4-project-words"><a href="./a4Project?project=${encodeURIComponent(project.projectId)}"><strong>${esc(project.name)}</strong></a>
+    <span class="muted">${esc(STAGE_PLAIN[project.stage] ?? stageTitle(project.stage))}: ${esc(STEP_PLAIN[project.step] ?? project.step)}</span>
+    <small class="a4-code">${project.readiness ? `${sayCode("readinessStatus", project.readiness.status)} · ` : ""}agent <code>${esc(project.agentId)}</code> · r${esc(project.revisionNo)}</small>${holdBanner(project)}</div>
+    ${where(project)}</li>`).join("")}</ul></section>`;
 }
 
 /** The page keeps the stage it opened on (a4.js); when the project is at another stage, it says so. */
@@ -350,16 +365,16 @@ export function renderConversation(ctx) {
   return `${staleBanner}<h4>Ask</h4>
     ${answers.length ? `<details data-a4-open="answers"><summary>${answers.length} answered (${notMine} carried or inferred);
       ${open.length} still need an answer</summary>${list(answers.map(answerRow), "")}</details>` : ""}
-    <form class="a4-form" data-a4-answers>${open.map(field).join("")}${change.length
+    <form class="a4-form" data-a4-answers>${open.filter((question) => question.required !== false).map(field).join("")}${open.some((question) => question.required === false)
+      ? `<details class="more-info" data-a4-open="optional"><summary>Optional questions (${open.filter((question) => question.required === false).length})</summary>${open.filter((question) => question.required === false).map(field).join("")}</details>` : ""}${change.length
       ? `<details data-a4-open="change-answers"><summary>Change my answers</summary>${change.map(field).join("")}</details>` : ""}
       ${answerDrift ? `<p class="status-bad">${ANSWER_CHANGED}.</p>` : ""}
-      <p class="muted">${RESTARTS} ${IN_RECORD}</p>
-      ${ctx.exampleOffered && open.length ? `<p class="muted">Not sure what to write? Each empty field shows an example. Use an example fills the empty
-        fields with sample answers marked (sample), which you can change before saving.</p>` : ""}
+      <details class="more-info" data-a4-open="saving"><summary>What happens when I save?</summary><p class="muted">${RESTARTS} ${IN_RECORD}</p>${ctx.exampleOffered && open.length
+        ? "<p class=\"muted\">Not sure what to write? Each empty field shows an example. Use an example fills the empty fields with sample answers marked (sample), which you can change before saving.</p>" : ""}</details>
       <div class="row wrap">${actionButton("Save answers", "answers", answerDrift ? held(ANSWER_CHANGED) : ask)}${ctx.exampleOffered && open.length
         ? ' <button type="button" class="secondary" data-a4-action="use-example">Use an example</button>' : ""}${answerDrift
         ? ` <button type="button" class="secondary" data-a4-action="discard-answers">Discard my answer edits</button>` : ""}</div></form>
-    <h4>Understand</h4>
+    ${laterFold(ctx, "Understand and Explain", `<h4>Understand</h4>
     <label>What this stage should achieve, in your words <textarea name="understanding" rows="3" maxlength="${CONTENT_MAX}"></textarea></label>
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap">${actionButton("Run Understand", "understand", understand)}</div>
@@ -369,7 +384,7 @@ export function renderConversation(ctx) {
     <p class="muted">${NO_PRODUCER} ${RETAINED}</p>
     <div class="row wrap"><select name="level" aria-label="Explanation level">${LEVELS.map((level) => `<option value="${level}">${stageTitle(level)}</option>`).join("")}</select>
       ${actionButton("Explain at this level", "explain", stepOffer(allowed.explain, ctx, "explain"))}</div>
-    ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`;
+    ${explanation ? recorded(`your explanation at the ${esc(explanation.level)} level`, explanation) : ""}`)}`;
 }
 
 /** The part of a revision's spec a member edits: Studio carries `answers` itself and refuses a proposal naming them. */

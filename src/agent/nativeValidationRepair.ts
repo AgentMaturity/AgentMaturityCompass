@@ -167,6 +167,7 @@ export class NativeValidationRepair {
       executionMode: () => "exclusive",
       ...(original.authorizationIntent === undefined ? {} : { authorizationIntent: (request: ToolCallRequest) => allowed(request) ? original.authorizationIntent!(request) : null }),
       ...(original.bindApprovalGate === undefined ? {} : { bindApprovalGate: original.bindApprovalGate.bind(original) }),
+      ...(original.denialBeforeApproval === undefined ? {} : { denialBeforeApproval: original.denialBeforeApproval.bind(original) }),
       execute: async request => {
         try { this.assertReady(); } catch { return denied("Repair budget or execution state stopped further effects."); }
         if (!allowed(request)) { this.stopReason = "repair-surface-denied"; return denied("Repair tool or file is outside the operator-selected surface."); }

@@ -43,7 +43,7 @@ function render(root, registriesPayload) {
         )}</textarea>
       </div>
       <div class="row wrap">
-        <button id="benchRegistriesApply">Apply Registries</button>
+        <button id="benchRegistriesApply">Apply registries</button>
       </div>
       <pre id="benchRegistriesOut" class="scroll muted"></pre>
     `

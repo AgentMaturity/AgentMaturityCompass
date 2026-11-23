@@ -11,6 +11,8 @@ import { roleGateNoteText } from "../../src/console/assets/api.js";
 import { renderScoreGauge } from "../../src/console/assets/components/scoreGauge.js";
 import { loginCardHtml } from "../../src/console/assets/loginView.js";
 import { plainCodeHtml } from "../../src/console/assets/plainError.js";
+import * as dailyView from "../../src/console/assets/dailyView.js";
+import { emptyState, moreInfo } from "../../src/console/assets/pageKit.js";
 
 const app = readFileSync("src/console/assets/app.js", "utf8");
 const bodyOf = (source: string, signature: string): string => {
@@ -52,7 +54,7 @@ describe("Login while signed in", () => {
 });
 
 describe("one run state across Agent, Drift and Work Orders", () => {
-  const context = vm.createContext({ htmlEscape: escape });
+  const context = vm.createContext({ htmlEscape: escape, plainCodeHtml });
   vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"),
     bodyOf(app, "const UNTRUSTED_SEAL_LABEL"), bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)")].join("\n"), context);
   const summary = context.runStateSummary as (agentId: string, run: unknown) => string;
@@ -62,8 +64,8 @@ describe("one run state across Agent, Drift and Work Orders", () => {
     expect(summary("default", null)).toContain("No run yet for agent <strong>default</strong>");
     expect(warning(null)).toBe("");
     const invalid = { runId: "run-1", ts: 0, status: "INVALID", trustLabel: "UNRELIABLE — DO NOT USE FOR CLAIMS", claimEligible: false };
-    expect(summary("default", invalid)).toContain("status <strong>INVALID</strong>");
-    expect(summary("default", invalid)).toContain("claims <strong>BLOCKED</strong>");
+    expect(summary("default", invalid)).toContain('status <strong><span class="code-word" title="Code: INVALID">Does not check out</span></strong>');
+    expect(summary("default", invalid)).toContain('claims <strong><span class="code-word" title="Code: BLOCKED">Blocked</span></strong>');
     expect(warning(invalid)).toContain("UNRELIABLE — DO NOT USE FOR CLAIMS");
     expect(warning(invalid)).toContain('class="status-bad"');
     expect(warning({ ...invalid, status: "VALID", trustLabel: "HIGH TRUST" })).toBe("");
@@ -76,14 +78,14 @@ describe("one run state across Agent, Drift and Work Orders", () => {
       layerScores: [{ avgFinalLevel: 3.25 }, { avgFinalLevel: 2.75 }],
       evidenceReadiness: { status: "READY", claimEligible: true, claimBoundary: "The artifact seal is valid, but no accepted evidence supports the score." } };
     const latestRun = { runId: "run-1", ts: 0, status: "VALID", trustLabel: "HIGH TRUST", claimEligible: true, sealVerified: false };
-    const agent = vm.createContext({ htmlEscape: escape, plainCodeHtml, root, currentAgent: () => "default", card: (t: string, b: string) => `<h3>${t}</h3>${b}`,
-      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => { bars += 1; }, document: { getElementById: () => null } });
+    const agent = vm.createContext({ ...dailyView, emptyState, moreInfo, htmlEscape: escape, plainCodeHtml, root, currentAgent: () => "default", card: (t: string, b: string) => `<h3>${t}</h3>${b}`,
+      apiGet: async (path: string) => path.endsWith("/status") ? { latestRun } : report, renderBars: () => { bars += 1; }, bindFullScore: () => {}, document: { getElementById: () => null } });
     vm.runInContext([bodyOf(app, "function shortId(value"), bodyOf(app, "function formatTime(value)"), bodyOf(app, "const UNTRUSTED_SEAL_LABEL"),
       bodyOf(app, "function runStateSummary(agentId, latestRun)"), bodyOf(app, "function runStateWarning(latestRun)"), bodyOf(app, "async function renderAgent()")].join("\n"), agent);
     await (agent.renderAgent as () => Promise<void>)();
-    expect(root.innerHTML).toContain("Artifact Status: <strong>INVALID</strong>");
+    expect(root.innerHTML).toContain('Artifact status: <strong><span class="code-word" title="Code: INVALID">Does not check out</span></strong>');
     expect(root.innerHTML).not.toMatch(/seal is valid|HIGH TRUST|0\.990|ELIGIBLE|READY|90\.0%|3\.000|layerBars/);
-    expect(root.innerHTML).toContain("Evidence Readiness: <strong>UNVERIFIED</strong>");
+    expect(root.innerHTML).toContain('Evidence Readiness: <strong><span class="code-word" title="Code: UNVERIFIED">Not verified</span></strong>');
     expect(bars).toBe(0);
   });
 
@@ -220,7 +222,7 @@ describe("load failures and untrusted text (2026-11-14 source audit)", () => {
   });
 
   test("the agent id from the URL and Ops server text are escaped; removing old records asks first", () => {
-    expect(app).toContain("Issue Lease For ${htmlEscape(currentAgent())}");
+    expect(app).toContain("Issue lease for ${htmlEscape(currentAgent())}");
     const ops = readFileSync("src/console/assets/ops.js", "utf8");
     expect(ops).not.toMatch(/\+ String\(error\) \+/);
     expect(ops).not.toMatch(/"<pre>" \+ JSON\.stringify/);
@@ -235,7 +237,7 @@ describe("Records wording", () => {
     const assurance = readFileSync("src/console/assets/assurance.js", "utf8");
     expect(app).not.toMatch(/Enforce Resource Proof|Finding Proofs|<th>Proof<\/th>|>activate changes<|>rollback previous</);
     expect(assurance).not.toContain("<th>Proof</th>");
-    expect(app).toContain('card("Enforce resource records"');
+    expect(app).toContain('moreInfo("Enforce resource records"');
     expect(app).toContain(">Roll back to previous</button>");
   });
 });

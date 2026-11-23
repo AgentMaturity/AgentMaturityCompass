@@ -124,7 +124,11 @@ export const toolsConfigSchema = z.object({
   tools: z.object({
     version: z.literal(1),
     denyByDefault: z.boolean().default(true),
-    allowedTools: z.array(toolDefinitionSchema)
+    allowedTools: z.array(toolDefinitionSchema),
+    // HP-04: commands the native harness runs after a turn that changed files (src/agent/turnVerification.ts). Only a
+    // person sets these, by editing this file and running `amc tools sign`; nothing is read from repo files.
+    afterEdits: z.object({ checks: z.array(z.object({ id: z.string(), title: z.string(), command: z.string(),
+      timeoutMs: z.number().int().optional() }).strict()).min(1).max(8) }).strict().optional()
   })
 });
 

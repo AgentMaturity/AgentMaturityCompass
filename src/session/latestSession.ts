@@ -39,7 +39,10 @@ export interface NativeSessionSummary {
   readonly canResume: boolean;
 }
 
-/** Every session in the workspace, most recently updated first (ties by session id). Never capped here. */
+/**
+ * Every session in the workspace, of EVERY agent, most recently updated first (ties by session id). Never capped here.
+ * `agentId` only decides `canResume`; a caller that lists one agent's sessions filters on `agentId` itself.
+ */
 export function summarizeNativeSessions(workspace: string, agentId: string, history: SessionEventHistory = loadSessionEventHistory({ workspace })): NativeSessionSummary[] {
   const grouped = new Map<string, typeof history.events[number][]>();
   for (const event of history.events) {

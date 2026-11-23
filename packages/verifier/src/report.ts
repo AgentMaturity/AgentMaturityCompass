@@ -81,7 +81,13 @@ export function buildReport(input: { evaluation: Evaluation; path: string; sha25
 }
 
 /** 0 every dimension passes; 1 any fails; 3 none fails and at least one is not evaluated. */
-export function exitCode(report: VerifierReport): 0 | 1 | 3 {
+export function exitCode(report: VerifierReport): 0 | 1 | 3 | 4 {
   const statuses = DIMENSIONS.map(dimension => report[dimension].status);
-  return statuses.includes("fail") ? 1 : statuses.includes("not-evaluated") ? 3 : 0;
+  if (statuses.includes("fail")) return 1;
+  // A session export whose record is intact, signed by an admitted key, sealed and complete: everything that can be
+  // checked was, and only what cannot be (whether the work was right; scope when nothing was expected) is open. Exit 4,
+  // so a script can tell it from 3 (something checkable was not: an unsealed session, an unchecked page or text).
+  const settled = (["integrity", "issuerAdmission", "freshness", "completeness"] as const).every(dimension => report[dimension].status === "pass");
+  if (report.artifact.kind === "session-export" && settled) return 4;
+  return statuses.includes("not-evaluated") ? 3 : 0;
 }

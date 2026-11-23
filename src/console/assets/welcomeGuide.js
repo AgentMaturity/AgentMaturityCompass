@@ -4,6 +4,9 @@
 // the browser allows it, which changes nothing now that it never opens on its own. No counts here: scripts/gen-counts.mjs
 // owns every published number.
 
+import { picture } from "./iconSet.js";
+import { routeTrack, moreInfo } from "./pageKit.js";
+
 export const GUIDE_STORAGE_KEY = "amc.welcomeGuide.dismissed.v1";
 
 const esc = (value) => String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
@@ -20,28 +23,31 @@ export const GLOSSARY = [
   ["Trust label", "A one-word summary of how much the score can be relied on, based on how strong the evidence is."]
 ];
 
-/** The guide's steps: a title and a body of static, trusted markup. */
+/** The guide's steps: a title and a body of static, trusted markup. Few words on sight; the rest one click away. */
 export const GUIDE_STEPS = [
   {
     title: "What AMC is",
-    body: `<p>AMC (Agent Maturity Compass) checks how far you can trust an AI agent.</p>
+    body: `<div class="welcome-guide-picture">${picture("check") ?? ""}</div>
+      <p class="welcome-guide-lead">Build, run and check AI agents for regulated work.</p>
+      ${moreInfo("How does it check?", `<p>AMC (Agent Maturity Compass) checks how far you can trust an AI agent.</p>
       <p>It does not take the agent's word for it. It looks at signed records of what the agent actually did, and gives
-      you a score and a list of gaps to fix.</p>`
+      you a score and a list of gaps to fix.</p>`)}`
   },
   {
     title: "How it works, in three moves",
-    body: `<ol class="welcome-guide-list">
+    body: `${routeTrack([{ label: "Connect or run", state: "todo" }, { label: "AMC records", state: "todo" }, { label: "You see results", state: "todo" }], { label: "How AMC works", className: "welcome-guide-route", diagram: true })}
+      <p>New here? Press "Run a task" on Home ("Try a demo task" in the demo).</p>
+      ${moreInfo("Tell me more", `<ol class="welcome-guide-list">
         <li><strong>Connect or run.</strong> Connect your agent, or run a task right here.</li>
         <li><strong>AMC records it.</strong> Every action goes into a tamper-evident log, so changes later would show.</li>
         <li><strong>You get results.</strong> A score, the gaps to work on, and evidence you can share.</li>
       </ol>
-      <p>Not sure where to start? "Try a demo task" on Home shows it working with no setup. Every other page is under
-      "All features" in the menu.</p>`
+      <p>Every other page is under "More" in the menu.</p>`)}`
   },
   {
     title: "Words you will see",
-    body: `<dl class="welcome-guide-glossary">${GLOSSARY.map(([term, text]) => `<dt>${esc(term)}</dt><dd>${esc(text)}</dd>`).join("")}</dl>
-      <p class="muted">You can open this guide again any time with "How AMC works" at the top of the page.</p>`
+    body: `<div class="welcome-guide-glossary">${GLOSSARY.map(([term, text]) => `<details class="welcome-guide-term"><summary>${esc(term)}</summary><p>${esc(text)}</p></details>`).join("")}</div>
+      <p class="muted">Press a word to read what it means. The ? button at the top opens this guide again.</p>`
   }
 ];
 
@@ -52,7 +58,6 @@ export function guideStepHtml(index) {
   const last = at === GUIDE_STEPS.length - 1;
   return `
     <div class="welcome-guide-head">
-      <span class="studio-kicker">Welcome to AMC</span>
       <span id="welcomeGuideProgress" class="muted">Step ${at + 1} of ${GUIDE_STEPS.length}</span>
     </div>
     <progress max="${GUIDE_STEPS.length}" value="${at + 1}" aria-labelledby="welcomeGuideProgress"></progress>
@@ -74,10 +79,10 @@ export const BANNER_TIPS = {
   trust: "How much the latest score can be relied on, based on the strength of its evidence. N/A means no scored run yet.",
   integrity: "A number from 0 to 1 for how complete and consistent the evidence behind the score is. N/A means no scored run yet.",
   evidence: "Whether the latest run has enough trustworthy evidence. NO RUN means nothing has been scored yet.",
-  claims: "ELIGIBLE means the evidence is strong enough to make a claim about this agent. BLOCKED means it is not yet.",
+  claims: "Can be claimed means the evidence is strong enough to make a claim about this agent. Blocked means it is not yet.",
   freezes: "How many pauses are stopping actions right now. 0 means none.",
   config: "SIGNED means AMC's settings carry a valid signature. Otherwise AMC switches to read-only to stay safe.",
-  trustMode: "Where AMC's signing keys live: LOCAL_VAULT is a locked store on this computer; NOTARY is a separate signing service.",
+  trustMode: "Where AMC's signing keys live: Local vault is a locked store on this computer; NOTARY is a separate signing service.",
   transparency: "Whether AMC's public log of signed records checks out. OK means no changes were found."
 };
 
@@ -92,9 +97,9 @@ export function bannerHelpHtml() {
 /** What each activation milestone means and, until it is complete, what to do next. */
 export const ACTIVATION_HELP = {
   connected_agent: ["AMC knows your agent and can see what it does.",
-    (agent) => `Use "Connect my agent" above, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
+    (agent) => `On Home, press "Connect an agent" under First steps, or run <code>amc connect --agent ${esc(agent)}</code> in your terminal.`],
   observed_action: ["AMC has recorded at least one real action by your agent.",
-    (agent) => `Run one task with a real model: open <a href="./native-tasks?agent=${encodeURIComponent(agent)}">Native Tasks</a>, or use your connected agent once. Only actions AMC records with a signed receipt count, so a task on the stand-in model does not.`],
+    (agent) => `Run one task with a real model: open <a href="./native-tasks?agent=${encodeURIComponent(agent)}">Run a task</a>, or use your connected agent once. Only actions AMC records with a signed receipt count, so a task on the stand-in model does not.`],
   control_decision: ["An AMC guardrail has checked one of your agent's actions and allowed or stopped it.",
     (agent) => `Turn on control mode: run <code>amc connect hooks install --provider claude-code --agent ${esc(agent)} --mode control</code> in your terminal (use <code>gemini-cli</code> or <code>pi</code> as the provider if that is your agent), then run one action.`],
   signed_proof: ["AMC has sealed that decision in a signed record you can show to others.",

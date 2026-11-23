@@ -560,6 +560,7 @@ Canonical approval routes:
 - The list response includes normalized filters, full-inventory integrity counts/reason codes, total matches, returned count, truncation, privacy-safe summaries, and `derivedView: true`, `recorded: false`, `proofEligible: false`. Invalid signatures, malformed or misbound artifacts, and orphan requests/decisions/consumption/signatures return no rows; filters never hide corruption.
 - Request-ID search is the only text search. Tool names, intent/work-order IDs, reviewer identities, reasons, commands, MCP servers, prompts, and payloads are not query fields or list output.
 - `GET /approvals/requests/:id` returns request, decision, quorum, request/chain/context integrity, and execution-readiness state.
+- `GET /approvals/requests/:id/view` returns the same without observing the request's expiry, so it writes nothing (the console's approvals list reads it).
 - `POST /approvals/requests/:id/decide` accepts only `APPROVE_EXECUTE`, `APPROVE_SIMULATE`, or `DENY` plus an optional bounded reason.
 - `POST /approvals/requests/:id/cancel` permits an `OWNER` to cancel only a pending request.
 - `GET /agent/approvals/:id/status` remains the lease-scoped agent polling route.

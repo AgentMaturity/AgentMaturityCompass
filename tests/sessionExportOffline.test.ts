@@ -143,7 +143,8 @@ describe("session export verifies offline", () => {
     const workspace = newWorkspace();
     const sessionId = runSession(workspace, false);
     expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(SessionExportError);
-    expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(/SESSION_NOT_SEALED/);
+    // UX-05: the refusal says why in words and names the command that exports it as a page.
+    expect(() => exportSessionBundle({ workspace, sessionId })).toThrow(/not sealed.*\/exit.*amc session export .* --out session-[0-9a-z-]{8}\.html/);
   });
 
   test("the CLI verifies a sealed bundle, viewer and canonical viewer JSON offline and refuses tampering", () => {
@@ -172,7 +173,9 @@ describe("session export verifies offline", () => {
     const verifiedText = spawnSync(process.execPath, [cli, "session", "verify-export", out, "--expect-monitor", monitorKeyFingerprint], { cwd: holder, env, encoding: "utf8" });
     expect(verifiedText.status, verifiedText.stderr).toBe(0);
     expect(verifiedText.stdout.split("\n").slice(0, 2)).toEqual([
-      "Session export verification PASSED", expect.stringMatching(/^Claim: Self-reported · Result: not evaluated/)
+      // UX-05: one plain line on what was checked and what was not, instead of PASSED beside "Result: not evaluated".
+      expect.stringMatching(/^Session export checked: \d+ recorded events are unchanged .* Not checked: a public log anchor, and whether what the records say is true\.$/),
+      expect.stringMatching(/^Claim: Self-reported · Result: not evaluated/)
     ]);
     // Legacy bundles may be reformatted. Viewer JSON must retain its exact canonical bytes, and HTML never falls back to JSON.
     const compactBundle = JSON.stringify(JSON.parse(readFileSync(out, "utf8")));

@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 import { afterEach, expect, it, vi } from "vitest";
 import { createBackup } from "../src/ops/backup/backupEngine.js";
 import { decryptBackupPayload } from "../src/ops/backup/backupCrypto.js";
-import { verifyLedgerIntegrity } from "../src/ledger/ledger.js";
+import { openLedger, verifyLedgerIntegrity } from "../src/ledger/ledger.js";
 import { extractValidatedTarGzipArchive } from "../src/security/safeTarArchive.js";
 import { withoutSqliteSidecars } from "../src/ops/backup/sqliteSnapshot.js";
 import { lockVault } from "../src/vault/vault.js";
@@ -34,9 +34,10 @@ const APPENDER = `
   while (Date.now() < end) {
     ledger.appendEvidence({ sessionId: "concurrent", runtime: "unknown", eventType: "stdout", payload: "row " + n + " " + "x".repeat(3000), inline: true });
     if (++n === 40) console.log("ready");
-    // Leave the write lock free for a moment every ten appends, as real writers do, so the backup's own
-    // audit row is not starved past SQLite's 5 s busy timeout on a loaded runner.
-    if (n % 10 === 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1);
+    // Leave the write lock free every ten appends, as real writers do, for longer than SQLite's longest busy-retry
+    // sleep (100 ms): a shorter gap falls between retries on a loaded runner and the backup's own audit row is
+    // starved past the 5 s busy timeout ("database is locked").
+    if (n % 10 === 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 120);
   }
   ledger.close();
   console.log("done " + n);
@@ -88,3 +89,24 @@ it("drops only the sidecars of SQLite files that are themselves backed up", () =
   expect(withoutSqliteSidecars([".amc/evidence.sqlite", ".amc/evidence.sqlite-wal", ".amc/evidence.sqlite-shm", ".amc/orphan.sqlite-wal", ".amc/notes-wal"]))
     .toEqual([".amc/evidence.sqlite", ".amc/orphan.sqlite-wal", ".amc/notes-wal"]);
 });
+
+// 2026-11-19: one cause of the flake ("database is locked" in createBackup's ops audit, CI 2026-11-17): every openLedger
+// ran INSERT OR IGNORE on schema_migrations, which takes SQLite's write lock even when the row exists, so a plain open
+// waited behind any other writer and failed after the 5 s busy timeout. An open now only reads unless the row is missing.
+// The ops audit append that follows still writes, so it can still wait behind a writer under the same timeout.
+it("opens the ledger while another process holds the write lock, without waiting for it", () => {
+  const root = mkdtempSync(join(tmpdir(), "amc-wal-open-"));
+  roots.push(root);
+  const workspace = join(root, "ws");
+  mkdirSync(workspace);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  openLedger(workspace).close();
+  const holder = new Database(join(workspace, ".amc", "evidence.sqlite"));
+  try {
+    holder.exec("BEGIN IMMEDIATE");
+    openLedger(workspace).close();
+  } finally {
+    holder.exec("ROLLBACK");
+    holder.close();
+  }
+}, 30_000);
