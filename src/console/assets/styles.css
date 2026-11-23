@@ -308,6 +308,12 @@ nav .nav-section {
   font-weight: 400;
 }
 
+/* On a phone each "More" link is its name alone, two to a row; the description stays on its title and at wider widths. */
+@media (max-width: 560px) {
+  .more-panel a .nav-desc { display: none; }
+  .more-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 .more-panel a.filtered-out {
   display: none;
 }

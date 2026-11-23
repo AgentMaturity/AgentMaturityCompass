@@ -192,6 +192,10 @@ describe("canonical navigation", () => {
     expect(hrefs(html).filter((href) => href === "./home")).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./assuranceRun"))).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./evidence"))).toHaveLength(1);
+    // open-items2 review: the page's own links come before "More", so on a phone they sit near the top of the sheet.
+    expect(html.indexOf('class="nav-features nav-pages"')).toBeLessThan(html.indexOf('class="nav-features nav-more"'));
+    // On a phone each "More" link is one line: its description is hidden there (kept on the title and at wider widths).
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/@media \(max-width: 560px\) \{\n  \.more-panel a \.nav-desc \{ display: none; \}\n  \.more-group \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}\n\}/);
   });
 
   test("renderCanonicalNav renders once, keeps the heading, and decorateNav still finds one toggle", () => {
