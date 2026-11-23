@@ -43,7 +43,7 @@ export function pinnedDirectoryRefusal(): string | null {
 
 /** A plain name in the pinned folder, as a path relative to it. */
 function own(name: string): string {
-  if (name === "" || name === "." || name === ".." || /[/\\]/.test(name)) throw new Error(`not a plain file or folder name: ${name}`);
+  if (name === "" || name === "." || name === ".." || name.includes("/") || name.includes("\0")) throw new Error(`not a plain file or folder name: ${name}`);
   return `./${name}`;
 }
 

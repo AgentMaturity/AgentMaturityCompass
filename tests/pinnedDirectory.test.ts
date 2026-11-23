@@ -65,7 +65,7 @@ describe("withPinnedDirectory", () => {
 
   it("refuses a name that is not a plain name, and a removal or a replace of something that is not a regular file", () => {
     mkdirSync(join(root, "folder"));
-    for (const name of ["a/b", "..", ".", ""]) expect(() => withPinnedDirectory(root, [], false, (dir) => dir.remove(name, noCheck))).toThrow(/not a plain/);
+    for (const name of ["a/b", "a\0b", "..", ".", ""]) expect(() => withPinnedDirectory(root, [], false, (dir) => dir.remove(name, noCheck))).toThrow(/not a plain/);
     expect(() => withPinnedDirectory(root, ["a/b"], true, () => undefined)).toThrow(/not a plain/);
     expect(() => withPinnedDirectory(root, [], false, (dir) => dir.remove("folder", noCheck))).toThrow(/not a regular file/);
     expect(() => withPinnedDirectory(root, [], false, (dir) => dir.write("folder", Buffer.from("x"), { createOnly: false, beforeCommit: noCheck }))).toThrow(/not a regular file/);

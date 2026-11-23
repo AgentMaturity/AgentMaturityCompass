@@ -299,6 +299,20 @@ describe("Pinned folder: a folder swapped for a link between the last check and 
   }, 120_000);
 });
 
+describe("A file name with a backslash (a plain character on macOS and Linux)", () => {
+  it("is put back and removed by a rewind, inside the workspace", async () => {
+    // MUTATION: refuse "\\" in pinnedDirectory.ts own() and both results are "failed".
+    writeFileSync(out("a\\b.txt"), "v0\n");
+    const edited = await run([scripted("fs.read", { path: "workspace/output/a\\b.txt" }), scripted("fs.write", { path: "workspace/output/a\\b.txt", content: "v1\n" })]);
+    expect(executeSessionRewind(planSessionRewind(workspace, edited, 1), { onlyClean: false }).results.map((result) => result.status)).toEqual(["restored"]);
+    expect(readFileSync(out("a\\b.txt"), "utf8")).toBe("v0\n");
+    const created = await run([scripted("fs.write", { path: "workspace/output/c\\d.txt", content: "created\n" }), scripted("fs.read", { path: "workspace/output/note.txt" })]);
+    expect(executeSessionRewind(planSessionRewind(workspace, created, 0), { onlyClean: false }).results.map((result) => result.status)).toEqual(["removed"]);
+    expect(readdirSync(join(workspace, "workspace", "output")).sort()).toEqual(["a\\b.txt", "note.txt"]);
+    expect(process.cwd()).toBe(workspace);
+  }, 120_000);
+});
+
 describe("H1: each safety rule has a test", () => {
   it("a path the signed tools policy now denies is a conflict", async () => {
     // MUTATION: drop deniedByPolicy in planSessionRewind and note.txt is planned as "restore".
