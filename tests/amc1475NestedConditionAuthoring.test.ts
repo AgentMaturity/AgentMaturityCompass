@@ -929,7 +929,7 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
     expect(evidenceLogicUi).toContain("read-only in Studio");
     expect(evidenceLogicUi).not.toContain("window.confirm");
     expect(readFileSync("src/console/pages/policypacks.html", "utf8"))
-      .toContain("app.js?v=20261122a");
+      .toContain("app.js?v=20261123a");
   });
 
   test("publishes adoption, source, no-copy, and release artifacts", () => {

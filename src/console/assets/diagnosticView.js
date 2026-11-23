@@ -1,6 +1,10 @@
 import { renderQuestionCard } from "./components/questionCard.js";
-import { esc, recordRows } from "./pageKit.js";
+import { statRowHtml } from "./dailyView.js";
+import { esc, moreInfo, recordRows } from "./pageKit.js";
 
+// The diagnostic in the route style: counts on top and, per area, how many questions have enough records as an ink bar;
+// every area's questions folded below under its name. Same reads, same cards, same filter buttons as before; nothing
+// dropped. The bars count what Studio returned (a question is "unknown" when it lacks records); no level is computed here.
 export async function renderDiagnosticViewPage(params) {
   const agentId = params.currentAgent();
   const [rendered, auto] = await Promise.all([
@@ -15,7 +19,8 @@ export async function renderDiagnosticViewPage(params) {
 
   const groups = new Map();
   for (const dimension of rendered.dimensions ?? []) {
-    groups.set(dimension.dimensionId, {
+    // Studio names a dimension's id `id`; questions point at it with `dimensionId`.
+    groups.set(dimension.dimensionId ?? dimension.id, {
       name: dimension.name,
       items: []
     });
@@ -38,40 +43,52 @@ export async function renderDiagnosticViewPage(params) {
     groups.set(question.dimensionId, row);
   }
 
-  const sections = [...groups.entries()]
-    .sort((a, b) => Number(a[0]) - Number(b[0]))
-    .map(([, group]) => {
+  const ordered = [...groups.entries()].sort((a, b) => Number(a[0]) - Number(b[0])).map(([, group]) => group);
+  // Per area: questions that have enough records to be answered, out of all its questions.
+  const answeredBars = ordered.map((group) => {
+    const answered = group.items.filter((row) => row.score && row.score.unknown !== true).length;
+    const share = group.items.length ? (answered / group.items.length) * 100 : 0;
+    return `<li><span class="bar-name">${esc(group.name)}</span><span class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:${share.toFixed(1)}%"></span></span>`
+      + `<span class="bar-value">${answered}/${group.items.length}</span></li>`;
+  }).join("");
+  const sections = ordered
+    .map((group) => {
       const cards = group.items
         .sort((a, b) => a.question.qId.localeCompare(b.question.qId))
         .map((row) => renderQuestionCard(row))
         .join("");
-      return `<section><h2>${esc(group.name)}</h2>${cards}</section>`;
+      return moreInfo(`${group.name} (${group.items.length})`, cards);
     })
     .join("");
+  const questionCount = (rendered.questions ?? []).length;
 
   params.root.innerHTML = `
     ${params.card("Diagnostic", `
-      <div class="grid">
-        <div><div class="muted">Agent</div><div class="tile-value">${esc(agentId)}</div></div>
-        <div><div class="muted">Score used</div><div class="tile-value" title="${esc(auto.runId ?? "")}">${auto.runId ? `latest (${esc(String(auto.runId).slice(0, 8))})` : "none"}</div></div>
-        <div><div class="muted">Integrity</div><div class="tile-value">${typeof auto.integrityIndex === "number" ? auto.integrityIndex.toFixed(3) : "n/a"}</div></div>
-        <div><div class="muted">Unknown Questions</div><div class="tile-value">${(auto.unknownReasons ?? []).length}</div></div>
-        <div><div class="muted">Low Confidence</div><div class="tile-value">${lowConfidenceCount}</div></div>
-        <div><div class="muted">High Risk</div><div class="tile-value">${highRiskCount}</div></div>
-      </div>
-      <div class="row wrap">
-        <button class="secondary" data-confidence-filter="all">All</button>
-        <button class="secondary" data-confidence-filter="low">Low confidence</button>
-        <button class="secondary" data-confidence-filter="risk">High risk</button>
-      </div>
+      ${statRowHtml([["Questions", questionCount], ["Not enough records", (auto.unknownReasons ?? []).length], ["Low confidence", lowConfidenceCount],
+        ["High risk", highRiskCount], ["Integrity", typeof auto.integrityIndex === "number" ? auto.integrityIndex.toFixed(3) : "n/a"]])}
       ${(auto.unknownReasons ?? []).length > 0 ? `<p class="status-bad"><strong>Not enough records</strong> to answer one or more questions.</p>` : ""}
-      ${auto.confidenceSummary ? recordRows(auto.confidenceSummary) : ""}
+      ${answeredBars ? `<p class="muted">Questions with enough records to answer, by area</p><ul class="ink-bars diag-bars" aria-label="Questions with enough records to answer, by area">${answeredBars}</ul>` : ""}
+      ${moreInfo("About this score", `
+        <div class="grid">
+          <div><div class="muted">Agent</div><div class="tile-value">${esc(agentId)}</div></div>
+          <div><div class="muted">Score used</div><div class="tile-value" title="${esc(auto.runId ?? "")}">${auto.runId ? `latest (${esc(String(auto.runId).slice(0, 8))})` : "none"}</div></div>
+        </div>
+        ${auto.confidenceSummary ? recordRows(auto.confidenceSummary) : ""}
+      `)}
     `)}
-    ${sections}
+    ${params.card("Questions by area", `
+      <div class="row wrap" role="group" aria-label="Show questions">
+        <button class="secondary" data-confidence-filter="all" aria-pressed="true">All</button>
+        <button class="secondary" data-confidence-filter="low" aria-pressed="false">Low confidence</button>
+        <button class="secondary" data-confidence-filter="risk" aria-pressed="false">High risk</button>
+      </div>
+      <div class="records-folds">${sections}</div>
+    `)}
   `;
   params.root.querySelectorAll("button[data-confidence-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       const filter = button.getAttribute("data-confidence-filter");
+      params.root.querySelectorAll("button[data-confidence-filter]").forEach((other) => other.setAttribute("aria-pressed", String(other === button)));
       params.root.querySelectorAll(".question-card").forEach((card) => {
         const show = filter === "low"
           ? card.getAttribute("data-low-confidence") === "true"
@@ -79,6 +96,10 @@ export async function renderDiagnosticViewPage(params) {
             ? card.getAttribute("data-high-risk") === "true"
             : true;
         card.style.display = show ? "" : "none";
+      });
+      // A filter opens the areas that have a matching question and folds the rest; "All" folds every area again.
+      params.root.querySelectorAll(".records-folds > details.more-info").forEach((area) => {
+        area.open = filter !== "all" && [...area.querySelectorAll(".question-card")].some((card) => card.style.display !== "none");
       });
     });
   });
