@@ -3,6 +3,7 @@
 // and re-checks every move (OWNER, bound approval); the form is a convenience, never the guard.
 import { apiGet, apiPost, ConsoleApiError } from "./api.js";
 import { routeTrack } from "./pageKit.js";
+import { plainCodeHtml } from "./plainError.js";
 
 const panel = document.getElementById("lifecyclePanel");
 const agentId = new URLSearchParams(location.search).get("agent") || "default";
@@ -27,7 +28,7 @@ async function render(message) {
   panel.innerHTML = `<h2 class="section-title">Agent state</h2>
     ${message ? `<p role="status">${esc(message)}</p>` : ""}
     ${routeTrack(steps, { label: `State of ${agentId}`, className: "route-small" })}
-    <p><strong>${esc(state.state)}</strong> (${esc(state.reason)}), claim kind ${esc(state.claimKind)}${state.implicit ? ", no lifecycle record yet" : ""}.</p>
+    <p><strong>${esc(state.state)}</strong> (${plainCodeHtml(state.reason, { small: true })}), claim kind ${plainCodeHtml(state.claimKind, { small: true })}${state.implicit ? ", no lifecycle record yet" : ""}.</p>
     ${fold(`Lifecycle: ${agentId}`, `<p>Approval ${esc(state.approvalId ?? "none")}; review due ${esc(when(state.reviewDueTs))}${state.reviewAdvisory ? " (advisory)" : ""}.</p>`)}
     ${fold(`Transitions (${list(transitions).length})`, table(["Time", "From", "To", "Reason", "Actor", "Approval"], list(transitions).map((row) =>
       [when(row.ts), row.from ?? "none", row.to, row.reason, row.actor?.username ?? "", row.approvalId ?? ""]), "No transition recorded."))}

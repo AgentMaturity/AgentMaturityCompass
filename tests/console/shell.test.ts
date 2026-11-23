@@ -172,12 +172,12 @@ describe("canonical navigation", () => {
     expect(html).toContain('<details class="nav-features nav-more"><summary>');
     expect(html).toContain('<span class="nav-label">More</span></summary><div class="more-panel"><input type="search" class="more-filter"');
     expect(html).toContain('<div class="more-group"><p class="nav-section">Rules and limits</p>');
-    for (const heading of ["Rules and limits", "Watch and review", "Teams and many agents", "Workspace"]) expect(html).toContain(`<p class="nav-section">${heading}</p>`);
+    for (const heading of ["Rules and limits", "Scores and reports", "Watch and review", "Teams and many agents", "Workspace"]) expect(html).toContain(`<p class="nav-section">${heading}</p>`);
     expect(html).not.toMatch(/>Login|>A4<|>Native Tasks</);
     // Sentence case: no label is all lowercase or all uppercase.
     for (const link of api.CANONICAL_NAV ?? []) expect(link.label[0], link.label).toBe(link.label[0]!.toUpperCase());
     expect(html).not.toContain("More pages");
-    expect(hrefs(html)).toHaveLength(32);
+    expect(hrefs(html)).toHaveLength(43);
     // The person is drawn at the foot of the rail, after the theme switch, and comes last for the keyboard too.
     expect(html.indexOf('href="./login"')).toBeGreaterThan(html.indexOf('class="rail-foot"'));
     expect(html).not.toMatch(/\son[a-z]+\s*=|javascript:/i);
@@ -192,11 +192,15 @@ describe("canonical navigation", () => {
     expect(hrefs(html).filter((href) => href === "./home")).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./assuranceRun"))).toHaveLength(1);
     expect(hrefs(html).filter((href) => href.startsWith("./evidence"))).toHaveLength(1);
+    // open-items2 review: the page's own links come before "More", so on a phone they sit near the top of the sheet.
+    expect(html.indexOf('class="nav-features nav-pages"')).toBeLessThan(html.indexOf('class="nav-features nav-more"'));
+    // On a phone each "More" link is one line: its description is hidden there (kept on the title and at wider widths).
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/@media \(max-width: 560px\) \{\n  \.more-panel a \.nav-desc \{ display: none; \}\n  \.more-group \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}\n  nav \.more-panel a \{ flex-wrap: nowrap;/);
   });
 
   test("renderCanonicalNav renders once, keeps the heading, and decorateNav still finds one toggle", () => {
     const doc = new FakeDocument();
-    const nav = pageWithNav(doc, ["./home", "./assurance", "./assuranceRun"], "assuranceRun");
+    const nav = pageWithNav(doc, ["./home", "./assuranceCert", "./assuranceRun"], "assuranceRun");
     api.renderCanonicalNav?.(nav);
     const first = nav.querySelectorAll("a").length;
     expect(nav.dataset.canonical).toBe("1");
@@ -206,7 +210,7 @@ describe("canonical navigation", () => {
     api.renderCanonicalNav?.(nav);
     expect(nav.querySelector("#a4NavLink")!.hasAttribute("hidden")).toBe(true);
     expect(nav.querySelectorAll("a")).toHaveLength(first);
-    expect(first).toBe(34);
+    expect(first).toBe(45);
     initShell(doc);
     expect(nav.querySelectorAll("a")).toHaveLength(first);
     expect(nav.querySelectorAll(".mobile-nav-toggle")).toHaveLength(1);
@@ -215,19 +219,52 @@ describe("canonical navigation", () => {
 
   test("initShell gives a page with its own short menu the canonical one, its links under More pages", () => {
     const doc = new FakeDocument();
-    const nav = pageWithNav(doc, ["./home", "./assurance", "./assuranceRun"], "assuranceRun");
+    const nav = pageWithNav(doc, ["./home", "./assuranceCert", "./assuranceRun"], "assuranceRun");
     initShell(doc);
     expect(nav.dataset.canonical).toBe("1");
-    expect(nav.querySelectorAll("a")).toHaveLength(34);
+    expect(nav.querySelectorAll("a")).toHaveLength(45);
     const section = nav.querySelectorAll("details").find((details) => details.textContent.startsWith("More pages"))!;
-    expect(section.querySelectorAll("a").map((anchor) => anchor.getAttribute("href"))).toEqual(["./assurance", "./assuranceRun"]);
+    expect(section.querySelectorAll("a").map((anchor) => anchor.getAttribute("href"))).toEqual(["./assuranceCert", "./assuranceRun"]);
     expect(section.open).toBe(true);
   });
 
   test("every canonical link names an existing console page", () => {
-    expect(api.CANONICAL_NAV?.length).toBe(32);
+    expect(api.CANONICAL_NAV?.length).toBe(43);
     for (const link of api.CANONICAL_NAV ?? []) {
       expect(existsSync(`src/console/pages/${link.href.replace(/^\.\//, "")}.html`), link.href).toBe(true);
+    }
+  });
+
+  // open-items2 lane (2026-11-23): every page the console serves is in the menu or reached from the page a person comes from.
+  // Each page left out of the menu names that parent page's file, which must link to it.
+  const PARENT_ONLY: Record<string, string> = {
+    a4Project: "assets/a4ListPage.js", advisories: "pages/forecast.html", assuranceCert: "assets/assurance.js", assuranceRun: "assets/assurance.js",
+    auditBinder: "assets/audit.js", auditRequests: "assets/audit.js", benchCompare: "pages/benchmarks.html", benchRegistry: "pages/benchmarks.html",
+    benchPortfolio: "pages/benchmarks.html", contextGraph: "pages/compass.html", diagnosticView: "pages/score.html",
+    evidenceDrilldown: "assets/components/questionCard.js", forecastAgent: "pages/forecast.html", forecastNode: "pages/forecast.html",
+    portfolioForecast: "pages/forecast.html", mechanic: "pages/equalizer.html", simulator: "pages/equalizer.html",
+    upgradeWizard: "pages/equalizer.html", "operator-plan": "pages/operator-inbox.html", "review-packet": "pages/operator-inbox.html",
+    valueAgent: "pages/value.html", valueKpis: "pages/value.html"
+  };
+  // dashboard.html is an old copy of Home (data-page="home") kept so old bookmarks still open; nothing links to it on purpose.
+  const OLD_ALIASES = ["dashboard"];
+
+  test("every console page is in the menu, reached from its parent page, or an old alias", () => {
+    const menu = new Set((api.CANONICAL_NAV ?? []).map((link) => link.href.replace(/^\.\//, "")));
+    for (const file of readdirSync("src/console/pages").filter((name) => name.endsWith(".html"))) {
+      const page = file.slice(0, -5);
+      if (menu.has(page) || OLD_ALIASES.includes(page)) continue;
+      const parent = PARENT_ONLY[page];
+      expect(parent, `${page} is in no menu and has no parent page`).toBeDefined();
+      expect(readFileSync(`src/console/${parent}`, "utf8"), `${parent} links to ${page}`).toMatch(new RegExp(`["'\`]\\./${page}(?:[?"'\`#$]|\\.html)`));
+    }
+    for (const page of Object.keys(PARENT_ONLY)) expect(menu.has(page), page).toBe(false);
+    expect(readFileSync("src/console/pages/dashboard.html", "utf8")).toContain('data-page="home"');
+    // Every page's static menu (the no-JavaScript fallback) lists the same "More" links as the canonical menu.
+    const features = (api.CANONICAL_NAV ?? []).filter((link) => link.group === "features").map((link) => link.href);
+    for (const file of readdirSync("src/console/pages").filter((name) => name.endsWith(".html") && name !== "benchPortfolio.html")) {
+      const block = readFileSync(`src/console/pages/${file}`, "utf8").match(/<summary>All features<\/summary>([\s\S]*?)<\/details>/)?.[1] ?? "";
+      expect(hrefs(block), file).toEqual(features);
     }
   });
 
@@ -409,9 +446,9 @@ describe("studio-ui inherit slice: one name per page, one 'Signed in as', a true
   });
 
   test("a page's own links carry their initials, shown in the folded rail where every file icon looks the same", () => {
-    const html = canonicalNavHtml([{ href: "./contextGraph", label: "x" }, { href: "./trust", label: "Trust" }]);
+    const html = canonicalNavHtml([{ href: "./contextGraph", label: "x" }, { href: "./auditBinder", label: "Binder" }]);
     expect(html).toContain('<span class="nav-initials" aria-hidden="true">CG</span><span class="nav-label">Context graph</span>');
-    expect(html).toContain('<span class="nav-initials" aria-hidden="true">T</span><span class="nav-label">Trust</span>');
+    expect(html).toContain('<span class="nav-initials" aria-hidden="true">AB</span><span class="nav-label">Audit binder</span>');
     const styles = readFileSync("src/console/assets/styles.css", "utf8");
     expect(styles).toContain(':root[data-rail="collapsed"] nav .nav-pages a .icon { display: none; }');
     expect(styles).not.toContain(':root[data-rail="collapsed"] nav .nav-pages a { display: none; }');

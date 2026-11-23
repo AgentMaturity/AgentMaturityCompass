@@ -723,11 +723,11 @@ async function renderEvidence() {
           <div><span class="muted">Index</span><code>${htmlEscape(shortId(latestTraceIndex.indexId, 18))}</code></div>
           <div><span class="muted">Entries</span><strong>${Number(latestTraceIndex.summary?.entryCount || 0)}</strong></div>
           <div><span class="muted">Clusters</span><strong>${Number(latestTraceIndex.summary?.clusterCount || 0)}</strong></div>
-          <div><span class="muted">Top class</span><strong>${htmlEscape(latestTraceIndex.summary?.topFailureClass || "-")}</strong></div>
+          <div><span class="muted">Top class</span><strong>${plainCodeHtml(latestTraceIndex.summary?.topFailureClass || "-", { small: true })}</strong></div>
         </div>
         <div class="scroll"><table><thead><tr><th>Class</th><th>Count</th><th>Impact</th><th>Snippet</th></tr></thead><tbody>${failureClusters.map((cluster) => `
           <tr>
-            <td>${htmlEscape(cluster.failureClass)}</td>
+            <td>${plainCodeHtml(cluster.failureClass, { small: true })}</td>
             <td>${Number(cluster.count || 0)}</td>
             <td>${Number(cluster.scoreImpact || 0)}</td>
             <td>${htmlEscape(cluster.sampleSnippet || "")}</td>
@@ -2919,8 +2919,8 @@ function renderFirewallEvents(events) {
 function renderRuntimeRunRows(runs) {
   return runs.map((run) => `<tr>
     <td>${htmlEscape(run.runId)}</td>
-    <td>${htmlEscape(run.status)}</td>
-    <td>${htmlEscape(run.currentStage)}</td>
+    <td>${plainCodeHtml(run.status, { small: true })}</td>
+    <td>${plainCodeHtml(run.currentStage, { small: true })}</td>
     <td>${Number(run.eventCount || 0)}</td>
     <td>${Number(run.alertCount || 0)}</td>
     <td>${Number(run.policyDecisionCount || 0)}</td>
@@ -2931,8 +2931,8 @@ function renderRuntimeRunRows(runs) {
 function renderRuntimeEventRows(events) {
   return events.map((event) => `<tr>
     <td>${htmlEscape(formatTime(event.createdAt))}</td>
-    <td>${htmlEscape(event.type)}</td>
-    <td>${htmlEscape(event.severity)}</td>
+    <td>${plainCodeHtml(event.type, { small: true })}</td>
+    <td>${plainCodeHtml(event.severity, { small: true })}</td>
     <td>${htmlEscape(event.stage || "-")}</td>
     <td>${htmlEscape(event.message || "")}</td>
     <td>${htmlEscape(event.links?.receiptId || "-")}</td>
@@ -2971,7 +2971,7 @@ async function renderRuntimeRuns() {
         </table>
       </div>`)}
       ${moreInfo("All runs as a table", `
-      <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.runId)} (${htmlEscape(latest.status)})` : "-"}</span></div>
+      <div class="studio-terminal-line"><strong>Latest</strong><span>${latest ? `${htmlEscape(latest.runId)} (${plainCodeHtml(latest.status, { small: true })})` : "-"}</span></div>
       <div class="scroll">
         <table>
           <thead><tr><th>Run</th><th>Status</th><th>Stage</th><th>Events</th><th>Alerts</th><th>Policy</th><th>Updated</th></tr></thead>
@@ -3044,7 +3044,7 @@ async function renderRuntimeRuns() {
 function renderFleetLifecycleRows(runs) {
   return runs.map((run) => `<tr>
     <td>${htmlEscape(run.fleetLifecycleRunId)}</td>
-    <td>${htmlEscape(run.status)}</td>
+    <td>${plainCodeHtml(run.status, { small: true })}</td>
     <td>${Number(run.childRuns?.length || 0)}</td>
     <td>${Number(run.cascadeFailures?.length || 0)}</td>
     <td>${htmlEscape(run.sharedResources?.manifest?.manifestId || "-")}</td>
@@ -3063,8 +3063,8 @@ function renderFleetTopologyRows(topology) {
 
 function renderFleetGraphIssueRows(issues) {
   return issues.map((issue) => `<tr>
-    <td>${htmlEscape(issue.severity || "-")}</td>
-    <td>${htmlEscape(issue.code || "-")}</td>
+    <td>${plainCodeHtml(issue.severity || "-", { small: true })}</td>
+    <td>${plainCodeHtml(issue.code || "-", { small: true })}</td>
     <td>${htmlEscape(issue.nodeId || issue.edgeId || "-")}</td>
     <td>${htmlEscape(issue.message || "")}</td>
   </tr>`).join("");
@@ -3148,8 +3148,8 @@ async function renderFleetLifecycle() {
         <table>
           <thead><tr><th>Severity</th><th>Type</th><th>Agents</th><th>Questions</th><th>Summary</th></tr></thead>
           <tbody>${cascadeFailures.map((failure) => `<tr>
-            <td>${htmlEscape(failure.severity)}</td>
-            <td>${htmlEscape(failure.type)}</td>
+            <td>${plainCodeHtml(failure.severity, { small: true })}</td>
+            <td>${plainCodeHtml(failure.type, { small: true })}</td>
             <td>${htmlEscape((failure.agentIds || []).join(", "))}</td>
             <td>${htmlEscape((failure.questionIds || []).join(", ") || "-")}</td>
             <td>${htmlEscape(failure.summary || "")}</td>
@@ -3271,7 +3271,7 @@ function renderOrgRunnerCard(runsResp, rolesResp) {
     .slice(0, 8)
     .map((run) => `<tr>
       <td>${htmlEscape(run.orgRunId)}</td>
-      <td>${htmlEscape(run.status)}</td>
+      <td>${plainCodeHtml(run.status, { small: true })}</td>
       <td>${Number(run.roleCount || 0)}</td>
       <td>${Number(run.heartbeatCount || 0)}</td>
       <td>${Number(run.blockedGateCount || 0)}</td>

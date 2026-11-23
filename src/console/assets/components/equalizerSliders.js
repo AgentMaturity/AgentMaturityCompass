@@ -1,3 +1,5 @@
+import { plainCodeHtml, plainCodesInTextHtml } from "../plainError.js";
+
 function esc(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -20,7 +22,7 @@ export function renderEqualizerSliders(container, rows) {
       <div class="card">
         <div class="row spaced">
           <strong>${esc(row.qId)}</strong>
-          <span class="pill">${esc(row.status || "OK")}</span>
+          <span class="pill">${plainCodeHtml(row.status || "OK", { small: true })}</span>
         </div>
         <div class="row wrap">
           <label>Measured <strong>${Number(row.measured || 0).toFixed(2)}</strong></label>
@@ -29,7 +31,7 @@ export function renderEqualizerSliders(container, rows) {
         </div>
         <input type="range" min="0" max="5" step="1" value="${Math.max(0, Math.min(5, Number(row.desired || 0)))}" data-qid="${esc(row.qId)}"
           aria-label="Target level for ${esc(row.qId)}${row.title ? `: ${esc(row.title)}` : ""}" />
-        ${reasons.length > 0 ? `<div class="muted">${esc(reasons.join("; "))}</div>` : ""}
+        ${reasons.length > 0 ? `<div class="muted">${plainCodesInTextHtml(reasons.join("; "))}</div>` : ""}
       </div>
     `;
     })

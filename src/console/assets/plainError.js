@@ -47,7 +47,22 @@ const CODE_WORDS = {
   OPERATOR: "Operator", VIEWER: "Viewer", ACTIVE: "Active", REVOKED: "Revoked", LOCAL_VAULT: "Local vault",
   VALID: "Checks out", INVALID: "Does not check out", PASS: "Passed", FAIL: "Failed", WARN: "Needs a look", ENFORCE: "Enforced",
   UNKNOWN: "Not known", MISSING: "Missing", UNVERIFIED: "Not verified", ELIGIBLE: "Can be claimed", BLOCKED: "Blocked", NOT_CONFIGURED: "Not set up",
-  SOC2: "SOC 2", NIST_AI_RMF: "NIST AI RMF", ISO_27001: "ISO 27001", ISO_42001: "ISO 42001", EU_AI_ACT: "EU AI Act"
+  SOC2: "SOC 2", NIST_AI_RMF: "NIST AI RMF", ISO_27001: "ISO 27001", ISO_42001: "ISO 42001", EU_AI_ACT: "EU AI Act",
+  // Server codes the console printed raw (open-items2 lane): readiness, evidence, advisories, A4 blockers.
+  RESOURCE_DRIFTED: "The agent's files changed since it was approved", WAITING: "Waiting", NO_SECOND_APPROVER: "Nobody else can approve",
+  NOT_EVALUATED: "Not checked yet", EMPTY_EVIDENCE: "No evidence recorded", SIGNATURE_INVALID: "A signature does not check out",
+  APPLICABILITY_UNRESOLVED: "Not yet known whether it applies", ASSURANCE_BASELINE_MISSING: "No assurance run yet",
+  MANIFEST_SCOPE_INVALID: "The record's scope does not check out", OBSERVED_HARDENED: "Observed and hardened", OBSERVED: "Observed",
+  CRITICAL: "Critical", INFO: "Information", INTEGRITY: "Integrity", DRIFT: "Drift", ANOMALY: "Something unusual",
+  RISK_INDEX: "Risk level", VALUE_REGRESSION: "Value went down", STABLE: "Steady", WORSENING: "Getting worse", IMPROVING: "Getting better",
+  LEGACY_MIGRATION: "Carried over from an older AMC", REASSESSMENT_REQUIRED: "Needs a new assessment", REVIEW_EXPIRED: "Its review ran out",
+  SELF_REPORTED: "Self-reported",
+  // Trace failure classes (src/watch/traceFailureIndex.ts) and typed-graph issues (src/fleet/typedGraph.ts).
+  PROMPT_ERROR: "Prompt problem", TOOL_MISUSE: "Tool used wrongly", INVALID_SCHEMA: "Wrong format", REFUSAL_OVERREACH: "Refused too much",
+  HALLUCINATED_CLAIM: "Made-up claim", UNSAFE_ACTION: "Risky action", LATENCY_TIMEOUT: "Too slow", COST_SPIKE: "Cost jumped",
+  RETRIEVAL_ERROR: "Lookup failed", MEMORY_ERROR: "Memory problem", HUMAN_REVIEW_GAP: "No human review", ORCHESTRATION_DEAD_END: "Agents got stuck",
+  POLICY_VIOLATION: "Broke a rule", UNKNOWN_FAILURE: "Other failure", DUPLICATE_NODE: "A part is listed twice", MISSING_NODE: "A part is missing",
+  CYCLE_DETECTED: "Goes round in a loop", AGENT: "Agent", NODE: "Team", WORKSPACE: "Workspace"
 };
 // Words joined by underscores are codes; a single word only when the table names it (so "AMC" stays "AMC").
 const isCode = (text) => /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$|^[a-z]+(?:_[a-z]+)+$/.test(text) || Object.hasOwn(CODE_WORDS, text);
@@ -63,10 +78,44 @@ export function plainCode(value) {
   return detail ? `${words} (${detail})` : words;
 }
 
-/** The same as HTML: the words, with the code on the title. */
-export function plainCodeHtml(value) {
+/** True when the words only re-case the code, underscores read as spaces. */
+const sameWords = (words, code) => words.toLowerCase() === String(code).toLowerCase().replaceAll("_", " ");
+
+const escHtml = (part) => String(part).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+
+/**
+ * The same as HTML: the words, with the code on the title. With `{ small: true }` a code joined by underscores also
+ * shows, as small secondary text after the words (a title is not seen on a phone); a one-word code ("UNKNOWN",
+ * "CRITICAL") reads as its words alone, the code on the title when the words differ. Then only a code the table names
+ * is put in words, and any other code is shown as it came.
+ */
+export function plainCodeHtml(value, { small = false } = {}) {
   const text = String(value ?? "");
-  const esc = (part) => part.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+  const head = text.split(":")[0];
+  if (small) {
+    if (!Object.hasOwn(CODE_WORDS, head.toUpperCase()) || !isCode(head)) return escHtml(text);
+    const words = plainCode(text);
+    // Words that only re-case the code ("CRITICAL" as "Critical", "NIST_AI_RMF" as "NIST AI RMF") need no second copy.
+    const same = sameWords(words, text);
+    if (head.includes("_") && !same) return `<span class="code-word">${escHtml(words)}</span> <small class="code-note">${escHtml(text)}</small>`;
+    return `<span class="code-word"${same ? "" : ` title="Code: ${escHtml(text)}"`}>${escHtml(words)}</span>`;
+  }
   const words = plainCode(text);
-  return words === text ? esc(text) : `<span class="code-word" title="Code: ${esc(text)}">${esc(words)}</span>`;
+  return words === text ? escHtml(text) : `<span class="code-word" title="Code: ${escHtml(text)}">${escHtml(words)}</span>`;
+}
+
+/**
+ * A server sentence with codes inside it ("evidence is INSUFFICIENT_EVIDENCE and not claim-ready"): each code the table
+ * names reads as its words in lower case with the code after them as small text, its numbers kept ("INTEGRITY_BELOW_MIN:
+ * 0.000<0.850" reads "integrity is below the minimum (0.000, minimum 0.850)"); everything else, unknown codes included,
+ * is unchanged.
+ */
+export function plainCodesInTextHtml(value) {
+  return String(value ?? "").split(/\b([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+(?::[\d.]+<[\d.]+)?)\b/).map((part, at) => {
+    const code = part.split(":")[0];
+    if (at % 2 === 0 || !Object.hasOwn(CODE_WORDS, code)) return escHtml(part);
+    const words = plainCode(part);
+    const lower = /^[A-Z][a-z]/.test(words) ? `${words.charAt(0).toLowerCase()}${words.slice(1)}` : words;
+    return `<span class="code-word">${escHtml(lower)}</span>${sameWords(CODE_WORDS[code], code) ? "" : ` <small class="code-note">${escHtml(code)}</small>`}`;
+  }).join("");
 }
