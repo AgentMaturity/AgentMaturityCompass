@@ -179,9 +179,9 @@ export function surfaceTilesHtml(definitions, order, surfaces) {
   return `<ul class="surface-chips" aria-label="The eight parts of AMC for this agent">${tiles}</ul>${moreInfo("What each part says", `<ul>${words}</ul>`)}`;
 }
 
-/** Counts as a row of small ink numbers with their names. `items` is [[label, count], ...]. */
+/** Counts as a row of small ink numbers with their names. `items` is [[label, count, tone?], ...]; a tone ("status-bad") is the card's class. */
 export function statRowHtml(items) {
-  return `<ul class="stat-row">${list(items).map(([label, count]) => `<li><strong>${esc(count ?? 0)}</strong><span>${esc(label)}</span></li>`).join("")}</ul>`;
+  return `<ul class="stat-row">${list(items).map(([label, count, tone]) => `<li${tone ? ` class="${esc(tone)}"` : ""}><strong>${esc(count ?? 0)}</strong><span>${esc(label)}</span></li>`).join("")}</ul>`;
 }
 
 const STATIONS = ["environment", "health", "wealth", "education", "mobility", "technology", "governance"];

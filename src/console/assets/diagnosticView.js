@@ -61,12 +61,12 @@ export async function renderDiagnosticViewPage(params) {
     })
     .join("");
   const questionCount = (rendered.questions ?? []).length;
+  const unknownCount = (auto.unknownReasons ?? []).length;
 
   params.root.innerHTML = `
     ${params.card("Diagnostic", `
-      ${statRowHtml([["Questions", questionCount], ["Not enough records", (auto.unknownReasons ?? []).length], ["Low confidence", lowConfidenceCount],
+      ${statRowHtml([["Questions", questionCount], ["Not enough records", unknownCount, unknownCount > 0 ? "status-bad" : ""], ["Low confidence", lowConfidenceCount],
         ["High risk", highRiskCount], ["Integrity", typeof auto.integrityIndex === "number" ? auto.integrityIndex.toFixed(3) : "n/a"]])}
-      ${(auto.unknownReasons ?? []).length > 0 ? `<p class="status-bad"><strong>Not enough records</strong> to answer one or more questions.</p>` : ""}
       ${answeredBars ? `<p class="muted">Questions with enough records to answer, by area</p><ul class="ink-bars diag-bars" aria-label="Questions with enough records to answer, by area">${answeredBars}</ul>` : ""}
       ${moreInfo("About this score", `
         <div class="grid">

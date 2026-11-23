@@ -15,6 +15,7 @@ export class FakeElement {
   readonly children: FakeElement[] = [];
   readonly dataset: Record<string, string> = {};
   readonly listeners = new Map<string, Listener[]>();
+  readonly style: Record<string, string> = {};
   parent: FakeElement | null = null;
   private ownText = "";
 
@@ -79,13 +80,17 @@ export class FakeElement {
     for (const listener of this.listeners.get("click") ?? []) listener({ type: "click", preventDefault: () => {} });
   }
 
+  /** Tag, .class, #id and [attribute] compounds, and one "parent > child" step. */
   matches(selector: string): boolean {
-    const match = /^([a-z0-9]*)((?:\.[\w-]+)*)(?:#([\w-]+))?$/i.exec(selector.trim());
+    const steps = selector.split(">").map((step) => step.trim());
+    if (steps.length === 2) return this.matches(steps[1]!) && Boolean(this.parent?.matches(steps[0]!));
+    const match = /^([a-z0-9]*)((?:\.[\w-]+)*)(?:#([\w-]+))?((?:\[[\w-]+\])*)$/i.exec(selector.trim());
     if (!match) throw new Error(`fakeDom: unsupported selector ${selector}`);
-    const [, tag, classes, id] = match;
+    const [, tag, classes, id, attrs] = match;
     return (!tag || this.tagName === tag.toUpperCase())
       && classes.split(".").filter(Boolean).every((name) => this.classList.contains(name))
-      && (!id || this.id === id);
+      && (!id || this.id === id)
+      && [...attrs.matchAll(/\[([\w-]+)\]/g)].every(([, name]) => this.hasAttribute(name!));
   }
   querySelectorAll(selector: string): FakeElement[] {
     const found: FakeElement[] = [];
