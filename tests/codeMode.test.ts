@@ -327,6 +327,27 @@ describe("the host treats worker traffic as hostile", () => {
     expect(dispatches, "the second forged message must be dropped").toBe(1);
   });
 
+  it("does not admit a call posted after the program's own verdict", async () => {
+    // Both messages are queued in one turn, so the call reaches the host after the verdict stopped the run.
+    let dispatches = 0;
+    const runner = new CodeModeRunner({
+      confined: true,
+      dispatch: async () => { dispatches += 1; return { ok: true, value: "late" }; }
+    });
+
+    const outcome = await runner.run(`
+      const { parentPort } = require("node:worker_threads");
+      parentPort.postMessage({ kind: "done", value: "first" });
+      parentPort.postMessage({ kind: "call", id: 1, name: "echo", args: {} });
+      await new Promise((r) => setTimeout(r, 200));
+      return "never";
+    `);
+
+    expect(outcome.value, "the first verdict stands").toBe("first");
+    expect(dispatches, "a stopped run dispatches nothing").toBe(0);
+    expect(outcome.calls, "and records no call").toEqual([]);
+  });
+
   it("survives junk messages instead of crashing the host", async () => {
     // A throw in the host's message listener takes down the HOST process, not
     // the worker that sent the junk. Dropping is the only safe response.
