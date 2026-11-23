@@ -1,4 +1,5 @@
 import { renderEvidenceChip } from "./evidenceChip.js";
+import { plainCodeHtml, plainCodesInTextHtml } from "../plainError.js";
 
 function esc(value) {
   return String(value)
@@ -28,14 +29,14 @@ export function renderQuestionCard(params) {
       <div class="row wrap">
         <span><strong>Measured:</strong> ${typeof params.score?.measuredScore === "number" ? params.score.measuredScore : "n/a"}</span>
         <span><strong>Target:</strong> ${params.question.ownerTarget === null ? "(not set)" : params.question.ownerTarget}</span>
-        <span><strong>Status:</strong> ${unknown ? "UNKNOWN" : "OK"}</span>
+        <span><strong>Status:</strong> ${unknown ? plainCodeHtml("UNKNOWN", { small: true }) : "OK"}</span>
         <span><strong>Coverage:</strong> ${typeof params.score?.evidenceCoverage === "number" ? params.score.evidenceCoverage.toFixed(2) : "n/a"}</span>
         <span><strong>Uncertainty:</strong> ${esc(controls.uncertaintyLevel || "n/a")}</span>
         <span><strong>Auto-fix:</strong> ${controls.autoFixAllowed ? "allowed" : "review"}</span>
       </div>
       ${chips.length > 0 ? `<div class="row wrap">${chips}</div>` : ""}
-      ${reasons.length > 0 ? `<p class="status-bad"><strong>UNKNOWN reasons:</strong> ${esc(reasons.join(" | "))}</p>` : ""}
-      ${controls.downgradeReason ? `<p class="status-bad"><strong>Confidence gate:</strong> ${esc(controls.downgradeReason)}</p>` : ""}
+      ${reasons.length > 0 ? `<p class="status-bad"><strong>Why it is not known:</strong> ${plainCodesInTextHtml(reasons.join(" | "))}</p>` : ""}
+      ${controls.downgradeReason ? `<p class="status-bad"><strong>Confidence gate:</strong> ${plainCodesInTextHtml(controls.downgradeReason)}</p>` : ""}
       <div class="row wrap">
         ${drilldownHref ? `<a class="secondary" href="${drilldownHref}">Open evidence drilldown</a>` : `<span class="muted">Evidence drilldown appears after a run ID is available.</span>`}
       </div>

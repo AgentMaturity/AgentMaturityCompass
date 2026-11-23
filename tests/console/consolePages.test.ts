@@ -7,7 +7,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
-import { plainCode, plainCodeHtml, plainErrorText } from "../../src/console/assets/plainError.js";
+import { plainCode, plainCodeHtml, plainCodesInTextHtml, plainErrorText } from "../../src/console/assets/plainError.js";
 import { codeWords, keyWords, recordRows, recordDetails, workspacePath } from "../../src/console/assets/pageKit.js";
 import { renderValueEvidenceBanner } from "../../src/console/assets/components/valueEvidenceBanner.js";
 import { renderNavSession } from "../../src/console/assets/shell.js";
@@ -82,6 +82,50 @@ describe("code words shown as values read as words, with the code kept on the ti
     const app = readFileSync("src/console/assets/app.js", "utf8");
     expect(app).not.toMatch(/\? "ELIGIBLE" : "BLOCKED"}/);
     expect(app).not.toContain('integrationReady ? "VALID" : "NOT CONFIGURED"}');
+  });
+
+  // open-items2 lane (2026-11-23): server codes printed as the main text read as words first, the code after them as small text.
+  test("a server code reads as words with the code as small text; an unknown code stays as it came", () => {
+    expect(plainCodeHtml("RESOURCE_DRIFTED", { small: true }))
+      .toBe(`<span class="code-word">The agent's files changed since it was approved</span> <small class="code-note">RESOURCE_DRIFTED</small>`);
+    expect(plainCodeHtml("IND_FREEZE_EVENTS_V1", { small: true })).toBe("IND_FREEZE_EVENTS_V1");
+    expect(plainCodeHtml("<b>X_Y</b>", { small: true })).toBe("&lt;b&gt;X_Y&lt;/b&gt;");
+    expect(plainCodesInTextHtml("evidence is INSUFFICIENT_EVIDENCE and not claim-ready; SOME_NEW_CODE <b>"))
+      .toBe('evidence is <span class="code-word" title="Code: INSUFFICIENT_EVIDENCE">not enough evidence yet</span> and not claim-ready; SOME_NEW_CODE &lt;b&gt;');
+    // A table entry that starts with a name keeps its capitals inside a sentence.
+    expect(plainCodesInTextHtml("mapped to NIST_AI_RMF")).toContain(">NIST AI RMF<");
+    expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/\.code-note \{[^}]*color: var\(--muted\)/);
+  });
+
+  test("advisories, indicators, gaps, actions and question cards put words before a server code", async () => {
+    const { renderAdvisoryCards } = await import("../../src/console/assets/components/advisoryCard.js");
+    const box = { innerHTML: "" };
+    renderAdvisoryCards(box, [{ severity: "CRITICAL", category: "RISK_INDEX", advisoryId: "adv_1", summary: "s", scope: { type: "AGENT", id: "default" } }]);
+    // Words that only re-case the code carry no second copy of it.
+    expect(box.innerHTML).toContain('<span class="code-word">Critical</span> · <span class="code-word">Risk level</span> <small class="code-note">RISK_INDEX</small>');
+    expect(box.innerHTML).toContain('Scope: <span class="code-word">Agent</span> default');
+    const { renderIndicatorList } = await import("../../src/console/assets/components/indicatorList.js");
+    renderIndicatorList(box, [{ label: "Freeze events", direction: "STABLE", explanationTemplateId: "IND_FREEZE_EVENTS_V1" }]);
+    expect(box.innerHTML).toContain('<span class="code-word">Steady</span> <small class="code-note">STABLE</small>');
+    expect(box.innerHTML).toContain("<strong>Freeze events</strong>");
+    expect(box.innerHTML).toContain('<small class="code-note">IND_FREEZE_EVENTS_V1</small>');
+    expect(box.innerHTML).not.toContain('<div class="muted">IND_');
+    const { renderActionCard } = await import("../../src/console/assets/components/actionCard.js");
+    expect(renderActionCard({ kind: "UNKNOWN" })).toContain('<span class="code-word">Not known</span> <small class="code-note">UNKNOWN</small>');
+    const { renderQuestionCard } = await import("../../src/console/assets/components/questionCard.js");
+    const card = renderQuestionCard({ question: { qId: "AMC-1.1", title: "t", howThisApplies: "h", ownerTarget: 1 }, score: { unknown: true, reasons: ["EMPTY_EVIDENCE"], confidenceControls: {} } });
+    expect(card).toContain('<strong>Status:</strong> <span class="code-word">Not known</span>');
+    expect(card).toContain('Why it is not known:</strong> <span class="code-word" title="Code: EMPTY_EVIDENCE">no evidence recorded</span>');
+    expect(card).not.toContain("UNKNOWN reasons");
+    const { renderValueTile } = await import("../../src/console/assets/components/valueTile.js");
+    expect(renderValueTile({ label: "Functional", status: "UNKNOWN" })).toContain('<div class="tile-value">No number yet</div>');
+    const operator = readFileSync("src/console/assets/operator.js", "utf8");
+    expect(operator).toContain('const codes = /^[A-Z_]+: ([A-Z_]+(?:, [A-Z_]+)*)$/.exec(String(text ?? ""));');
+    expect(operator).toContain("plainCodeHtml(item.severity, { small: true })");
+    expect(readFileSync("src/console/assets/lifecycle.js", "utf8")).toContain("plainCodeHtml(state.reason, { small: true })");
+    const { claimBadge } = await import("../../src/console/assets/components/claimBadge.js");
+    expect(claimBadge({ claimKind: "self_reported", statusDimensions: {} })).toContain(">Self-reported · not evaluated<");
+    expect(plainCodeHtml("legacy_migration", { small: true })).toBe('<span class="code-word">Carried over from an older AMC</span> <small class="code-note">legacy_migration</small>');
   });
 
   test("role pickers are checkboxes in words, not a multi-select of codes (C-27)", () => {

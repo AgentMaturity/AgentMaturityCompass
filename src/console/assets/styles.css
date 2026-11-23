@@ -2514,6 +2514,9 @@ button.station-tile[aria-pressed="true"] { border-color: var(--accent); box-shad
   .governor-grid td:not(.on):not([colspan]) { display: none; }
 }
 
+/* A server code after its plain words (plainError.js plainCodeHtml { small: true }): small, muted, never the main text. */
+.code-note { display: inline-block; margin-left: 4px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; font-weight: 400; overflow-wrap: anywhere; }
+
 /* The diagnostic's per-area bars end in "answered/total", wider than a level's number. */
 .ink-bars.diag-bars li { grid-template-columns: minmax(120px, 260px) 1fr 52px; }
 @media (max-width: 560px) { .ink-bars.diag-bars li { grid-template-columns: 1fr 52px; } }

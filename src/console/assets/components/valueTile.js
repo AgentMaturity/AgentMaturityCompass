@@ -23,7 +23,7 @@ export function renderValueTile(params) {
   const tone = score === "UNKNOWN" ? "status-warn" : "status-ok";
   return `<div class="card">
     <div class="muted">${label}</div>
-    <div class="tile-value">${escapeHtml(score)}</div>
+    <div class="tile-value">${score === "UNKNOWN" ? "No number yet" : escapeHtml(score)}</div>
     <div class="${tone}">${status}</div>
   </div>`;
 }

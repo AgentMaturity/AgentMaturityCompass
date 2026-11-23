@@ -3,7 +3,7 @@
 // reasons are printed as Studio returned them. The inbox never says "all clear": an empty list says what was evaluated
 // and when, and an unavailable source is shown as such. Studio re-checks every action; buttons are conveniences.
 import { apiGet, apiPost, showSignIn, whoami } from "./api.js";
-import { plainCode, plainErrorText } from "./plainError.js";
+import { plainCode, plainCodeHtml, plainErrorText } from "./plainError.js";
 import { notReadyWords, say as sayPlain } from "./a4Plain.js";
 import { renderControlStatusChip } from "./components/controlStatusChip.js";
 import { createReviewTimer } from "./reviewTimer.js";
@@ -20,9 +20,13 @@ const table = (head, rows, empty) => (rows.length ? `<div class="scroll"><table>
 // Inbox kinds and the A4 source's "WAITING: GATE_PENDING" next actions in words; the code stays on the title.
 const titled = (code, words) => `<span title="Code: ${esc(code)}">${esc(words)}</span>`;
 const kindHtml = (kind) => titled(kind, sayPlain("blockerKind", kind).replace(/^./, (first) => first.toUpperCase()));
+// "BLOCKED: RESOURCE_DRIFTED, GATE_PENDING" reads as the reasons in words, the codes after them as small text.
 const nextActionHtml = (text) => {
-  const codes = /^[A-Z_]+: ([A-Z_]+)$/.exec(String(text ?? ""));
-  return codes ? titled(text, notReadyWords({ reasonCodes: [codes[1]] }) ?? plainCode(codes[1])) : esc(text);
+  const codes = /^[A-Z_]+: ([A-Z_]+(?:, [A-Z_]+)*)$/.exec(String(text ?? ""));
+  if (!codes) return esc(text);
+  const reasons = codes[1].split(", ");
+  const words = (reasons.length === 1 ? notReadyWords({ reasonCodes: reasons }) : undefined) ?? reasons.map(plainCode).join("; ");
+  return `${esc(words)} <small class="code-note">${esc(text)}</small>`;
 };
 const say = (text, bad = false) => { status.textContent = text; status.className = bad ? "status-bad" : "muted"; };
 /** A failure is said at the top and, when a form or button sent it, beside that control (C-05), in plain words (C-10). */
@@ -58,7 +62,7 @@ async function planPage() {
   const plans = list(data.plans);
   const options = plans.map((plan) => `<option value="${esc(plan.planDigest)}">${esc(plan.planDigest.slice(0, 19))}… ${esc(plan.status)} ${esc(plan.source.kind)}${plan.active ? " (active)" : ""}</option>`).join("");
   root.innerHTML = `${sourcesLine(data.sources)}
-    ${table(["Plan", "Status", "Source", "Signature", "Active", "Previous"], plans.map((plan) => [code(plan.planDigest), esc(plan.status),
+    ${table(["Plan", "Status", "Source", "Signature", "Active", "Previous"], plans.map((plan) => [code(plan.planDigest), plainCodeHtml(plan.status, { small: true }),
       esc(plan.source.kind === "a4" ? `A4 ${plan.source.projectId} r${plan.source.revisionNo}` : "control journal"), esc(plan.signature), plan.active ? "yes" : "no",
       plan.previousPlanDigest ? code(plan.previousPlanDigest) : "none"]), "No plan was found. A plan an A4 project signs at Adapt Build appears here.")}
     <form id="diffForm" class="card"><h2>Compare</h2>
@@ -112,7 +116,7 @@ async function inboxPage() {
   root.innerHTML = `${sourcesLine(inbox.sources)}
     ${a4Off ? '<p class="muted">A4 agent projects are turned off in this workspace, so they are not checked here.</p>' : ""}
     <p class="muted">Expiry window: ${esc(inbox.expiryWindowDays)} days. Evaluated ${esc(inbox.evaluatedAt)}.</p>
-    ${table(["Kind", "Severity", "Control", "Agent", "Due", "Next action"], items.map((item) => [kindHtml(item.kind), esc(item.severity),
+    ${table(["Kind", "Severity", "Control", "Agent", "Due", "Next action"], items.map((item) => [kindHtml(item.kind), plainCodeHtml(item.severity, { small: true }),
       item.controlId ? code(item.controlId) : "", esc(item.subject?.agentId ?? ""), item.dueTs ? esc(new Date(item.dueTs).toISOString()) : "",
       `${nextActionHtml(item.nextAction)}${list(item.links).map((link) => ` <a href="${esc(link)}">open</a>`).join("")}`]), empty)}`;
 }

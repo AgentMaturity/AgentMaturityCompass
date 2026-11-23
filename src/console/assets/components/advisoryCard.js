@@ -1,3 +1,5 @@
+import { plainCodeHtml } from "../plainError.js";
+
 function htmlEscape(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -17,11 +19,11 @@ export function renderAdvisoryCards(container, advisories) {
         .map(
           (row) => `<article class="card">
         <div class="row spaced">
-          <strong>${htmlEscape(row.severity || "INFO")} · ${htmlEscape(row.category || "-")}</strong>
+          <strong>${plainCodeHtml(row.severity || "INFO", { small: true })} · ${plainCodeHtml(row.category || "-", { small: true })}</strong>
           <code>${htmlEscape(row.advisoryId || "-")}</code>
         </div>
         <p>${htmlEscape(row.summary || "")}</p>
-        <div class="muted">Scope: ${htmlEscape(`${row.scope?.type || "UNKNOWN"}:${row.scope?.id || "-"}`)}</div>
+        <div class="muted">Scope: ${plainCodeHtml(row.scope?.type || "UNKNOWN", { small: true })} ${htmlEscape(row.scope?.id || "-")}</div>
         <div class="muted">Evidence refs: runs=${(row.evidenceRefs?.runIds || []).length}, events=${(row.evidenceRefs?.eventHashes || []).length}</div>
       </article>`
         )

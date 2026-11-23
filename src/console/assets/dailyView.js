@@ -4,7 +4,7 @@
 // A score is drawn in ink, never in the accent and never beside a tick or a badge.
 import { esc, moreInfo, personChip, routeTrack } from "./pageKit.js";
 import { icon } from "./iconSet.js";
-import { plainCode } from "./plainError.js";
+import { plainCode, plainCodesInTextHtml } from "./plainError.js";
 
 const list = (value) => (Array.isArray(value) ? value : []);
 const num = (value) => (Number.isFinite(Number(value)) ? Number(value) : 0);
@@ -174,7 +174,7 @@ export function surfaceTilesHtml(definitions, order, surfaces) {
   }).join("");
   const words = list(order).map((name) => {
     const definition = byName.get(name) ?? { surface: name };
-    return `<li><strong>${esc(definition.surface)}</strong>: ${esc(definition.headline ?? "")}. <span class="muted">${esc(surfaces?.[name]?.summary || definition.description || "")}</span></li>`;
+    return `<li><strong>${esc(definition.surface)}</strong>: ${esc(definition.headline ?? "")}. <span class="muted">${plainCodesInTextHtml(surfaces?.[name]?.summary || definition.description || "")}</span></li>`;
   }).join("");
   return `<ul class="surface-chips" aria-label="The eight parts of AMC for this agent">${tiles}</ul>${moreInfo("What each part says", `<ul>${words}</ul>`)}`;
 }
