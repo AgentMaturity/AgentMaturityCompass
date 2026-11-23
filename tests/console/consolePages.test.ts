@@ -91,7 +91,13 @@ describe("code words shown as values read as words, with the code kept on the ti
     expect(plainCodeHtml("IND_FREEZE_EVENTS_V1", { small: true })).toBe("IND_FREEZE_EVENTS_V1");
     expect(plainCodeHtml("<b>X_Y</b>", { small: true })).toBe("&lt;b&gt;X_Y&lt;/b&gt;");
     expect(plainCodesInTextHtml("evidence is INSUFFICIENT_EVIDENCE and not claim-ready; SOME_NEW_CODE <b>"))
-      .toBe('evidence is <span class="code-word" title="Code: INSUFFICIENT_EVIDENCE">not enough evidence yet</span> and not claim-ready; SOME_NEW_CODE &lt;b&gt;');
+      .toBe('evidence is <span class="code-word">not enough evidence yet</span> <small class="code-note">INSUFFICIENT_EVIDENCE</small> and not claim-ready; SOME_NEW_CODE &lt;b&gt;');
+    // A code with numbers after it keeps them, in words; the code itself still shows after the words.
+    expect(plainCodesInTextHtml("gate INTEGRITY_BELOW_MIN:0.000<0.850."))
+      .toBe('gate <span class="code-word">integrity is below the minimum (0.000, minimum 0.850)</span> <small class="code-note">INTEGRITY_BELOW_MIN</small>.');
+    // A one-word code is its words alone (no shouting copy after them), the code on the title when the words differ.
+    expect(plainCodeHtml("UNKNOWN", { small: true })).toBe('<span class="code-word" title="Code: UNKNOWN">Not known</span>');
+    expect(plainCodeHtml("CRITICAL", { small: true })).toBe('<span class="code-word">Critical</span>');
     // A table entry that starts with a name keeps its capitals inside a sentence.
     expect(plainCodesInTextHtml("mapped to NIST_AI_RMF")).toContain(">NIST AI RMF<");
     expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/\.code-note \{[^}]*color: var\(--muted\)/);
@@ -104,19 +110,26 @@ describe("code words shown as values read as words, with the code kept on the ti
     // Words that only re-case the code carry no second copy of it.
     expect(box.innerHTML).toContain('<span class="code-word">Critical</span> · <span class="code-word">Risk level</span> <small class="code-note">RISK_INDEX</small>');
     expect(box.innerHTML).toContain('Scope: <span class="code-word">Agent</span> default');
+    // An id that only repeats the type is left out ("Workspace", not "Workspace workspace").
+    renderAdvisoryCards(box, [{ severity: "INFO", category: "DRIFT", scope: { type: "WORKSPACE", id: "workspace" } }]);
+    expect(box.innerHTML).toContain('Scope: <span class="code-word">Workspace</span></div>');
     const { renderIndicatorList } = await import("../../src/console/assets/components/indicatorList.js");
     renderIndicatorList(box, [{ label: "Freeze events", direction: "STABLE", explanationTemplateId: "IND_FREEZE_EVENTS_V1" }]);
-    expect(box.innerHTML).toContain('<span class="code-word">Steady</span> <small class="code-note">STABLE</small>');
+    expect(box.innerHTML).toContain('<span class="code-word" title="Code: STABLE">Steady</span> (z=');
     expect(box.innerHTML).toContain("<strong>Freeze events</strong>");
     expect(box.innerHTML).toContain('<small class="code-note">IND_FREEZE_EVENTS_V1</small>');
     expect(box.innerHTML).not.toContain('<div class="muted">IND_');
     const { renderActionCard } = await import("../../src/console/assets/components/actionCard.js");
-    expect(renderActionCard({ kind: "UNKNOWN" })).toContain('<span class="code-word">Not known</span> <small class="code-note">UNKNOWN</small>');
+    expect(renderActionCard({ kind: "UNKNOWN" })).toContain('<span class="code-word" title="Code: UNKNOWN">Not known</span></strong>');
     const { renderQuestionCard } = await import("../../src/console/assets/components/questionCard.js");
     const card = renderQuestionCard({ question: { qId: "AMC-1.1", title: "t", howThisApplies: "h", ownerTarget: 1 }, score: { unknown: true, reasons: ["EMPTY_EVIDENCE"], confidenceControls: {} } });
-    expect(card).toContain('<strong>Status:</strong> <span class="code-word">Not known</span>');
-    expect(card).toContain('Why it is not known:</strong> <span class="code-word" title="Code: EMPTY_EVIDENCE">no evidence recorded</span>');
+    expect(card).toContain("<strong>Status:</strong> Not known</span>");
+    expect(card).toContain('Why it is not known:</strong> <span class="code-word">no evidence recorded</span> <small class="code-note">EMPTY_EVIDENCE</small>');
     expect(card).not.toContain("UNKNOWN reasons");
+    const { renderEtaCard } = await import("../../src/console/assets/components/etaCard.js");
+    const eta = { innerHTML: "" };
+    renderEtaCard(eta, { status: "UNKNOWN", reasons: ["insufficient completion history"] });
+    expect(eta.innerHTML).toContain("<strong>ETA:</strong> Not known (insufficient completion history)");
     const { renderValueTile } = await import("../../src/console/assets/components/valueTile.js");
     expect(renderValueTile({ label: "Functional", status: "UNKNOWN" })).toContain('<div class="tile-value">No number yet</div>');
     const operator = readFileSync("src/console/assets/operator.js", "utf8");

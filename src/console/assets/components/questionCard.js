@@ -1,5 +1,5 @@
 import { renderEvidenceChip } from "./evidenceChip.js";
-import { plainCodeHtml, plainCodesInTextHtml } from "../plainError.js";
+import { plainCodesInTextHtml } from "../plainError.js";
 
 function esc(value) {
   return String(value)
@@ -29,7 +29,7 @@ export function renderQuestionCard(params) {
       <div class="row wrap">
         <span><strong>Measured:</strong> ${typeof params.score?.measuredScore === "number" ? params.score.measuredScore : "n/a"}</span>
         <span><strong>Target:</strong> ${params.question.ownerTarget === null ? "(not set)" : params.question.ownerTarget}</span>
-        <span><strong>Status:</strong> ${unknown ? plainCodeHtml("UNKNOWN", { small: true }) : "OK"}</span>
+        <span><strong>Status:</strong> ${unknown ? "Not known" : "OK"}</span>
         <span><strong>Coverage:</strong> ${typeof params.score?.evidenceCoverage === "number" ? params.score.evidenceCoverage.toFixed(2) : "n/a"}</span>
         <span><strong>Uncertainty:</strong> ${esc(controls.uncertaintyLevel || "n/a")}</span>
         <span><strong>Auto-fix:</strong> ${controls.autoFixAllowed ? "allowed" : "review"}</span>

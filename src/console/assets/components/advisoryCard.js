@@ -9,6 +9,13 @@ function htmlEscape(value) {
     .replaceAll("'", "&#39;");
 }
 
+/** "Workspace", or "Agent agent-7": the id follows the type only when it says something the type does not. */
+function scopeHtml(scope) {
+  const type = scope?.type || "UNKNOWN";
+  const id = String(scope?.id ?? "");
+  return `${plainCodeHtml(type, { small: true })}${id && id.toLowerCase() !== type.toLowerCase() ? ` ${htmlEscape(id)}` : ""}`;
+}
+
 export function renderAdvisoryCards(container, advisories) {
   if (!container) {
     return;
@@ -23,7 +30,7 @@ export function renderAdvisoryCards(container, advisories) {
           <code>${htmlEscape(row.advisoryId || "-")}</code>
         </div>
         <p>${htmlEscape(row.summary || "")}</p>
-        <div class="muted">Scope: ${plainCodeHtml(row.scope?.type || "UNKNOWN", { small: true })} ${htmlEscape(row.scope?.id || "-")}</div>
+        <div class="muted">Scope: ${scopeHtml(row.scope)}</div>
         <div class="muted">Evidence refs: runs=${(row.evidenceRefs?.runIds || []).length}, events=${(row.evidenceRefs?.eventHashes || []).length}</div>
       </article>`
         )

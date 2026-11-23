@@ -17,7 +17,7 @@ export function renderEtaCard(container, eta) {
   }
   if (!eta || eta.status !== "OK") {
     const reasons = Array.isArray(eta?.reasons) ? eta.reasons : ["insufficient completion history"];
-    container.innerHTML = `<p class="muted"><strong>ETA:</strong> UNKNOWN (${htmlEscape(reasons.join("; "))})</p>`;
+    container.innerHTML = `<p class="muted"><strong>ETA:</strong> Not known (${htmlEscape(reasons.join("; "))})</p>`;
     return;
   }
   container.innerHTML = `

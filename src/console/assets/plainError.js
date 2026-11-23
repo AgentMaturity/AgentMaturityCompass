@@ -81,19 +81,21 @@ export function plainCode(value) {
 const escHtml = (part) => String(part).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
 /**
- * The same as HTML: the words, with the code on the title. With `{ small: true }` the code also shows, as small
- * secondary text after the words (a title is not seen on a phone); then only a code the table names is put in words,
- * and any other code is shown as it came.
+ * The same as HTML: the words, with the code on the title. With `{ small: true }` a code joined by underscores also
+ * shows, as small secondary text after the words (a title is not seen on a phone); a one-word code ("UNKNOWN",
+ * "CRITICAL") reads as its words alone, the code on the title when the words differ. Then only a code the table names
+ * is put in words, and any other code is shown as it came.
  */
 export function plainCodeHtml(value, { small = false } = {}) {
   const text = String(value ?? "");
+  const head = text.split(":")[0];
   if (small) {
-    const known = Object.hasOwn(CODE_WORDS, text.split(":")[0].toUpperCase()) && isCode(text.split(":")[0]);
-    if (!known) return escHtml(text);
-    // Words that only re-case the code ("CRITICAL" as "Critical") need no second copy of it.
+    if (!Object.hasOwn(CODE_WORDS, head.toUpperCase()) || !isCode(head)) return escHtml(text);
     const words = plainCode(text);
-    const same = words.toLowerCase() === text.toLowerCase().replaceAll("_", " ");
-    return `<span class="code-word">${escHtml(words)}</span>${same ? "" : ` <small class="code-note">${escHtml(text)}</small>`}`;
+    if (head.includes("_")) return `<span class="code-word">${escHtml(words)}</span> <small class="code-note">${escHtml(text)}</small>`;
+    // Words that only re-case the code ("CRITICAL" as "Critical") need no title either.
+    const same = words.toLowerCase() === text.toLowerCase();
+    return `<span class="code-word"${same ? "" : ` title="Code: ${escHtml(text)}"`}>${escHtml(words)}</span>`;
   }
   const words = plainCode(text);
   return words === text ? escHtml(text) : `<span class="code-word" title="Code: ${escHtml(text)}">${escHtml(words)}</span>`;
@@ -101,13 +103,16 @@ export function plainCodeHtml(value, { small = false } = {}) {
 
 /**
  * A server sentence with codes inside it ("evidence is INSUFFICIENT_EVIDENCE and not claim-ready"): each code the table
- * names reads as its words in lower case, the code on the title; everything else, unknown codes included, is unchanged.
+ * names reads as its words in lower case with the code after them as small text, its numbers kept ("INTEGRITY_BELOW_MIN:
+ * 0.000<0.850" reads "integrity is below the minimum (0.000, minimum 0.850)"); everything else, unknown codes included,
+ * is unchanged.
  */
 export function plainCodesInTextHtml(value) {
-  return String(value ?? "").split(/\b([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+)\b/).map((part, at) => {
-    if (at % 2 === 0 || !Object.hasOwn(CODE_WORDS, part)) return escHtml(part);
-    const words = CODE_WORDS[part];
+  return String(value ?? "").split(/\b([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+(?::[\d.]+<[\d.]+)?)\b/).map((part, at) => {
+    const code = part.split(":")[0];
+    if (at % 2 === 0 || !Object.hasOwn(CODE_WORDS, code)) return escHtml(part);
+    const words = plainCode(part);
     const lower = /^[A-Z][a-z]/.test(words) ? `${words.charAt(0).toLowerCase()}${words.slice(1)}` : words;
-    return `<span class="code-word" title="Code: ${escHtml(part)}">${escHtml(lower)}</span>`;
+    return `<span class="code-word">${escHtml(lower)}</span> <small class="code-note">${escHtml(code)}</small>`;
   }).join("");
 }
