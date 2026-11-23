@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { hostname, tmpdir } from "node:os";
 import { join } from "node:path";
@@ -32,10 +32,24 @@ import { AGENT_ENV_MARKERS } from "../src/vault/operatorContext.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
 
-const hook: { beforeWrite?: () => void; afterRead?: (path: string) => void; failFinished?: boolean } = {};
-vi.mock("../src/tools/builtin/atomicWrite.js", async (orig) => {
-  const real = await orig<typeof import("../src/tools/builtin/atomicWrite.js")>();
-  return { ...real, writeFileAtomicSync: (...args: Parameters<typeof real.writeFileAtomicSync>) => { const h = hook.beforeWrite; hook.beforeWrite = undefined; h?.(); return real.writeFileAtomicSync(...args); } };
+const hook: { afterRead?: (path: string) => void; failFinished?: boolean } = {};
+/**
+ * One armed swap, run right before the next named fs call whose path matches: the moment between the last check and
+ * the system call that a separate process would have to hit. Every other call passes through.
+ */
+const step = vi.hoisted(() => ({ armed: null as null | { fn: string; match: (path: string, flags?: unknown) => boolean; run: () => void; after?: () => void }, fired: 0 }));
+vi.mock("node:fs", async (orig) => {
+  const real = await orig<typeof import("node:fs")>();
+  const at = <F extends (...args: never[]) => unknown>(fn: string, original: F): F => ((...args: Parameters<F>) => {
+    const armed = step.armed;
+    if (!(armed?.fn === fn && armed.match(String(args[0]), args[1]))) return original(...args);
+    step.armed = null; step.fired++; armed.run();
+    const result = original(...args);
+    armed.after?.();
+    return result;
+  }) as F;
+  const wrapped = { mkdirSync: at("mkdirSync", real.mkdirSync), openSync: at("openSync", real.openSync), lstatSync: at("lstatSync", real.lstatSync), renameSync: at("renameSync", real.renameSync), unlinkSync: at("unlinkSync", real.unlinkSync) };
+  return { ...real, ...wrapped, default: { ...real, ...wrapped } };
 });
 vi.mock("../src/tools/builtin/fsRegularFile.js", async (orig) => {
   const real = await orig<typeof import("../src/tools/builtin/fsRegularFile.js")>();
@@ -144,17 +158,29 @@ const deleteEvil = () => run([scripted("fs.read", { path: "workspace/output/evil
   scripted("apply_patch", { patch: "*** Begin Patch\n*** Delete File: workspace/output/evil.txt\n*** End Patch" })]);
 
 describe("B1: a folder swapped for a link after planning never sends a write or a delete outside the workspace", () => {
-  it("R2: re-creating a deleted file through a swapped folder fails and writes nothing outside", async () => {
-    // MUTATION: drop the location check in stillAsPlanned and evil.txt is created in the outside folder.
+  it("R2: a link swapped in only while a folder is entered is refused, and nothing is written outside", async () => {
+    // The swap is undone right after the chdir, so the location check that follows sees the planned folder again:
+    // only the process.cwd() check at the pin can tell that the process entered the outside folder.
+    // MUTATION: drop the process.cwd() check in pinnedDirectory.ts enter() and evil.txt is created in the outside folder.
     writeFileSync(out("evil.txt"), "ATTACKER CONTENT\n");
     const parent = await deleteEvil();
     const outside = realpathSync(mkdtempSync(join(tmpdir(), "amc-outside-")));
     const plan = planSessionRewind(workspace, parent, 1);
     expect(plan.files.map((file) => file.action)).toEqual(["recreate"]);
-    hook.beforeWrite = () => swapTo(outside);
+    const chdir = process.chdir.bind(process);
+    const output = join(workspace, "workspace", "output");
+    const spy = vi.spyOn(process, "chdir").mockImplementation((to: string) => {
+      if (to !== "./output") return chdir(to);
+      spy.mockRestore();
+      swapTo(outside);
+      chdir(to);
+      unlinkSync(output); renameSync(`${output}.real`, output);
+    });
     const outcome = executeSessionRewind(plan, { onlyClean: false });
+    spy.mockRestore();
     expect(outcome.results.map((result) => result.status)).toEqual(["failed"]);
-    expect(existsSync(join(outside, "evil.txt"))).toBe(false);
+    expect(readdirSync(outside)).toEqual([]);
+    expect(process.cwd()).toBe(workspace);
     rmSync(outside, { recursive: true, force: true });
   }, 120_000);
 
@@ -181,7 +207,7 @@ describe("B1: a folder swapped for a link after planning never sends a write or 
     swapper.kill("SIGSTOP");
     let wins = 0;
     try {
-      for (let tries = 0; tries < 150 && wins === 0; tries++) {
+      for (let tries = 0; tries < 500 && wins === 0; tries++) {
         swapper.kill("SIGCONT");
         try { executeSessionRewind(plan, { onlyClean: false }); } catch { /* a refusal is a safe outcome */ }
         swapper.kill("SIGSTOP");
@@ -192,6 +218,189 @@ describe("B1: a folder swapped for a link after planning never sends a write or 
     } finally { swapper.kill("SIGKILL"); rmSync(outside, { recursive: true, force: true }); }
     expect(wins).toBe(0);
   }, 600_000);
+});
+
+/** Every file in a folder with its bytes and permission bits, to show an outside folder gained, lost or changed nothing. */
+const snapshot = (dir: string) => readdirSync(dir).sort().map((entry) => {
+  const status = lstatSync(join(dir, entry));
+  return [entry, status.isFile() ? readFileSync(join(dir, entry), "utf8") : "not a file", status.mode & 0o7777];
+});
+const onlyFile = (plan: ReturnType<typeof planSessionRewind>, suffix: string) => ({ ...plan, files: plan.files.filter((file) => file.path.endsWith(suffix)) });
+
+describe("Pinned folder: a folder swapped for a link between the last check and each system call changes nothing outside", () => {
+  let outside: string;
+  beforeEach(() => {
+    outside = realpathSync(mkdtempSync(join(tmpdir(), "amc-outside-")));
+    writeFileSync(join(outside, "note.txt"), "outside\n", { mode: 0o644 });
+    writeFileSync(join(outside, "new.txt"), "created\n", { mode: 0o644 });
+    chmodSync(join(outside, "note.txt"), 0o644);
+  });
+  afterEach(() => { step.armed = null; step.fired = 0; rmSync(outside, { recursive: true, force: true }); });
+
+  /** Arm one swap of workspace/output (or `folder`) for a link to the outside folder, run the rewind, check outside and the working folder. */
+  /** `midway`: also compare the outside folder right after the armed call returns, before any cleanup can undo it. */
+  const swapAt = (fn: string, match: (path: string, flags?: unknown) => boolean, plan: ReturnType<typeof planSessionRewind>, folder = join(workspace, "workspace", "output"), midway = false) => {
+    const before = snapshot(outside);
+    let atCall: ReturnType<typeof snapshot> = before;
+    step.armed = { fn, match, run: () => { renameSync(folder, `${folder}.real`); symlinkSync(outside, folder); }, ...(midway ? { after: () => { atCall = snapshot(outside); } } : {}) };
+    const outcome = executeSessionRewind(plan, { onlyClean: false });
+    expect(step.fired).toBe(1);
+    expect(atCall).toEqual(before);
+    expect(snapshot(outside)).toEqual(before);
+    expect(process.cwd()).toBe(workspace);
+    return { outcome, real: `${folder}.real` };
+  };
+
+  it("mkdir: nested missing folders made through a swapped folder are made inside, never outside", async () => {
+    // MUTATION: mkdirSync(join(expected, folder)) instead of mkdirSync(name) in withPinnedDirectory and outside gains b/.
+    writeFileSync(out("evil.txt"), "ATTACKER CONTENT\n");
+    const plan = planSessionRewind(workspace, await deleteEvil(), 1);
+    const nested = { ...plan, files: [{ ...plan.files[0]!, path: "workspace/output/a/b/evil.txt" }] };
+    const { outcome, real } = swapAt("mkdirSync", (path) => path.endsWith("b"), nested, join(workspace, "workspace", "output", "a"));
+    expect(outcome.results.map((result) => result.status)).toEqual(["failed"]); // entering b no longer leads to output/a/b
+    expect(readdirSync(real)).toEqual(["b"]);
+  }, 120_000);
+
+  it("create: a re-created file lands in the folder that was checked", async () => {
+    // MUTATION: openSync(join(expected, name), ...) for the create-only write and evil.txt appears outside.
+    writeFileSync(out("evil.txt"), "ATTACKER CONTENT\n");
+    const plan = planSessionRewind(workspace, await deleteEvil(), 1);
+    const { outcome, real } = swapAt("openSync", (path, flags) => path.endsWith("evil.txt") && typeof flags === "number", plan);
+    expect(outcome.results.map((result) => result.status)).toEqual(["recreated"]);
+    expect(readFileSync(join(real, "evil.txt"), "utf8")).toBe("ATTACKER CONTENT\n");
+  }, 120_000);
+
+  it("temp create: the temp file of a restore is made and removed in the folder that was checked", async () => {
+    // MUTATION: an absolute temp path and the temp file is made in the outside folder (seen right after the open, before
+    // the commit check refuses and the cleanup removes it again).
+    const plan = onlyFile(planSessionRewind(workspace, await fourTurns(), 1), "note.txt");
+    const { outcome, real } = swapAt("openSync", (path) => path.includes(".amc-tmp-"), plan, join(workspace, "workspace", "output"), true);
+    expect(outcome.results.map((result) => result.status)).toEqual(["failed"]); // the check before the rename sees the swap
+    expect(readdirSync(real)).toEqual(["new.txt", "note.txt"]); // the temp file was removed where it was made
+    expect(readFileSync(join(real, "note.txt"), "utf8")).toBe("v2\n");
+  }, 120_000);
+
+  it("rename: a restore publishes into the folder that was checked", async () => {
+    // MUTATION: renameSync(temporary, join(expected, name)) and the outside note.txt is replaced.
+    const plan = onlyFile(planSessionRewind(workspace, await fourTurns(), 1), "note.txt");
+    const { outcome, real } = swapAt("renameSync", (path) => path.includes(".amc-tmp-"), plan);
+    expect(outcome.results.map((result) => result.status)).toEqual(["restored"]);
+    expect(readFileSync(join(real, "note.txt"), "utf8")).toBe("v0\n");
+  }, 120_000);
+
+  it("unlink: a removal deletes only inside the folder that was checked", async () => {
+    // MUTATION: unlinkSync(join(expected, name)) and the outside new.txt is deleted.
+    const plan = onlyFile(planSessionRewind(workspace, await fourTurns(), 1), "new.txt");
+    const { outcome, real } = swapAt("unlinkSync", (path) => path.endsWith("new.txt"), plan);
+    expect(outcome.results.map((result) => result.status)).toEqual(["removed"]);
+    expect(existsSync(join(real, "new.txt"))).toBe(false);
+  }, 120_000);
+
+  it("chmod: the recorded mode is set on the new file before it is published, and no outside file changes mode", async () => {
+    // MUTATION: put back the old chmodSync(planned) after the rename (here: on the absolute path) and outside note.txt becomes 0640.
+    const plan = onlyFile(planSessionRewind(workspace, await fourTurns(), 1), "note.txt");
+    const withMode = { ...plan, files: [{ ...plan.files[0]!, mode: 0o640 }] };
+    const { outcome, real } = swapAt("renameSync", (path) => path.includes(".amc-tmp-"), withMode);
+    expect(outcome.results.map((result) => result.status)).toEqual(["restored"]);
+    expect(lstatSync(join(real, "note.txt")).mode & 0o777).toBe(0o640);
+  }, 120_000);
+
+  /** After the pin, the pinned folder is moved outside and a real folder with the same file bytes is put at the planned place. */
+  const moveAt = async (suffix: string, toTurn: number) => {
+    const plan = onlyFile(planSessionRewind(workspace, await fourTurns(), toTurn), suffix);
+    const output = join(workspace, "workspace", "output"), moved = join(outside, "moved");
+    let movedBefore: ReturnType<typeof snapshot> = [], freshBefore: ReturnType<typeof snapshot> = [];
+    step.armed = { fn: "lstatSync", match: (path) => path === `./${suffix}`, run: () => {
+      renameSync(output, moved);
+      mkdirSync(output);
+      for (const entry of readdirSync(moved)) writeFileSync(join(output, entry), readFileSync(join(moved, entry)));
+      movedBefore = snapshot(moved); freshBefore = snapshot(output);
+    } };
+    const outcome = executeSessionRewind(plan, { onlyClean: false });
+    expect(step.fired).toBe(1);
+    expect(outcome.results.map((result) => result.status)).toEqual(["failed"]);
+    expect(snapshot(moved)).toEqual(movedBefore);
+    expect(snapshot(output)).toEqual(freshBefore);
+    expect(process.cwd()).toBe(workspace);
+  };
+
+  it("moved folder: a restore in a pinned folder that was moved away and replaced is refused, and neither folder changes", async () => {
+    // MUTATION: drop the device-and-inode check in applyOne's stillAsPlanned and note.txt is replaced in outside/moved.
+    await moveAt("note.txt", 1);
+  }, 120_000);
+
+  it("moved folder: a removal in a pinned folder that was moved away and replaced is refused, and neither folder changes", async () => {
+    // MUTATION: drop the device-and-inode check in applyOne's stillAsPlanned and new.txt is deleted from outside/moved.
+    await moveAt("new.txt", 1);
+  }, 120_000);
+});
+
+describe("A working folder that cannot be restored, and Windows", () => {
+  it("stops the rewind, writes the finished record, zeroes the kept copies and says files may have changed", async () => {
+    // MUTATION: rethrow ERR_AMC_PIN_RESTORE before the finished record and unfinishedRewindOf names the rewind.
+    const parent = await fourTurns();
+    const plan = planSessionRewind(workspace, parent, 1);
+    const chdir = process.chdir.bind(process);
+    let toWorkspace = 0;
+    const spy = vi.spyOn(process, "chdir").mockImplementation((to: string) => {
+      if (to === workspace && ++toWorkspace === 2) throw Object.assign(new Error("ENOENT: the folder is gone"), { code: "ENOENT" }); // the restore
+      chdir(to);
+    });
+    const fills = vi.spyOn(Buffer.prototype, "fill");
+    let caught: unknown;
+    try { executeSessionRewind(plan, { onlyClean: false }); } catch (error) { caught = error; }
+    spy.mockRestore();
+    process.chdir(workspace);
+    const zeroed = (fills.mock.contexts as Buffer[]).filter((buffer) => buffer.length === 3 && buffer.every((byte: number) => byte === 0));
+    fills.mockRestore();
+    expect((caught as { code?: string }).code).toBe("INTERRUPTED");
+    expect((caught as Error).message).toContain("Some files may already have been changed");
+    expect((caught as Error).message).toContain("Run the same rewind again");
+    expect(readFileSync(out("note.txt"), "utf8")).toBe("v0\n"); // changed before the restore failed
+    expect(existsSync(out("new.txt"))).toBe(true); // not reached
+    expect(unfinishedRewindOf(workspace, parent)).toBe(null); // the finished record was written
+    expect(zeroed.length).toBe(1); // the kept copy "v0\n"
+  }, 120_000);
+
+  it("on Windows the rewind is refused before anything is recorded or asked", async () => {
+    // MUTATION: drop assertRewindCanRun in the command and the confirmation question is asked and the files change.
+    const parent = await fourTurns();
+    expect(() => executeSessionRewind(planSessionRewind(workspace, parent, 1), { onlyClean: false, platform: "win32" })).toThrow(/cannot rewind files here \(a folder cannot be pinned on Windows\)/);
+    expect(unfinishedRewindOf(workspace, parent)).toBe(null);
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => { errors.push(String(line)); });
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const tty = Object.getOwnPropertyDescriptor(process.stdin, "isTTY");
+    Object.defineProperty(process.stdin, "isTTY", { configurable: true, value: true });
+    let asked = 0;
+    try {
+      const program = new Command().exitOverride();
+      registerSessionRewindCommand(program.command("session"), () => { asked++; return Promise.resolve("rewind"); }, "win32");
+      for (const marker of AGENT_ENV_MARKERS) vi.stubEnv(marker, "");
+      await program.parseAsync(["session", "rewind", parent, "--to-turn", "1"], { from: "user" });
+    } finally {
+      if (tty) Object.defineProperty(process.stdin, "isTTY", tty); else Reflect.deleteProperty(process.stdin, "isTTY");
+      process.exitCode = undefined;
+      vi.restoreAllMocks();
+    }
+    expect(errors.join("\n")).toContain("cannot rewind files here");
+    expect(asked).toBe(0);
+    expect(readFileSync(out("note.txt"), "utf8")).toBe("v2\n");
+  }, 120_000);
+});
+
+describe("A file name with a backslash (a plain character on macOS and Linux)", () => {
+  it("is put back and removed by a rewind, inside the workspace", async () => {
+    // MUTATION: refuse "\\" in pinnedDirectory.ts own() and both results are "failed".
+    writeFileSync(out("a\\b.txt"), "v0\n");
+    const edited = await run([scripted("fs.read", { path: "workspace/output/a\\b.txt" }), scripted("fs.write", { path: "workspace/output/a\\b.txt", content: "v1\n" })]);
+    expect(executeSessionRewind(planSessionRewind(workspace, edited, 1), { onlyClean: false }).results.map((result) => result.status)).toEqual(["restored"]);
+    expect(readFileSync(out("a\\b.txt"), "utf8")).toBe("v0\n");
+    const created = await run([scripted("fs.write", { path: "workspace/output/c\\d.txt", content: "created\n" }), scripted("fs.read", { path: "workspace/output/note.txt" })]);
+    expect(executeSessionRewind(planSessionRewind(workspace, created, 0), { onlyClean: false }).results.map((result) => result.status)).toEqual(["removed"]);
+    expect(readdirSync(join(workspace, "workspace", "output")).sort()).toEqual(["a\\b.txt", "note.txt"]);
+    expect(process.cwd()).toBe(workspace);
+  }, 120_000);
 });
 
 describe("H1: each safety rule has a test", () => {
