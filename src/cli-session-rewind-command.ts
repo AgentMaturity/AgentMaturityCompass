@@ -27,7 +27,8 @@ const short = (digest: string | null): string => digest === null ? "(no file)" :
 const DONE_WORDS = { restored: "put back", recreated: "re-created", removed: "removed", already: "already back" } as const;
 const ACTION_WORDS = { restore: "put back", recreate: "re-create (the session deleted it)", remove: "remove (the session created it)", already: "already back" } as const;
 
-export function registerSessionRewindCommand(session: Command, readLine?: (prompt: string) => Promise<string | null>): void {
+/** `platform` is for tests (the Windows refusal). */
+export function registerSessionRewindCommand(session: Command, readLine?: (prompt: string) => Promise<string | null>, platform?: NodeJS.Platform): void {
   session
     .command("rewind")
     .description("Put back the files a session's file tools changed after a turn, then continue from that turn as a new session")
@@ -38,7 +39,7 @@ export function registerSessionRewindCommand(session: Command, readLine?: (promp
     .option("--json", "Output as JSON")
     .action(async (id: string, opts: RewindOptions) => {
       const { planSessionRewind, REWIND_CONFLICT_WORDS, SessionRewindRefused } = await import("./session/sessionRewind.js");
-      const { executeSessionRewind, RECREATED_DEFAULT_MODE } = await import("./session/sessionRewindApply.js");
+      const { assertRewindCanRun, executeSessionRewind, RECREATED_DEFAULT_MODE } = await import("./session/sessionRewindApply.js");
       const { unfinishedRewindOf } = await import("./session/sessionRewindEvidence.js");
       const { interactiveOperator, operatorRefusalText } = await import("./vault/operatorContext.js");
       const say = (line: string) => { if (!opts.json) console.log(escapeTerminalControls(line)); };
@@ -47,6 +48,7 @@ export function registerSessionRewindCommand(session: Command, readLine?: (promp
         if (!opts.dryRun) {
           const operator = interactiveOperator({ workspace: process.cwd() });
           if (!operator.ok) throw new SessionRewindRefused("PERSON", `A rewind changes files, so a person at an interactive terminal runs it, and ${operatorRefusalText(operator)}. Nothing was changed. --dry-run shows the plan.`);
+          assertRewindCanRun(platform); // before planning and the confirmation question, not after the person typed it
         }
         const plan = planSessionRewind(process.cwd(), id, Number(opts.toTurn), unfinishedRewindOf(process.cwd(), id));
         say(`${opts.dryRun ? "Rewind plan" : "Rewind"} for session ${id}: keep turns up to ${plan.toTurn}.`);
@@ -72,7 +74,7 @@ export function registerSessionRewindCommand(session: Command, readLine?: (promp
         const read = readLine ?? (await import("./setup/codingAdoption.js")).readTypedLine;
         const answer = await read(`Type ${CONFIRM_WORD} to change these files, anything else changes nothing: `);
         if (answer?.trim() !== CONFIRM_WORD) throw new SessionRewindRefused("CONFIRM", "Not confirmed. Nothing was changed.");
-        const outcome = executeSessionRewind(plan, { onlyClean: opts.onlyClean === true });
+        const outcome = executeSessionRewind(plan, { onlyClean: opts.onlyClean === true, ...(platform === undefined ? {} : { platform }) });
         for (const result of outcome.results) {
           say(`  ${result.status === "failed" ? chalk.red("not changed (its place or content changed while the rewind ran)") : DONE_WORDS[result.status]}  ${result.path}`
             + (result.modeDefaulted ? `  (permissions ${RECREATED_DEFAULT_MODE.toString(8)})` : ""));

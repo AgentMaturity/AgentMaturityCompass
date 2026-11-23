@@ -1,8 +1,9 @@
 /**
  * Act on the files of one folder so that swapping any folder on its path afterwards (a folder replaced by a link, by
  * another process) cannot redirect the act. Node has no openat, so the process working directory is the folder
- * handle: each folder is entered from the one before by a relative name, and the first process.cwd() after each chdir
- * (Node caches it until the next chdir) must be the expected path. getcwd reports the real location of the folder the
+ * handle: the root is entered and checked by identity (device and inode), then each folder is entered from the one
+ * before by a relative name, and the first process.cwd() after each chdir (Node caches it until the next chdir) must be
+ * the root as the process itself reports it, joined with the folder names. getcwd reports the real location of the folder the
  * process is in, never a link, so a link swapped in on the way is refused. From then on every system call names the
  * file relative to ".", with no slash, so it resolves in the folder already entered, whatever its path leads to now.
  * The pin holds the folder that was at the expected place when it was checked: if that folder itself is moved later,
@@ -13,11 +14,11 @@
  * fs calls already queued on the libuv thread pool resolve their relative paths when they run. So this is only for
  * short synchronous sections in a process with no concurrent relative-path work; do anything slow before pinning.
  * Pinning refuses in a worker thread (process.chdir is not available there) and on Windows, where neither what
- * process.cwd() reports after entering through a link nor O_NOFOLLOW has been checked. The
- * previous working directory is restored after the act, also when it throws.
+ * process.cwd() reports after entering through a link nor O_NOFOLLOW has been checked, so rewind does not run there.
+ * The previous working directory is restored after the act, also when it throws, and checked to be the same again.
  */
 import { randomUUID } from "node:crypto";
-import { accessSync, closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { accessSync, closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, renameSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { isMainThread } from "node:worker_threads";
 
@@ -34,10 +35,10 @@ export interface PinnedDirectory {
   remove(name: string, beforeCommit: () => void): void;
 }
 
-/** Why a folder cannot be pinned in this process, or null when it can. */
-export function pinnedDirectoryRefusal(): string | null {
-  if (!isMainThread) return "a folder cannot be pinned from a worker thread";
-  if (process.platform === "win32") return "a folder cannot be pinned on Windows";
+/** Why a folder cannot be pinned in this process, or null when it can. The parameters are for tests. */
+export function pinnedDirectoryRefusal(platform: NodeJS.Platform = process.platform, mainThread: boolean = isMainThread): string | null {
+  if (!mainThread) return "a folder cannot be pinned from a worker thread";
+  if (platform === "win32") return "a folder cannot be pinned on Windows";
   return null;
 }
 
@@ -47,13 +48,25 @@ function own(name: string): string {
   return `./${name}`;
 }
 
+/**
+ * Enter the root and return how the process reports it. Checked by identity, not spelling: realpath can keep a
+ * spelling (/System/Volumes/Data/private/tmp/...) that getcwd reports differently (/private/tmp/...).
+ */
+function enterRoot(root: string): string {
+  const expected = statSync(root);
+  process.chdir(root);
+  const here = statSync(".");
+  if (!here.isDirectory() || here.dev !== expected.dev || here.ino !== expected.ino) throw new Error(`the folder ${root} changed location; nothing was changed there`);
+  return process.cwd();
+}
+
 function enter(to: string, expected: string): void {
   process.chdir(to);
   if (process.cwd() !== expected) throw new Error(`the folder ${expected} changed location; nothing was changed there`);
 }
 
 /**
- * Pin `root` (a real path with no link), then each of `folders` below it in turn (made when missing and `create` is
+ * Pin `root` (the workspace root, trusted as given: a link in its own path is followed once, on entry), then each of `folders` below it in turn (made when missing and `create` is
  * set), and run `act` there. The working directory is the caller's again when this returns or throws; a restore that
  * fails throws an error with code ERR_AMC_PIN_RESTORE, which a caller must not treat as one failed file.
  */
@@ -64,8 +77,7 @@ export function withPinnedDirectory<T>(root: string, folders: readonly string[],
   // Restored after both outcomes; a restore failure wins over the act's own error (the process is in the wrong folder).
   let outcome: { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: unknown };
   try {
-    enter(root, root);
-    let expected = root;
+    let expected = enterRoot(root);
     for (const folder of folders) {
       const name = own(folder);
       expected = join(expected, folder);
@@ -74,8 +86,10 @@ export function withPinnedDirectory<T>(root: string, folders: readonly string[],
     }
     outcome = { ok: true, value: act({ write, remove }) };
   } catch (error) { outcome = { ok: false, error }; }
-  try { process.chdir(previous); }
-  catch (error) { throw Object.assign(new Error(`the working folder ${previous} could not be restored (${error instanceof Error ? error.message : String(error)})`), { code: "ERR_AMC_PIN_RESTORE" }); }
+  let lost: string | null = null;
+  try { process.chdir(previous); if (process.cwd() !== previous) lost = `it now leads to ${process.cwd()}`; }
+  catch (error) { lost = error instanceof Error ? error.message : String(error); }
+  if (lost !== null) throw Object.assign(new Error(`the working folder ${previous} could not be restored (${lost})`), { code: "ERR_AMC_PIN_RESTORE" });
   if (!outcome.ok) throw outcome.error;
   return outcome.value;
 }

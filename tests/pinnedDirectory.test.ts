@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Worker } from "node:worker_threads";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { withPinnedDirectory } from "../src/tools/builtin/pinnedDirectory.js";
+import { pinnedDirectoryRefusal, withPinnedDirectory } from "../src/tools/builtin/pinnedDirectory.js";
 
 let root: string;
 const originalCwd = process.cwd();
@@ -104,6 +104,35 @@ describe("withPinnedDirectory", () => {
     let caught: unknown;
     try { withPinnedDirectory(root, [], false, () => undefined); } catch (error) { caught = error; }
     expect((caught as NodeJS.ErrnoException).code).toBe("ERR_AMC_PIN_RESTORE");
+  });
+
+  it("a working folder that leads somewhere else when restored is reported with its own code", () => {
+    const start = join(root, "start");
+    mkdirSync(start);
+    process.chdir(start);
+    expect(process.cwd()).toBe(start);
+    renameSync(start, join(root, "elsewhere"));
+    symlinkSync(join(root, "elsewhere"), start);
+    let caught: unknown;
+    try { withPinnedDirectory(root, [], false, () => undefined); } catch (error) { caught = error; }
+    expect((caught as NodeJS.ErrnoException).code).toBe("ERR_AMC_PIN_RESTORE");
+    expect((caught as Error).message).toContain(`now leads to ${join(root, "elsewhere")}`);
+  });
+
+  it("accepts a root spelled differently from how the process reports it (checked by identity), and writes in it", () => {
+    const alias = join(realpathSync.native(mkdtempSync(join(tmpdir(), "amc-pinned-alias-"))), "root");
+    try {
+      symlinkSync(root, alias);
+      withPinnedDirectory(alias, ["x"], true, (dir) => dir.write("f.txt", Buffer.from("in root\n"), { createOnly: true, beforeCommit: noCheck }));
+      expect(readFileSync(join(root, "x", "f.txt"), "utf8")).toBe("in root\n");
+    } finally { rmSync(join(alias, ".."), { recursive: true, force: true }); }
+  });
+
+  it("names why a folder cannot be pinned: a worker thread, or Windows", () => {
+    expect(pinnedDirectoryRefusal("linux", true)).toBe(null);
+    expect(pinnedDirectoryRefusal("darwin", true)).toBe(null);
+    expect(pinnedDirectoryRefusal("win32", true)).toBe("a folder cannot be pinned on Windows");
+    expect(pinnedDirectoryRefusal("darwin", false)).toBe("a folder cannot be pinned from a worker thread");
   });
 
   it("refuses inside a worker thread, with the reason, and writes nothing", async () => {

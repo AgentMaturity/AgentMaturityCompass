@@ -80,7 +80,7 @@ export interface RewindPlan {
 }
 
 export class SessionRewindRefused extends Error {
-  constructor(readonly code: "NOT_FOUND" | "TURN" | "FORK" | "LIVE_WRITER" | "CONFLICTS" | "PRE_IMAGE" | "PERSON" | "UNREADABLE" | "CONFIRM", message: string) {
+  constructor(readonly code: "NOT_FOUND" | "TURN" | "FORK" | "LIVE_WRITER" | "CONFLICTS" | "PRE_IMAGE" | "PERSON" | "UNREADABLE" | "CONFIRM" | "PLATFORM" | "INTERRUPTED", message: string) {
     super(message); this.name = "SessionRewindRefused";
   }
 }
