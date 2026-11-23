@@ -55,13 +55,27 @@ function openSessions(dir: string): number {
 
 const others = { gatewayPort: 0, proxyPort: 0, dashboardPort: 0, metricsPort: 0 };
 
+type Runtime = Awaited<ReturnType<typeof runStudioForeground>>;
+
+// The signed port has to be chosen before Studio binds it, so a parallel test can take it in between. Sign a
+// fresh port and start again when that happens; any other start error is the test's to report.
+async function startOnSignedPort(dir: string, env: Record<string, string>): Promise<{ runtime: Runtime; lanPort: number }> {
+  for (let attempt = 1; ; attempt += 1) {
+    const lanPort = await freePort();
+    enableLanMode({ workspace: dir, bind: "127.0.0.1", port: lanPort, allowedCIDRs: ["10.9.0.0/16"] });
+    try {
+      return { runtime: await runStudioForeground({ workspace: dir, env, trustedProxyHops: 1, ...others }), lanPort };
+    } catch (error) {
+      if (attempt >= 5 || !/is already in use/.test(String(error))) throw error;
+    }
+  }
+}
+
 describe("signed LAN allow list", () => {
   test("applies with the variables unset, binds the signed port, and always admits loopback", async () => {
     const dir = workspace();
-    const lanPort = await freePort();
-    enableLanMode({ workspace: dir, bind: "127.0.0.1", port: lanPort, allowedCIDRs: ["10.9.0.0/16"] });
     // The loopback test client plays the reverse proxy, so it is named as one (SR-1).
-    const runtime = await runStudioForeground({ workspace: dir, env: { AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" }, trustedProxyHops: 1, ...others });
+    const { runtime, lanPort } = await startOnSignedPort(dir, { AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" });
     try {
       expect(runtime.state.apiPort, "the signed port is bound").toBe(lanPort);
       expect(await status(lanPort), "loopback is admitted although the signed list omits it").toBe(200);
@@ -74,8 +88,7 @@ describe("signed LAN allow list", () => {
 
   test("a set AMC_ALLOWED_CIDRS replaces the signed list", async () => {
     const dir = workspace();
-    enableLanMode({ workspace: dir, bind: "127.0.0.1", port: await freePort(), allowedCIDRs: ["10.9.0.0/16"] });
-    const runtime = await runStudioForeground({ workspace: dir, env: { AMC_ALLOWED_CIDRS: "192.0.2.0/24", AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" }, trustedProxyHops: 1, ...others });
+    const { runtime } = await startOnSignedPort(dir, { AMC_ALLOWED_CIDRS: "192.0.2.0/24", AMC_TRUSTED_PROXY_CIDRS: "127.0.0.1/32" });
     try {
       expect(await status(runtime.state.apiPort, { "x-forwarded-for": "10.9.1.2" })).toBe(403);
       expect(await status(runtime.state.apiPort, { "x-forwarded-for": "192.0.2.9" })).toBe(200);
