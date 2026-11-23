@@ -155,7 +155,9 @@ const deleteEvil = () => run([scripted("fs.read", { path: "workspace/output/evil
   scripted("apply_patch", { patch: "*** Begin Patch\n*** Delete File: workspace/output/evil.txt\n*** End Patch" })]);
 
 describe("B1: a folder swapped for a link after planning never sends a write or a delete outside the workspace", () => {
-  it("R2: a folder swapped for a link right before it is entered is refused, and nothing is written outside", async () => {
+  it("R2: a link swapped in only while a folder is entered is refused, and nothing is written outside", async () => {
+    // The swap is undone right after the chdir, so the location check that follows sees the planned folder again:
+    // only the process.cwd() check at the pin can tell that the process entered the outside folder.
     // MUTATION: drop the process.cwd() check in pinnedDirectory.ts enter() and evil.txt is created in the outside folder.
     writeFileSync(out("evil.txt"), "ATTACKER CONTENT\n");
     const parent = await deleteEvil();
@@ -163,11 +165,18 @@ describe("B1: a folder swapped for a link after planning never sends a write or 
     const plan = planSessionRewind(workspace, parent, 1);
     expect(plan.files.map((file) => file.action)).toEqual(["recreate"]);
     const chdir = process.chdir.bind(process);
-    const spy = vi.spyOn(process, "chdir").mockImplementation((to: string) => { if (to === "./output") { spy.mockRestore(); swapTo(outside); } chdir(to); });
+    const output = join(workspace, "workspace", "output");
+    const spy = vi.spyOn(process, "chdir").mockImplementation((to: string) => {
+      if (to !== "./output") return chdir(to);
+      spy.mockRestore();
+      swapTo(outside);
+      chdir(to);
+      unlinkSync(output); renameSync(`${output}.real`, output);
+    });
     const outcome = executeSessionRewind(plan, { onlyClean: false });
     spy.mockRestore();
     expect(outcome.results.map((result) => result.status)).toEqual(["failed"]);
-    expect(existsSync(join(outside, "evil.txt"))).toBe(false);
+    expect(readdirSync(outside)).toEqual([]);
     expect(process.cwd()).toBe(workspace);
     rmSync(outside, { recursive: true, force: true });
   }, 120_000);
@@ -209,7 +218,10 @@ describe("B1: a folder swapped for a link after planning never sends a write or 
 });
 
 /** Every file in a folder with its bytes and permission bits, to show an outside folder gained, lost or changed nothing. */
-const snapshot = (dir: string) => readdirSync(dir).sort().map((entry) => [entry, readFileSync(join(dir, entry), "utf8"), lstatSync(join(dir, entry)).mode & 0o7777]);
+const snapshot = (dir: string) => readdirSync(dir).sort().map((entry) => {
+  const status = lstatSync(join(dir, entry));
+  return [entry, status.isFile() ? readFileSync(join(dir, entry), "utf8") : "not a file", status.mode & 0o7777];
+});
 const onlyFile = (plan: ReturnType<typeof planSessionRewind>, suffix: string) => ({ ...plan, files: plan.files.filter((file) => file.path.endsWith(suffix)) });
 
 describe("Pinned folder: a folder swapped for a link between the last check and each system call changes nothing outside", () => {

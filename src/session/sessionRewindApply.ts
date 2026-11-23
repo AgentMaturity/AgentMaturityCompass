@@ -98,7 +98,7 @@ export function executeSessionRewind(plan: RewindPlan, options: { readonly onlyC
     throw new SessionRewindRefused("CONFLICTS", `${plan.conflicts.length} file(s) cannot be put back safely, so nothing was written. Add --only-clean to put back only the others.`);
   }
   const refusal = pinnedDirectoryRefusal();
-  if (refusal !== null) throw new SessionRewindRefused("PERSON", `A rewind runs in the person's own terminal process, and ${refusal}. Nothing was changed.`);
+  if (refusal !== null) throw new SessionRewindRefused("PERSON", `This rewind cannot check its folders safely here (${refusal}), so nothing was changed. --dry-run still shows the plan.`);
   const root = realpathSync.native(resolve(workspace));
   const kept = readKept(workspace, plan);
   const intended = appendOpsAuditEvent({ workspace, auditType: REWIND_INTENDED_AUDIT, subjectId: plan.sessionId, payload: {
