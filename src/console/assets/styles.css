@@ -312,6 +312,8 @@ nav .nav-section {
 @media (max-width: 560px) {
   .more-panel a .nav-desc { display: none; }
   .more-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  nav .more-panel a { flex-wrap: nowrap; gap: 0 8px; min-height: 44px; padding: 8px 10px; }
+  nav .more-panel a .nav-label { min-width: 0; overflow-wrap: anywhere; }
 }
 
 .more-panel a.filtered-out {

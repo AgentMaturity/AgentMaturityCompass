@@ -78,6 +78,9 @@ export function plainCode(value) {
   return detail ? `${words} (${detail})` : words;
 }
 
+/** True when the words only re-case the code, underscores read as spaces. */
+const sameWords = (words, code) => words.toLowerCase() === String(code).toLowerCase().replaceAll("_", " ");
+
 const escHtml = (part) => String(part).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
 /**
@@ -92,9 +95,9 @@ export function plainCodeHtml(value, { small = false } = {}) {
   if (small) {
     if (!Object.hasOwn(CODE_WORDS, head.toUpperCase()) || !isCode(head)) return escHtml(text);
     const words = plainCode(text);
-    if (head.includes("_")) return `<span class="code-word">${escHtml(words)}</span> <small class="code-note">${escHtml(text)}</small>`;
-    // Words that only re-case the code ("CRITICAL" as "Critical") need no title either.
-    const same = words.toLowerCase() === text.toLowerCase();
+    // Words that only re-case the code ("CRITICAL" as "Critical", "NIST_AI_RMF" as "NIST AI RMF") need no second copy.
+    const same = sameWords(words, text);
+    if (head.includes("_") && !same) return `<span class="code-word">${escHtml(words)}</span> <small class="code-note">${escHtml(text)}</small>`;
     return `<span class="code-word"${same ? "" : ` title="Code: ${escHtml(text)}"`}>${escHtml(words)}</span>`;
   }
   const words = plainCode(text);
@@ -113,6 +116,6 @@ export function plainCodesInTextHtml(value) {
     if (at % 2 === 0 || !Object.hasOwn(CODE_WORDS, code)) return escHtml(part);
     const words = plainCode(part);
     const lower = /^[A-Z][a-z]/.test(words) ? `${words.charAt(0).toLowerCase()}${words.slice(1)}` : words;
-    return `<span class="code-word">${escHtml(lower)}</span> <small class="code-note">${escHtml(code)}</small>`;
+    return `<span class="code-word">${escHtml(lower)}</span>${sameWords(CODE_WORDS[code], code) ? "" : ` <small class="code-note">${escHtml(code)}</small>`}`;
   }).join("");
 }

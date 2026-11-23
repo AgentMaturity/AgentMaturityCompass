@@ -99,7 +99,9 @@ describe("code words shown as values read as words, with the code kept on the ti
     expect(plainCodeHtml("UNKNOWN", { small: true })).toBe('<span class="code-word" title="Code: UNKNOWN">Not known</span>');
     expect(plainCodeHtml("CRITICAL", { small: true })).toBe('<span class="code-word">Critical</span>');
     // A table entry that starts with a name keeps its capitals inside a sentence.
-    expect(plainCodesInTextHtml("mapped to NIST_AI_RMF")).toContain(">NIST AI RMF<");
+    expect(plainCodesInTextHtml("mapped to NIST_AI_RMF")).toBe('mapped to <span class="code-word">NIST AI RMF</span>');
+    // Underscore codes whose words only re-case them carry no second copy either.
+    expect(plainCodeHtml("NOT_INSTALLED", { small: true })).toBe('<span class="code-word">Not installed</span>');
     expect(readFileSync("src/console/assets/styles.css", "utf8")).toMatch(/\.code-note \{[^}]*color: var\(--muted\)/);
   });
 
