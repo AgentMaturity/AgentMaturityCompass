@@ -12,8 +12,8 @@
  * in the process resolves against it: worker threads share it (they cannot chdir, but they read it), and asynchronous
  * fs calls already queued on the libuv thread pool resolve their relative paths when they run. So this is only for
  * short synchronous sections in a process with no concurrent relative-path work; do anything slow before pinning.
- * Pinning refuses in a worker thread (process.chdir is not available there) and on Windows, where the working
- * directory keeps the spelling it was entered by rather than the real place, and O_NOFOLLOW does not exist. The
+ * Pinning refuses in a worker thread (process.chdir is not available there) and on Windows, where neither what
+ * process.cwd() reports after entering through a link nor O_NOFOLLOW has been checked. The
  * previous working directory is restored after the act, also when it throws.
  */
 import { randomUUID } from "node:crypto";

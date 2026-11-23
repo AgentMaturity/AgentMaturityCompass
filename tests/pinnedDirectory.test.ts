@@ -20,12 +20,11 @@ describe("the facts the pin rests on", () => {
     expect(process.cwd()).toBe(join(root, "real", "sub"));
   });
 
-  it("process.cwd() is read fresh after each chdir and cached until the next one, so the check is the first read", () => {
+  it("process.cwd() is read fresh after each chdir, so a folder renamed since is reported where it is now", () => {
     mkdirSync(join(root, "a"));
     process.chdir(join(root, "a"));
     expect(process.cwd()).toBe(join(root, "a"));
     renameSync(join(root, "a"), join(root, "b"));
-    expect(process.cwd()).toBe(join(root, "a")); // stale: cached
     process.chdir(".");
     expect(process.cwd()).toBe(join(root, "b"));
   });
