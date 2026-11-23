@@ -9,17 +9,19 @@
  * Location, checked like the file tools check theirs (fsWritePrimitives.ts stillAsPlanned, here with the stricter
  * link-free resolution): right before every write and every removal, the path must still resolve, with no link on the
  * way, to the location planned, and the file must hold the bytes planned. A removal unlinks only a regular file there.
- * The write is the file tools' own primitive (writeFileAtomicSync: a temp file in the same folder, then a rename;
- * create-only for a file that does not exist). The residual is the one the file tools state for themselves: portable
- * Node has no compare-and-swap against another process, which can still race the final check and the rename or unlink.
+ * The act itself runs in a pinned folder (../tools/builtin/pinnedDirectory.ts): the folder that receives the write or
+ * the removal is entered and checked first, and the temp file, the create, the rename and the unlink then name the file
+ * relative to it, so a folder on the path swapped for a link after the check cannot send the act outside the workspace.
+ * A replace is a temp file in the same folder, then a rename; a re-created file is create-only; the recorded mode is
+ * set on the new inode before it is published. Kept copies are read and checked before anything is pinned.
  */
-import { chmodSync, lstatSync, mkdirSync, unlinkSync } from "node:fs";
+import { realpathSync } from "node:fs";
 import { hostname, userInfo } from "node:os";
-import { dirname } from "node:path";
+import { relative, resolve, sep } from "node:path";
 import { appendOpsAuditEvent } from "../ops/audit.js";
-import { writeFileAtomicSync } from "../tools/builtin/atomicWrite.js";
 import { CHECKPOINT_SALT_BYTES } from "../tools/builtin/fileCheckpoint.js";
 import { readRegularFile } from "../tools/builtin/fsRegularFile.js";
+import { pinnedDirectoryRefusal, withPinnedDirectory } from "../tools/builtin/pinnedDirectory.js";
 import { insideWorkspaceNoLinks } from "../tools/builtin/workspacePath.js";
 import { sha256Hex } from "../utils/hash.js";
 import { loadSessionEventHistory } from "./sessionEventHistory.js";
@@ -66,31 +68,27 @@ function measured(full: string, salt: Buffer | null): string | null {
   catch { return null; }
 }
 
-/** Put one file back. Throws when its location or bytes are not what was planned. */
-function applyOne(workspace: string, file: RewindFile, kept: Kept | null): { status: Exclude<Status, "failed">; modeDefaulted: boolean } {
-  const planned = insideWorkspaceNoLinks(workspace, file.path).full;
-  // The commit-time check: the same link-free location, holding the planned bytes.
-  // The place is checked last, after reading the bytes, so nothing between the check and the write or unlink reads the disk.
-  const stillAsPlanned = () => {
-    if (currentDigest(planned) !== file.fromSha256) throw new Error("the file changed while the rewind ran");
-    if (insideWorkspaceNoLinks(workspace, file.path).full !== planned) throw new Error("the path changed location while the rewind ran");
-  };
+/** Put one file back. Throws when its location or bytes are not what was planned. `root` is the workspace's real path. */
+function applyOne(root: string, file: RewindFile, kept: Kept | null): { status: Exclude<Status, "failed">; modeDefaulted: boolean } {
   if (file.action === "already") return { status: "already", modeDefaulted: false };
-  if (file.action === "remove") {
-    if (!lstatSync(planned).isFile()) throw new Error("not a regular file");
-    stillAsPlanned();
-    unlinkSync(planned);
-    return { status: "removed", modeDefaulted: false };
-  }
-  const recreate = file.action === "recreate";
-  stillAsPlanned();
-  mkdirSync(dirname(planned), { recursive: true });
-  const mode = file.mode ?? (recreate ? RECREATED_DEFAULT_MODE : undefined);
-  writeFileAtomicSync(planned, kept!.content, { createOnly: recreate, ...(recreate && mode !== undefined ? { mode } : {}), beforeCommit: stillAsPlanned });
-  if (!recreate && file.mode !== null && (lstatSync(planned).mode & 0o7777) !== file.mode) {
-    if (insideWorkspaceNoLinks(workspace, file.path).full === planned) chmodSync(planned, file.mode);
-  }
-  return { status: recreate ? "recreated" : "restored", modeDefaulted: recreate && file.mode === null };
+  const planned = insideWorkspaceNoLinks(root, file.path).full;
+  const folders = relative(root, planned).split(sep);
+  const name = folders.pop()!;
+  // The commit-time check: the same link-free location, holding the planned bytes (read at `at`).
+  // The place is checked last, after reading the bytes, so nothing between the check and the write or unlink reads the disk.
+  const stillAsPlanned = (at: string) => () => {
+    if (currentDigest(at) !== file.fromSha256) throw new Error("the file changed while the rewind ran");
+    if (insideWorkspaceNoLinks(root, file.path).full !== planned) throw new Error("the path changed location while the rewind ran");
+  };
+  stillAsPlanned(planned)(); // a changed file or place refuses before any folder is made
+  return withPinnedDirectory(root, folders, file.action !== "remove", (dir) => {
+    const here = stillAsPlanned(`./${name}`);
+    if (file.action === "remove") { dir.remove(name, here); return { status: "removed" as const, modeDefaulted: false }; }
+    const recreate = file.action === "recreate";
+    const mode = file.mode ?? (recreate ? RECREATED_DEFAULT_MODE : undefined);
+    dir.write(name, kept!.content, { createOnly: recreate, ...(mode === undefined ? {} : { mode }), beforeCommit: here });
+    return { status: recreate ? "recreated" as const : "restored" as const, modeDefaulted: recreate && file.mode === null };
+  });
 }
 
 /** Apply a plan the person confirmed. */
@@ -99,6 +97,9 @@ export function executeSessionRewind(plan: RewindPlan, options: { readonly onlyC
   if (plan.conflicts.length > 0 && !options.onlyClean) {
     throw new SessionRewindRefused("CONFLICTS", `${plan.conflicts.length} file(s) cannot be put back safely, so nothing was written. Add --only-clean to put back only the others.`);
   }
+  const refusal = pinnedDirectoryRefusal();
+  if (refusal !== null) throw new SessionRewindRefused("PERSON", `A rewind runs in the person's own terminal process, and ${refusal}. Nothing was changed.`);
+  const root = realpathSync.native(resolve(workspace));
   const kept = readKept(workspace, plan);
   const intended = appendOpsAuditEvent({ workspace, auditType: REWIND_INTENDED_AUDIT, subjectId: plan.sessionId, payload: {
     v: 2, sessionId: plan.sessionId, toTurn: plan.toTurn, parentHeadEventHash: plan.parentHeadEventHash, by: rewindActor(), onlyClean: options.onlyClean,
@@ -106,8 +107,11 @@ export function executeSessionRewind(plan: RewindPlan, options: { readonly onlyC
     ...(plan.unfinishedIntendedEventId === null ? {} : { resumes: plan.unfinishedIntendedEventId }),
     files: plan.files.map((file) => ({ checkpointEventId: file.checkpointEventId, commitmentEventId: file.commitmentEventId, action: file.action })) } });
   const results = plan.files.map((file, index) => {
-    try { return { path: file.path, ...applyOne(workspace, file, kept[index] ?? null) }; }
-    catch { return { path: file.path, status: "failed" as const, modeDefaulted: false }; }
+    try { return { path: file.path, ...applyOne(root, file, kept[index] ?? null) }; }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ERR_AMC_PIN_RESTORE") throw error; // not one failed file: the process is in the wrong folder
+      return { path: file.path, status: "failed" as const, modeDefaulted: false };
+    }
   });
   const outcomes = results.map((result, index) => {
     const file = plan.files[index]!;
