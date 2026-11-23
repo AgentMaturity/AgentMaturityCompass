@@ -14,7 +14,7 @@
  * short synchronous sections in a process with no concurrent relative-path work; do anything slow before pinning.
  * Pinning refuses in a worker thread (process.chdir is not available there) and on Windows, where the working
  * directory keeps the spelling it was entered by rather than the real place, and O_NOFOLLOW does not exist. The
- * previous working directory is restored in `finally`, also when the act throws.
+ * previous working directory is restored after the act, also when it throws.
  */
 import { randomUUID } from "node:crypto";
 import { accessSync, closeSync, constants, fchmodSync, fstatSync, fsyncSync, lstatSync, mkdirSync, openSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
@@ -61,6 +61,8 @@ export function withPinnedDirectory<T>(root: string, folders: readonly string[],
   const refusal = pinnedDirectoryRefusal();
   if (refusal !== null) throw new Error(`${refusal}; nothing was changed`);
   const previous = process.cwd();
+  // Restored after both outcomes; a restore failure wins over the act's own error (the process is in the wrong folder).
+  let outcome: { readonly ok: true; readonly value: T } | { readonly ok: false; readonly error: unknown };
   try {
     enter(root, root);
     let expected = root;
@@ -70,11 +72,12 @@ export function withPinnedDirectory<T>(root: string, folders: readonly string[],
       if (create && lstatSync(name, { throwIfNoEntry: false }) === undefined) mkdirSync(name);
       enter(name, expected);
     }
-    return act({ write, remove });
-  } finally {
-    try { process.chdir(previous); }
-    catch (error) { throw Object.assign(new Error(`the working folder ${previous} could not be restored (${error instanceof Error ? error.message : String(error)})`), { code: "ERR_AMC_PIN_RESTORE" }); }
-  }
+    outcome = { ok: true, value: act({ write, remove }) };
+  } catch (error) { outcome = { ok: false, error }; }
+  try { process.chdir(previous); }
+  catch (error) { throw Object.assign(new Error(`the working folder ${previous} could not be restored (${error instanceof Error ? error.message : String(error)})`), { code: "ERR_AMC_PIN_RESTORE" }); }
+  if (!outcome.ok) throw outcome.error;
+  return outcome.value;
 }
 
 /** Set the mode, write all bytes and flush them, on a descriptor this module opened. */
